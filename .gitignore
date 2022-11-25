@@ -1,3 +1,4 @@
+@@ -0,0 +1,68 @@
 # Compiled class file
 *.class
 
@@ -44,6 +45,7 @@ target/
 */.metadata/*
 */metadata/*
 bin/
+*/bin*
 tmp/
 *.tmp
 *.bak
@@ -55,6 +57,7 @@ local.properties
 [Dd]esktop.ini
 $RECYCLE.BIN/
 *.cab
+*dist*
 *.msi
 *.msix
 *.msm
@@ -66,3 +69,4 @@ $RECYCLE.BIN/
 *.ntvs*
 *.njsproj
 *dist*
+No newline at end of file
