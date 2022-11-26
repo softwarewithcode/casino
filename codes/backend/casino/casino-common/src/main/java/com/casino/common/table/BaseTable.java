@@ -190,6 +190,10 @@ public abstract class BaseTable implements ITable {
 		return set;
 	}
 
+	protected boolean coversMinimumBet(IPlayer player) {
+		return player.getInitialBalance().compareTo(this.getMinBet()) >= 0;
+	}
+
 	@Override
 	public void startTimer(int initialDelay) {
 		// TODO Auto-generated method stub

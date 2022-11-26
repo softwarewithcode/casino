@@ -1,10 +1,15 @@
 package com.casino.common.cards;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Deck implements IDeck {
-	public Set<Card> cards;
+	private Set<Card> cards;
 
 	public Deck() {
 		create();
@@ -25,8 +30,12 @@ public class Deck implements IDeck {
 	}
 
 	public void shuffle() {
-		// TODO Auto-generated method stub
+		List<Card> c = new ArrayList<Card>(cards);
+		Collections.shuffle(c);
+	}
 
+	public Set<Card> getCards() {
+		return cards;
 	}
 
 	public Set<Card> take(int count) {
@@ -34,4 +43,12 @@ public class Deck implements IDeck {
 		return null;
 	}
 
+	public static List<Card> combineDecks(int count) {
+		List<Deck> decks = IntStream.range(0, count).mapToObj(i -> new Deck()).collect(Collectors.toList());
+		List<Card> cards = new ArrayList<Card>();
+		decks.forEach(deck -> {
+			cards.addAll(deck.getCards());
+		});
+		return cards;
+	}
 }

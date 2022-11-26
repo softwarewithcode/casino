@@ -29,10 +29,13 @@ public abstract class OrderBasedTable extends BaseTable {
 	protected boolean takeSeat(int seatNumber, IPlayer player) {
 		if (seatNumber <= 0 || seatNumber >= getMaxPlayers())
 			return false;
+		if (!coversMinimumBet(player))
+			return false;
 		if (super.isPrivate()) // In private table player can reserve all seats
 			return seats.get(seatNumber).take(player);
 		return hasSeat(player) ? false : seats.get(seatNumber).take(player);
 	}
+
 
 	private boolean hasSeat(IPlayer p) {
 		if (p == null)
