@@ -1,150 +1,41 @@
 package com.casino.blackjack.table;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-import com.casino.common.language.Language;
+import com.casino.common.table.OrderBasedTable;
 import com.casino.common.table.Player;
-import com.casino.common.table.Table;
+import com.casino.common.table.Status;
+import com.casino.common.table.Type;
 
-public class BlackjackTable implements Table {
+public class BlackjackTable extends OrderBasedTable {
 
-	@Override
-	public boolean isClosed() {
-		// TODO Auto-generated method stub
-		return false;
+	protected BlackjackTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type, int seats) {
+		super(initialStatus, minBet, maxBet, minPlayers, maxPlayers, type);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public void close() {
+	public void onTimeout(Player player) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void open() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isOpen() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onClose() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onOpen() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getMinPlayers() {
+	public int getTurnTime() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	public int getMaxPlayers() {
+	public int getComputerTurnTime() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	public BigDecimal getMinBet() {
+	public void onPlayerLeave(Player player) {
 		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public BigDecimal getMaxBet() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getAvailableSeats() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Language getLanguage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Player getPlayerInTurn() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void addPlayer(Player player) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void addWatcher(Player player) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void removePlayer(Player p) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void removeWatcher(Player p) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<Player> getPlayers() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Player> getWatchers() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Player> getPlayersAndWatchers() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getAITurnTimeInMillis() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getPlayerTurnTimeInMillis() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void startTime(int initialDelay) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
