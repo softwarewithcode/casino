@@ -1,14 +1,14 @@
-package com.casino.common.table;
+package com.casino.common.player;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public interface Player {
+public interface IPlayer {
 	public String getName();
 
 	public BigDecimal getInitialBalance();
 
-	public BigDecimal getLeaveBalance();
+	public BigDecimal getEndBalance();
 
 	public UUID getId();
 

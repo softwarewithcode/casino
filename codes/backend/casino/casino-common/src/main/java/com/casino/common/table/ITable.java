@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 import com.casino.common.language.Language;
+import com.casino.common.player.IPlayer;
 
 public interface ITable {
 	public boolean isClosed();
@@ -28,7 +29,7 @@ public interface ITable {
 
 	public void onOpen();
 
-	public void onPlayerLeave(Player player);
+	public void onPlayerLeave(IPlayer player);
 
 	public int getMinPlayers();
 
@@ -42,21 +43,21 @@ public interface ITable {
 
 	public Language getLanguage();
 
-	public Player getPlayerInTurn();
+	public IPlayer getPlayerInTurn();
 
-	public boolean addPlayer(Player player);
+	public boolean addPlayer(IPlayer player);
 
-	public boolean addWatcher(Player player);
+	public boolean addWatcher(IPlayer player);
 
-	public boolean removePlayer(Player p);
+	public boolean removePlayer(IPlayer p);
 
-	public boolean removeWatcher(Player p);
+	public boolean removeWatcher(IPlayer p);
 
-	public Set<Player> getPlayers();
+	public Set<IPlayer> getPlayers();
 
-	public Set<Player> getWatchers();
+	public Set<IPlayer> getWatchers();
 
-	public Set<Player> getPlayersAndWatchers();
+	public Set<IPlayer> getPlayersAndWatchers();
 
 	public int getComputerTurnTime();
 
@@ -64,5 +65,5 @@ public interface ITable {
 
 	public void startTimer(int initialDelay);
 
-	public void onTimeout(Player player);
+	public void onTimeout(IPlayer player);
 }

@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.Timer;
 
 import com.casino.common.language.Language;
+import com.casino.common.player.IPlayer;
 
 /**
  * Base class for all casino tables. Gather here common data and operations what
@@ -15,9 +16,9 @@ import com.casino.common.language.Language;
  */
 public abstract class BaseTable implements ITable {
 
-	private Set<Player> players;
-	private Set<Player> watchers;
-	private Player playerInTurn;
+	private Set<IPlayer> players;
+	private Set<IPlayer> watchers;
+	private IPlayer playerInTurn;
 	private Status status;
 	private int minPlayers;
 	private int maxPlayers;
@@ -28,8 +29,8 @@ public abstract class BaseTable implements ITable {
 	private Timer timer;
 
 	protected BaseTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type) {
-		this.players = Collections.synchronizedSet(new HashSet<Player>());
-		this.watchers = Collections.synchronizedSet(new HashSet<Player>());
+		this.players = Collections.synchronizedSet(new HashSet<IPlayer>());
+		this.watchers = Collections.synchronizedSet(new HashSet<IPlayer>());
 		this.status = initialStatus;
 		this.minBet = minBet;
 		this.maxBet = maxBet;
@@ -45,7 +46,7 @@ public abstract class BaseTable implements ITable {
 	public abstract int getComputerTurnTime();
 
 	@Override
-	public abstract void onPlayerLeave(Player player);
+	public abstract void onPlayerLeave(IPlayer player);
 
 	@Override
 	public boolean isClosed() {
@@ -135,12 +136,12 @@ public abstract class BaseTable implements ITable {
 	}
 
 	@Override
-	public Player getPlayerInTurn() {
+	public IPlayer getPlayerInTurn() {
 		return playerInTurn;
 	}
 
 	@Override
-	public boolean addPlayer(Player player) {
+	public boolean addPlayer(IPlayer player) {
 		if (player == null) {
 			return false;
 		}
@@ -151,39 +152,39 @@ public abstract class BaseTable implements ITable {
 	}
 
 	@Override
-	public boolean addWatcher(Player player) {
+	public boolean addWatcher(IPlayer player) {
 		if (player == null)
 			return false;
 		return watchers.add(player);
 	}
 
 	@Override
-	public boolean removePlayer(Player p) {
+	public boolean removePlayer(IPlayer p) {
 		if (p == null)
 			return false;
 		return players.remove(p);
 	}
 
 	@Override
-	public boolean removeWatcher(Player p) {
+	public boolean removeWatcher(IPlayer p) {
 		if (p == null)
 			return false;
 		return watchers.remove(p);
 	}
 
 	@Override
-	public Set<Player> getPlayers() {
+	public Set<IPlayer> getPlayers() {
 		return players;
 	}
 
 	@Override
-	public Set<Player> getWatchers() {
+	public Set<IPlayer> getWatchers() {
 		return watchers;
 	}
 
 	@Override
-	public Set<Player> getPlayersAndWatchers() {
-		HashSet<Player> set = new HashSet<Player>();
+	public Set<IPlayer> getPlayersAndWatchers() {
+		HashSet<IPlayer> set = new HashSet<IPlayer>();
 		set.addAll(players);
 		set.addAll(watchers);
 		return set;

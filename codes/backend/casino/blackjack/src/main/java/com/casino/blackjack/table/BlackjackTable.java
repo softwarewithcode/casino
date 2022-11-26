@@ -2,8 +2,8 @@ package com.casino.blackjack.table;
 
 import java.math.BigDecimal;
 
+import com.casino.common.player.IPlayer;
 import com.casino.common.table.OrderBasedTable;
-import com.casino.common.table.Player;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
 
@@ -15,7 +15,7 @@ public class BlackjackTable extends OrderBasedTable {
 	}
 
 	@Override
-	public void onTimeout(Player player) {
+	public void onTimeout(IPlayer player) {
 		// TODO Auto-generated method stub
 
 	}
@@ -33,7 +33,7 @@ public class BlackjackTable extends OrderBasedTable {
 	}
 
 	@Override
-	public void onPlayerLeave(Player player) {
+	public void onPlayerLeave(IPlayer player) {
 		// TODO Auto-generated method stub
 
 	}
