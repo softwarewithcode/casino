@@ -15,9 +15,7 @@ public class BlackjackTable extends OrderBasedTable {
 	private List<Card> decks;
 
 	public BlackjackTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type, int seats) {
-		super(initialStatus, minBet, maxBet, minPlayers, maxPlayers, type);
-		if (maxPlayers > seats)
-			throw new IllegalArgumentException("not enough seats for the players");
+		super(initialStatus, minBet, maxBet, minPlayers, maxPlayers, type, seats);
 		createDecks();
 	}
 

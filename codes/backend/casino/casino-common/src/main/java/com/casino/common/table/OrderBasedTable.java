@@ -14,15 +14,17 @@ import com.casino.common.player.IPlayer;
  */
 public abstract class OrderBasedTable extends BaseTable {
 
-	protected List<Seat> seats;
+	private List<Seat> seats;
 
-	protected OrderBasedTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type) {
+	protected OrderBasedTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type, int seats) {
 		super(initialStatus, minBet, maxBet, minPlayers, maxPlayers, type);
-		createSeats(maxPlayers);
+		if (maxPlayers > seats)
+			throw new IllegalArgumentException("not enough seats for the players");
+		createSeats(seats);
 	}
 
-	private void createSeats(int maxPlayers) {
-		List<Seat> seats = IntStream.range(0, maxPlayers).mapToObj(i -> new Seat(i)).collect(Collectors.toList());
+	private void createSeats(int seatCount) {
+		List<Seat> seats = IntStream.range(0, seatCount).mapToObj(i -> new Seat(i)).collect(Collectors.toList());
 		this.seats = Collections.synchronizedList(seats);
 	}
 
@@ -36,6 +38,9 @@ public abstract class OrderBasedTable extends BaseTable {
 		return hasSeat(player) ? false : seats.get(seatNumber).take(player);
 	}
 
+	public List<Seat> getSeats() {
+		return seats;
+	}
 
 	private boolean hasSeat(IPlayer p) {
 		if (p == null)

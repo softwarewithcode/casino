@@ -126,11 +126,6 @@ public abstract class BaseTable implements ITable {
 	}
 
 	@Override
-	public int getAvailableSeats() {
-		return maxPlayers - players.size();
-	}
-
-	@Override
 	public Language getLanguage() {
 		return language;
 	}

@@ -39,8 +39,6 @@ public interface ITable {
 
 	public BigDecimal getMaxBet();
 
-	public int getAvailableSeats();
-
 	public Language getLanguage();
 
 	public IPlayer getPlayerInTurn();
