@@ -1,5 +1,8 @@
 package com.casino.blackjack.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Assertions;
@@ -15,5 +18,21 @@ public class BlacjackTableTest {
 	public void tableUsesSixDecks() {
 		BlackjackTable table = new BlackjackTable(Status.OPEN, new BigDecimal("5.0"), new BigDecimal("100.0"), 1, 1, Type.PRIVATE, 7);
 		Assertions.assertEquals(312, table.getDecks().size());
+	}
+
+	@Test
+	public void seatsAreCreatedPerSeatRequirement() {
+		BlackjackTable table = new BlackjackTable(Status.OPEN, new BigDecimal("5.0"), new BigDecimal("100.0"), 1, 6, Type.PUBLIC, 15);
+		Assertions.assertEquals(15, table.getSeats().size());
+	}
+
+	@Test
+	public void exceptionIsThrownIfNotEnoughSeatsForMaximumAmountPlayers() {
+		String expectedMessage = "not enough seats for the players";
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			new BlackjackTable(Status.OPEN, new BigDecimal("5.0"), new BigDecimal("100.0"), 1, 6, Type.PUBLIC, 2);
+		});
+		String actualMessage = exception.getMessage();
+		assertEquals(expectedMessage, actualMessage);
 	}
 }
