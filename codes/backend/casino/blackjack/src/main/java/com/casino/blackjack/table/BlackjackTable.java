@@ -2,20 +2,21 @@ package com.casino.blackjack.table;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.player.IPlayer;
-import com.casino.common.table.OrderBasedTable;
+import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
 
-public class BlackjackTable extends OrderBasedTable {
+public class BlackjackTable extends SeatedTable {
 	// 6 decks combined to one
 	private List<Card> decks;
 
-	public BlackjackTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type, int seats) {
-		super(initialStatus, minBet, maxBet, minPlayers, maxPlayers, type, seats);
+	public BlackjackTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type, int seats, UUID id) {
+		super(initialStatus, minBet, maxBet, minPlayers, maxPlayers, type, seats, id);
 		createDecks();
 	}
 

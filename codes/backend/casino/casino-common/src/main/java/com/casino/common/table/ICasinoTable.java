@@ -6,7 +6,7 @@ import java.util.Set;
 import com.casino.common.language.Language;
 import com.casino.common.player.IPlayer;
 
-public interface ITable {
+public interface ICasinoTable {
 	public boolean isClosed();
 
 	public void close();

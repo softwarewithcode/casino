@@ -4,14 +4,14 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
-public class BasePlayer implements IPlayer {
+public class CasinoPlayer implements IPlayer {
 
 	private String name;
 	private UUID id;
 	private BigDecimal startBalance;
 	private BigDecimal endBalance;
 
-	public BasePlayer(String name, UUID id, BigDecimal startBalance, BigDecimal endBalance) {
+	public CasinoPlayer(String name, UUID id, BigDecimal startBalance, BigDecimal endBalance) {
 		super();
 		this.name = name;
 		this.id = id;
@@ -58,7 +58,7 @@ public class BasePlayer implements IPlayer {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BasePlayer other = (BasePlayer) obj;
+		CasinoPlayer other = (CasinoPlayer) obj;
 		return Objects.equals(id, other.id);
 	}
 

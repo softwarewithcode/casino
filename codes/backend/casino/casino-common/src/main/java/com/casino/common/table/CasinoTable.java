@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
+import java.util.UUID;
 
 import com.casino.common.language.Language;
 import com.casino.common.player.IPlayer;
@@ -14,7 +15,7 @@ import com.casino.common.player.IPlayer;
  * could be related to all tables.
  * 
  */
-public abstract class BaseTable implements ITable {
+public abstract class CasinoTable implements ICasinoTable {
 
 	private Set<IPlayer> players;
 	private Set<IPlayer> watchers;
@@ -27,8 +28,9 @@ public abstract class BaseTable implements ITable {
 	private BigDecimal maxBet;
 	private Language language;
 	private Timer timer;
+	private UUID id;
 
-	protected BaseTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type) {
+	protected CasinoTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type, UUID id) {
 		this.players = Collections.synchronizedSet(new HashSet<IPlayer>());
 		this.watchers = Collections.synchronizedSet(new HashSet<IPlayer>());
 		this.status = initialStatus;
@@ -37,6 +39,7 @@ public abstract class BaseTable implements ITable {
 		this.maxPlayers = maxPlayers;
 		this.minPlayers = minPlayers;
 		this.type = type;
+		this.id = id;
 	}
 
 	@Override
