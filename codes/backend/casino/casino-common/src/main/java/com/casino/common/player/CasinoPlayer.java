@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
-public class CasinoPlayer implements IPlayer {
+public class CasinoPlayer implements ICasinoPlayer {
 
 	private String name;
 	private UUID id;

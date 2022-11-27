@@ -3,7 +3,7 @@ package com.casino.common.player;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public interface IPlayer {
+public interface ICasinoPlayer {
 	public String getName();
 
 	public BigDecimal getInitialBalance();

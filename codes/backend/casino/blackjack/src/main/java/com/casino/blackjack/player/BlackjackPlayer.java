@@ -27,9 +27,10 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public List<Integer> calculateSums() {
 		HighCardPredicate<Card> highCardPredicate = new HighCardPredicate<Card>();
+		List<Integer>sums=new ArrayList<Integer>();
 		AcePredicate<Card> acePredicate = new AcePredicate<>();
-		// return cards.stream().filter(highCardPredicate);
-		return new ArrayList();
+		//return cards.stream().filter(highCardPredicate);
+		return sums;
 	}
 
 	public List<Card> getCards() {

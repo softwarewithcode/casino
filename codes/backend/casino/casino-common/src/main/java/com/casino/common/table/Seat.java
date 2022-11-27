@@ -2,24 +2,24 @@ package com.casino.common.table;
 
 import java.util.Objects;
 
-import com.casino.common.player.IPlayer;
+import com.casino.common.player.ICasinoPlayer;
 
 public class Seat {
 	private final int number;
-	private IPlayer player;
+	private ICasinoPlayer player;
 
 	public Seat(int number) {
 		this.number = number;
 	}
 
-	public boolean take(IPlayer p) {
+	public boolean take(ICasinoPlayer p) {
 		if (player != null)
 			return false;
 		player = p;
 		return true;
 	}
 
-	public Seat(int number, IPlayer player) {
+	public Seat(int number, ICasinoPlayer player) {
 		super();
 		this.number = number;
 		this.player = player;
@@ -33,7 +33,7 @@ public class Seat {
 		player = null;
 	}
 
-	public boolean removePlayerIfHolder(IPlayer player) {
+	public boolean removePlayerIfHolder(ICasinoPlayer player) {
 		if (this.player == null || player == null)
 			return false;
 		if (this.player.equals(player)) {
@@ -43,11 +43,11 @@ public class Seat {
 		return false;
 	}
 
-	public IPlayer getPlayer() {
+	public ICasinoPlayer getPlayer() {
 		return player;
 	}
 
-	public void setPlayer(IPlayer player) {
+	public void setPlayer(ICasinoPlayer player) {
 		this.player = player;
 	}
 

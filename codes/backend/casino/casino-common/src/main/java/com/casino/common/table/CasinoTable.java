@@ -8,7 +8,7 @@ import java.util.Timer;
 import java.util.UUID;
 
 import com.casino.common.language.Language;
-import com.casino.common.player.IPlayer;
+import com.casino.common.player.ICasinoPlayer;
 
 /**
  * Base class for all casino tables. Gather here common data and operations what
@@ -17,9 +17,9 @@ import com.casino.common.player.IPlayer;
  */
 public abstract class CasinoTable implements ICasinoTable {
 
-	private Set<IPlayer> players;
-	private Set<IPlayer> watchers;
-	private IPlayer playerInTurn;
+	private Set<ICasinoPlayer> players;
+	private Set<ICasinoPlayer> watchers;
+	private ICasinoPlayer playerInTurn;
 	private Status status;
 	private int minPlayers;
 	private int maxPlayers;
@@ -31,8 +31,8 @@ public abstract class CasinoTable implements ICasinoTable {
 	private UUID id;
 
 	protected CasinoTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type, UUID id) {
-		this.players = Collections.synchronizedSet(new HashSet<IPlayer>());
-		this.watchers = Collections.synchronizedSet(new HashSet<IPlayer>());
+		this.players = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
+		this.watchers = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.status = initialStatus;
 		this.minBet = minBet;
 		this.maxBet = maxBet;
@@ -49,7 +49,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	public abstract int getComputerTurnTime();
 
 	@Override
-	public abstract void onPlayerLeave(IPlayer player);
+	public abstract void onPlayerLeave(ICasinoPlayer player);
 
 	@Override
 	public boolean isClosed() {
@@ -134,12 +134,12 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public IPlayer getPlayerInTurn() {
+	public ICasinoPlayer getPlayerInTurn() {
 		return playerInTurn;
 	}
 
 	@Override
-	public boolean addPlayer(IPlayer player) {
+	public boolean addPlayer(ICasinoPlayer player) {
 		if (player == null) {
 			return false;
 		}
@@ -150,45 +150,45 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public boolean addWatcher(IPlayer player) {
+	public boolean addWatcher(ICasinoPlayer player) {
 		if (player == null)
 			return false;
 		return watchers.add(player);
 	}
 
 	@Override
-	public boolean removePlayer(IPlayer p) {
+	public boolean removePlayer(ICasinoPlayer p) {
 		if (p == null)
 			return false;
 		return players.remove(p);
 	}
 
 	@Override
-	public boolean removeWatcher(IPlayer p) {
+	public boolean removeWatcher(ICasinoPlayer p) {
 		if (p == null)
 			return false;
 		return watchers.remove(p);
 	}
 
 	@Override
-	public Set<IPlayer> getPlayers() {
+	public Set<ICasinoPlayer> getPlayers() {
 		return players;
 	}
 
 	@Override
-	public Set<IPlayer> getWatchers() {
+	public Set<ICasinoPlayer> getWatchers() {
 		return watchers;
 	}
 
 	@Override
-	public Set<IPlayer> getPlayersAndWatchers() {
-		HashSet<IPlayer> set = new HashSet<IPlayer>();
+	public Set<ICasinoPlayer> getPlayersAndWatchers() {
+		HashSet<ICasinoPlayer> set = new HashSet<ICasinoPlayer>();
 		set.addAll(players);
 		set.addAll(watchers);
 		return set;
 	}
 
-	protected boolean coversMinimumBet(IPlayer player) {
+	protected boolean coversMinimumBet(ICasinoPlayer player) {
 		return player.getInitialBalance().compareTo(this.getMinBet()) >= 0;
 	}
 

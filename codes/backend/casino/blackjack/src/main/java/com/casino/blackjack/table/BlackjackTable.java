@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
-import com.casino.common.player.IPlayer;
+import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
@@ -25,7 +25,7 @@ public class BlackjackTable extends SeatedTable {
 	}
 
 	@Override
-	public void onTimeout(IPlayer player) {
+	public void onTimeout(ICasinoPlayer player) {
 		// TODO Auto-generated method stub
 
 	}
@@ -47,7 +47,7 @@ public class BlackjackTable extends SeatedTable {
 	}
 
 	@Override
-	public void onPlayerLeave(IPlayer player) {
+	public void onPlayerLeave(ICasinoPlayer player) {
 		// TODO Auto-generated method stub
 
 	}

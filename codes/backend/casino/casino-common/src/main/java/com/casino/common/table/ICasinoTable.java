@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 import com.casino.common.language.Language;
-import com.casino.common.player.IPlayer;
+import com.casino.common.player.ICasinoPlayer;
 
 public interface ICasinoTable {
 	public boolean isClosed();
@@ -29,7 +29,7 @@ public interface ICasinoTable {
 
 	public void onOpen();
 
-	public void onPlayerLeave(IPlayer player);
+	public void onPlayerLeave(ICasinoPlayer player);
 
 	public int getMinPlayers();
 
@@ -41,21 +41,21 @@ public interface ICasinoTable {
 
 	public Language getLanguage();
 
-	public IPlayer getPlayerInTurn();
+	public ICasinoPlayer getPlayerInTurn();
 
-	public boolean addPlayer(IPlayer player);
+	public boolean addPlayer(ICasinoPlayer player);
 
-	public boolean addWatcher(IPlayer player);
+	public boolean addWatcher(ICasinoPlayer player);
 
-	public boolean removePlayer(IPlayer p);
+	public boolean removePlayer(ICasinoPlayer p);
 
-	public boolean removeWatcher(IPlayer p);
+	public boolean removeWatcher(ICasinoPlayer p);
 
-	public Set<IPlayer> getPlayers();
+	public Set<ICasinoPlayer> getPlayers();
 
-	public Set<IPlayer> getWatchers();
+	public Set<ICasinoPlayer> getWatchers();
 
-	public Set<IPlayer> getPlayersAndWatchers();
+	public Set<ICasinoPlayer> getPlayersAndWatchers();
 
 	public int getComputerTurnTime();
 
@@ -63,5 +63,5 @@ public interface ICasinoTable {
 
 	public void startTimer(int initialDelay);
 
-	public void onTimeout(IPlayer player);
+	public void onTimeout(ICasinoPlayer player);
 }

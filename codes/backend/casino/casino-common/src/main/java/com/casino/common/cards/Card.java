@@ -6,6 +6,8 @@ public class Card {
 
 	public Card(int rank, Suit suit) {
 		super();
+		if (rank < 1 || rank > 13)
+			throw new IllegalArgumentException("incorrect rank");
 		this.rank = rank;
 		this.suit = suit;
 	}

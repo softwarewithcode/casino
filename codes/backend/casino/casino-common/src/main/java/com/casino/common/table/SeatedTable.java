@@ -7,7 +7,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.casino.common.player.IPlayer;
+import com.casino.common.player.ICasinoPlayer;
 
 /*
  * For example blackjack and red dog games are order based games. 
@@ -30,7 +30,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	}
 
 	@Override
-	public boolean takeSeat(int seatNumber, IPlayer player) {
+	public boolean takeSeat(int seatNumber, ICasinoPlayer player) {
 		if (seatNumber <= 0 || seatNumber >= seats.size())
 			return false;
 		if (!coversMinimumBet(player))
@@ -42,12 +42,12 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	}
 
 	@Override
-	public void leaveSeats(IPlayer player) {
+	public void leaveSeats(ICasinoPlayer player) {
 		// Less than 10 possibility
 		seats.forEach(seat -> seat.removePlayerIfHolder(player));
 	}
 
-	private boolean takeSeatIfAvailable(int seatNumber, IPlayer player) {
+	private boolean takeSeatIfAvailable(int seatNumber, ICasinoPlayer player) {
 		Seat seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().orElse(null);
 		return seat == null ? false : seat.take(player);
 	}
@@ -56,7 +56,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return seats;
 	}
 
-	private boolean hasSeat(IPlayer p) {
+	private boolean hasSeat(ICasinoPlayer p) {
 		return p == null ? false : seats.stream().anyMatch(seat -> p.equals(seat.getPlayer()));
 	}
 
