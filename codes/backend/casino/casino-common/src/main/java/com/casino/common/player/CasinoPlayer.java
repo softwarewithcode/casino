@@ -4,12 +4,16 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.casino.common.common.Result;
+
 public class CasinoPlayer implements ICasinoPlayer {
 
 	private String name;
 	private UUID id;
 	private BigDecimal startBalance;
 	private BigDecimal endBalance;
+	private BigDecimal balance;
+	private BigDecimal bet;
 
 	public CasinoPlayer(String name, UUID id, BigDecimal startBalance) {
 		super();
@@ -71,6 +75,33 @@ public class CasinoPlayer implements ICasinoPlayer {
 	public void setStatus(Status status) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public BigDecimal getBet() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateBet(BigDecimal bet) {
+		boolean betAllowed = balance.compareTo(bet) >= 0;
+		if (!betAllowed) {
+			bet = null;
+			return;
+		}
+		this.bet = bet;
+	}
+
+	@Override
+	public void calculateBalance(Result result) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public BigDecimal getBalance() {
+		return balance;
 	}
 
 }
