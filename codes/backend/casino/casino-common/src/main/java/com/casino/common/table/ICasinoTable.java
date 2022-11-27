@@ -6,7 +6,6 @@ import java.util.Set;
 import com.casino.common.language.Language;
 import com.casino.common.player.BetLimit;
 import com.casino.common.player.ICasinoPlayer;
-import com.casino.common.player.PlayerLimit;
 
 public interface ICasinoTable {
 	public boolean isClosed();
@@ -29,21 +28,17 @@ public interface ICasinoTable {
 
 	public void onClose();
 
-	public void onOpen();
-
 	public void onPlayerLeave(ICasinoPlayer player);
 
-	public void onPlayerJoin(ICasinoPlayer player);
+	public boolean join(ICasinoPlayer player);
 
-	public PlayerLimit getPlayerLimit();
+	public PlayerRange getPlayerLimit();
 
 	public BetLimit getBetLimit();
 
 	public Language getLanguage();
 
 	public ICasinoPlayer getPlayerInTurn();
-
-	public boolean addPlayer(ICasinoPlayer player);
 
 	public boolean addWatcher(ICasinoPlayer player);
 

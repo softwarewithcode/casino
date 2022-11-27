@@ -14,7 +14,7 @@ import com.casino.common.cards.Suit;
 public class BlackjackPlayerTest {
 	@Test
 	public void playerHoldsDealtCardsInFirstHand() {
-		BlackjackPlayer player = new BlackjackPlayer("player", UUID.randomUUID(), BigDecimal.TEN, null);
+		BlackjackPlayer player = new BlackjackPlayer("player", UUID.randomUUID(), BigDecimal.TEN);
 		player.addCard(player.getHands().get(0), new Card(13, Suit.CLUB));
 		player.addCard(player.getHands().get(0), new Card(11, Suit.CLUB));
 		Assertions.assertEquals(1, player.getHands().size());
@@ -85,7 +85,7 @@ public class BlackjackPlayerTest {
 	}
 
 	private BlackjackPlayer createPlayer() {
-		BlackjackPlayer player = new BlackjackPlayer("player", UUID.randomUUID(), BigDecimal.TEN, null);
+		BlackjackPlayer player = new BlackjackPlayer("player", UUID.randomUUID(), BigDecimal.TEN);
 
 		return player;
 	}

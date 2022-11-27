@@ -11,7 +11,6 @@ import java.util.UUID;
 import com.casino.common.language.Language;
 import com.casino.common.player.BetLimit;
 import com.casino.common.player.ICasinoPlayer;
-import com.casino.common.player.PlayerLimit;
 
 /**
  * Base class for all casino tables. Gather here common data and operations what
@@ -23,7 +22,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private Set<ICasinoPlayer> players;
 	private Set<ICasinoPlayer> watchers;
 	private Status status;
-	private PlayerLimit playerLimit;
+	private PlayerRange playerLimit;
 	private BetLimit betLimit;
 	private Type type;
 	private Language language;
@@ -31,7 +30,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private UUID id;
 	private Instant created;
 
-	protected CasinoTable(Status initialStatus, BetLimit betLimit, PlayerLimit playerLimit, Type type, UUID id) {
+	protected CasinoTable(Status initialStatus, BetLimit betLimit, PlayerRange playerLimit, Type type, UUID id) {
 		this.players = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.watchers = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.status = initialStatus;
@@ -51,9 +50,18 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public abstract void onPlayerLeave(ICasinoPlayer player);
 
-	@Override
-	public void onPlayerJoin(ICasinoPlayer player) {
+	protected boolean joinAsWatcher(ICasinoPlayer player) {
+		if (player == null)
+			return false;
+		watchers.add(player);
+		return true;
+	}
+
+	protected boolean joinAsPlayer(ICasinoPlayer player) {
+		if (player == null)
+			return false;
 		players.add(player);
+		return true;
 	}
 
 	@Override
@@ -108,29 +116,12 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public void onOpen() {
-		status = Status.OPEN;
-
-	}
-
-	@Override
 	public Language getLanguage() {
 		return language;
 	}
 
 	@Override
-	public boolean addPlayer(ICasinoPlayer player) {
-		if (player == null) {
-			return false;
-		}
-		if (players.size() >= playerLimit.maximumPlayers()) {
-			return false;
-		}
-		return players.add(player);
-	}
-
-	@Override
-	public PlayerLimit getPlayerLimit() {
+	public PlayerRange getPlayerLimit() {
 		return playerLimit;
 	}
 
@@ -158,6 +149,11 @@ public abstract class CasinoTable implements ICasinoTable {
 		if (p == null)
 			return false;
 		return watchers.remove(p);
+	}
+
+	protected void changeFromWatcherToPlayer(ICasinoPlayer player) {
+		watchers.remove(player);
+		players.add(player);
 	}
 
 	@Override

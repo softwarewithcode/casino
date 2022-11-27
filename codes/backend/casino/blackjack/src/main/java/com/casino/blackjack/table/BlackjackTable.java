@@ -7,7 +7,7 @@ import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.player.BetLimit;
 import com.casino.common.player.ICasinoPlayer;
-import com.casino.common.player.PlayerLimit;
+import com.casino.common.table.PlayerRange;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
@@ -16,10 +16,9 @@ public class BlackjackTable extends SeatedTable {
 	// 6 decks combined to one
 	private List<Card> decks;
 
-	public BlackjackTable(Status initialStatus, BetLimit betLimit, PlayerLimit playerLimit, Type type, int seats, UUID id) {
+	public BlackjackTable(Status initialStatus, BetLimit betLimit, PlayerRange playerLimit, Type type, int seats, UUID id) {
 		super(initialStatus, betLimit, playerLimit, type, seats, id);
 		createDecks();
-		super.onOpen();
 	}
 
 	private void createDecks() {
@@ -53,7 +52,5 @@ public class BlackjackTable extends SeatedTable {
 		// TODO Auto-generated method stub
 
 	}
-
-
 
 }

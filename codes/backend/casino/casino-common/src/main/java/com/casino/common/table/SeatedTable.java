@@ -8,7 +8,6 @@ import java.util.stream.IntStream;
 
 import com.casino.common.player.BetLimit;
 import com.casino.common.player.ICasinoPlayer;
-import com.casino.common.player.PlayerLimit;
 
 /*
  * For example blackjack and red dog games are order based games. 
@@ -19,7 +18,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	private Set<Seat> seats;
 	private ICasinoPlayer playerInTurn;
 
-	protected SeatedTable(Status initialStatus, BetLimit betLimit, PlayerLimit playerLimit, Type type, int seats, UUID id) {
+	protected SeatedTable(Status initialStatus, BetLimit betLimit, PlayerRange playerLimit, Type type, int seats, UUID id) {
 		super(initialStatus, betLimit, playerLimit, type, id);
 		if (playerLimit.maximumPlayers() > seats)
 			throw new IllegalArgumentException("not enough seats for the players");
@@ -33,12 +32,12 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	@Override
 	public boolean takeSeat(int seatNumber, ICasinoPlayer player) {
-		if (seatNumber <= 0 || seatNumber >= seats.size())
+		if (seatNumber < 0 || seatNumber >= seats.size())
 			return false;
 		if (!coversMinimumBet(player))
 			return false;
 		if (super.isPrivate()) { // In private table player can reserve all seats
-			takeSeatIfAvailable(seatNumber, player);
+			return takeSeatIfAvailable(seatNumber, player);
 		}
 		return hasSeat(player) ? false : takeSeatIfAvailable(seatNumber, player);
 	}
@@ -51,7 +50,10 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	private boolean takeSeatIfAvailable(int seatNumber, ICasinoPlayer player) {
 		Seat seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().orElse(null);
-		return seat == null ? false : seat.take(player);
+		if (seat == null || !seat.take(player))
+			return false;
+		super.changeFromWatcherToPlayer(player);
+		return true;
 	}
 
 	public Set<Seat> getSeats() {
@@ -67,4 +69,8 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return playerInTurn;
 	}
 
+	@Override
+	public boolean join(ICasinoPlayer player) {
+		return super.joinAsWatcher(player);
+	}
 }

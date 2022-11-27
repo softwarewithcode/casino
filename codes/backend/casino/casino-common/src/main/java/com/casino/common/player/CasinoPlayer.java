@@ -11,12 +11,11 @@ public class CasinoPlayer implements ICasinoPlayer {
 	private BigDecimal startBalance;
 	private BigDecimal endBalance;
 
-	public CasinoPlayer(String name, UUID id, BigDecimal startBalance, BigDecimal endBalance) {
+	public CasinoPlayer(String name, UUID id, BigDecimal startBalance) {
 		super();
 		this.name = name;
 		this.id = id;
 		this.startBalance = startBalance;
-		this.endBalance = endBalance;
 	}
 
 	@Override
