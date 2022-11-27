@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.casino.common.cards.Card;
-import com.casino.common.cards.Hand;
 import com.casino.common.cards.IHand;
 import com.casino.common.player.CasinoPlayer;
 
@@ -19,8 +18,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 		hands.add(createNewHand());
 	}
 
-	private Hand createNewHand() {
-		return new Hand(UUID.randomUUID());
+	private BlackjackHand createNewHand() {
+		return new BlackjackHand(UUID.randomUUID());
 	}
 
 	public void addCard(IHand hand, Card card) {

@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public interface IHand {
 
-	public int calculateValue();
+	public List<Integer> calculateValues();
 
 	public void addCard(Card card);
 
