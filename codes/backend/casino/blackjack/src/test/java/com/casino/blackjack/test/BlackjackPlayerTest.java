@@ -81,6 +81,7 @@ public class BlackjackPlayerTest {
 		player.addCard(player.getHands().get(0), new Card(1, Suit.DIAMOND));
 		values = player.getHands().get(0).calculateValues();
 		Assertions.assertEquals(12, values.get(0));
+		Assertions.assertEquals(1, values.size());
 	}
 
 	private BlackjackPlayer createPlayer() {
