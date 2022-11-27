@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Timer;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.casino.common.language.Language;
 import com.casino.common.player.BetLimit;
@@ -19,6 +21,7 @@ import com.casino.common.player.ICasinoPlayer;
  */
 public abstract class CasinoTable implements ICasinoTable {
 
+	private static final Logger LOGGER = Logger.getLogger(CasinoTable.class.getName());
 	private Set<ICasinoPlayer> players;
 	private Set<ICasinoPlayer> watchers;
 	private Status status;
@@ -53,6 +56,10 @@ public abstract class CasinoTable implements ICasinoTable {
 	protected boolean joinAsWatcher(ICasinoPlayer player) {
 		if (player == null)
 			return false;
+		if (players.contains(player)) {
+			LOGGER.log(Level.INFO, "Player is playing, tries to join as a watcher " + player.getName());
+			return false;
+		}
 		watchers.add(player);
 		return true;
 	}
@@ -154,6 +161,11 @@ public abstract class CasinoTable implements ICasinoTable {
 	protected void changeFromWatcherToPlayer(ICasinoPlayer player) {
 		watchers.remove(player);
 		players.add(player);
+	}
+
+	protected void changeFromPlayerToWatcher(ICasinoPlayer player) {
+		players.remove(player);
+		watchers.add(player);
 	}
 
 	@Override
