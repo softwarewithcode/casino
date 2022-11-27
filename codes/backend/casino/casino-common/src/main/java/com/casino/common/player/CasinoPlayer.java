@@ -62,4 +62,16 @@ public class CasinoPlayer implements ICasinoPlayer {
 		return Objects.equals(id, other.id);
 	}
 
+	@Override
+	public Status getStatus() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setStatus(Status status) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

@@ -1,13 +1,14 @@
 package com.casino.common.table;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.casino.common.player.BetLimit;
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.player.PlayerLimit;
 
 /*
  * For example blackjack and red dog games are order based games. 
@@ -16,10 +17,11 @@ import com.casino.common.player.ICasinoPlayer;
 public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	private Set<Seat> seats;
+	private ICasinoPlayer playerInTurn;
 
-	protected SeatedTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type, int seats, UUID id) {
-		super(initialStatus, minBet, maxBet, minPlayers, maxPlayers, type, id);
-		if (maxPlayers > seats)
+	protected SeatedTable(Status initialStatus, BetLimit betLimit, PlayerLimit playerLimit, Type type, int seats, UUID id) {
+		super(initialStatus, betLimit, playerLimit, type, id);
+		if (playerLimit.maximumPlayers() > seats)
 			throw new IllegalArgumentException("not enough seats for the players");
 		createSeats(seats);
 	}
@@ -43,7 +45,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	@Override
 	public void leaveSeats(ICasinoPlayer player) {
-		// Less than 10 possibility
+		// in a private table user can take all the seats
 		seats.forEach(seat -> seat.removePlayerIfHolder(player));
 	}
 
@@ -58,6 +60,11 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	private boolean hasSeat(ICasinoPlayer p) {
 		return p == null ? false : seats.stream().anyMatch(seat -> p.equals(seat.getPlayer()));
+	}
+
+	@Override
+	public ICasinoPlayer getPlayerInTurn() {
+		return playerInTurn;
 	}
 
 }

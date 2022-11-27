@@ -1,10 +1,12 @@
 package com.casino.common.table;
 
-import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Set;
 
 import com.casino.common.language.Language;
+import com.casino.common.player.BetLimit;
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.player.PlayerLimit;
 
 public interface ICasinoTable {
 	public boolean isClosed();
@@ -31,13 +33,11 @@ public interface ICasinoTable {
 
 	public void onPlayerLeave(ICasinoPlayer player);
 
-	public int getMinPlayers();
+	public void onPlayerJoin(ICasinoPlayer player);
 
-	public int getMaxPlayers();
+	public PlayerLimit getPlayerLimit();
 
-	public BigDecimal getMinBet();
-
-	public BigDecimal getMaxBet();
+	public BetLimit getBetLimit();
 
 	public Language getLanguage();
 
@@ -64,4 +64,10 @@ public interface ICasinoTable {
 	public void startTimer(int initialDelay);
 
 	public void onTimeout(ICasinoPlayer player);
+
+	public Status getStatus();
+
+	public void setStatus(Status status);
+
+	public Instant getCreated();
 }

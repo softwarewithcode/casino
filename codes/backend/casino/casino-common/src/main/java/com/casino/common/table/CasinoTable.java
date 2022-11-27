@@ -1,6 +1,6 @@
 package com.casino.common.table;
 
-import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -9,7 +9,9 @@ import java.util.Timer;
 import java.util.UUID;
 
 import com.casino.common.language.Language;
+import com.casino.common.player.BetLimit;
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.player.PlayerLimit;
 
 /**
  * Base class for all casino tables. Gather here common data and operations what
@@ -20,27 +22,24 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	private Set<ICasinoPlayer> players;
 	private Set<ICasinoPlayer> watchers;
-	private ICasinoPlayer playerInTurn;
 	private Status status;
-	private int minPlayers;
-	private int maxPlayers;
+	private PlayerLimit playerLimit;
+	private BetLimit betLimit;
 	private Type type;
-	private BigDecimal minBet;
-	private BigDecimal maxBet;
 	private Language language;
 	private Timer timer;
 	private UUID id;
+	private Instant created;
 
-	protected CasinoTable(Status initialStatus, BigDecimal minBet, BigDecimal maxBet, int minPlayers, int maxPlayers, Type type, UUID id) {
+	protected CasinoTable(Status initialStatus, BetLimit betLimit, PlayerLimit playerLimit, Type type, UUID id) {
 		this.players = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.watchers = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.status = initialStatus;
-		this.minBet = minBet;
-		this.maxBet = maxBet;
-		this.maxPlayers = maxPlayers;
-		this.minPlayers = minPlayers;
 		this.type = type;
 		this.id = id;
+		this.created = Instant.now();
+		this.betLimit = betLimit;
+		this.playerLimit = playerLimit;
 	}
 
 	@Override
@@ -51,6 +50,11 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public abstract void onPlayerLeave(ICasinoPlayer player);
+
+	@Override
+	public void onPlayerJoin(ICasinoPlayer player) {
+		players.add(player);
+	}
 
 	@Override
 	public boolean isClosed() {
@@ -64,7 +68,7 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public boolean isMultiplayer() {
-		return maxPlayers > 1;
+		return playerLimit.maximumPlayers() > 1;
 	}
 
 	@Override
@@ -105,28 +109,8 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public void onOpen() {
-		// TODO Auto-generated method stub
+		status = Status.OPEN;
 
-	}
-
-	@Override
-	public int getMinPlayers() {
-		return minPlayers;
-	}
-
-	@Override
-	public int getMaxPlayers() {
-		return maxPlayers;
-	}
-
-	@Override
-	public BigDecimal getMinBet() {
-		return minBet;
-	}
-
-	@Override
-	public BigDecimal getMaxBet() {
-		return maxBet;
 	}
 
 	@Override
@@ -135,19 +119,24 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public ICasinoPlayer getPlayerInTurn() {
-		return playerInTurn;
-	}
-
-	@Override
 	public boolean addPlayer(ICasinoPlayer player) {
 		if (player == null) {
 			return false;
 		}
-		if (players.size() >= maxPlayers) {
+		if (players.size() >= playerLimit.maximumPlayers()) {
 			return false;
 		}
 		return players.add(player);
+	}
+
+	@Override
+	public PlayerLimit getPlayerLimit() {
+		return playerLimit;
+	}
+
+	@Override
+	public BetLimit getBetLimit() {
+		return betLimit;
 	}
 
 	@Override
@@ -190,13 +179,32 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	protected boolean coversMinimumBet(ICasinoPlayer player) {
-		return player.getInitialBalance().compareTo(this.getMinBet()) >= 0;
+		return player.getInitialBalance().compareTo(this.getBetLimits().minimumBet()) >= 0;
 	}
 
 	@Override
 	public void startTimer(int initialDelay) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public Status getStatus() {
+		return status;
+	}
+
+	@Override
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+
+	@Override
+	public Instant getCreated() {
+		return created;
+	}
+
+	public BetLimit getBetLimits() {
+		return betLimit;
 	}
 
 	@Override
