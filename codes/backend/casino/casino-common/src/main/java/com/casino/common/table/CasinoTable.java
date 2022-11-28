@@ -26,7 +26,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private Set<ICasinoPlayer> watchers;
 	private Status status;
 	private PlayerRange playerLimit;
-	private BetValues betLimit;
+	private BetValues betValues;
 	private Type type;
 	private Language language;
 	private Timer timer;
@@ -40,7 +40,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.type = type;
 		this.id = id;
 		this.created = Instant.now();
-		this.betLimit = betLimit;
+		this.betValues = betLimit;
 		this.playerLimit = playerLimit;
 		this.timer = new Timer();
 	}
@@ -190,10 +190,6 @@ public abstract class CasinoTable implements ICasinoTable {
 		return set;
 	}
 
-	protected boolean coversMinimumBet(ICasinoPlayer player) {
-		return player.getInitialBalance().compareTo(this.getBetLimits().minimumBet()) >= 0;
-	}
-
 	@Override
 	public Status getStatus() {
 		return status;
@@ -209,13 +205,24 @@ public abstract class CasinoTable implements ICasinoTable {
 		return created;
 	}
 
-	public BetValues getBetLimits() {
-		return betLimit;
+	@Override
+	public BetValues getBetValues() {
+		return betValues;
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
+	}
+
+	@Override
+	public UUID getId() {
+		return id;
+	}
+
+	@Override
+	public String toString() {
+		return "CasinoTable [status=" + status + ", playerLimit=" + playerLimit + ", betValues=" + betValues + ", type=" + type + ", id=" + id + ", created=" + created + "]";
 	}
 
 	@Override

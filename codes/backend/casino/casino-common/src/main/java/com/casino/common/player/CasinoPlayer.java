@@ -10,17 +10,18 @@ public class CasinoPlayer implements ICasinoPlayer {
 
 	private String name;
 	private UUID id;
-	private BigDecimal startBalance;
+	private BigDecimal initialBalance;
 	private BigDecimal endBalance;
 	private BigDecimal balance;
 	private BigDecimal bet;
 	private Status status;
 
-	public CasinoPlayer(String name, UUID id, BigDecimal startBalance) {
+	public CasinoPlayer(String name, UUID id, BigDecimal initialBalance) {
 		super();
 		this.name = name;
 		this.id = id;
-		this.startBalance = startBalance;
+		this.initialBalance = initialBalance;
+		this.balance = initialBalance;
 		this.status = null;
 	}
 
@@ -31,7 +32,7 @@ public class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public BigDecimal getInitialBalance() {
-		return startBalance;
+		return initialBalance;
 	}
 
 	@Override
@@ -80,17 +81,13 @@ public class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public BigDecimal getBet() {
-		// TODO Auto-generated method stub
-		return null;
+		return bet;
 	}
 
 	@Override
 	public void updateBet(BigDecimal bet) {
-		boolean betAllowed = balance.compareTo(bet) >= 0;
-		if (!betAllowed) {
-			bet = null;
-			return;
-		}
+		// Bet data must be checked before calling this method. Here is no knowledge
+		// about betLimits
 		this.bet = bet;
 	}
 
@@ -103,6 +100,16 @@ public class CasinoPlayer implements ICasinoPlayer {
 	@Override
 	public BigDecimal getBalance() {
 		return balance;
+	}
+
+	@Override
+	public void clearBet() {
+		this.bet = null;
+	}
+
+	@Override
+	public void updateBalance(BigDecimal balance) {
+		this.balance = balance;
 	}
 
 }

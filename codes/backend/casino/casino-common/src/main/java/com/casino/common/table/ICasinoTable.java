@@ -3,8 +3,10 @@ package com.casino.common.table;
 import java.time.Instant;
 import java.util.Set;
 import java.util.Timer;
+import java.util.UUID;
 
 import com.casino.common.bet.BetInfo;
+import com.casino.common.bet.BetValues;
 import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
 
@@ -72,4 +74,10 @@ public interface ICasinoTable {
 	public void onBetRoundEnd();
 
 	public IDealer getDealer();
+
+	public BetValues getBetValues();
+
+	public Phase getPhase();
+
+	public UUID getId();
 }

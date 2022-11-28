@@ -26,17 +26,18 @@ public class BaseTest {
 
 	@BeforeEach
 	public void init() {
+		System.out.println("Init-all-tests-beforeEach");
 		publicTable = createPublicTable();
 		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100.0"));
 		blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100.0"));
 	}
 
 	protected BlackjackTable createPublicTable() {
-		return new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME, INDIVIDUAL_BET_TIME,INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		return new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 	}
 
-	protected void takeSeat(int seatNumber, ICasinoPlayer player) {
-		publicTable.takeSeat(seatNumber, player);
+	protected boolean takeSeat(int seatNumber, ICasinoPlayer player) {
+		return publicTable.takeSeat(seatNumber, player);
 	}
 
 	protected void sleep(int i) {

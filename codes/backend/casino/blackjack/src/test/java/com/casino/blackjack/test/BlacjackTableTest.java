@@ -27,6 +27,8 @@ public class BlacjackTableTest extends BaseTest {
 		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
 		Assertions.assertEquals(15, table.getSeats().size());
 	}
+	
+
 
 	@Test
 	public void exceptionIsThrownIfNotEnoughSeatsForMaximumAmountPlayers() {

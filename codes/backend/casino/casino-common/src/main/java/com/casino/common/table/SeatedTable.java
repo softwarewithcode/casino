@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.casino.common.bet.BetUtil;
 import com.casino.common.bet.BetValues;
 import com.casino.common.player.ICasinoPlayer;
 
@@ -37,9 +38,8 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	@Override
 	public boolean takeSeat(int seatNumber, ICasinoPlayer player) {
+		BetUtil.verifySufficentInitialBalance(getBetValues(), player);
 		if (seatNumber < 0 || seatNumber >= seats.size())
-			return false;
-		if (!coversMinimumBet(player))
 			return false;
 		if (super.isPrivate()) { // In private table player can reserve all seats
 			return takeSeatIfAvailable(seatNumber, player);
