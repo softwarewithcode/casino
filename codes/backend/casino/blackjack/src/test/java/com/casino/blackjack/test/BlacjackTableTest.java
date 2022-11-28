@@ -3,7 +3,6 @@ package com.casino.blackjack.test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
@@ -15,12 +14,7 @@ import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
 
-public class BlacjackTableTest {
-
-	private static final BigDecimal MIN_BET = new BigDecimal("5.0");
-	private static final BigDecimal MAX_BET = new BigDecimal("100.0");
-	private static final Integer BET_ROUND_TIME = 10;
-	private static final Integer INDIVIDUAL_BET_TIME = 10;
+public class BlacjackTableTest extends BaseTest {
 
 	@Test
 	public void tableUsesSixDecks() {

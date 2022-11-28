@@ -13,7 +13,6 @@ import com.casino.common.table.Type;
 
 public class BlackjackTable extends SeatedTable {
 	private final Dealer dealer;
-
 	public BlackjackTable(Status initialStatus, BetValues betValues, PlayerRange playerLimit, Type type, int seats, UUID id) {
 		super(initialStatus, betValues, playerLimit, type, seats, id);
 		this.dealer = new Dealer(this, new BetInfo(betValues));
