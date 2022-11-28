@@ -42,6 +42,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.created = Instant.now();
 		this.betLimit = betLimit;
 		this.playerLimit = playerLimit;
+		this.timer = new Timer();
 	}
 
 	@Override
@@ -69,6 +70,14 @@ public abstract class CasinoTable implements ICasinoTable {
 			return false;
 		players.add(player);
 		return true;
+	}
+
+	public Timer getTimer() {
+		return timer;
+	}
+
+	public void setTimer(Timer timer) {
+		this.timer = timer;
 	}
 
 	@Override
@@ -132,7 +141,6 @@ public abstract class CasinoTable implements ICasinoTable {
 		return playerLimit;
 	}
 
-
 	@Override
 	public boolean addWatcher(ICasinoPlayer player) {
 		if (player == null)
@@ -184,12 +192,6 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	protected boolean coversMinimumBet(ICasinoPlayer player) {
 		return player.getInitialBalance().compareTo(this.getBetLimits().minimumBet()) >= 0;
-	}
-
-	@Override
-	public void startTimer(int initialDelay) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

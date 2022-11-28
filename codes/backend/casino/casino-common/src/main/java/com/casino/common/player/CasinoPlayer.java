@@ -14,12 +14,14 @@ public class CasinoPlayer implements ICasinoPlayer {
 	private BigDecimal endBalance;
 	private BigDecimal balance;
 	private BigDecimal bet;
+	private Status status;
 
 	public CasinoPlayer(String name, UUID id, BigDecimal startBalance) {
 		super();
 		this.name = name;
 		this.id = id;
 		this.startBalance = startBalance;
+		this.status = null;
 	}
 
 	@Override
@@ -67,8 +69,7 @@ public class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public Status getStatus() {
-		// TODO Auto-generated method stub
-		return null;
+		return status;
 	}
 
 	@Override

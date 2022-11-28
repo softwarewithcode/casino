@@ -1,8 +1,9 @@
 package com.casino.blackjack.table;
 
+import java.util.Timer;
 import java.util.UUID;
 
-import com.casino.blackjack.rules.Dealer;
+import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.common.bet.BetInfo;
 import com.casino.common.bet.BetValues;
 import com.casino.common.player.ICasinoPlayer;
@@ -12,14 +13,16 @@ import com.casino.common.table.Status;
 import com.casino.common.table.Type;
 
 public class BlackjackTable extends SeatedTable {
-	private final Dealer dealer;
+	private final BlackjackDealer dealer;
+
 	public BlackjackTable(Status initialStatus, BetValues betValues, PlayerRange playerLimit, Type type, int seats, UUID id) {
 		super(initialStatus, betValues, playerLimit, type, seats, id);
-		this.dealer = new Dealer(this, new BetInfo(betValues));
+		this.dealer = new BlackjackDealer(this, new BetInfo(betValues));
 	}
 
+	@Override
 	@SuppressWarnings("exports")
-	public Dealer getDealer() {
+	public BlackjackDealer getDealer() {
 		return dealer;
 	}
 
@@ -49,8 +52,8 @@ public class BlackjackTable extends SeatedTable {
 
 	@Override
 	public void onBetRoundEnd() {
-		// TODO Auto-generated method stub
-
+		System.out.println("BetRound has ended: Players should have place their bets by now");
+		getTimer().cancel();
 	}
 
 	@Override

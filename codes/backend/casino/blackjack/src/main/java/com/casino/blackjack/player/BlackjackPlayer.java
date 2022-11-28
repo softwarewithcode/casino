@@ -11,7 +11,7 @@ import com.casino.common.player.CasinoPlayer;
 
 public class BlackjackPlayer extends CasinoPlayer {
 	private List<IHand> hands;
-
+	
 	public BlackjackPlayer(String name, UUID id, BigDecimal startBalance) {
 		super(name, id, startBalance);
 		hands = new ArrayList<IHand>();

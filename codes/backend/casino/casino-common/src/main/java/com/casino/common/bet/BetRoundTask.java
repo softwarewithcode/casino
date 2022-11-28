@@ -16,7 +16,7 @@ public class BetRoundTask extends TimerTask {
 		BetInfo info = table.getBetInfo();
 		int seconds = info.getBetRoundTimeLeft();
 		seconds--;
-		System.out.println("Time:" + seconds);
+		System.out.println("BetRoundTask time left:" + seconds);
 		info.setBetRoundTimeLeft(seconds);
 		if (seconds <= 0) {
 			table.onBetRoundEnd();

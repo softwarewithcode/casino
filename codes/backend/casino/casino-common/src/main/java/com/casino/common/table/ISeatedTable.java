@@ -9,5 +9,7 @@ public interface ISeatedTable extends ICasinoTable {
 
 	public Set<Seat> getSeats();
 
+	public Integer getReservedSeatCount();
+
 	public void leaveSeats(ICasinoPlayer player);
 }

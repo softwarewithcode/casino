@@ -31,6 +31,11 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	}
 
 	@Override
+	public Integer getReservedSeatCount() {
+		return (int) seats.stream().filter(seat -> seat.getPlayer() != null).count();
+	}
+
+	@Override
 	public boolean takeSeat(int seatNumber, ICasinoPlayer player) {
 		if (seatNumber < 0 || seatNumber >= seats.size())
 			return false;

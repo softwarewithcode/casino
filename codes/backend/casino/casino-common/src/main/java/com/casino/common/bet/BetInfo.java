@@ -2,7 +2,7 @@ package com.casino.common.bet;
 
 public class BetInfo {
 	private final BetValues betValues;
-	private int betRoundTimeLeft;
+	private Integer betRoundTimeLeft;
 
 	public BetInfo(BetValues values) {
 		super();

@@ -2,6 +2,7 @@ package com.casino.common.table;
 
 import java.time.Instant;
 import java.util.Set;
+import java.util.Timer;
 
 import com.casino.common.bet.BetInfo;
 import com.casino.common.language.Language;
@@ -56,7 +57,9 @@ public interface ICasinoTable {
 
 	public int getTurnTime();
 
-	public void startTimer(int initialDelay);
+	public Timer getTimer();
+
+	public void setTimer(Timer timer);
 
 	public void onTimeout(ICasinoPlayer player);
 
@@ -67,4 +70,6 @@ public interface ICasinoTable {
 	public Instant getCreated();
 
 	public void onBetRoundEnd();
+
+	public IDealer getDealer();
 }
