@@ -5,6 +5,7 @@ module casino.common {
 	exports com.casino.common.user;
 	exports com.casino.common.player;
 	exports com.casino.common.common;
+	exports com.casino.common.bet;
 
 	requires java.logging;
 }

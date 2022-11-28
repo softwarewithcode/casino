@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
-import com.casino.common.player.BetLimit;
+import com.casino.common.bet.BetValues;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.ISeatedTable;
 import com.casino.common.table.PlayerRange;
@@ -20,6 +20,10 @@ public class BlackjackTest {
 	private ISeatedTable table;
 	private ICasinoPlayer blackjackPlayer;
 	private ICasinoPlayer blackjackPlayer2;
+	private static final BigDecimal MIN_BET = new BigDecimal("5.0");
+	private static final BigDecimal MAX_BET = new BigDecimal("100.0");
+	private static final Integer BET_ROUND_TIME = 10;
+	private static final Integer INDIVIDUAL_BET_TIME = 10;
 
 	@BeforeEach
 	public void init() {
@@ -29,7 +33,7 @@ public class BlackjackTest {
 	}
 
 	private BlackjackTable createPublicTable() {
-		return new BlackjackTable(Status.OPEN, new BetLimit(new BigDecimal("5.0"), new BigDecimal("100.0")), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		return new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME, INDIVIDUAL_BET_TIME), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 	}
 
 	@Test

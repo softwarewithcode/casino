@@ -3,8 +3,8 @@ package com.casino.common.table;
 import java.time.Instant;
 import java.util.Set;
 
+import com.casino.common.bet.BetInfo;
 import com.casino.common.language.Language;
-import com.casino.common.player.BetLimit;
 import com.casino.common.player.ICasinoPlayer;
 
 public interface ICasinoTable {
@@ -34,7 +34,7 @@ public interface ICasinoTable {
 
 	public PlayerRange getPlayerLimit();
 
-	public BetLimit getBetLimit();
+	public BetInfo getBetInfo();
 
 	public Language getLanguage();
 
@@ -65,4 +65,6 @@ public interface ICasinoTable {
 	public void setStatus(Status status);
 
 	public Instant getCreated();
+
+	public void onBetRoundEnd();
 }

@@ -10,8 +10,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.casino.common.bet.BetValues;
 import com.casino.common.language.Language;
-import com.casino.common.player.BetLimit;
 import com.casino.common.player.ICasinoPlayer;
 
 /**
@@ -26,14 +26,14 @@ public abstract class CasinoTable implements ICasinoTable {
 	private Set<ICasinoPlayer> watchers;
 	private Status status;
 	private PlayerRange playerLimit;
-	private BetLimit betLimit;
+	private BetValues betLimit;
 	private Type type;
 	private Language language;
 	private Timer timer;
 	private UUID id;
 	private Instant created;
 
-	protected CasinoTable(Status initialStatus, BetLimit betLimit, PlayerRange playerLimit, Type type, UUID id) {
+	protected CasinoTable(Status initialStatus, BetValues betLimit, PlayerRange playerLimit, Type type, UUID id) {
 		this.players = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.watchers = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.status = initialStatus;
@@ -132,10 +132,6 @@ public abstract class CasinoTable implements ICasinoTable {
 		return playerLimit;
 	}
 
-	@Override
-	public BetLimit getBetLimit() {
-		return betLimit;
-	}
 
 	@Override
 	public boolean addWatcher(ICasinoPlayer player) {
@@ -211,7 +207,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		return created;
 	}
 
-	public BetLimit getBetLimits() {
+	public BetValues getBetLimits() {
 		return betLimit;
 	}
 

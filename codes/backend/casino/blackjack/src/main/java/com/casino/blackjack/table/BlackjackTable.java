@@ -4,23 +4,23 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import com.casino.blackjack.rules.IBetRound;
+import com.casino.common.bet.BetValues;
+import com.casino.common.bet.BetInfo;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
-import com.casino.common.player.BetLimit;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
 
-public class BlackjackTable extends SeatedTable implements IBetRound {
+public class BlackjackTable extends SeatedTable {
 	// 6 decks combined to one
 	private List<Card> decks;
-	private BetRound betRound;
+	private BetInfo betInfo;
 
-	public BlackjackTable(Status initialStatus, BetLimit betLimit, PlayerRange playerLimit, Type type, int seats, UUID id) {
-		super(initialStatus, betLimit, playerLimit, type, seats, id);
+	public BlackjackTable(Status initialStatus, BetValues betValues, PlayerRange playerLimit, Type type, int seats, UUID id) {
+		super(initialStatus, betValues, playerLimit, type, seats, id);
 		createDecks();
 	}
 
@@ -61,9 +61,14 @@ public class BlackjackTable extends SeatedTable implements IBetRound {
 	}
 
 	@Override
-	public void onBetRoundStart() {
-		this.betRound = new BetRound(); // TODO timer for public tables
+	public void onBetRoundEnd() {
+		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public BetInfo getBetInfo() {
+		return betInfo;
 	}
 
 }
