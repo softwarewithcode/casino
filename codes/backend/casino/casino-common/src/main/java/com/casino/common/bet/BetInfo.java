@@ -1,25 +1,25 @@
 package com.casino.common.bet;
 
 public class BetInfo {
-	private final BetValues betData;
-	private int betTimeLeft;
+	private final BetValues betValues;
+	private int betRoundTimeLeft;
 
-	public BetInfo(BetValues betData, int betTimeLeft) {
+	public BetInfo(BetValues values) {
 		super();
-		this.betData = betData;
-		this.betTimeLeft = betTimeLeft;
+		this.betValues = values;
+		this.betRoundTimeLeft = betValues.betRoundTime();
 	}
 
-	public int getBetTimeLeft() {
-		return betTimeLeft;
+	public int getBetRoundTimeLeft() {
+		return betRoundTimeLeft;
 	}
 
-	public void setBetTimeLeft(int betTimeLeft) {
-		this.betTimeLeft = betTimeLeft;
+	public void setBetRoundTimeLeft(int betRoundTimeLeft) {
+		this.betRoundTimeLeft = betRoundTimeLeft;
 	}
 
-	public BetValues getBetData() {
-		return betData;
+	public BetValues getBetValues() {
+		return betValues;
 	}
 
 }

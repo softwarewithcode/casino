@@ -25,7 +25,7 @@ public class BlacjackTableTest {
 	@Test
 	public void tableUsesSixDecks() {
 		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME, INDIVIDUAL_BET_TIME), new PlayerRange(1, 1), Type.PRIVATE, 7, UUID.randomUUID());
-		Assertions.assertEquals(312, table.getDecks().size());
+		Assertions.assertEquals(312, table.getDealer().getDecks().size());
 	}
 
 	@Test
