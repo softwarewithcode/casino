@@ -42,13 +42,6 @@ public class BlackjackTest extends BaseTest {
 	}
 
 	@Test
-	public void betInWrongPhaseThrowsException() {
-		takeSeat(0, blackjackPlayer);
-		takeSeat(0, blackjackPlayer2);
-		Assertions.assertEquals(blackjackPlayer, publicTable.getSeats().stream().filter(seat -> seat.getPlayer() != null).findFirst().get().getPlayer());
-	}
-
-	@Test
 	public void playerCannotTakeSeatIfMinimumBetIsNotCovered() {
 		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
 		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("2.5"));

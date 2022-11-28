@@ -13,7 +13,7 @@ public class BetUtil {
 		if (table.getPhase() != Phase.BET_ROUND)
 			throw new IllegalBetException("given bet in wrong phase:" + table + " player:" + player + " bet:" + betAttempt.toString(), 1);
 		if (betAttempt == null)
-			throw new IllegalBetException("given bet is missing in table:" + table + " player:" + player, 2);
+			throw new IllegalBetException("no bet is given in table:" + table + " player:" + player, 2);
 		if (player.getBalance().compareTo(betAttempt) < 0)
 			throw new IllegalBetException("given bet is more than balance " + table + " player:" + player + " bet" + betAttempt.toString(), 3);
 		if (betAttempt.compareTo(table.getBetValues().minimumBet()) < 0)
