@@ -5,7 +5,7 @@ import java.util.Set;
 import com.casino.common.player.ICasinoPlayer;
 
 public interface ISeatedTable extends ICasinoTable {
-	public boolean takeSeat(int seatNumber, ICasinoPlayer player);
+	public boolean trySeat(int seatNumber, ICasinoPlayer player);
 
 	public Set<Seat> getSeats();
 

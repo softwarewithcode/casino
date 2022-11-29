@@ -39,7 +39,7 @@ public class BaseTest {
 	}
 
 	protected boolean takeSeat(int seatNumber, ICasinoPlayer player) {
-		return publicTable.takeSeat(seatNumber, player);
+		return publicTable.trySeat(seatNumber, player);
 	}
 
 	protected void sleep(int i, ChronoUnit unit) {
