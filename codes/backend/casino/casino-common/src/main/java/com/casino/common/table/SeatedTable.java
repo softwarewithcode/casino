@@ -37,6 +37,11 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	}
 
 	@Override
+	public Integer getActivePlayerCount() {
+		return (int) seats.stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getStatus() != com.casino.common.player.Status.SIT_OUT).count();
+	}
+
+	@Override
 	public boolean takeSeat(int seatNumber, ICasinoPlayer player) {
 		BetUtil.verifySufficentInitialBalance(getBetValues(), player);
 		if (seatNumber < 0 || seatNumber >= seats.size())

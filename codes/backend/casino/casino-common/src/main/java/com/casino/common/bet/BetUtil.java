@@ -10,7 +10,7 @@ import com.casino.common.table.Phase;
 public class BetUtil {
 
 	public static void verifyBet(ICasinoTable table, ICasinoPlayer player, BigDecimal betAttempt) {
-		if (table.getPhase() != Phase.BET_ROUND)
+		if (table.getPhase() != Phase.BET)
 			throw new IllegalBetException("given bet in wrong phase:" + table + " player:" + player + " bet:" + betAttempt.toString(), 1);
 		if (betAttempt == null)
 			throw new IllegalBetException("no bet is given in table:" + table + " player:" + player, 2);

@@ -2,7 +2,6 @@ package com.casino.common.table;
 
 import java.time.Instant;
 import java.util.Set;
-import java.util.Timer;
 import java.util.UUID;
 
 import com.casino.common.bet.BetInfo;
@@ -59,10 +58,6 @@ public interface ICasinoTable {
 
 	public int getTurnTime();
 
-	public Timer getTimer();
-
-	public void setTimer(Timer timer);
-
 	public void onTimeout(ICasinoPlayer player);
 
 	public Status getStatus();
@@ -80,4 +75,7 @@ public interface ICasinoTable {
 	public Phase getPhase();
 
 	public UUID getId();
+
+	public Clock getClock();
+
 }

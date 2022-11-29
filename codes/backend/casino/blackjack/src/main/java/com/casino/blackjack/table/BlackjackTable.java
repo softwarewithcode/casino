@@ -34,7 +34,7 @@ public class BlackjackTable extends SeatedTable {
 		return dealer;
 	}
 
-	public synchronized void updatePhase(Phase phase) {
+	public void updatePhase(Phase phase) {
 		if (this.phase != phase)
 			this.phase = phase;
 	}
@@ -65,8 +65,10 @@ public class BlackjackTable extends SeatedTable {
 
 	@Override
 	public void onBetRoundEnd() {
-		System.out.println("BetRound has ended: Players should have place their bets by now");
-		getTimer().cancel();
+		dealer.finalizeBetPhase();
+		if (dealer.shouldMakeInitialDeal()) {
+			System.out.println("Should start dealing");
+		}
 	}
 
 	@Override

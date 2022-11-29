@@ -85,16 +85,6 @@ public class BlackjackTest extends BaseTest {
 	}
 
 	@Test
-	public void placingAllowedBetSetsTheBetForPlayer() {
-		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
-		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"));
-		table.takeSeat(0, blackjackPlayer);
-		table.getDealer().welcomeNewPlayer(blackjackPlayer);
-		table.placeBet(blackjackPlayer, new BigDecimal("49.9"));
-		assertEquals(blackjackPlayer.getBet().toString(), "49.9");
-	}
-
-	@Test
 	public void placingBetToPlayerNotInTableResultsInException() {
 		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
 		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"));
@@ -130,4 +120,25 @@ public class BlackjackTest extends BaseTest {
 		assertEquals(5, exception.getCode());
 	}
 
+	@Test
+	public void placingAllowedBetSetsTheBetForPlayer() {
+		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"));
+		table.takeSeat(0, blackjackPlayer);
+		table.getDealer().welcomeNewPlayer(blackjackPlayer);
+		table.placeBet(blackjackPlayer, new BigDecimal("49.9"));
+		assertEquals(blackjackPlayer.getBet().toString(), "49.9");
+	}
+
+	@Test
+	public void initialHandIsDealtAfterBetRoundHasEnded() {
+		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, 2, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"));
+		table.takeSeat(0, blackjackPlayer);
+		table.getDealer().welcomeNewPlayer(blackjackPlayer);
+		table.placeBet(blackjackPlayer, new BigDecimal("49.9"));
+		sleep(5000);
+		BlackjackPlayer b = (BlackjackPlayer) blackjackPlayer;
+		assertEquals(2, b.getHands().get(0).getCards().size());
+	}
 }

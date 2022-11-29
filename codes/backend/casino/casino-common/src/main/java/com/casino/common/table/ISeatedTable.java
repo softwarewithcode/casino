@@ -11,5 +11,8 @@ public interface ISeatedTable extends ICasinoTable {
 
 	public Integer getReservedSeatCount();
 
+	public Integer getActivePlayerCount();
+
 	public void leaveSeats(ICasinoPlayer player);
+
 }

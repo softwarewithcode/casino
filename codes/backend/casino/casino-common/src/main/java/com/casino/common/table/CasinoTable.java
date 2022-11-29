@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Timer;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,9 +28,9 @@ public abstract class CasinoTable implements ICasinoTable {
 	private BetValues betValues;
 	private Type type;
 	private Language language;
-	private Timer timer;
 	private UUID id;
 	private Instant created;
+	private Clock clock;
 
 	protected CasinoTable(Status initialStatus, BetValues betLimit, PlayerRange playerLimit, Type type, UUID id) {
 		this.players = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
@@ -42,7 +41,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.created = Instant.now();
 		this.betValues = betLimit;
 		this.playerLimit = playerLimit;
-		this.timer = new Timer();
+		this.clock = new Clock();
 	}
 
 	@Override
@@ -70,14 +69,6 @@ public abstract class CasinoTable implements ICasinoTable {
 			return false;
 		players.add(player);
 		return true;
-	}
-
-	public Timer getTimer() {
-		return timer;
-	}
-
-	public void setTimer(Timer timer) {
-		this.timer = timer;
 	}
 
 	@Override
@@ -129,6 +120,11 @@ public abstract class CasinoTable implements ICasinoTable {
 	public void onClose() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public Clock getClock() {
+		return this.clock;
 	}
 
 	@Override

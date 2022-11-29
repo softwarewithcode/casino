@@ -3,16 +3,16 @@ package com.casino.blackjack.rules;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.Timer;
 import java.util.stream.Stream;
 
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetInfo;
-import com.casino.common.bet.BetRoundTask;
+import com.casino.common.bet.BetPhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.common.PlayerNotFoundException;
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.player.Status;
 import com.casino.common.table.IDealer;
 import com.casino.common.table.Phase;
 import com.casino.common.table.Seat;
@@ -20,6 +20,7 @@ import com.casino.common.table.Seat;
 public class BlackjackDealer implements IDealer {
 	private final BetInfo betInfo;
 	private final BlackjackTable table;
+	private static final Integer SECOND_IN_MILLIS = 1000;
 	// 6 decks combined to one
 	private List<Card> decks;
 
@@ -29,10 +30,12 @@ public class BlackjackDealer implements IDealer {
 		this.decks = Deck.combineDecks(6);
 	}
 
-	public void initBetRound() {
-		table.getPlayers().forEach(ICasinoPlayer::clearBet);
-		table.updatePhase(Phase.BET_ROUND);
-		initBetRoundTimer();
+	private void startBetPhase() {
+		table.updatePhase(Phase.BET);
+		if (table.getActivePlayerCount() > 0) {
+			BetPhaseClockTask task = new BetPhaseClockTask(table);
+			this.getTable().getClock().startClock(task, 200);
+		}
 	}
 
 	public void placeBetForPlayer(ICasinoPlayer tablePlayer, BigDecimal bet) {
@@ -43,17 +46,6 @@ public class BlackjackDealer implements IDealer {
 		}, () -> {
 			throw new PlayerNotFoundException("Player not found in table:" + table + " player:" + tablePlayer, 1);
 		});
-	}
-
-	private void initBetRoundTimer() {
-		Timer timer = table.getTimer();
-		if (timer != null) {
-			timer.cancel();
-			timer.purge();
-		}
-		timer = new Timer();
-		table.setTimer(timer);
-		timer.schedule(new BetRoundTask(table), betInfo.getBetValues().initialBetRoundDelay(), 1000);
 	}
 
 	public void initTable() {
@@ -80,11 +72,44 @@ public class BlackjackDealer implements IDealer {
 		return table;
 	}
 
-	public void welcomeNewPlayer(ICasinoPlayer player) {
+	public void makeInitialDeal() {
+		table.updatePhase(Phase.INITIAL_DEAL);
+	}
+
+	public synchronized void welcomeNewPlayer(ICasinoPlayer player) {
 		System.out.println("Dealer welcomes:" + player.getName());
 		if (table.getReservedSeatCount() == 1) {
-			initBetRound();
+			startBetPhase();
 			System.out.println("Dealer starts betRound");
+		} else if (table.getPhase() == Phase.BET) {
+			startBetPhase();
 		}
+	}
+
+	public boolean shouldMakeInitialDeal() {
+		return table.getPhase() == Phase.INITIAL_DEAL && somebodyHasBet();
+	}
+
+	private boolean somebodyHasBet() {
+		return getPlayersWithBet().findAny().isPresent();
+	}
+
+	private Stream<Seat> getPlayersWithBet() {
+		return table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getBet() != null);
+	}
+
+	public void finalizeBetPhase() {
+		table.updatePhase(null);
+		table.getClock().stopClock();
+		updatePlayerStatusesAfterBetPhase();
+	}
+
+	private void updatePlayerStatusesAfterBetPhase() {
+		table.getSeats().stream().filter(seat -> seat.getPlayer() != null).map(seat -> seat.getPlayer()).forEach(player -> {
+			if (player.getBet() == null)
+				player.setStatus(Status.SIT_OUT);
+			else
+				player.setStatus(Status.AVAILABLE);
+		});
 	}
 }

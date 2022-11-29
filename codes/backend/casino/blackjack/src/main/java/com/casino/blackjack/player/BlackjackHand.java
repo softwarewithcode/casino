@@ -65,6 +65,11 @@ public class BlackjackHand implements IHand {
 	}
 
 	@Override
+	public String toString() {
+		return "BlackjackHand [id=" + id + ", created=" + created + ", cards=" + cards + "]";
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
