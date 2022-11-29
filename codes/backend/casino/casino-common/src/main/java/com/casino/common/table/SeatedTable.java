@@ -43,13 +43,18 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	@Override
 	public boolean takeSeat(int seatNumber, ICasinoPlayer player) {
-		BetUtil.verifySufficentInitialBalance(getBetValues(), player);
+		BetUtil.verifySufficentAmount(getBetValues().minimumBet(), player);
 		if (seatNumber < 0 || seatNumber >= seats.size())
 			return false;
 		if (super.isPrivate()) { // In private table player can reserve all seats
-			return takeSeatIfAvailable(seatNumber, player);
+			return trySeat(seatNumber, player);
 		}
-		return hasSeat(player) ? false : takeSeatIfAvailable(seatNumber, player);
+		if (hasAlreadySeat(player))
+			return false;
+		boolean gotSeat = trySeat(seatNumber, player);
+		if (gotSeat)
+			getDealer().handleNewPlayer(player);
+		return gotSeat;
 	}
 
 	@Override
@@ -58,7 +63,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		seats.forEach(seat -> seat.removePlayerIfHolder(player));
 	}
 
-	private boolean takeSeatIfAvailable(int seatNumber, ICasinoPlayer player) {
+	private boolean trySeat(int seatNumber, ICasinoPlayer player) {
 		Seat seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().orElse(null);
 		if (seat == null || !seat.take(player))
 			return false;
@@ -70,7 +75,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return seats;
 	}
 
-	private boolean hasSeat(ICasinoPlayer p) {
+	private boolean hasAlreadySeat(ICasinoPlayer p) {
 		return p == null ? false : seats.stream().anyMatch(seat -> p.equals(seat.getPlayer()));
 	}
 

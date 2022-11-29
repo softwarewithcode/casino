@@ -1,8 +1,10 @@
 package com.casino.common.player;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
+import com.casino.common.cards.IHand;
 import com.casino.common.common.Result;
 
 public interface ICasinoPlayer {
@@ -31,4 +33,6 @@ public interface ICasinoPlayer {
 	public BigDecimal getBalance();
 
 	public void updateBalance(BigDecimal balance);
+
+	public List<IHand> getHands();
 }

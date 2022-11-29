@@ -1,5 +1,7 @@
 package com.casino.common.table;
 
+import com.casino.common.player.ICasinoPlayer;
+
 public interface IDealer {
-	// just a tag
+	public void handleNewPlayer(ICasinoPlayer player);
 }

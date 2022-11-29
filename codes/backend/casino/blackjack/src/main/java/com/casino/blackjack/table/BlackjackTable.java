@@ -23,11 +23,6 @@ public class BlackjackTable extends SeatedTable {
 		this.dealer = new BlackjackDealer(this, new BetInfo(betValues));
 	}
 
-	public void placeBet(ICasinoPlayer player, BigDecimal bet) {
-		BetUtil.verifyBet(this, player, bet);
-		dealer.placeBetForPlayer(player, bet);
-	}
-
 	@SuppressWarnings("exports")
 	@Override
 	public BlackjackDealer getDealer() {
@@ -63,12 +58,16 @@ public class BlackjackTable extends SeatedTable {
 
 	}
 
+	@SuppressWarnings("preview")
 	@Override
 	public void onBetRoundEnd() {
 		dealer.finalizeBetPhase();
+		System.out.println("CurrentThread:onBetRoundEnd" + Thread.currentThread().toString());
 		if (dealer.shouldMakeInitialDeal()) {
-			System.out.println("Should start dealing");
+			Thread.ofVirtual().start(() -> dealer.dealInitialCards()); // testing here and commenting below row
+			// dealer.dealInitialCards();
 		}
+		System.out.println("onBetRoundEnd End");
 	}
 
 	@Override

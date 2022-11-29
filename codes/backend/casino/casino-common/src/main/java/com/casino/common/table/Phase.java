@@ -1,5 +1,5 @@
 package com.casino.common.table;
 
 public enum Phase {
-	BET, INITIAL_DEAL, PLAY, BREAK
+	BET, BET_COMPLETED, INITIAL_DEAL, INITIAL_DEAL_COMPLETED, PLAY, BREAK
 }

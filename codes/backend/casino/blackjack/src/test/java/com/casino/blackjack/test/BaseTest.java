@@ -1,6 +1,8 @@
 package com.casino.blackjack.test;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +19,7 @@ import com.casino.common.table.Type;
 public class BaseTest {
 	protected static final BigDecimal MIN_BET = new BigDecimal("5.0");
 	protected static final BigDecimal MAX_BET = new BigDecimal("100.0");
-	protected static final Integer BET_ROUND_TIME = 8;
+	protected static final Integer BET_ROUND_TIME_SECONDS = 2;
 	protected static final Integer INDIVIDUAL_BET_TIME = 10;
 	protected static final Integer INITIAL_DELAY = 0;
 	protected ISeatedTable publicTable;
@@ -33,16 +35,16 @@ public class BaseTest {
 	}
 
 	protected BlackjackTable createPublicTable() {
-		return new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		return new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 	}
 
 	protected boolean takeSeat(int seatNumber, ICasinoPlayer player) {
 		return publicTable.takeSeat(seatNumber, player);
 	}
 
-	protected void sleep(int i) {
+	protected void sleep(int i, ChronoUnit unit) {
 		try {
-			Thread.sleep(i);
+			Thread.sleep(Duration.of(i, unit));
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

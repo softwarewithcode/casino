@@ -1,12 +1,14 @@
 package com.casino.common.player;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.casino.common.cards.IHand;
 import com.casino.common.common.Result;
 
-public class CasinoPlayer implements ICasinoPlayer {
+public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	private String name;
 	private UUID id;
@@ -24,6 +26,8 @@ public class CasinoPlayer implements ICasinoPlayer {
 		this.balance = initialBalance;
 		this.status = null;
 	}
+
+
 
 	@Override
 	public String getName() {
