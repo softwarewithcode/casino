@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetInfo;
 import com.casino.common.bet.BetPhaseClockTask;
-import com.casino.common.bet.BetUtil;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.common.PlayerNotFoundException;
@@ -40,11 +39,10 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void handlePlayerBet(ICasinoPlayer tablePlayer, BigDecimal bet) {
-		BetUtil.verifyBet(table, tablePlayer, bet);
 		Stream<Seat> seatStream = table.getSeats().stream();
 		Optional<Seat> playerOptional = seatStream.filter(seat -> seat.getPlayer() != null && seat.getPlayer().equals(tablePlayer)).findFirst();
 		playerOptional.ifPresentOrElse(seat -> {
-			seat.getPlayer().updateBet(bet);
+			seat.getPlayer().updateBet(bet, table);
 		}, () -> {
 			throw new PlayerNotFoundException("Player not found in table:" + table + " player:" + tablePlayer, 1);
 		});

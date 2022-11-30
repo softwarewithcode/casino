@@ -77,5 +77,7 @@ public interface ICasinoTable {
 	public UUID getId();
 
 	public Clock getClock();
+	
+	
 
 }

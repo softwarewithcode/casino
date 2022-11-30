@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.casino.common.cards.IHand;
 import com.casino.common.common.Result;
+import com.casino.common.table.ICasinoTable;
 
 public interface ICasinoPlayer {
 	public String getName();
@@ -24,7 +25,7 @@ public interface ICasinoPlayer {
 
 	public BigDecimal getBet();
 
-	public void updateBet(BigDecimal bet);
+	public void updateBet(BigDecimal bet, ICasinoTable table);
 
 	public void clearBet();
 

@@ -21,6 +21,7 @@ import com.casino.common.player.ICasinoPlayer;
 public abstract class CasinoTable implements ICasinoTable {
 
 	private static final Logger LOGGER = Logger.getLogger(CasinoTable.class.getName());
+	private volatile Phase phase;
 	private Set<ICasinoPlayer> players;
 	private Set<ICasinoPlayer> watchers;
 	private Status status;
@@ -69,6 +70,11 @@ public abstract class CasinoTable implements ICasinoTable {
 			return false;
 		players.add(player);
 		return true;
+	}
+
+	public void updatePhase(Phase phase) {
+		if (this.phase != phase)
+			this.phase = phase;
 	}
 
 	@Override
@@ -214,6 +220,10 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public UUID getId() {
 		return id;
+	}
+
+	public Phase getPhase() {
+		return phase;
 	}
 
 	@Override

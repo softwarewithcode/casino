@@ -1,18 +1,18 @@
 package com.casino.common.player;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.casino.common.cards.IHand;
+import com.casino.common.bet.BetUtil;
 import com.casino.common.common.Result;
+import com.casino.common.table.ICasinoTable;
 
 public abstract class CasinoPlayer implements ICasinoPlayer {
 
-	private String name;
-	private UUID id;
-	private BigDecimal initialBalance;
+	private final String name;
+	private final UUID id;
+	private final BigDecimal initialBalance;
 	private BigDecimal endBalance;
 	private BigDecimal balance;
 	private BigDecimal bet;
@@ -26,8 +26,6 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		this.balance = initialBalance;
 		this.status = null;
 	}
-
-
 
 	@Override
 	public String getName() {
@@ -89,9 +87,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	}
 
 	@Override
-	public void updateBet(BigDecimal bet) {
-		// Bet data must be checked before calling this method. Here is no knowledge
-		// about betLimits
+	public void updateBet(BigDecimal bet, ICasinoTable table) {
+		BetUtil.verifyBet(table, this, bet);
 		this.bet = bet;
 	}
 

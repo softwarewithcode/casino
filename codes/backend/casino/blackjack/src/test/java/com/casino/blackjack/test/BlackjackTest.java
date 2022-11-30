@@ -53,8 +53,11 @@ public class BlackjackTest extends BaseTest {
 	}
 
 	@Test
-	public void placingBetInWrongPhaseResultsToException() {
+	public void placingBetWhenBetPhaseIsCompleteResultsToException() {
 		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"));
+		table.trySeat(0, blackjackPlayer);
+		sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
 			table.getDealer().handlePlayerBet(blackjackPlayer, new BigDecimal("50.0"));
 		});
