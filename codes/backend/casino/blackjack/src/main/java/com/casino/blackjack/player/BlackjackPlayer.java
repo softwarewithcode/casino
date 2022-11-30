@@ -8,12 +8,13 @@ import java.util.UUID;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.player.CasinoPlayer;
+import com.casino.common.table.ISeatedTable;
 
 public class BlackjackPlayer extends CasinoPlayer {
 	private List<IHand> hands;
 
-	public BlackjackPlayer(String name, UUID id, BigDecimal startBalance) {
-		super(name, id, startBalance);
+	public BlackjackPlayer(String name, UUID id, BigDecimal startBalance, ISeatedTable table) {
+		super(name, id, startBalance, table);
 		hands = new ArrayList<IHand>();
 		hands.add(createNewHand());
 	}

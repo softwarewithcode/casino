@@ -1,11 +1,10 @@
-package com.casino.common.common;
+package com.casino.common.exception;
 
-public class IllegalBetException extends RuntimeException {
-
+public class PlayerNotFoundException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	private final Integer code;
 
-	public IllegalBetException(String message, int code) {
+	public PlayerNotFoundException(String message, int code) {
 		super(message);
 		this.code = code;
 	}

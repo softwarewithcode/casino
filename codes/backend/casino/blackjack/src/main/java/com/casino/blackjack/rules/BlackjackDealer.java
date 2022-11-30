@@ -1,6 +1,7 @@
 package com.casino.blackjack.rules;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -12,12 +13,13 @@ import com.casino.common.bet.BetInfo;
 import com.casino.common.bet.BetPhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
-import com.casino.common.common.PlayerNotFoundException;
+import com.casino.common.exception.IllegalPhaseException;
+import com.casino.common.exception.PlayerNotFoundException;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.player.Status;
 import com.casino.common.table.IDealer;
-import com.casino.common.table.Phase;
 import com.casino.common.table.Seat;
+import com.casino.common.table.phase.GamePhase;
 
 public class BlackjackDealer implements IDealer {
 	private final BetInfo betInfo;
@@ -31,7 +33,8 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void startBetPhase() {
-		table.updatePhase(Phase.BET);
+		table.updateGamePhase(GamePhase.BET);
+		System.out.println("StartBetPhase:" + table.getGamePhase() + " -> ");
 		if (table.getActivePlayerCount() > 0) {
 			BetPhaseClockTask task = new BetPhaseClockTask(table);
 			this.getTable().getClock().startClock(task, 1000);
@@ -72,51 +75,63 @@ public class BlackjackDealer implements IDealer {
 		return table;
 	}
 
-	public void dealInitialCards() {
-		System.out.println("dealInitialCards ");
-		table.updatePhase(Phase.INITIAL_DEAL);
-		// getPlayersWithBet().forEach(player -> dealCard(player,
-		// decks.remove(decks.size() - 1)));
+	public boolean dealInitialCards() {
+		if (!isAllowedToDeal())
+			return false;
 		IntStream.range(0, 2).forEach(i -> getPlayersWithBet().forEach(player -> dealCard(player, decks.remove(decks.size() - 1))));
-		table.updatePhase(Phase.INITIAL_DEAL_COMPLETED);
+		return true;
 	}
 
 	private void dealCard(ICasinoPlayer player, Card card) {
-		System.out.println("Player " + player + " getsCard:" + card);
+		System.out.println("Dealer dealCard " + player + " getsCard:" + card);
 		player.getHands().get(0).addCard(card);
 	}
 
-	public synchronized void handleNewPlayer(ICasinoPlayer player) {
-		System.out.println("Dealer welcomes:" + player);
-		if (table.getPhase() == null) {
+	public void handleNewPlayer(ICasinoPlayer player) {
+		System.out.println("Dealer welcomes:" + player + " currentPlayers:" + table.getPlayers().size() + "PHASE:" + table.getGamePhase() + " table:" + table.getId());
+		if (table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS) {
+			table.setStatus(com.casino.common.table.Status.RUNNING);
 			startBetPhase();
 		}
 	}
 
-	public boolean shouldMakeInitialDeal() {
-		return table.getPhase() == Phase.BET_COMPLETED && somebodyHasBet();
+	private boolean isAllowedToDeal() {
+		if (table.getGamePhase() != GamePhase.BETS_COMPLETED)
+			throw new IllegalPhaseException("Wrond phase for card dealing", table.getGamePhase(), GamePhase.BETS_COMPLETED);
+		return somebodyHasBet();
 	}
 
 	private boolean somebodyHasBet() {
-		return getPlayersWithBet() != null;
+		return getPlayersWithBet() != null && getPlayersWithBet().size() > 0;
 	}
 
 	private List<ICasinoPlayer> getPlayersWithBet() {
-		return table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getBet() != null).map(seat -> seat.getPlayer()).collect(Collectors.toList());
+		List<ICasinoPlayer> playersWithBet = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getBet() != null).map(seat -> seat.getPlayer()).collect(Collectors.toList());
+		return playersWithBet;
 	}
 
 	public void finalizeBetPhase() {
-		table.updatePhase(Phase.BET_COMPLETED);
 		table.getClock().stopClock();
 		updatePlayerStatusesAfterBetPhase();
+		table.updateGamePhase(GamePhase.BETS_COMPLETED);
 	}
 
 	private void updatePlayerStatusesAfterBetPhase() {
 		table.getSeats().stream().filter(seat -> seat.getPlayer() != null).map(seat -> seat.getPlayer()).forEach(player -> {
-			if (player.getBet() == null)
+			if (player.getBet() == null) {
 				player.setStatus(Status.SIT_OUT);
-			else
+				table.changeFromPlayerToWatcher(player);
+			} else
 				player.setStatus(Status.AVAILABLE);
 		});
+	}
+
+	public void updatePlayerInTurn() {
+		Optional<Seat> startingSeat = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getBet() != null).min(Comparator.comparing(Seat::getNumber));
+		if (startingSeat.isEmpty()) {
+			throw new IllegalStateException("Should start playing but no players with bet");
+		}
+		Seat starting = startingSeat.get();
+		System.out.println("Starting player is:" + starting.getPlayer());
 	}
 }

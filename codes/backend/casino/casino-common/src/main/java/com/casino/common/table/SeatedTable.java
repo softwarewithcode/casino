@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 import com.casino.common.bet.BetUtil;
 import com.casino.common.bet.BetValues;
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.table.phase.PhasePath;
 
 /*
  * For example blackjack and red dog games are order based games. 
@@ -17,13 +18,12 @@ import com.casino.common.player.ICasinoPlayer;
 public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	private Set<Seat> seats;
-	private ICasinoPlayer playerInTurn;
 
-	protected SeatedTable(Status initialStatus, BetValues betLimit, PlayerRange playerLimit, Type type, int seats, UUID id) {
-		super(initialStatus, betLimit, playerLimit, type, id);
-		if (playerLimit.maximumPlayers() > seats)
+	protected SeatedTable(Status initialStatus, BetValues betValues, PlayerRange playerRange, Type tableType, int seatCount, UUID tableId, PhasePath phasePath) {
+		super(initialStatus, betValues, playerRange, tableType, tableId, phasePath);
+		if (playerRange.maximumPlayers() > seatCount)
 			throw new IllegalArgumentException("not enough seats for the players");
-		createSeats(seats);
+		createSeats(seatCount);
 	}
 
 	private void createSeats(int seatCount) {
@@ -41,6 +41,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return (int) seats.stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getStatus() != com.casino.common.player.Status.SIT_OUT).count();
 	}
 
+	// public trySeat(..) vs. required join() first ?
 	@Override
 	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
 		BetUtil.verifySufficentAmount(getBetValues().minimumBet(), player);
@@ -58,9 +59,20 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	}
 
 	@Override
+	public boolean join(ICasinoPlayer player) {
+		return super.joinAsWatcher(player);
+	}
+
+	@Override
 	public void leaveSeats(ICasinoPlayer player) {
 		// in a private table user can take all the seats
 		seats.forEach(seat -> seat.removePlayerIfHolder(player));
+	}
+
+	protected void sanitizeAllSeats() {
+		seats.stream().map(seat -> seat.getPlayer()).forEach(player -> {
+			super.changeFromPlayerToWatcher(player);
+		});
 	}
 
 	private boolean takeSeat(int seatNumber, ICasinoPlayer player) {
@@ -79,13 +91,4 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return p == null ? false : seats.stream().anyMatch(seat -> p.equals(seat.getPlayer()));
 	}
 
-	@Override
-	public ICasinoPlayer getPlayerInTurn() {
-		return playerInTurn;
-	}
-
-	@Override
-	public boolean join(ICasinoPlayer player) {
-		return super.joinAsWatcher(player);
-	}
 }

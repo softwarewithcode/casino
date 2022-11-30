@@ -9,6 +9,7 @@ public class BetPhaseClockTask extends TimerTask {
 	private int secondsLeft;
 
 	public BetPhaseClockTask(ICasinoTable table) {
+		System.out.println("TASK:"+table.getId());
 		this.table = table;
 		BetInfo info = table.getBetInfo();
 		secondsLeft = info.getBetValues().betRoundTime();
@@ -22,7 +23,7 @@ public class BetPhaseClockTask extends TimerTask {
 		secondsLeft--;
 		System.out.println("BetRoundTask time left:" + secondsLeft + " table:" + table.getId());
 		if (secondsLeft == 0) {
-			table.onBetRoundEnd();
+			table.onBetPhaseEnd();
 		}
 	}
 }

@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.common.cards.Card;
@@ -14,7 +16,7 @@ import com.casino.common.cards.Suit;
 public class BlackjackPlayerTest {
 	@Test
 	public void playerHoldsDealtCardsInFirstHand() {
-		BlackjackPlayer player = new BlackjackPlayer("player", UUID.randomUUID(), BigDecimal.TEN);
+		BlackjackPlayer player = new BlackjackPlayer("player", UUID.randomUUID(), BigDecimal.TEN, null);
 		player.addCard(player.getHands().get(0), new Card(13, Suit.CLUB));
 		player.addCard(player.getHands().get(0), new Card(11, Suit.CLUB));
 		Assertions.assertEquals(1, player.getHands().size());
@@ -85,12 +87,8 @@ public class BlackjackPlayerTest {
 	}
 
 	private BlackjackPlayer createPlayer() {
-		BlackjackPlayer player = new BlackjackPlayer("player", UUID.randomUUID(), BigDecimal.TEN);
+		BlackjackPlayer player = new BlackjackPlayer("player", UUID.randomUUID(), BigDecimal.TEN, null);
 
 		return player;
-	}
-
-	private Card createCard(int rank, Suit suit) {
-		return new Card(rank, suit);
 	}
 }

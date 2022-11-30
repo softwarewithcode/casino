@@ -8,6 +8,7 @@ import com.casino.common.bet.BetInfo;
 import com.casino.common.bet.BetValues;
 import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.table.phase.GamePhase;
 
 public interface ICasinoTable {
 	public boolean isClosed();
@@ -19,8 +20,6 @@ public interface ICasinoTable {
 	public boolean isOpen();
 
 	public boolean isMultiplayer();
-
-	public boolean isGathering();
 
 	public boolean isPublic();
 
@@ -66,18 +65,18 @@ public interface ICasinoTable {
 
 	public Instant getCreated();
 
-	public void onBetRoundEnd();
+	public void onBetPhaseEnd();
 
 	public IDealer getDealer();
 
 	public BetValues getBetValues();
 
-	public Phase getPhase();
+	public GamePhase getGamePhase();
 
 	public UUID getId();
 
 	public Clock getClock();
-	
-	
+
+	public GamePhase updateGamePhase(GamePhase phase);
 
 }

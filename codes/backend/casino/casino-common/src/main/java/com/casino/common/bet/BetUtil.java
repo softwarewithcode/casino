@@ -2,10 +2,10 @@ package com.casino.common.bet;
 
 import java.math.BigDecimal;
 
-import com.casino.common.common.IllegalBetException;
+import com.casino.common.exception.IllegalBetException;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.ICasinoTable;
-import com.casino.common.table.Phase;
+import com.casino.common.table.phase.GamePhase;
 
 public class BetUtil {
 
@@ -15,7 +15,7 @@ public class BetUtil {
 	}
 
 	private static void verify(ICasinoTable table, ICasinoPlayer player, BigDecimal betAttempt) {
-		if (table.getPhase() != Phase.BET)
+		if (table.getGamePhase() != GamePhase.BET)
 			throw new IllegalBetException("given bet in wrong phase:" + table + " player:" + player + " bet:" + betAttempt.toString(), 1);
 		if (betAttempt == null)
 			throw new IllegalBetException("no bet is given in table:" + table + " player:" + player, 2);

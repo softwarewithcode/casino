@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetValues;
-import com.casino.common.common.IllegalBetException;
-import com.casino.common.common.PlayerNotFoundException;
+import com.casino.common.exception.IllegalBetException;
+import com.casino.common.exception.PlayerNotFoundException;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
@@ -23,29 +23,36 @@ public class BlackjackTest extends BaseTest {
 
 	@Test
 	public void initialTableJoinSetsPlayerAsWatcherInPublicTable() {
-		publicTable.join(blackjackPlayer);
-		Assertions.assertEquals(1, publicTable.getWatchers().size());
-		Assertions.assertEquals(0, publicTable.getPlayers().size());
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		table.join(blackjackPlayer);
+		Assertions.assertEquals(1, table.getWatchers().size());
+		Assertions.assertEquals(0, table.getPlayers().size());
 	}
 
 	@Test
 	public void takingSeatChangesWatcherToPlayer() {
-		takeSeat(0, blackjackPlayer);
-		Assertions.assertEquals(0, publicTable.getWatchers().size());
-		Assertions.assertEquals(1, publicTable.getPlayers().size());
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		table.trySeat(0, blackjackPlayer);
+		Assertions.assertEquals(0, table.getWatchers().size());
+		Assertions.assertEquals(1, table.getPlayers().size());
 	}
 
 	@Test
 	public void reservedSeatCannotBeTaken() {
-		takeSeat(0, blackjackPlayer);
-		takeSeat(0, blackjackPlayer2);
-		Assertions.assertEquals(blackjackPlayer, publicTable.getSeats().stream().filter(seat -> seat.getPlayer() != null).findFirst().get().getPlayer());
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		table.trySeat(0, blackjackPlayer);
+		table.trySeat(0, blackjackPlayer2);
+		Assertions.assertEquals(blackjackPlayer, table.getSeats().stream().filter(seat -> seat.getPlayer() != null).findFirst().get().getPlayer());
 	}
 
 	@Test
 	public void playerCannotTakeSeatIfMinimumBetIsNotCovered() {
-		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
-		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("2.5"));
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("4.99"), table);
 		assertThrows(IllegalArgumentException.class, () -> {
 			table.trySeat(0, blackjackPlayer);
 		});
@@ -54,10 +61,10 @@ public class BlackjackTest extends BaseTest {
 
 	@Test
 	public void placingBetWhenBetPhaseIsCompleteResultsToException() {
-		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
-		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"));
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		table.trySeat(0, blackjackPlayer);
-		sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
+		sleep(BET_ROUND_TIME_SECONDS + 1, ChronoUnit.SECONDS);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
 			table.getDealer().handlePlayerBet(blackjackPlayer, new BigDecimal("50.0"));
 		});
@@ -66,8 +73,8 @@ public class BlackjackTest extends BaseTest {
 
 	@Test
 	public void emptyBetResultsToException() {
-		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
-		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"));
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		table.trySeat(0, blackjackPlayer);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
 			table.getDealer().handlePlayerBet(blackjackPlayer, null);
@@ -77,8 +84,8 @@ public class BlackjackTest extends BaseTest {
 
 	@Test
 	public void placingBetOverBalanceButWithinTableLimitsResultsToException() {
-		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
-		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"));
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50.0"), table);
 		table.trySeat(0, blackjackPlayer);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
 			table.getDealer().handlePlayerBet(blackjackPlayer, new BigDecimal("50.001"));
@@ -88,8 +95,9 @@ public class BlackjackTest extends BaseTest {
 
 	@Test
 	public void placingBetToPlayerNotInTableResultsInException() {
-		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
-		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"));
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		table.trySeat(0, blackjackPlayer);
 		PlayerNotFoundException exception = assertThrows(PlayerNotFoundException.class, () -> {
 			table.getDealer().handlePlayerBet(blackjackPlayer2, new BigDecimal("7.0"));
@@ -99,8 +107,8 @@ public class BlackjackTest extends BaseTest {
 
 	@Test
 	public void placingBetUnderTableMinimumResultsException() {
-		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
-		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"));
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		table.trySeat(0, blackjackPlayer);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
 			table.getDealer().handlePlayerBet(blackjackPlayer, new BigDecimal("4.99"));
@@ -110,8 +118,8 @@ public class BlackjackTest extends BaseTest {
 
 	@Test
 	public void placingBetOverTableMaximuResultsToException() {
-		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
-		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"));
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe!!", UUID.randomUUID(), new BigDecimal("1000"), table);
 		table.trySeat(0, blackjackPlayer);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
 			table.getDealer().handlePlayerBet(blackjackPlayer, new BigDecimal("100.1"));
@@ -121,8 +129,8 @@ public class BlackjackTest extends BaseTest {
 
 	@Test
 	public void placingAllowedBetSetsTheBetForPlayer() {
-		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
-		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"));
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"), table);
 		table.trySeat(0, blackjackPlayer);
 		table.getDealer().handlePlayerBet(blackjackPlayer, new BigDecimal("49.9"));
 		assertEquals(blackjackPlayer.getBet().toString(), "49.9");
@@ -130,11 +138,11 @@ public class BlackjackTest extends BaseTest {
 
 	@Test
 	public void initialHandIsDealtAfterBetRoundHasEnded() {
-		BlackjackTable table = new BlackjackTable(Status.OPEN, new BetValues(MIN_BET, MAX_BET, 2, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
-		blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"));
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, 2, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"), table);
 		table.trySeat(0, blackjackPlayer);
 		table.getDealer().handlePlayerBet(blackjackPlayer, new BigDecimal("49.9"));
-		sleep(5, ChronoUnit.SECONDS);
+		sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
 		BlackjackPlayer b = (BlackjackPlayer) blackjackPlayer;
 		assertEquals(2, b.getHands().get(0).getCards().size());
 	}

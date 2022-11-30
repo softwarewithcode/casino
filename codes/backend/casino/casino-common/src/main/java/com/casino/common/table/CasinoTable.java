@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 import com.casino.common.bet.BetValues;
 import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.table.phase.GamePhase;
+import com.casino.common.table.phase.PhasePath;
 
 /**
  * Base class for all casino tables. Gather here common data and operations what
@@ -21,7 +23,7 @@ import com.casino.common.player.ICasinoPlayer;
 public abstract class CasinoTable implements ICasinoTable {
 
 	private static final Logger LOGGER = Logger.getLogger(CasinoTable.class.getName());
-	private volatile Phase phase;
+	private PhasePath phasePath;
 	private Set<ICasinoPlayer> players;
 	private Set<ICasinoPlayer> watchers;
 	private Status status;
@@ -32,8 +34,9 @@ public abstract class CasinoTable implements ICasinoTable {
 	private UUID id;
 	private Instant created;
 	private Clock clock;
+	private ICasinoPlayer playerInTurn;
 
-	protected CasinoTable(Status initialStatus, BetValues betLimit, PlayerRange playerLimit, Type type, UUID id) {
+	protected CasinoTable(Status initialStatus, BetValues betLimit, PlayerRange playerLimit, Type type, UUID id, PhasePath phases) {
 		this.players = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.watchers = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.status = initialStatus;
@@ -43,6 +46,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.betValues = betLimit;
 		this.playerLimit = playerLimit;
 		this.clock = new Clock();
+		this.phasePath = phases;
 	}
 
 	@Override
@@ -72,19 +76,13 @@ public abstract class CasinoTable implements ICasinoTable {
 		return true;
 	}
 
-	public void updatePhase(Phase phase) {
-		if (this.phase != phase)
-			this.phase = phase;
+	protected void setPhasePath(PhasePath path) {
+		this.phasePath = path;
 	}
 
 	@Override
 	public boolean isClosed() {
 		return status == Status.CLOSED;
-	}
-
-	@Override
-	public boolean isGathering() {
-		return status == Status.GATHERING;
 	}
 
 	@Override
@@ -114,12 +112,12 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public void open() {
-		status = Status.OPEN;
+		status = Status.WAITING_PLAYERS;
 	}
 
 	@Override
 	public boolean isOpen() {
-		return status == Status.OPEN;
+		return status == Status.WAITING_PLAYERS;
 	}
 
 	@Override
@@ -169,7 +167,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		players.add(player);
 	}
 
-	protected void changeFromPlayerToWatcher(ICasinoPlayer player) {
+	public void changeFromPlayerToWatcher(ICasinoPlayer player) {
 		players.remove(player);
 		watchers.add(player);
 	}
@@ -222,13 +220,24 @@ public abstract class CasinoTable implements ICasinoTable {
 		return id;
 	}
 
-	public Phase getPhase() {
-		return phase;
+	public GamePhase updateGamePhase(GamePhase phase) {
+		phasePath.setCurrentPhase(phase);
+		return phasePath.getPhase();
 	}
 
 	@Override
 	public String toString() {
 		return "CasinoTable [status=" + status + ", playerLimit=" + playerLimit + ", betValues=" + betValues + ", type=" + type + ", id=" + id + ", created=" + created + "]";
+	}
+
+	@Override
+	public ICasinoPlayer getPlayerInTurn() {
+		return playerInTurn;
+	}
+
+	@Override
+	public GamePhase getGamePhase() {
+		return phasePath.getPhase();
 	}
 
 	@Override

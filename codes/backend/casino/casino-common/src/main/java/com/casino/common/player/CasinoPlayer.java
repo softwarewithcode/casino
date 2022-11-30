@@ -17,19 +17,25 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	private BigDecimal balance;
 	private BigDecimal bet;
 	private Status status;
+	private ICasinoTable table;
 
-	public CasinoPlayer(String name, UUID id, BigDecimal initialBalance) {
+	public CasinoPlayer(String name, UUID id, BigDecimal initialBalance, ICasinoTable table) {
 		super();
 		this.name = name;
 		this.id = id;
 		this.initialBalance = initialBalance;
 		this.balance = initialBalance;
 		this.status = null;
+		this.table = table;
 	}
 
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	public ICasinoTable getTable() {
+		return table;
 	}
 
 	@Override

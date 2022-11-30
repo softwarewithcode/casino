@@ -1,33 +1,45 @@
 package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
-import com.casino.common.table.Phase;
+import com.casino.blackjack.table.BlackjackTable;
+import com.casino.common.bet.BetValues;
+import com.casino.common.table.PlayerRange;
+import com.casino.common.table.Status;
+import com.casino.common.table.Type;
+import com.casino.common.table.phase.GamePhase;
 
 public class DealerTest extends BaseTest {
 	@Test
-	public void betPhaseStartsAndEnds() {
-		var dealer = (BlackjackDealer) publicTable.getDealer();
-		assertNull(dealer.getTable().getPhase());
-		takeSeat(1, blackjackPlayer);
-		assertEquals(Phase.BET, dealer.getTable().getPhase());
-		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS); // w for the dealer to complete. Just a number
-		assertEquals(Phase.INITIAL_DEAL_COMPLETED, dealer.getTable().getPhase());
+	public void tablePhaseTestsFromWaitingToInitialDealCompleted() {
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		var dealer = (BlackjackDealer) table.getDealer();
+		assertEquals(GamePhase.BET, table.getGamePhase());
+		table.trySeat(1, blackjackPlayer);
+		assertEquals(GamePhase.BET, table.getGamePhase());
+		dealer.handlePlayerBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(GamePhase.PLAY, table.getGamePhase());
 	}
 
 	@Test
 	public void playerReceivesTwoCardsInFirstHandDuringInitialDeal() {
-		var dealer = (BlackjackDealer) publicTable.getDealer();
-		assertNull(dealer.getTable().getPhase());
-		assertTrue(takeSeat(1, blackjackPlayer));
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		var dealer = (BlackjackDealer) table.getDealer();
+		assertTrue(table.getStatus() == Status.WAITING_PLAYERS);
+		assertTrue(table.trySeat(1, blackjackPlayer));
+		assertTrue(table.getStatus() == Status.RUNNING);
 		assertEquals(1, blackjackPlayer.getHands().size());
 		assertEquals(0, blackjackPlayer.getHands().get(0).getCards().size());
 		dealer.handlePlayerBet(blackjackPlayer, new BigDecimal("50.0"));
@@ -37,9 +49,12 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void playersReceiveTwoCardsInFirstHandDuringInitialDeal() {
-		var dealer = (BlackjackDealer) publicTable.getDealer();
-		takeSeat(1, blackjackPlayer);
-		takeSeat(2, blackjackPlayer2);
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		var dealer = (BlackjackDealer) table.getDealer();
+		table.trySeat(1, blackjackPlayer);
+		table.trySeat(2, blackjackPlayer2);
 		dealer.handlePlayerBet(blackjackPlayer, new BigDecimal("54.0"));
 		dealer.handlePlayerBet(blackjackPlayer2, new BigDecimal("51.0"));
 		assertEquals(1, blackjackPlayer.getHands().size());
@@ -55,9 +70,12 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void playerWithoutBetDoesNotGetCards() {
-		assertTrue(takeSeat(1, blackjackPlayer));
-		assertTrue(takeSeat(2, blackjackPlayer2));
-		var dealer = (BlackjackDealer) publicTable.getDealer();
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		assertTrue(table.trySeat(1, blackjackPlayer));
+		assertTrue(table.trySeat(2, blackjackPlayer2));
+		var dealer = (BlackjackDealer) table.getDealer();
 		dealer.handlePlayerBet(blackjackPlayer, new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS); // w for the dealer to complete. Just a number
 		assertEquals(2, blackjackPlayer.getHands().get(0).getCards().size());
@@ -66,9 +84,12 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void playersBetsAreAccepted() {
-		assertTrue(takeSeat(1, blackjackPlayer));
-		assertTrue(takeSeat(2, blackjackPlayer2));
-		var dealer = (BlackjackDealer) publicTable.getDealer();
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INDIVIDUAL_BET_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		assertTrue(table.trySeat(1, blackjackPlayer));
+		assertTrue(table.trySeat(2, blackjackPlayer2));
+		var dealer = (BlackjackDealer) table.getDealer();
 		dealer.handlePlayerBet(blackjackPlayer, new BigDecimal("50.0"));
 		dealer.handlePlayerBet(blackjackPlayer2, new BigDecimal("99.7"));
 		assertEquals("50.0", blackjackPlayer.getBet().toString());
