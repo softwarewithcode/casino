@@ -236,6 +236,11 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
+	public boolean isGamePhase(GamePhase phase) {
+		return getGamePhase() == phase;
+	}
+
+	@Override
 	public GamePhase getGamePhase() {
 		return phasePath.getPhase();
 	}

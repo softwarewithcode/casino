@@ -1,6 +1,7 @@
 package com.casino.blackjack.table;
 
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,10 +20,12 @@ import com.casino.common.table.phase.PhasePathFactory;
 public class BlackjackTable extends SeatedTable {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
 	private final BlackjackDealer dealer;
+	private ReentrantLock lock;
 
 	public BlackjackTable(Status initialStatus, BetValues betValues, PlayerRange playerLimit, Type type, int seats, UUID id) {
 		super(initialStatus, betValues, playerLimit, type, seats, id, PhasePathFactory.buildBlackjackPath());
 		this.dealer = new BlackjackDealer(this, new BetInfo(betValues));
+		lock = new ReentrantLock(true);
 	}
 
 	@SuppressWarnings("exports")
@@ -57,8 +60,11 @@ public class BlackjackTable extends SeatedTable {
 
 	@Override
 	public void onBetPhaseEnd() {
-		dealer.finalizeBetPhase();
 		try {
+			if (!canProceedToPlayPhase()) {
+				throw new IllegalPhaseException("GamePhase is not correct ot lock was not acquired", getGamePhase(), GamePhase.BET);
+			}
+			dealer.finalizeBetPhase();
 			if (dealer.dealInitialCards()) {
 				updateGamePhase(GamePhase.PLAY);
 				dealer.updatePlayerInTurn();
@@ -66,8 +72,16 @@ public class BlackjackTable extends SeatedTable {
 		} catch (IllegalPhaseException re) {
 			LOGGER.log(Level.SEVERE, "betPhaseEnd dealer cannot deal:", re);
 			super.updateGamePhase(null);
+			dealer.returnBets();
 			setStatus(Status.WAITING_PLAYERS);
+		} finally {
+			LOGGER.log(Level.INFO, "onBetPhaseEnd, releasing lock holdCount:" + lock.getHoldCount());
+			lock.unlock();
 		}
+	}
+
+	private boolean canProceedToPlayPhase() {
+		return isGamePhase(GamePhase.BET) && lock.tryLock();
 	}
 
 	public void updatePlayerInTurn() {

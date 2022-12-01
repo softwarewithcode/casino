@@ -96,8 +96,8 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private boolean isAllowedToDeal() {
-		if (table.getGamePhase() != GamePhase.BETS_COMPLETED)
-			throw new IllegalPhaseException("Wrond phase for card dealing", table.getGamePhase(), GamePhase.BETS_COMPLETED);
+		if (!table.isGamePhase(GamePhase.BETS_COMPLETED))
+			throw new IllegalPhaseException("Wrong phase for card dealing", table.getGamePhase(), GamePhase.BETS_COMPLETED);
 		return somebodyHasBet();
 	}
 
@@ -112,11 +112,11 @@ public class BlackjackDealer implements IDealer {
 
 	public void finalizeBetPhase() {
 		table.getClock().stopClock();
-		updatePlayerStatusesAfterBetPhase();
+		updateSittingOutAndAvailablePlayers();
 		table.updateGamePhase(GamePhase.BETS_COMPLETED);
 	}
 
-	private void updatePlayerStatusesAfterBetPhase() {
+	private void updateSittingOutAndAvailablePlayers() {
 		table.getSeats().stream().filter(seat -> seat.getPlayer() != null).map(seat -> seat.getPlayer()).forEach(player -> {
 			if (player.getBet() == null) {
 				player.setStatus(Status.SIT_OUT);
@@ -133,5 +133,10 @@ public class BlackjackDealer implements IDealer {
 		}
 		Seat starting = startingSeat.get();
 		System.out.println("Starting player is:" + starting.getPlayer());
+	}
+
+	public void returnBets() {
+		// TODO Auto-generated method stub
+
 	}
 }

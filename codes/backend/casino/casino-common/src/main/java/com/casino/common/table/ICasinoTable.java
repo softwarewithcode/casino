@@ -79,4 +79,6 @@ public interface ICasinoTable {
 
 	public GamePhase updateGamePhase(GamePhase phase);
 
+	boolean isGamePhase(GamePhase phase);
+
 }
