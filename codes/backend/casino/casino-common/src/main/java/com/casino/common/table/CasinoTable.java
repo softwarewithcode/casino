@@ -50,12 +50,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public abstract int getTurnTime();
-
-	@Override
-	public abstract int getComputerTurnTime();
-
-	@Override
 	public abstract void onPlayerLeave(ICasinoPlayer player);
 
 	protected boolean joinAsWatcher(ICasinoPlayer player) {

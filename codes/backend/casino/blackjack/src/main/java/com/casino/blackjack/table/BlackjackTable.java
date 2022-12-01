@@ -63,19 +63,13 @@ public class BlackjackTable extends SeatedTable {
 	}
 
 	@Override
-	public int getTurnTime() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getComputerTurnTime() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public void onPlayerLeave(ICasinoPlayer player) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onPlayerTimeout(ICasinoPlayer player) {
 		// TODO Auto-generated method stub
 
 	}
@@ -102,13 +96,14 @@ public class BlackjackTable extends SeatedTable {
 		}
 	}
 
-	private boolean canProceedToPlayPhase() {
-		return isGamePhase(GamePhase.BET) && lock.tryLock();
+	@Override
+	public void onTableClose() {
+		// TODO Auto-generated method stub
+
 	}
 
-	public void updatePlayerInTurn() {
-		// TODO Auto-generated method stub
-		System.out.println("Checking who's turn it is");
+	private boolean canProceedToPlayPhase() {
+		return isGamePhase(GamePhase.BET) && lock.tryLock();
 	}
 
 	@Override

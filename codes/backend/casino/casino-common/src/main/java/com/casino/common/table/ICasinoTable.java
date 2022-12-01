@@ -31,6 +31,10 @@ public interface ICasinoTable {
 
 	public void onPlayerLeave(ICasinoPlayer player);
 
+	public void onPlayerTimeout(ICasinoPlayer player);
+
+	public void onTableClose();
+
 	public boolean join(ICasinoPlayer player);
 
 	public PlayerRange getPlayerLimit();
@@ -52,10 +56,6 @@ public interface ICasinoTable {
 	public Set<ICasinoPlayer> getWatchers();
 
 	public Set<ICasinoPlayer> getPlayersAndWatchers();
-
-	public int getComputerTurnTime();
-
-	public int getTurnTime();
 
 	public void onTimeout(ICasinoPlayer player);
 
