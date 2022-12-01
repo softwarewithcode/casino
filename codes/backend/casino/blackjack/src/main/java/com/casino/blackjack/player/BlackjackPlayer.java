@@ -21,6 +21,12 @@ public class BlackjackPlayer extends CasinoPlayer {
 		hands.add(hand);
 	}
 
+	public boolean canTake() {
+		IHand hand = getActiveHand();
+		List<Integer> values = hand.calculateValues(); // Smallest value in 0 pos.
+		return values.get(0) < 21;
+	}
+
 	private BlackjackHand createNewHand() {
 		return new BlackjackHand(UUID.randomUUID());
 	}

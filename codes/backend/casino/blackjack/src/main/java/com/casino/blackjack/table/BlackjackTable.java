@@ -43,7 +43,7 @@ public final class BlackjackTable extends SeatedTable {
 
 	public void placeInitialBet(ICasinoPlayer player, BigDecimal bet) {
 		LOGGER.entering(getClass().getName(), "placeInitialBet:" + this + " player:" + player);
-		// Replaces previous bet. UI handles usability
+		// Replaces previous bet if bet is allowed. UI handles usability
 		try {
 			if (isGamePhase(GamePhase.BET))
 				dealer.handlePlayerBet(player, bet);
@@ -62,7 +62,7 @@ public final class BlackjackTable extends SeatedTable {
 		if (!isPlayerAllowedToPlay(player)) {
 			// Timer might have run out or unauthorized call
 			LOGGER.log(Level.SEVERE, " Player not in turn: " + player + " called stand:" + this);
-			return;
+			throw new IllegalArgumentException("Player:" + player + " is not allowed to stand in table :)" + this + " phase:" + getGamePhase());
 		}
 		try {
 			if (!playerInTurnLock.tryLock()) {
@@ -81,14 +81,14 @@ public final class BlackjackTable extends SeatedTable {
 		if (!isPlayerAllowedToPlay(player)) {
 			// Timer might have run out or unauthorized call
 			LOGGER.log(Level.SEVERE, " Player not in turn: " + player + " called takeCard:" + this);
-			return;
+			throw new IllegalArgumentException("Player:" + player + " is not allowed to take card in table:" + this + " phase:" + getGamePhase());
 		}
 		try {
 			if (!playerInTurnLock.tryLock()) {
 				LOGGER.log(Level.INFO, " Player -takeCard " + player + " tried to take card in table:" + this);
-				dealer.addCard(player);
 				return;
 			}
+			dealer.addCard(player);
 		} finally {
 			if (playerInTurnLock.isHeldByCurrentThread())
 				playerInTurnLock.unlock();
@@ -137,9 +137,8 @@ public final class BlackjackTable extends SeatedTable {
 	@Override
 	public void onBetPhaseEnd() {
 		try {
-			if (!canProceedToPlayPhase()) {
+			if (!canProceedToPlayPhase())
 				throw new IllegalPhaseException("GamePhase is not correct or lock was not acquired", getGamePhase(), GamePhase.BET);
-			}
 			dealer.finalizeBetPhase();
 			if (dealer.dealInitialCards()) {
 				updateGamePhase(GamePhase.PLAY);
@@ -167,11 +166,6 @@ public final class BlackjackTable extends SeatedTable {
 	@Override
 	public BetInfo getBetInfo() {
 		return dealer.getBetInfo();
-	}
-
-	@Override
-	public String toString() {
-		return "BlackjackTable [dealer=" + dealer + ", phase=" + getGamePhase() + "]";
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import com.casino.common.cards.IHand;
 public class BlackjackHand implements IHand {
 	private final UUID id;
 	private final Instant created;
-	private List<Card> cards;
+	private final List<Card> cards;
 	private Instant completed;
 	private boolean active;
 
@@ -43,6 +43,7 @@ public class BlackjackHand implements IHand {
 
 	public void completeHand() {
 		this.completed = Instant.now();
+		this.active = false;
 	}
 
 	@Override

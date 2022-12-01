@@ -64,10 +64,6 @@ public class BlackjackDealer implements IDealer {
 		return decks;
 	}
 
-	public void setDecks(List<Card> decks) {
-		this.decks = decks;
-	}
-
 	public BetInfo getBetInfo() {
 		return betInfo;
 	}
@@ -124,11 +120,11 @@ public class BlackjackDealer implements IDealer {
 
 	public void finalizeBetPhase() {
 		table.getClock().stopClock();
-		updateSittingOutAndAvailablePlayers();
+		updatePlayers();
 		table.updateGamePhase(GamePhase.BETS_COMPLETED);
 	}
 
-	private void updateSittingOutAndAvailablePlayers() {
+	private void updatePlayers() {
 		table.getSeats().stream().filter(seat -> seat.getPlayer() != null).map(seat -> seat.getPlayer()).forEach(player -> {
 			if (player.getBet() == null) {
 				player.setStatus(Status.SIT_OUT);
@@ -143,8 +139,8 @@ public class BlackjackDealer implements IDealer {
 		if (startingSeat.isEmpty()) {
 			throw new IllegalStateException("Should start playing but no players with bet");
 		}
-		Seat starting = startingSeat.get();
-		System.out.println("Starting player is:" + starting.getPlayer());
+		Seat nextSeat = startingSeat.get();
+		table.setPlayerInTurn(nextSeat.getPlayer());
 	}
 
 	public void changeTurn() {

@@ -227,7 +227,7 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public String toString() {
-		return "CasinoTable [status=" + status + ", playerLimit=" + playerLimit + ", betValues=" + betValues + ", type=" + type + ", id=" + id + ", created=" + created + "]";
+		return "CasinoTable [status=" + status + ", type=" + type + ", id=" + id + ", playerInTurn=" + playerInTurn + "]";
 	}
 
 	@Override
@@ -239,6 +239,10 @@ public abstract class CasinoTable implements ICasinoTable {
 		if (player == null)
 			return false;
 		return getPlayerInTurn() != null && getPlayerInTurn().equals(player);
+	}
+
+	public void setPlayerInTurn(ICasinoPlayer player) {
+		playerInTurn = player;
 	}
 
 	@Override
