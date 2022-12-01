@@ -12,7 +12,7 @@ public class Seat {
 		this.number = number;
 	}
 
-	public boolean take(ICasinoPlayer p) {
+	public synchronized boolean take(ICasinoPlayer p) {
 		if (player != null)
 			return false;
 		player = p;
