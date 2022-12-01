@@ -57,8 +57,6 @@ public interface ICasinoTable {
 
 	public Set<ICasinoPlayer> getPlayersAndWatchers();
 
-	public void onTimeout(ICasinoPlayer player);
-
 	public Status getStatus();
 
 	public void setStatus(Status status);

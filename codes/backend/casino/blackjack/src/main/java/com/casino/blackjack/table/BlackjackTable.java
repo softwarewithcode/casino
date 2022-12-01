@@ -57,12 +57,6 @@ public class BlackjackTable extends SeatedTable {
 	}
 
 	@Override
-	public void onTimeout(ICasinoPlayer player) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void onPlayerLeave(ICasinoPlayer player) {
 		// TODO Auto-generated method stub
 
