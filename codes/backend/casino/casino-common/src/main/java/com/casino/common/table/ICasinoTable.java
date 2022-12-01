@@ -33,6 +33,8 @@ public interface ICasinoTable {
 
 	public void onPlayerTimeout(ICasinoPlayer player);
 
+	public int getPlayerTurnTime();
+
 	public void onTableClose();
 
 	public boolean join(ICasinoPlayer player);

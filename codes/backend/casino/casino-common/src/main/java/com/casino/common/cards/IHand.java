@@ -11,5 +11,13 @@ public interface IHand {
 
 	public List<Card> getCards();
 
+	public boolean isCompleted();
+
 	public UUID getId();
+
+	public boolean isActive();
+
+	public void activate();
+
+	public void complete();
 }

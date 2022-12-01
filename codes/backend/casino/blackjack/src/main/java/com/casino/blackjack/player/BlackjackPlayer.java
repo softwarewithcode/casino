@@ -16,11 +16,17 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public BlackjackPlayer(String name, UUID id, BigDecimal startBalance, ISeatedTable table) {
 		super(name, id, startBalance, table);
 		hands = new ArrayList<IHand>();
-		hands.add(createNewHand());
+		IHand hand = createNewHand();
+		hand.activate();
+		hands.add(hand);
 	}
 
 	private BlackjackHand createNewHand() {
 		return new BlackjackHand(UUID.randomUUID());
+	}
+
+	public IHand getActiveHand() {
+		return hands.stream().filter(hand -> !hand.isCompleted()).findFirst().orElseThrow();
 	}
 
 	public void addCard(IHand hand, Card card) {

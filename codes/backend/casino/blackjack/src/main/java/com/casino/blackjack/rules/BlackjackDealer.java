@@ -13,6 +13,7 @@ import com.casino.common.bet.BetInfo;
 import com.casino.common.bet.BetPhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
+import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.PlayerNotFoundException;
 import com.casino.common.player.ICasinoPlayer;
@@ -87,6 +88,17 @@ public class BlackjackDealer implements IDealer {
 		player.getHands().get(0).addCard(card);
 	}
 
+	public void addCard(ICasinoPlayer player) {
+		if (!table.isGamePhase(GamePhase.PLAY))
+			throw new IllegalPhaseException("Wrong phase for add card", table.getGamePhase(), GamePhase.PLAY);
+		Card card = decks.remove(decks.size() - 1);
+		getActiveHand(player).addCard(card);
+	}
+
+	private IHand getActiveHand(ICasinoPlayer player) {
+		return player.getHands().stream().filter(hand -> hand.isActive()).findFirst().orElseThrow();
+	}
+
 	public void handleNewPlayer(ICasinoPlayer player) {
 		System.out.println("Dealer welcomes:" + player + " currentPlayers:" + table.getPlayers().size() + "PHASE:" + table.getGamePhase() + " table:" + table.getId());
 		if (table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS) {
@@ -135,7 +147,7 @@ public class BlackjackDealer implements IDealer {
 		System.out.println("Starting player is:" + starting.getPlayer());
 	}
 
-	public void returnBets() {
+	public void changeTurn() {
 		// TODO Auto-generated method stub
 
 	}

@@ -27,7 +27,4 @@ public class Clock {
 		return ticking;
 	}
 
-	public Timer getTimer() {
-		return timer;
-	}
 }

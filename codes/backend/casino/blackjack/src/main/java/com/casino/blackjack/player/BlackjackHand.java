@@ -15,11 +15,14 @@ public class BlackjackHand implements IHand {
 	private final UUID id;
 	private final Instant created;
 	private List<Card> cards;
+	private Instant completed;
+	private boolean active;
 
 	public BlackjackHand(UUID id) {
 		this.id = id;
 		this.created = Instant.now();
 		cards = new ArrayList<Card>();
+		active = false;
 	}
 
 	@Override
@@ -38,16 +41,32 @@ public class BlackjackHand implements IHand {
 		return aceOptional.isPresent() && smallestValue + 10 < 22;
 	}
 
+	public void completeHand() {
+		this.completed = Instant.now();
+	}
+
 	@Override
 	public void addCard(Card card) {
 		if (card == null)
 			throw new IllegalArgumentException("Card is missing");
+		if (isCompleted())
+			throw new IllegalArgumentException("Hand is completed cannot add card " + this);
 		this.cards.add(card);
 	}
 
 	@Override
 	public List<Card> getCards() {
 		return cards;
+	}
+
+	public boolean isActive() {
+		return active && !isCompleted();
+	}
+
+	public void setActive(boolean active) {
+		if (isCompleted())
+			throw new IllegalArgumentException("cannot set completed hand as active");
+		this.active = active;
 	}
 
 	@Override
@@ -79,6 +98,22 @@ public class BlackjackHand implements IHand {
 			return false;
 		BlackjackHand other = (BlackjackHand) obj;
 		return Objects.equals(id, other.id);
+	}
+
+	@Override
+	public boolean isCompleted() {
+		return completed != null;
+	}
+
+	@Override
+	public void activate() {
+		this.active = true;
+	}
+
+	@Override
+	public void complete() {
+		this.completed = Instant.now();
+		this.active = false;
 	}
 
 }

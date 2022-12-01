@@ -33,7 +33,8 @@ public abstract class CasinoTable implements ICasinoTable {
 	private Language language;
 	private UUID id;
 	private Instant created;
-	private Clock clock;
+	private Clock tableClock;
+	private Clock playerClock;
 	private ICasinoPlayer playerInTurn;
 
 	protected CasinoTable(Status initialStatus, BetValues betLimit, PlayerRange playerLimit, Type type, UUID id, PhasePath phases) {
@@ -45,7 +46,8 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.created = Instant.now();
 		this.betValues = betLimit;
 		this.playerLimit = playerLimit;
-		this.clock = new Clock();
+		this.tableClock = new Clock();
+		this.playerClock = new Clock();
 		this.phasePath = phases;
 	}
 
@@ -122,7 +124,7 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public Clock getClock() {
-		return this.clock;
+		return this.tableClock;
 	}
 
 	@Override
@@ -164,6 +166,10 @@ public abstract class CasinoTable implements ICasinoTable {
 	public void changeFromPlayerToWatcher(ICasinoPlayer player) {
 		players.remove(player);
 		watchers.add(player);
+	}
+
+	public void stopPlayerClock() {
+		playerClock.stopClock();
 	}
 
 	@Override
@@ -227,6 +233,12 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public ICasinoPlayer getPlayerInTurn() {
 		return playerInTurn;
+	}
+
+	protected boolean isPlayerInTurn(ICasinoPlayer player) {
+		if (player == null)
+			return false;
+		return getPlayerInTurn() != null && getPlayerInTurn().equals(player);
 	}
 
 	@Override
