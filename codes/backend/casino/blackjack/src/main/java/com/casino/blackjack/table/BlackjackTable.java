@@ -1,5 +1,6 @@
 package com.casino.blackjack.table;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -8,6 +9,7 @@ import java.util.logging.Logger;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.common.bet.BetInfo;
 import com.casino.common.bet.BetValues;
+import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.PlayerRange;
@@ -28,10 +30,30 @@ public class BlackjackTable extends SeatedTable {
 		lock = new ReentrantLock(true);
 	}
 
-	@SuppressWarnings("exports")
 	@Override
-	public BlackjackDealer getDealer() {
-		return dealer;
+	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
+		boolean gotSeat = super.trySeat(seatNumber, player);
+		if (gotSeat) {
+			dealer.handleNewPlayer(player);
+		}
+		return gotSeat;
+	}
+
+	public void placeInitialBet(ICasinoPlayer player, BigDecimal bet) {
+		dealer.handlePlayerBet(player, bet);
+	}
+
+	public void takeCard(ICasinoPlayer player, IHand hand) {
+
+	}
+
+	public void splitHand(ICasinoPlayer player) {
+		// One time split in basic blackjack
+
+	}
+
+	public void doubleInitialBet(ICasinoPlayer player) {
+
 	}
 
 	@Override

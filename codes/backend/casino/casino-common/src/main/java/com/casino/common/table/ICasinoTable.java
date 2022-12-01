@@ -67,8 +67,6 @@ public interface ICasinoTable {
 
 	public void onBetPhaseEnd();
 
-	public IDealer getDealer();
-
 	public BetValues getBetValues();
 
 	public GamePhase getGamePhase();
