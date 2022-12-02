@@ -9,8 +9,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.casino.blackjack.table.BlackjackTable;
-import com.casino.common.bet.BetInfo;
 import com.casino.common.bet.BetPhaseClockTask;
+import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
@@ -23,13 +23,13 @@ import com.casino.common.table.Seat;
 import com.casino.common.table.phase.GamePhase;
 
 public class BlackjackDealer implements IDealer {
-	private final BetInfo betInfo;
+	private final BetThresholds betThresholds;
 	private final BlackjackTable table;
 	private List<Card> decks; // 6 decks
 
-	public BlackjackDealer(BlackjackTable blackjackTable, BetInfo betInfo) {
+	public BlackjackDealer(BlackjackTable blackjackTable, BetThresholds betThresholds) {
 		this.table = blackjackTable;
-		this.betInfo = betInfo;
+		this.betThresholds = betThresholds;
 		this.decks = Deck.combineDecks(6);
 	}
 
@@ -64,8 +64,8 @@ public class BlackjackDealer implements IDealer {
 		return decks;
 	}
 
-	public BetInfo getBetInfo() {
-		return betInfo;
+	public BetThresholds getBetThresholds() {
+		return betThresholds;
 	}
 
 	public BlackjackTable getTable() {
@@ -134,12 +134,12 @@ public class BlackjackDealer implements IDealer {
 		});
 	}
 
-	public void updatePlayerInTurn() {
-		Optional<Seat> startingSeat = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getBet() != null).min(Comparator.comparing(Seat::getNumber));
-		if (startingSeat.isEmpty()) {
+	public void updateStartingPlayer() {
+		Optional<Seat> startingPlayer = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getBet() != null).min(Comparator.comparing(Seat::getNumber));
+		if (startingPlayer.isEmpty()) {
 			throw new IllegalStateException("Should start playing but no players with bet");
 		}
-		Seat nextSeat = startingSeat.get();
+		Seat nextSeat = startingPlayer.get();
 		table.setPlayerInTurn(nextSeat.getPlayer());
 	}
 

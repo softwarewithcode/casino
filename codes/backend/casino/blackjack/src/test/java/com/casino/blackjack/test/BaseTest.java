@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
-import com.casino.common.bet.BetValues;
+import com.casino.common.bet.BetThresholds;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.ISeatedTable;
 import com.casino.common.table.PlayerRange;
@@ -35,7 +35,7 @@ public class BaseTest {
 	}
 
 	protected BlackjackTable createPublicTable() {
-		return new BlackjackTable(Status.WAITING_PLAYERS, new BetValues(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		return new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 	}
 
 //	protected boolean takeSeat(int seatNumber, ICasinoPlayer player) {

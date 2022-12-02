@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.casino.common.bet.BetValues;
+import com.casino.common.bet.BetThresholds;
 import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.GamePhase;
@@ -28,7 +28,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private Set<ICasinoPlayer> watchers;
 	private Status status;
 	private PlayerRange playerLimit;
-	private BetValues betValues;
+	private BetThresholds betValues;
 	private Type type;
 	private Language language;
 	private UUID id;
@@ -37,7 +37,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private Clock playerClock;
 	private ICasinoPlayer playerInTurn;
 
-	protected CasinoTable(Status initialStatus, BetValues betLimit, PlayerRange playerLimit, Type type, UUID id, PhasePath phases) {
+	protected CasinoTable(Status initialStatus, BetThresholds betLimit, PlayerRange playerLimit, Type type, UUID id, PhasePath phases) {
 		this.players = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.watchers = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.status = initialStatus;
@@ -206,7 +206,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public BetValues getBetValues() {
+	public BetThresholds getBetValues() {
 		return betValues;
 	}
 

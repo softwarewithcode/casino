@@ -7,8 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.blackjack.rules.BlackjackDealer;
-import com.casino.common.bet.BetInfo;
-import com.casino.common.bet.BetValues;
+import com.casino.common.bet.BetThresholds;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.player.ICasinoPlayer;
@@ -25,9 +24,9 @@ public final class BlackjackTable extends SeatedTable {
 	private ReentrantLock betPhaseLock;
 	private ReentrantLock playerInTurnLock;
 
-	public BlackjackTable(Status initialStatus, BetValues betValues, PlayerRange playerLimit, Type type, int seats, UUID id) {
-		super(initialStatus, betValues, playerLimit, type, seats, id, PhasePathFactory.buildBlackjackPath());
-		this.dealer = new BlackjackDealer(this, new BetInfo(betValues));
+	public BlackjackTable(Status initialStatus, BetThresholds betThresholds, PlayerRange playerLimit, Type type, int seats, UUID id) {
+		super(initialStatus, betThresholds, playerLimit, type, seats, id, PhasePathFactory.buildBlackjackPath());
+		this.dealer = new BlackjackDealer(this, betThresholds);
 		betPhaseLock = new ReentrantLock(true);
 		playerInTurnLock = new ReentrantLock(true);
 	}
@@ -120,17 +119,14 @@ public final class BlackjackTable extends SeatedTable {
 	public void onPlayerTimeout(ICasinoPlayer timedOutPlayer) {
 		LOGGER.info("Player timedOut:" + timedOutPlayer);
 		try {
-			if (!playerInTurnLock.tryLock()) {
+			if (!playerInTurnLock.tryLock())
 				return;
-			}
 			timedOutPlayer.setStatus(com.casino.common.player.Status.SIT_OUT);
-			if (isPlayerInTurn(timedOutPlayer)) {
+			if (isPlayerInTurn(timedOutPlayer))
 				dealer.changeTurn();
-			}
 		} finally {
-			if (playerInTurnLock.isHeldByCurrentThread()) {
+			if (playerInTurnLock.isHeldByCurrentThread())
 				playerInTurnLock.unlock();
-			}
 		}
 	}
 
@@ -142,7 +138,7 @@ public final class BlackjackTable extends SeatedTable {
 			dealer.finalizeBetPhase();
 			if (dealer.dealInitialCards()) {
 				updateGamePhase(GamePhase.PLAY);
-				dealer.updatePlayerInTurn();
+				dealer.updateStartingPlayer();
 			}
 		} catch (IllegalPhaseException re) {
 			LOGGER.log(Level.SEVERE, "betPhaseEnd dealer cannot deal:", re);
@@ -161,11 +157,6 @@ public final class BlackjackTable extends SeatedTable {
 
 	private boolean canProceedToPlayPhase() {
 		return isGamePhase(GamePhase.BET) && betPhaseLock.tryLock();
-	}
-
-	@Override
-	public BetInfo getBetInfo() {
-		return dealer.getBetInfo();
 	}
 
 	@Override

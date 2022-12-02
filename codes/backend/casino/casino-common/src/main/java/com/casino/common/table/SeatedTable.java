@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.casino.common.bet.BetUtil;
-import com.casino.common.bet.BetValues;
+import com.casino.common.bet.BetThresholds;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.PhasePath;
 
@@ -19,7 +19,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	private Set<Seat> seats;
 
-	protected SeatedTable(Status initialStatus, BetValues betValues, PlayerRange playerRange, Type tableType, int seatCount, UUID tableId, PhasePath phasePath) {
+	protected SeatedTable(Status initialStatus, BetThresholds betValues, PlayerRange playerRange, Type tableType, int seatCount, UUID tableId, PhasePath phasePath) {
 		super(initialStatus, betValues, playerRange, tableType, tableId, phasePath);
 		if (playerRange.maximumPlayers() > seatCount)
 			throw new IllegalArgumentException("not enough seats for the players");
