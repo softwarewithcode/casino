@@ -376,6 +376,26 @@ public class GamePlayTests extends BaseTest {
 		assertEquals(10, blackjackPlayer.getHands().get(1).calculateValues().get(0));
 	}
 
+	@Test
+	public void splittingAcesCreatesTwoValues() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.splitStartingHand(blackjackPlayer);
+		List<Integer> activeHandValues = blackjackPlayer.getActiveHand().calculateValues();
+		assertEquals(2, activeHandValues.size());
+		assertEquals(2, blackjackPlayer.getHands().get(1).calculateValues().size());
+		assertEquals(10, activeHandValues.get(0));
+		assertEquals(20, activeHandValues.get(1));
+		assertEquals(1, blackjackPlayer.getHands().get(1).calculateValues().get(0));
+		assertEquals(11, blackjackPlayer.getHands().get(1).calculateValues().get(1));
+	}
+
 //	@Test
 //	public void completingSplittedHandsChangesTurnToNextPlayer() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 //		List<Card> cards = dealer.getDecks();
