@@ -2,6 +2,9 @@ package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
@@ -21,6 +24,7 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
+import com.casino.common.exception.IllegalSplitException;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
@@ -33,7 +37,6 @@ public class GamePlayTests extends BaseTest {
 
 	@BeforeEach
 	public void initTest() {
-		System.out.println("INitt");
 		try {
 			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
@@ -168,4 +171,214 @@ public class GamePlayTests extends BaseTest {
 		assertFalse(blackjackPlayer.canTake());
 	}
 
+	@Test
+	public void startingHandIsPossibleToSplitWithEqualRanks() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(1, blackjackPlayer.getHands().size());
+		table.splitStartingHand(blackjackPlayer);
+		assertEquals(2, blackjackPlayer.getHands().size());
+		assertTrue(blackjackPlayer.getHands().get(0).isActive());
+		assertFalse(blackjackPlayer.getHands().get(1).isActive());
+	}
+
+	@Test
+	public void onlyOneTimeSplitIsPossible() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(1, blackjackPlayer.getHands().size());
+		table.splitStartingHand(blackjackPlayer);
+		assertEquals(2, blackjackPlayer.getHands().size());
+		IllegalSplitException exception = assertThrows(IllegalSplitException.class, () -> {
+			table.splitStartingHand(blackjackPlayer);
+		});
+		assertEquals(1, exception.getCode());
+	}
+
+	@Test
+	public void splitInactiveHandIsNotPossible() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		blackjackPlayer.getActiveHand().complete();
+		IllegalSplitException exception = assertThrows(IllegalSplitException.class, () -> {
+			table.splitStartingHand(blackjackPlayer);
+		});
+		assertEquals(2, exception.getCode());
+	}
+
+	@Test
+	public void splitIsPossibleOnlyWith2Cards() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.takeCard(blackjackPlayer);
+		assertEquals(3, blackjackPlayer.getHands().get(0).getCards().size());
+		IllegalSplitException exception = assertThrows(IllegalSplitException.class, () -> {
+			table.splitStartingHand(blackjackPlayer);
+		});
+		assertEquals(3, exception.getCode());
+	}
+
+	@Test
+	public void startingHandIsNotPossibleToSplitWithoutEqualRanks() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		IllegalSplitException exception = assertThrows(IllegalSplitException.class, () -> {
+			table.splitStartingHand(blackjackPlayer);
+		});
+		assertEquals(4, exception.getCode());
+	}
+
+	@Test
+	public void splitAddsAutomaticallyCardToFirstHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(9, Suit.SPADE));
+		cards.add(Card.of(9, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.splitStartingHand(blackjackPlayer);
+		assertEquals(2, blackjackPlayer.getActiveHand().getCards().size());
+	}
+
+	@Test
+	public void splitDoesNotAddCardToSecondHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(12, Suit.DIAMOND));
+		cards.add(Card.of(12, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.splitStartingHand(blackjackPlayer);
+		assertEquals(1, blackjackPlayer.getHands().get(1).getCards().size());
+	}
+
+	@Test
+	public void splitHandValuesAreCalculatedCorrectly() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(12, Suit.DIAMOND));
+		cards.add(Card.of(12, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.splitStartingHand(blackjackPlayer);
+		assertEquals(2, blackjackPlayer.getActiveHand().getCards().size());
+		assertEquals(19, blackjackPlayer.getActiveHand().calculateValues().get(0));
+		assertEquals(10, blackjackPlayer.getHands().get(1).calculateValues().get(0));
+	}
+
+	@Test
+	public void takeCardAfterSplitAddsUpInFirstHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.splitStartingHand(blackjackPlayer);
+		assertEquals(12, blackjackPlayer.getActiveHand().calculateValues().get(0));
+		table.takeCard(blackjackPlayer);
+		assertEquals(17, blackjackPlayer.getActiveHand().calculateValues().get(0));
+		assertEquals(3, blackjackPlayer.getHands().get(1).calculateValues().get(0));
+	}
+
+	@Test
+	public void callingStandOnSplitHandAfterTakingCardActivatesSecondHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.splitStartingHand(blackjackPlayer);
+		assertEquals(12, blackjackPlayer.getActiveHand().calculateValues().get(0));
+		table.takeCard(blackjackPlayer);
+		assertEquals(17, blackjackPlayer.getActiveHand().calculateValues().get(0));
+		assertEquals(3, blackjackPlayer.getHands().get(1).calculateValues().get(0));
+		table.stand(blackjackPlayer);
+		assertEquals(blackjackPlayer.getHands().get(1), blackjackPlayer.getActiveHand());
+	}
+
+	@Test
+	public void takingCardOnSplittedHandAfterCallingStandAddsUpToSecondHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.splitStartingHand(blackjackPlayer);
+		table.takeCard(blackjackPlayer);
+		table.stand(blackjackPlayer);
+		table.takeCard(blackjackPlayer);
+		assertEquals(2, blackjackPlayer.getActiveHand().getCards().size());
+		assertEquals(13, blackjackPlayer.getActiveHand().calculateValues().get(0));
+	}
+
+	@Test
+	public void callingStandOnSecondHandOfSplitCompletesSecondHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.splitStartingHand(blackjackPlayer);
+		table.takeCard(blackjackPlayer);
+		table.stand(blackjackPlayer);
+		table.takeCard(blackjackPlayer);
+		table.stand(blackjackPlayer);
+		assertNull(blackjackPlayer.getActiveHand());
+		assertTrue(blackjackPlayer.getHands().get(1).isCompleted());
+	}
+
+//	@Test
+//	public void completingSplittedHandsChangesTurnToNextPlayer() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+//		List<Card> cards = dealer.getDecks();
+//		cards.add(Card.of(11, Suit.DIAMOND));
+//		cards.add(Card.of(5, Suit.DIAMOND));
+//		cards.add(Card.of(9, Suit.DIAMOND));
+//		cards.add(Card.of(3, Suit.DIAMOND));
+//		cards.add(Card.of(3, Suit.SPADE));
+//		table.trySeat(5, blackjackPlayer);
+//		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+//		table.trySeat(3, blackjackPlayer);
+//		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+//		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+//		table.splitStartingHand(blackjackPlayer);
+//		table.takeCard(blackjackPlayer);
+//		table.stand(blackjackPlayer);
+//		table.takeCard(blackjackPlayer);
+//		table.stand(blackjackPlayer);
+//	}
 }

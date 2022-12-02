@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.blackjack.external.IBlackjackTable;
+import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.exception.IllegalBetException;
@@ -34,11 +35,10 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	@Override
 	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
-		boolean hasSeat = super.trySeat(seatNumber, player);
-		if (hasSeat) {
+		boolean gotSeat = super.trySeat(seatNumber, player);
+		if (gotSeat) 
 			dealer.handleNewPlayer(player);
-		}
-		return hasSeat;
+		return gotSeat;
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void stand(ICasinoPlayer player) {
+	public void stand(BlackjackPlayer player) {
 		LOGGER.entering(getClass().getName(), "stand:" + this + " player:" + player);
 		if (!isPlayerAllowedToPlay(player)) {
 			// Timer might have run out or unauthorized call
@@ -70,6 +70,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 				dealer.changeTurn();
 				return;
 			}
+			dealer.stand(player);
+			if (player.getActiveHand() == null)
+				dealer.changeTurn();
 		} finally {
 			if (playerInTurnLock.isHeldByCurrentThread())
 				playerInTurnLock.unlock();
@@ -158,13 +161,18 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void splitStartingHand(ICasinoPlayer player) {
+	public void splitStartingHand(BlackjackPlayer player) {
+		dealer.handleSplit(player);
+	}
+
+	@Override
+	public void doubleStartingBet(ICasinoPlayer player) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void doubleStartingBet(ICasinoPlayer player) {
+	public void insure(ICasinoPlayer player) {
 		// TODO Auto-generated method stub
 
 	}

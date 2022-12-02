@@ -36,4 +36,5 @@ public interface ICasinoPlayer {
 	public void updateBalance(BigDecimal balance);
 
 	public List<IHand> getHands();
+
 }

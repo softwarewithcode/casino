@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetPhaseClockTask;
 import com.casino.common.bet.BetThresholds;
@@ -92,7 +93,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private IHand getActiveHand(ICasinoPlayer player) {
-		return player.getHands().stream().filter(hand -> hand.isActive()).findFirst().orElseThrow();
+		return player.getHands().stream().filter(hand -> !hand.isCompleted()).findFirst().orElseThrow();
 	}
 
 	public void handleNewPlayer(ICasinoPlayer player) {
@@ -146,5 +147,14 @@ public class BlackjackDealer implements IDealer {
 	public void changeTurn() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void handleSplit(BlackjackPlayer player) {
+		player.splitStartingHand();
+		player.getHands().get(0).addCard(decks.remove(decks.size() - 1));
+	}
+
+	public void stand(BlackjackPlayer player) {
+		player.stand();
 	}
 }
