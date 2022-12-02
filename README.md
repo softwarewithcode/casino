@@ -14,4 +14,5 @@
 * JakartaEE backend with MariaDB for the core data. Finished hands into MongoDB cloud?
 * UI: Browser? Html canvas for visualization?
 * Timetable?
-* OpenJDK 19 with compiler level 17
+* OpenJDK 19 with compiler level 19
+* used IDE Eclipse 2022-09
