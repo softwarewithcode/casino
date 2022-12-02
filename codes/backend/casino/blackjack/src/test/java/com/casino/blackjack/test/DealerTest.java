@@ -28,7 +28,7 @@ public class DealerTest extends BaseTest {
 		assertEquals(GamePhase.BET, table.getGamePhase());
 		table.trySeat(1, blackjackPlayer);
 		assertEquals(GamePhase.BET, table.getGamePhase());
-		table.placeInitialBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(GamePhase.PLAY, table.getGamePhase());
 	}
@@ -43,7 +43,7 @@ public class DealerTest extends BaseTest {
 		assertTrue(table.getStatus() == Status.RUNNING);
 		assertEquals(1, blackjackPlayer.getHands().size());
 		assertEquals(0, blackjackPlayer.getHands().get(0).getCards().size());
-		table.placeInitialBet(blackjackPlayer, new BigDecimal("50.0"));
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(2, blackjackPlayer.getHands().get(0).getCards().size());
 	}
@@ -56,8 +56,8 @@ public class DealerTest extends BaseTest {
 		// var dealer = (BlackjackDealer) table.getDealer();
 		table.trySeat(1, blackjackPlayer);
 		table.trySeat(2, blackjackPlayer2);
-		table.placeInitialBet(blackjackPlayer, new BigDecimal("54.0"));
-		table.placeInitialBet(blackjackPlayer2, new BigDecimal("51.0"));
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("54.0"));
+		table.placeStartingBet(blackjackPlayer2, new BigDecimal("51.0"));
 		assertEquals(1, blackjackPlayer.getHands().size());
 		assertEquals(0, blackjackPlayer.getHands().get(0).getCards().size());
 		assertEquals(1, blackjackPlayer2.getHands().size());
@@ -77,7 +77,7 @@ public class DealerTest extends BaseTest {
 		assertTrue(table.trySeat(1, blackjackPlayer));
 		assertTrue(table.trySeat(2, blackjackPlayer2));
 		// var dealer = (BlackjackDealer) table.getDealer();
-		table.placeInitialBet(blackjackPlayer, new BigDecimal("50.0"));
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS); // w for the dealer to complete. Just a number
 		assertEquals(2, blackjackPlayer.getHands().get(0).getCards().size());
 		assertEquals(0, blackjackPlayer2.getHands().get(0).getCards().size());
@@ -91,8 +91,8 @@ public class DealerTest extends BaseTest {
 		assertTrue(table.trySeat(1, blackjackPlayer));
 		assertTrue(table.trySeat(2, blackjackPlayer2));
 		// var dealer = (BlackjackDealer) table.getDealer();
-		table.placeInitialBet(blackjackPlayer, new BigDecimal("50.0"));
-		table.placeInitialBet(blackjackPlayer2, new BigDecimal("99.7"));
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
+		table.placeStartingBet(blackjackPlayer2, new BigDecimal("99.7"));
 		assertEquals("50.0", blackjackPlayer.getBet().toString());
 		assertEquals("99.7", blackjackPlayer2.getBet().toString());
 	}

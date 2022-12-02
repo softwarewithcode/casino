@@ -12,10 +12,6 @@ import com.casino.common.table.phase.GamePhase;
 public interface ICasinoTable {
 	public boolean isClosed();
 
-	public void close();
-
-	public void open();
-
 	public boolean isOpen();
 
 	public boolean isMultiplayer();
@@ -36,7 +32,7 @@ public interface ICasinoTable {
 
 	public void onTableClose();
 
-	public boolean join(ICasinoPlayer player);
+	public boolean watch(ICasinoPlayer player);
 
 	public PlayerRange getPlayerLimit();
 

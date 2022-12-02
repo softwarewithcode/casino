@@ -102,16 +102,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public void close() {
-		status = Status.CLOSED;
-	}
-
-	@Override
-	public void open() {
-		status = Status.WAITING_PLAYERS;
-	}
-
-	@Override
 	public boolean isOpen() {
 		return status == Status.WAITING_PLAYERS;
 	}

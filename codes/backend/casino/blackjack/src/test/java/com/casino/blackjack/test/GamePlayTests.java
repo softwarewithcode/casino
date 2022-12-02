@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import com.casino.blackjack.external.IBlackjackTable;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.blackjack.table.BlackjackTable;
@@ -27,7 +28,7 @@ public class GamePlayTests extends BaseTest {
 
 	@Test
 	public void playerCannotTakeCardsAfterBusted21() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		IBlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
 		// BlackjackDealer dealer = new BlackjackDealer(table, null);
 		Field f = table.getClass().getDeclaredField("dealer");
@@ -39,7 +40,7 @@ public class GamePlayTests extends BaseTest {
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
-		table.placeInitialBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		// dealer.dealInitialCards();
 		assertEquals(5, blackjackPlayer.getHands().get(0).getCards().get(0).getRank());
@@ -57,7 +58,7 @@ public class GamePlayTests extends BaseTest {
 
 	@Test
 	public void playerCannotTakeCardsWhenHandValueIs21() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		IBlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
 		// BlackjackDealer dealer = new BlackjackDealer(table, null);
 		Field f = table.getClass().getDeclaredField("dealer");
@@ -69,7 +70,7 @@ public class GamePlayTests extends BaseTest {
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
-		table.placeInitialBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		// dealer.dealInitialCards();
 		assertEquals(5, blackjackPlayer.getHands().get(0).getCards().get(0).getRank());

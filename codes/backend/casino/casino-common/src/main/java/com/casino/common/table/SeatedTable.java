@@ -57,7 +57,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	}
 
 	@Override
-	public boolean join(ICasinoPlayer player) {
+	public boolean watch(ICasinoPlayer player) {
 		return super.joinAsWatcher(player);
 	}
 

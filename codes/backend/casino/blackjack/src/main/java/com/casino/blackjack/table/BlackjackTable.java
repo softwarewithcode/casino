@@ -6,6 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.casino.blackjack.external.IBlackjackTable;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.exception.IllegalBetException;
@@ -18,11 +19,11 @@ import com.casino.common.table.Type;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
 
-public final class BlackjackTable extends SeatedTable {
+public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
 	private final BlackjackDealer dealer;
-	private ReentrantLock betPhaseLock;
-	private ReentrantLock playerInTurnLock;
+	private final ReentrantLock betPhaseLock;
+	private final ReentrantLock playerInTurnLock;
 
 	public BlackjackTable(Status initialStatus, BetThresholds betThresholds, PlayerRange playerLimit, Type type, int seats, UUID id) {
 		super(initialStatus, betThresholds, playerLimit, type, seats, id, PhasePathFactory.buildBlackjackPath());
@@ -33,15 +34,16 @@ public final class BlackjackTable extends SeatedTable {
 
 	@Override
 	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
-		boolean gotSeat = super.trySeat(seatNumber, player);
-		if (gotSeat) {
+		boolean hasSeat = super.trySeat(seatNumber, player);
+		if (hasSeat) {
 			dealer.handleNewPlayer(player);
 		}
-		return gotSeat;
+		return hasSeat;
 	}
 
-	public void placeInitialBet(ICasinoPlayer player, BigDecimal bet) {
-		LOGGER.entering(getClass().getName(), "placeInitialBet:" + this + " player:" + player);
+	@Override
+	public void placeStartingBet(ICasinoPlayer player, BigDecimal bet) {
+		LOGGER.entering(getClass().getName(), "placeStartingBet:" + this + " player:" + player);
 		// Replaces previous bet if bet is allowed. UI handles usability
 		try {
 			if (isGamePhase(GamePhase.BET))
@@ -51,11 +53,11 @@ public final class BlackjackTable extends SeatedTable {
 				throw new IllegalBetException("Initial bet in wrong phase:" + this + " player:" + player + " bet:" + bet.toString(), 1);
 			}
 		} finally {
-			LOGGER.exiting(getClass().getName(), "placeInitialBet");
+			LOGGER.exiting(getClass().getName(), "placeStartingBet");
 		}
 	}
 
-	// stand = no more cards and change of turn if next player exist
+	@Override
 	public void stand(ICasinoPlayer player) {
 		LOGGER.entering(getClass().getName(), "stand:" + this + " player:" + player);
 		if (!isPlayerAllowedToPlay(player)) {
@@ -75,6 +77,7 @@ public final class BlackjackTable extends SeatedTable {
 		}
 	}
 
+	@Override
 	public void takeCard(ICasinoPlayer player) {
 		LOGGER.entering(getClass().getName(), "takeCard:" + this + " player:" + player);
 		if (!isPlayerAllowedToPlay(player)) {
@@ -97,16 +100,6 @@ public final class BlackjackTable extends SeatedTable {
 
 	private boolean isPlayerAllowedToPlay(ICasinoPlayer player) {
 		return isPlayerInTurn(player) && isGamePhase(GamePhase.PLAY);
-	}
-
-	public void splitHand(ICasinoPlayer player) {
-		// One time split in basic blackjack if two similar cards from initial deal
-
-	}
-
-	public void doubleHandBet(ICasinoPlayer player) {
-		// If player get 9,10,11 in initial deal player is able to double the bet but
-		// with only one card
 	}
 
 	@Override
@@ -162,6 +155,18 @@ public final class BlackjackTable extends SeatedTable {
 	@Override
 	public int getPlayerTurnTime() {
 		return 20;
+	}
+
+	@Override
+	public void splitStartingHand(ICasinoPlayer player) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void doubleStartingBet(ICasinoPlayer player) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
