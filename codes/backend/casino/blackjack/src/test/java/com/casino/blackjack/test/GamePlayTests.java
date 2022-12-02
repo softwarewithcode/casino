@@ -2,7 +2,6 @@ package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,6 +39,7 @@ public class GamePlayTests extends BaseTest {
 		try {
 			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
+			blackjackPlayer2 = new BlackjackPlayer("JaneDoes", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
@@ -49,7 +49,7 @@ public class GamePlayTests extends BaseTest {
 	}
 
 	@Test
-	public void playerCannotTakeCardsIfCardsValueIsOver21() {
+	public void playerCannotTakeCardsIfHandValueIsOver21() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(4, Suit.CLUB));
 		cards.add(Card.of(8, Suit.DIAMOND));
@@ -97,7 +97,7 @@ public class GamePlayTests extends BaseTest {
 	}
 
 	@Test // starting ace makes a second value if not blackjack
-	public void secondValueOfHandIsRemovedIfItGoesOver21() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void secondValueOfHandIsRemovedIfHandGoesOver21() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(8, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.DIAMOND));
@@ -362,6 +362,20 @@ public class GamePlayTests extends BaseTest {
 		assertTrue(blackjackPlayer.getHands().get(1).isCompleted());
 	}
 
+	@Test
+	public void pictureCardsCanBeSplitted() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(12, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.splitStartingHand(blackjackPlayer);
+		assertEquals(19, blackjackPlayer.getActiveHand().calculateValues().get(0));
+		assertEquals(10, blackjackPlayer.getHands().get(1).calculateValues().get(0));
+	}
+
 //	@Test
 //	public void completingSplittedHandsChangesTurnToNextPlayer() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 //		List<Card> cards = dealer.getDecks();
@@ -373,7 +387,7 @@ public class GamePlayTests extends BaseTest {
 //		table.trySeat(5, blackjackPlayer);
 //		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
 //		table.trySeat(3, blackjackPlayer);
-//		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+//		table.placeStartingBet(blackjackPlayer2, new BigDecimal("99.0"));
 //		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 //		table.splitStartingHand(blackjackPlayer);
 //		table.takeCard(blackjackPlayer);

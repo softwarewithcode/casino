@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.casino.blackjack.table.BlackjackUtil;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalSplitException;
@@ -51,7 +52,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 			throw new IllegalSplitException("initial hand is not active", 2);
 		if (hands.get(0).getCards().size() != 2)
 			throw new IllegalSplitException("initial hand does not contain exactly two cards:" + hands.get(0).getCards(), 3);
-		if (hands.get(0).getCards().get(0).getRank() != hands.get(0).getCards().get(1).getRank())
+		if (!BlackjackUtil.haveSameValue(hands.get(0).getCards().get(0), hands.get(0).getCards().get(1)))
 			throw new IllegalSplitException("not equal ranks", 4);
 	}
 
