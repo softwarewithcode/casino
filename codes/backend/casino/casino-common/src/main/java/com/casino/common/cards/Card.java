@@ -8,8 +8,14 @@ public class Card {
 		super();
 		if (rank < 1 || rank > 13)
 			throw new IllegalArgumentException("incorrect rank " + rank);
+		if (suit == null)
+			throw new IllegalArgumentException("suit is missing");
 		this.rank = rank;
 		this.suit = suit;
+	}
+
+	public static Card of(int rank, Suit suit) {
+		return new Card(rank, suit);
 	}
 
 	public int getRank() {

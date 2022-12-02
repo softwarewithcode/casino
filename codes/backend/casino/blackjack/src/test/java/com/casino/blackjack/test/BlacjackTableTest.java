@@ -8,9 +8,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.blackjack.table.BlackjackTable;
-import com.casino.common.bet.BetInfo;
 import com.casino.common.bet.BetValues;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
