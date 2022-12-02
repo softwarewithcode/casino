@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import com.casino.common.player.ICasinoPlayer;
 
 /*
- * Describes available actions for blackjack tables
+ * Describes possible actions for blackjack tables
  */
 public interface IBlackjackTable {
 	public boolean trySeat(int seatNumber, ICasinoPlayer player);
@@ -18,6 +18,6 @@ public interface IBlackjackTable {
 
 	public void takeCard(ICasinoPlayer player);
 
-	public void stand(ICasinoPlayer player);
+	public void stand(ICasinoPlayer player); // no more cards
 
 }

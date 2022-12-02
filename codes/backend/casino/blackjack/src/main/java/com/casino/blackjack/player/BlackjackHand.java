@@ -37,6 +37,11 @@ public class BlackjackHand implements IHand {
 		return values;
 	}
 
+	public boolean isBlackjack() {
+		List<Integer> vals = calculateValues();
+		return cards.size() == 2 && vals.size() == 2 && vals.get(1) == 21;
+	}
+
 	private boolean hasTwoPossibleValues(Integer smallestValue, Optional<Card> aceOptional) {
 		return aceOptional.isPresent() && smallestValue + 10 < 22;
 	}

@@ -11,6 +11,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.external.IBlackjackTable;
@@ -25,15 +26,27 @@ import com.casino.common.table.Status;
 import com.casino.common.table.Type;
 
 public class GamePlayTests extends BaseTest {
+	private IBlackjackTable table;
+	private BlackjackPlayer blackjackPlayer;
+	private BlackjackPlayer blackjackPlayer2;
+	private BlackjackDealer dealer;
+
+	@BeforeEach
+	public void initTest() {
+		System.out.println("INitt");
+		try {
+			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
+			Field f = table.getClass().getDeclaredField("dealer");
+			f.setAccessible(true);
+			dealer = (BlackjackDealer) f.get(table);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Test
-	public void playerCannotTakeCardsAfterBusted21() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-		IBlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
-		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
-		// BlackjackDealer dealer = new BlackjackDealer(table, null);
-		Field f = table.getClass().getDeclaredField("dealer");
-		f.setAccessible(true);
-		BlackjackDealer dealer = (BlackjackDealer) f.get(table);
+	public void playerCannotTakeCardsIfCardsValueIsOver21() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(4, Suit.CLUB));
 		cards.add(Card.of(8, Suit.DIAMOND));
@@ -58,12 +71,6 @@ public class GamePlayTests extends BaseTest {
 
 	@Test
 	public void playerCannotTakeCardsWhenHandValueIs21() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-		IBlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
-		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
-		// BlackjackDealer dealer = new BlackjackDealer(table, null);
-		Field f = table.getClass().getDeclaredField("dealer");
-		f.setAccessible(true);
-		BlackjackDealer dealer = (BlackjackDealer) f.get(table);
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(4, Suit.CLUB));
 		cards.add(Card.of(7, Suit.HEART));
@@ -85,4 +92,80 @@ public class GamePlayTests extends BaseTest {
 		assertFalse(blackjackPlayer.canTake());
 		assertEquals(21, blackjackPlayer.getHands().get(0).calculateValues().get(0));
 	}
+
+	@Test // starting ace makes a second value if not blackjack
+	public void secondValueOfHandIsRemovedIfItGoesOver21() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(8, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.SPADE));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(1, blackjackPlayer.getHands().size()); // 1 hand
+		assertEquals(2, blackjackPlayer.getHands().get(0).calculateValues().size());
+		assertEquals(6, blackjackPlayer.getHands().get(0).calculateValues().get(0));
+		assertEquals(16, blackjackPlayer.getHands().get(0).calculateValues().get(1));
+		table.takeCard(blackjackPlayer);
+		assertEquals(7, blackjackPlayer.getHands().get(0).calculateValues().get(0));
+		assertEquals(17, blackjackPlayer.getHands().get(0).calculateValues().get(1));
+		table.takeCard(blackjackPlayer);
+		assertEquals(10, blackjackPlayer.getHands().get(0).calculateValues().get(0));
+		assertEquals(20, blackjackPlayer.getHands().get(0).calculateValues().get(1));
+		table.takeCard(blackjackPlayer);
+		assertEquals(1, blackjackPlayer.getHands().get(0).calculateValues().size());
+		assertEquals(14, blackjackPlayer.getHands().get(0).calculateValues().get(0));
+		table.takeCard(blackjackPlayer);
+		assertEquals(1, blackjackPlayer.getHands().get(0).calculateValues().size());
+		assertEquals(22, blackjackPlayer.getHands().get(0).calculateValues().get(0));
+		assertFalse(blackjackPlayer.canTake());
+	}
+
+	@Test // starting ace makes a second value if not blackjack
+	public void dealerPicksUpBlackjackWhenFirstCardIsAce() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(12, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(21, blackjackPlayer.getHands().get(0).calculateValues().get(1));
+		assertTrue(blackjackPlayer.getHands().get(0).isBlackjack());
+		assertFalse(blackjackPlayer.canTake());
+	}
+
+	@Test
+	public void dealerPicksUpBlackjackWhenSecondCardIsAce() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(21, blackjackPlayer.getHands().get(0).calculateValues().get(1));
+		assertTrue(blackjackPlayer.getHands().get(0).isBlackjack());
+		assertFalse(blackjackPlayer.canTake());
+	}
+
+	@Test
+	public void blackjackRequiresExactlyTwoCards() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertFalse(blackjackPlayer.getHands().get(0).isBlackjack());
+		assertEquals(12, blackjackPlayer.getHands().get(0).calculateValues().get(0));
+		assertTrue(blackjackPlayer.canTake());
+		table.takeCard(blackjackPlayer);
+		assertFalse(blackjackPlayer.getHands().get(0).isBlackjack());
+		assertEquals(21, blackjackPlayer.getHands().get(0).calculateValues().get(0));
+		assertFalse(blackjackPlayer.canTake());
+	}
+
 }

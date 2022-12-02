@@ -24,7 +24,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public boolean canTake() {
 		IHand hand = getActiveHand();
 		List<Integer> values = hand.calculateValues(); // Smallest value in 0 pos.
-		return values.get(0) < 21;
+		return values.get(0) < 21 && !hand.isBlackjack(); // isBlackjack() causes second calculation but does not hold a new state
 	}
 
 	private BlackjackHand createNewHand() {

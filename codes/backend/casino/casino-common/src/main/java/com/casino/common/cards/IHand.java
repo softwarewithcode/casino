@@ -20,4 +20,6 @@ public interface IHand {
 	public void activate();
 
 	public void complete();
+
+	public boolean isBlackjack();
 }
