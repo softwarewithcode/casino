@@ -48,7 +48,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void startingHandIsPossibleToSplitWithEqualRanks() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void startingHandIsPossibleToSplitWithEqualRanks() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.SPADE));
@@ -63,7 +63,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void onlyOneTimeSplitIsPossible() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void onlyOneTimeSplitIsPossible() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(1, Suit.DIAMOND));
@@ -81,7 +81,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void splitInactiveHandIsNotPossible() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void splitInactiveHandIsNotPossible() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));
@@ -96,7 +96,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void splitIsPossibleOnlyWith2Cards() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void splitIsPossibleOnlyWith2Cards() {
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
@@ -109,7 +109,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void startingHandIsNotPossibleToSplitWithoutEqualRanks() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void startingHandIsNotPossibleToSplitWithoutEqualRanks() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));
@@ -123,7 +123,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void splitAddsAutomaticallyCardToFirstHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void splitAddsAutomaticallyCardToFirstHand() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.SPADE));
 		cards.add(Card.of(9, Suit.SPADE));
@@ -135,7 +135,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void splitDoesNotAddCardToSecondHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void splitDoesNotAddCardToSecondHand() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(12, Suit.DIAMOND));
@@ -148,7 +148,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void splitHandValuesAreCalculatedCorrectly() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void splitHandValuesAreCalculatedCorrectly() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(12, Suit.DIAMOND));
@@ -163,7 +163,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void takeCardAfterSplitAddsUpInFirstHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void takeCardAfterSplitAddsUpInFirstHand() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.DIAMOND));
@@ -180,7 +180,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void callingStandOnSplitHandAfterTakingCardActivatesSecondHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void callingStandOnSplitHandAfterTakingCardActivatesSecondHand() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.DIAMOND));
@@ -200,7 +200,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void takingCardOnSplittedHandAfterCallingStandAddsUpToSecondHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void takingCardOnSplittedHandAfterCallingStandAddsUpToSecondHand() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(11, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.DIAMOND));
@@ -219,7 +219,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void callingStandOnSecondHandOfSplitCompletesSecondHand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void callingStandOnSecondHandOfSplitCompletesSecondHand() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(11, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.DIAMOND));
@@ -239,7 +239,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void pictureCardsCanBeSplitted() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void pictureCardsCanBeSplitted() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(11, Suit.DIAMOND));
@@ -253,7 +253,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void splittingAcesCreatesTwoValues() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void splittingAcesCreatesTwoValues() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(10, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.DIAMOND));

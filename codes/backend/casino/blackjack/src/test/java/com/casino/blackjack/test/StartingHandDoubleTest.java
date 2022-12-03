@@ -44,7 +44,7 @@ public class StartingHandDoubleTest extends BaseTest {
 	}
 
 	@Test
-	public void doublingNineResultsToDoubleBet() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void doublingNineResultsToDoubleBet() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.SPADE));
@@ -56,7 +56,7 @@ public class StartingHandDoubleTest extends BaseTest {
 	}
 
 	@Test
-	public void doublingTenResultsToDoubleBet() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void doublingTenResultsToDoubleBet() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.SPADE));
@@ -68,7 +68,7 @@ public class StartingHandDoubleTest extends BaseTest {
 	}
 
 	@Test
-	public void doublingElevenResultsToDoubleBet() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void doublingElevenResultsToDoubleBet() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(6, Suit.SPADE));

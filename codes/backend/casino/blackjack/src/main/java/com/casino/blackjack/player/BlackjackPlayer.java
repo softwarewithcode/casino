@@ -4,15 +4,21 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.casino.blackjack.table.BlackjackUtil;
+import com.casino.common.bet.BetUtil;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
+import com.casino.common.exception.ConcurrentModificationException;
+import com.casino.common.exception.IllegalDoublingException;
 import com.casino.common.exception.IllegalSplitException;
 import com.casino.common.player.CasinoPlayer;
 import com.casino.common.table.ISeatedTable;
 
 public class BlackjackPlayer extends CasinoPlayer {
+	private static final Logger LOGGER = Logger.getLogger(BlackjackPlayer.class.getName());
 	private List<IHand> hands;
 
 	public BlackjackPlayer(String name, UUID id, BigDecimal startBalance, ISeatedTable table) {
@@ -43,6 +49,24 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public void stand() {
 		getActiveHand().complete();
+	}
+
+	public void doubleDown() {
+		try {
+			if (!getBalanceLock().tryLock())
+				throw new ConcurrentModificationException("no balance lock acquired");
+			BetUtil.verifySufficentBalance(getBet(), this);
+			increaseBet(getBet());
+		} catch (IllegalArgumentException e) {
+			LOGGER.log(Level.SEVERE, "Doubling failed ", e);
+			throw new IllegalDoublingException("insufficent funds", 1);
+		} catch (ConcurrentModificationException ce) {
+			LOGGER.log(Level.SEVERE, "Doubling failed ", ce);
+			throw new IllegalDoublingException("balance handling is reserved", 2);
+		} finally {
+			if (getBalanceLock().isHeldByCurrentThread())
+				getBalanceLock().unlock();
+		}
 	}
 
 	private void validateSplitConditions() {

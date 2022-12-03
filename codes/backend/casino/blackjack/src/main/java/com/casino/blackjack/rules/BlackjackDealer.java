@@ -149,6 +149,10 @@ public class BlackjackDealer implements IDealer {
 
 	}
 
+	public void doubleDown(BlackjackPlayer player) {
+		player.doubleDown();
+	}
+
 	public void handleSplit(BlackjackPlayer player) {
 		player.splitStartingHand();
 		player.getHands().get(0).addCard(decks.remove(decks.size() - 1));

@@ -36,7 +36,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
 		boolean gotSeat = super.trySeat(seatNumber, player);
-		if (gotSeat) 
+		if (gotSeat)
 			dealer.handleNewPlayer(player);
 		return gotSeat;
 	}
@@ -166,8 +166,15 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void doubleStartingBet(ICasinoPlayer player) {
-		// TODO Auto-generated method stub
+	public void doubleStartingBet(BlackjackPlayer player) {
+		LOGGER.entering(getClass().getName(), "doubleStartingBet:" + this + " player:" + player);
+		try {
+			if (!isGamePhase(GamePhase.PLAY))
+				throw new IllegalPhaseException("doubling bet in wrong phase:", getGamePhase(), GamePhase.PLAY);
+			dealer.doubleDown(player);
+		} finally {
+			LOGGER.exiting(getClass().getName(), "doubleStartingBet");
+		}
 
 	}
 

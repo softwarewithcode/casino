@@ -11,7 +11,7 @@ public class BetUtil {
 
 	public static void verifyBet(ICasinoTable table, ICasinoPlayer player, BigDecimal betAttempt) {
 		verify(table, player, betAttempt);
-		verifySufficentAmount(betAttempt, player);
+		verifySufficentBalance(betAttempt, player);
 	}
 
 	private static void verify(ICasinoTable table, ICasinoPlayer player, BigDecimal betAttempt) {
@@ -27,9 +27,9 @@ public class BetUtil {
 			throw new IllegalBetException("given bet is over table maximum bet " + table.getBetValues().maximumBet().toString() + " bet:" + betAttempt.toString(), 5);
 	}
 
-	public static void verifySufficentAmount(BigDecimal amount, ICasinoPlayer player) {
-		if (player.getInitialBalance().compareTo(amount) < 0)
-			throw new IllegalArgumentException("player has not enough money: Should have " + amount.toString() + " has: " + player.getInitialBalance().toString());
+	public static void verifySufficentBalance(BigDecimal attempt, ICasinoPlayer player) {
+		if (player.getBalance().compareTo(attempt) < 0)
+			throw new IllegalArgumentException("player has not enough money: Should have " + attempt.toString() + " has: " + player.getBalance().toString());
 
 	}
 }

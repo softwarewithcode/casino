@@ -44,7 +44,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	// public trySeat(..) vs. required join() first ?
 	@Override
 	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
-		BetUtil.verifySufficentAmount(getBetValues().minimumBet(), player);
+		BetUtil.verifySufficentBalance(getBetValues().minimumBet(), player);
 		if (seatNumber < 0 || seatNumber >= seats.size())
 			return false;
 		if (hasAlreadySeat(player))

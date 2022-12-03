@@ -1,11 +1,14 @@
 package com.casino.common.player;
 
 import java.math.BigDecimal;
+import java.util.ConcurrentModificationException;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.casino.common.bet.BetUtil;
 import com.casino.common.common.Result;
+import com.casino.common.exception.IllegalBetException;
 import com.casino.common.table.ICasinoTable;
 
 public abstract class CasinoPlayer implements ICasinoPlayer {
@@ -18,6 +21,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	private BigDecimal bet;
 	private Status status;
 	private ICasinoTable table;
+	private final ReentrantLock balanceLock;
 
 	public CasinoPlayer(String name, UUID id, BigDecimal initialBalance, ICasinoTable table) {
 		super();
@@ -27,6 +31,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		this.balance = initialBalance;
 		this.status = null;
 		this.table = table;
+		this.balanceLock = new ReentrantLock(true); // !?
 	}
 
 	@Override
@@ -57,6 +62,10 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	public void onLeave() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public ReentrantLock getBalanceLock() {
+		return balanceLock;
 	}
 
 	@Override
@@ -98,6 +107,14 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		this.bet = bet;
 	}
 
+	public void increaseBet(BigDecimal increaseAmount) {
+		BetUtil.verifySufficentBalance(increaseAmount, this);
+		if (this.bet == null)
+			throw new IllegalBetException("increase called but no initial bet was found", 6);
+		this.balance = this.getBalance().subtract(increaseAmount);
+		this.bet = getBet().add(increaseAmount);
+	}
+
 	@Override
 	public void calculateBalance(Result result) {
 		// TODO Auto-generated method stub
@@ -116,7 +133,15 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public void updateBalance(BigDecimal balance) {
-		this.balance = balance;
+		try {
+			if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0)
+				throw new IllegalArgumentException("Balance missing or negative:" + balance);
+			if (!balanceLock.tryLock())
+				throw new ConcurrentModificationException("balance lock was not obtained");
+			this.balance = balance;
+		} finally {
+			if (balanceLock.isHeldByCurrentThread())
+				balanceLock.unlock();
+		}
 	}
-
 }
