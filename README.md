@@ -15,4 +15,5 @@
 * UI: Browser? Html canvas for visualization?
 * Timetable?
 * OpenJDK 19 with compiler level 19
-* used IDE Eclipse 2022-09
+* used IDE Eclipse 2022-09 -> import as Maven projects
+* running tests in Eclipse -> run as JUnit test from the main test folder level "blackjack/src/test/java" with mouse right click
