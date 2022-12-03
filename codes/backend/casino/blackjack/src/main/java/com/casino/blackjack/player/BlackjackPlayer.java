@@ -26,7 +26,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public boolean canTake() {
 		IHand hand = getActiveHand();
 		List<Integer> values = hand.calculateValues(); // Smallest value in 0 pos.
-		return values.get(0) < 21 && !hand.isBlackjack(); // isBlackjack() causes second calculation but does not hold a new state
+		return values.get(0) < 21 && !hand.isBlackjack();
 	}
 
 	public BlackjackHand createNewHand(boolean active) {
@@ -49,11 +49,11 @@ public class BlackjackPlayer extends CasinoPlayer {
 		if (this.hands.size() != 1)
 			throw new IllegalSplitException("wrong hand count:" + hands.size(), 1);
 		if (!hands.get(0).isActive())
-			throw new IllegalSplitException("initial hand is not active", 2);
+			throw new IllegalSplitException("first hand is not active", 2);
 		if (hands.get(0).getCards().size() != 2)
-			throw new IllegalSplitException("initial hand does not contain exactly two cards:" + hands.get(0).getCards(), 3);
+			throw new IllegalSplitException("starting hand does not contain exactly two cards:" + hands.get(0).getCards(), 3);
 		if (!BlackjackUtil.haveSameValue(hands.get(0).getCards().get(0), hands.get(0).getCards().get(1)))
-			throw new IllegalSplitException("not equal ranks", 4);
+			throw new IllegalSplitException("not equal values", 4);
 	}
 
 	public IHand getActiveHand() {
