@@ -22,7 +22,7 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
-import com.casino.common.exception.IllegalPlayerAction;
+import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
@@ -73,7 +73,7 @@ public class StartingHandSplitTest extends BaseTest {
 		assertEquals(1, blackjackPlayer.getHands().size());
 		table.splitStartingHand(blackjackPlayer);
 		assertEquals(2, blackjackPlayer.getHands().size());
-		IllegalPlayerAction exception = assertThrows(IllegalPlayerAction.class, () -> {
+		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
 			table.splitStartingHand(blackjackPlayer);
 		});
 		assertEquals(1, exception.getCode());
@@ -88,7 +88,7 @@ public class StartingHandSplitTest extends BaseTest {
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		blackjackPlayer.getActiveHand().complete();
-		IllegalPlayerAction exception = assertThrows(IllegalPlayerAction.class, () -> {
+		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
 			table.splitStartingHand(blackjackPlayer);
 		});
 		assertEquals(2, exception.getCode());
@@ -101,7 +101,7 @@ public class StartingHandSplitTest extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.takeCard(blackjackPlayer);
 		assertEquals(3, blackjackPlayer.getHands().get(0).getCards().size());
-		IllegalPlayerAction exception = assertThrows(IllegalPlayerAction.class, () -> {
+		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
 			table.splitStartingHand(blackjackPlayer);
 		});
 		assertEquals(3, exception.getCode());
@@ -115,7 +115,7 @@ public class StartingHandSplitTest extends BaseTest {
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		IllegalPlayerAction exception = assertThrows(IllegalPlayerAction.class, () -> {
+		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
 			table.splitStartingHand(blackjackPlayer);
 		});
 		assertEquals(4, exception.getCode());

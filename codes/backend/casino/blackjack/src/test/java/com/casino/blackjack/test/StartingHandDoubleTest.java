@@ -20,7 +20,7 @@ import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalBetException;
-import com.casino.common.exception.IllegalPlayerAction;
+import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
@@ -109,7 +109,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		table.doubleStartingBet(blackjackPlayer);
 		assertEquals(new BigDecimal("0.02468"), blackjackPlayer.getBet());
 		assertEquals(new BigDecimal("999.97532"), blackjackPlayer.getBalance());
-		IllegalPlayerAction exception = assertThrows(IllegalPlayerAction.class, () -> {
+		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
 			table.doubleStartingBet(blackjackPlayer);
 		});
 		assertEquals(10, exception.getCode());

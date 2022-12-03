@@ -12,7 +12,7 @@ import com.casino.blackjack.table.BlackjackUtil;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalDoublingException;
-import com.casino.common.exception.IllegalPlayerAction;
+import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.CasinoPlayer;
 import com.casino.common.table.ISeatedTable;
 
@@ -72,22 +72,22 @@ public class BlackjackPlayer extends CasinoPlayer {
 	private void validateDoubleDownConditions() {
 		validateActionConditions();
 		if (getActiveHand().isDoubled())
-			throw new IllegalPlayerAction("hand has been doubled before ", 10);
+			throw new IllegalPlayerActionException("hand has been doubled before ", 10);
 	}
 
 	private void validateSplitConditions() {
 		validateActionConditions();
 		if (!BlackjackUtil.haveSameValue(hands.get(0).getCards().get(0), hands.get(0).getCards().get(1)))
-			throw new IllegalPlayerAction("not equal values", 4);
+			throw new IllegalPlayerActionException("not equal values", 4);
 	}
 
 	private void validateActionConditions() {
 		if (this.hands.size() != 1)
-			throw new IllegalPlayerAction("wrong hand count:" + hands.size(), 1);
+			throw new IllegalPlayerActionException("wrong hand count:" + hands.size(), 1);
 		if (!hands.get(0).isActive())
-			throw new IllegalPlayerAction("first hand is not active", 2);
+			throw new IllegalPlayerActionException("first hand is not active", 2);
 		if (hands.get(0).getCards().size() != 2)
-			throw new IllegalPlayerAction("starting hand does not contain exactly two cards:" + hands.get(0).getCards(), 3);
+			throw new IllegalPlayerActionException("starting hand does not contain exactly two cards:" + hands.get(0).getCards(), 3);
 	}
 
 	public IHand getActiveHand() {

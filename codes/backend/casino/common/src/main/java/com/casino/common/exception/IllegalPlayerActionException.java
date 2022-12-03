@@ -1,10 +1,10 @@
 package com.casino.common.exception;
 
-public class IllegalPlayerAction extends RuntimeException {
+public class IllegalPlayerActionException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	private final Integer code;
 
-	public IllegalPlayerAction(String message, int code) {
+	public IllegalPlayerActionException(String message, int code) {
 		super(message);
 		this.code = code;
 	}
