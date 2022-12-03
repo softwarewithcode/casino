@@ -16,7 +16,7 @@ public class BetUtil {
 
 	private static void verify(ICasinoTable table, ICasinoPlayer player, BigDecimal betAttempt) {
 		if (table.getGamePhase() != GamePhase.BET)
-			throw new IllegalBetException("given bet in wrong phase:" + table + " player:" + player + " bet:" + betAttempt.toString(), 1);
+			throw new IllegalBetException("given bet in wrong phase: " + table + " player:" + player + " bet:" + betAttempt.toString(), 1);
 		if (betAttempt == null)
 			throw new IllegalBetException("no bet is given in table:" + table + " player:" + player, 2);
 		if (player.getBalance().compareTo(betAttempt) < 0)

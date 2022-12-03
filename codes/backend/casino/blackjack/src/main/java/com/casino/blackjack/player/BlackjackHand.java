@@ -17,6 +17,7 @@ public class BlackjackHand implements IHand {
 	private final List<Card> cards;
 	private Instant completed;
 	private boolean active;
+	private boolean doubled;
 
 	public BlackjackHand(UUID id, boolean active) {
 		this.id = id;
@@ -53,6 +54,10 @@ public class BlackjackHand implements IHand {
 		if (isCompleted())
 			throw new IllegalArgumentException("Hand is completed cannot add card " + this);
 		this.cards.add(card);
+	}
+
+	public boolean isDoubled() {
+		return doubled;
 	}
 
 	@Override
@@ -110,6 +115,11 @@ public class BlackjackHand implements IHand {
 	@Override
 	public void activate() {
 		active = true;
+	}
+
+	@Override
+	public void doubleDown() {
+		this.doubled = true;
 	}
 
 }

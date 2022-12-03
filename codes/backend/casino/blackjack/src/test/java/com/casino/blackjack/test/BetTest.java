@@ -117,10 +117,20 @@ public class BetTest extends BaseTest {
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		assertTrue(table.trySeat(1, blackjackPlayer));
 		assertTrue(table.trySeat(2, blackjackPlayer2));
-		// var dealer = (BlackjackDealer) table.getDealer();
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
 		table.placeStartingBet(blackjackPlayer2, new BigDecimal("99.7"));
 		assertEquals("50.0", blackjackPlayer.getBet().toString());
 		assertEquals("99.7", blackjackPlayer2.getBet().toString());
+	}
+
+	@Test
+	public void negativeStartingBetIsPreventeted() { // In error case where minimum bet is negative
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(new BigDecimal("-1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		table.trySeat(0, blackjackPlayer);
+		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
+			table.placeStartingBet(blackjackPlayer, new BigDecimal("-10.1"));
+		});
+		assertEquals(9, exception.getCode());
 	}
 }

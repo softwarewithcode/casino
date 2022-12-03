@@ -1,6 +1,7 @@
 package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -18,6 +19,8 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
+import com.casino.common.exception.IllegalBetException;
+import com.casino.common.exception.IllegalPlayerAction;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
@@ -91,6 +94,25 @@ public class StartingHandDoubleTest extends BaseTest {
 		table.doubleStartingBet(blackjackPlayer);
 		assertEquals(new BigDecimal("0.02468"), blackjackPlayer.getBet());
 		assertEquals(new BigDecimal("999.97532"), blackjackPlayer.getBalance());
+	}
+
+	@Test
+	public void doublingIsAllowedOnlyOnce() {
+		table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(new BigDecimal("0.01"), MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(6, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("0.01234"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("999.98766"), blackjackPlayer.getBalance());
+		table.doubleStartingBet(blackjackPlayer);
+		assertEquals(new BigDecimal("0.02468"), blackjackPlayer.getBet());
+		assertEquals(new BigDecimal("999.97532"), blackjackPlayer.getBalance());
+		IllegalPlayerAction exception = assertThrows(IllegalPlayerAction.class, () -> {
+			table.doubleStartingBet(blackjackPlayer);
+		});
+		assertEquals(10, exception.getCode());
 	}
 
 }

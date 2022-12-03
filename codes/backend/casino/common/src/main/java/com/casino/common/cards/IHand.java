@@ -21,5 +21,9 @@ public interface IHand {
 
 	public void complete();
 
+	public boolean isDoubled();
+
+	public void doubleDown();
+
 	public boolean isBlackjack();
 }

@@ -60,7 +60,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void stand(BlackjackPlayer player) {
 		LOGGER.entering(getClass().getName(), "stand:" + this + " player:" + player);
-		if (!isPlayerAllowedToPlay(player)) {
+		if (!isPlayerAllowedToMakeAction(player)) {
 			// Timer might have run out or unauthorized call
 			LOGGER.log(Level.SEVERE, " Player not in turn: " + player + " called stand:" + this);
 			throw new IllegalArgumentException("Player:" + player + " is not allowed to stand in table :)" + this + " phase:" + getGamePhase());
@@ -83,7 +83,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void takeCard(ICasinoPlayer player) {
 		LOGGER.entering(getClass().getName(), "takeCard:" + this + " player:" + player);
-		if (!isPlayerAllowedToPlay(player)) {
+		if (!isPlayerAllowedToMakeAction(player)) {
 			// Timer might have run out or unauthorized call
 			LOGGER.log(Level.SEVERE, " Player not in turn: " + player + " called takeCard:" + this);
 			throw new IllegalArgumentException("Player:" + player + " is not allowed to take card in table:" + this + " phase:" + getGamePhase());
@@ -101,7 +101,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		}
 	}
 
-	private boolean isPlayerAllowedToPlay(ICasinoPlayer player) {
+	private boolean isPlayerAllowedToMakeAction(ICasinoPlayer player) {
 		return isPlayerInTurn(player) && isGamePhase(GamePhase.PLAY);
 	}
 
@@ -169,7 +169,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void doubleStartingBet(BlackjackPlayer player) {
 		LOGGER.entering(getClass().getName(), "doubleStartingBet:" + this + " player:" + player);
 		try {
-			if (!isPlayerAllowedToPlay(player))
+			if (!isPlayerAllowedToMakeAction(player))
 				throw new IllegalPhaseException("doubling bet in wrong phase:", getGamePhase(), GamePhase.PLAY);
 			dealer.doubleDown(player);
 		} finally {
