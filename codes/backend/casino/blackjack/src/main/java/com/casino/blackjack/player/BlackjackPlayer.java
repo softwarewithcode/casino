@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import com.casino.blackjack.table.BlackjackUtil;
+import com.casino.common.bet.BetUtil;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPlayerActionException;
@@ -22,7 +23,6 @@ public class BlackjackPlayer extends CasinoPlayer {
 		super(name, id, startBalance, table);
 		hands = new ArrayList<IHand>();
 		IHand hand = createNewHand(true);
-		// hand.activate();
 		hands.add(hand);
 	}
 
@@ -40,14 +40,21 @@ public class BlackjackPlayer extends CasinoPlayer {
 		validateSplitPreConditions();
 		if (!getPlayerLock().tryLock())
 			throw new ConcurrentModificationException("no balance lock acquired");
+		BetUtil.verifySufficentBalance(hands.get(0).getBet(), this); // Check balance after getting lock
 		IHand splitHand = new BlackjackHand(UUID.randomUUID(), false);
 		Card cardFromStartingHand = hands.get(0).getCards().remove(1);
 		splitHand.addCard(cardFromStartingHand);
+		splitHand.updateBet(hands.get(0).getBet());// immutable BigDecimal
+		increaseTotalBet(splitHand.getBet());
 		hands.add(splitHand);
 	}
 
 	public void stand() {
-		getActiveHand().complete();
+		IHand activeHand = getActiveHand();
+		activeHand.complete();
+		if (getHands().indexOf(activeHand) == 0 && getHands().size() == 2) {
+			getHands().get(1).activate();
+		}
 	}
 
 	public void doubleDown() {
@@ -55,7 +62,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 			validateDoubleDownPreConditions();
 			if (!getPlayerLock().tryLock())
 				throw new ConcurrentModificationException("no balance lock acquired");
-			increaseBet(getBet());
+			increaseTotalBet(getTotalBet());
 			getActiveHand().doubleDown();
 		} finally {
 			if (getPlayerLock().isHeldByCurrentThread())
@@ -85,7 +92,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	}
 
 	public IHand getActiveHand() {
-		return hands.stream().filter(hand -> !hand.isCompleted()).findFirst().orElse(null);
+		return hands.stream().filter(hand -> !hand.isCompleted() && hand.isActive()).findFirst().orElse(null);
 	}
 
 	public void addCard(IHand hand, Card card) {

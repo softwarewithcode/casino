@@ -54,7 +54,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		table.placeStartingBet(blackjackPlayer, initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleStartingBet(blackjackPlayer);
-		assertEquals(new BigDecimal("51.56").setScale(2), blackjackPlayer.getBet());
+		assertEquals(new BigDecimal("51.56").setScale(2), blackjackPlayer.getTotalBet());
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		table.placeStartingBet(blackjackPlayer, initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleStartingBet(blackjackPlayer);
-		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getBet());
+		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getTotalBet());
 	}
 
 	@Test
@@ -78,7 +78,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		table.placeStartingBet(blackjackPlayer, initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleStartingBet(blackjackPlayer);
-		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getBet());
+		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getTotalBet());
 	}
 
 	@Test
@@ -92,7 +92,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("999.98766"), blackjackPlayer.getBalance());
 		table.doubleStartingBet(blackjackPlayer);
-		assertEquals(new BigDecimal("0.02468"), blackjackPlayer.getBet());
+		assertEquals(new BigDecimal("0.02468"), blackjackPlayer.getTotalBet());
 		assertEquals(new BigDecimal("999.97532"), blackjackPlayer.getBalance());
 	}
 
@@ -107,7 +107,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("999.98766"), blackjackPlayer.getBalance());
 		table.doubleStartingBet(blackjackPlayer);
-		assertEquals(new BigDecimal("0.02468"), blackjackPlayer.getBet());
+		assertEquals(new BigDecimal("0.02468"), blackjackPlayer.getTotalBet());
 		assertEquals(new BigDecimal("999.97532"), blackjackPlayer.getBalance());
 		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
 			table.doubleStartingBet(blackjackPlayer);

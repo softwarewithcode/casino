@@ -67,10 +67,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			throw new IllegalArgumentException("Player:" + player + " is not allowed to stand in table :)" + this + " phase:" + getGamePhase());
 		}
 		try {
-			if (!playerInTurnLock.tryLock()) {
-				dealer.changeTurn();
-				return;
-			}
 			dealer.stand(player);
 			if (player.getActiveHand() == null)
 				dealer.changeTurn();

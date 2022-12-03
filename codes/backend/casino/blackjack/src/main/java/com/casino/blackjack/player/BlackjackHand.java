@@ -19,7 +19,7 @@ public class BlackjackHand implements IHand {
 	private Instant completed;
 	private boolean active;
 	private boolean doubled;
-	private BigDecimal bet; // Bet here!?
+	private BigDecimal bet;
 
 	public BlackjackHand(UUID id, boolean active) {
 		this.id = id;
@@ -47,6 +47,14 @@ public class BlackjackHand implements IHand {
 
 	private boolean hasTwoPossibleValues(Integer smallestValue, Optional<Card> aceOptional) {
 		return aceOptional.isPresent() && smallestValue + 10 < 22;
+	}
+
+	public void updateBet(BigDecimal bet) {
+		this.bet = bet;
+	}
+
+	public BigDecimal getBet() {
+		return bet;
 	}
 
 	@Override

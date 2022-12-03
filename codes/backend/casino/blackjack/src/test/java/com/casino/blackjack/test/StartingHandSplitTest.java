@@ -270,4 +270,54 @@ public class StartingHandSplitTest extends BaseTest {
 		assertEquals(1, blackjackPlayer.getHands().get(1).calculateValues().get(0));
 		assertEquals(11, blackjackPlayer.getHands().get(1).calculateValues().get(1));
 	}
+
+	@Test
+	public void splitReducesTotalBalance() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.1"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("949.9"), blackjackPlayer.getBalance());
+		table.splitStartingHand(blackjackPlayer);
+		assertEquals(new BigDecimal("899.8"), blackjackPlayer.getBalance());
+	}
+
+	@Test
+	public void splitIsNotAllowedWithInSufficentBalance() {
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.1"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("49.9"), blackjackPlayer.getBalance());
+		assertThrows(IllegalArgumentException.class, () -> {
+			table.splitStartingHand(blackjackPlayer);
+		});
+	}
+
+	@Test
+	public void splitIsNotAllowedIfCardsHasBeenTaken() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.takeCard(blackjackPlayer);
+		assertThrows(IllegalPlayerActionException.class, () -> {
+			table.splitStartingHand(blackjackPlayer);
+		});
+	}
 }

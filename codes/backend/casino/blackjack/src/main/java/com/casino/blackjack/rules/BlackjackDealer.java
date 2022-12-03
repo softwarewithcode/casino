@@ -46,7 +46,7 @@ public class BlackjackDealer implements IDealer {
 		Stream<Seat> seatStream = table.getSeats().stream();
 		Optional<Seat> playerOptional = seatStream.filter(seat -> seat.getPlayer() != null && seat.getPlayer().equals(tablePlayer)).findFirst();
 		playerOptional.ifPresentOrElse(seat -> {
-			seat.getPlayer().updateStartingBet(bet, table);
+			seat.getPlayer().updateTotalBet(bet, table);
 		}, () -> {
 			throw new PlayerNotFoundException("Player not found in table:" + table + " player:" + tablePlayer, 1);
 		});
@@ -114,7 +114,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private List<ICasinoPlayer> getPlayersWithBet() {
-		List<ICasinoPlayer> playersWithBet = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getBet() != null).map(seat -> seat.getPlayer()).collect(Collectors.toList());
+		List<ICasinoPlayer> playersWithBet = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getTotalBet() != null).map(seat -> seat.getPlayer()).collect(Collectors.toList());
 		return playersWithBet;
 	}
 
@@ -126,18 +126,21 @@ public class BlackjackDealer implements IDealer {
 
 	private void updatePlayers() {
 		table.getSeats().stream().filter(seat -> seat.getPlayer() != null).map(seat -> seat.getPlayer()).forEach(player -> {
-			if (player.getBet() == null) {
+			if (player.getTotalBet() == null) {
 				player.setStatus(Status.SIT_OUT);
 				table.changeFromPlayerToWatcher(player);
 			} else {
 				player.setStatus(Status.AVAILABLE);
-				player.deriveBalanceFromBet();
+				player.deriveBalanceFromTotalBet();
+				// Place totalBet amount into first hand when dealing starts.
+				// Same information is now doubled which is not optimal. 
+				player.getHands().get(0).updateBet(player.getTotalBet());
 			}
 		});
 	}
 
 	public void updateStartingPlayer() {
-		Optional<Seat> startingPlayer = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getBet() != null).min(Comparator.comparing(Seat::getNumber));
+		Optional<Seat> startingPlayer = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getTotalBet() != null).min(Comparator.comparing(Seat::getNumber));
 		if (startingPlayer.isEmpty()) {
 			throw new IllegalStateException("Should start playing but no players with bet");
 		}

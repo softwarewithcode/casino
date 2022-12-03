@@ -1,5 +1,6 @@
 package com.casino.common.cards;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,4 +27,8 @@ public interface IHand {
 	public void doubleDown();
 
 	public boolean isBlackjack();
+
+	public BigDecimal getBet();
+
+	public void updateBet(BigDecimal bet);
 }

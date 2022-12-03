@@ -107,7 +107,7 @@ public class BetTest extends BaseTest {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"), table);
 		table.trySeat(0, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("49.9"));
-		assertEquals(blackjackPlayer.getBet().toString(), "49.9");
+		assertEquals(blackjackPlayer.getTotalBet().toString(), "49.9");
 	}
 
 	@Test
@@ -119,8 +119,8 @@ public class BetTest extends BaseTest {
 		assertTrue(table.trySeat(2, blackjackPlayer2));
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
 		table.placeStartingBet(blackjackPlayer2, new BigDecimal("99.7"));
-		assertEquals("50.0", blackjackPlayer.getBet().toString());
-		assertEquals("99.7", blackjackPlayer2.getBet().toString());
+		assertEquals("50.0", blackjackPlayer.getTotalBet().toString());
+		assertEquals("99.7", blackjackPlayer2.getTotalBet().toString());
 	}
 
 	@Test

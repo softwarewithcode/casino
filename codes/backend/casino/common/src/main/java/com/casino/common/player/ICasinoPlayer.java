@@ -22,13 +22,13 @@ public interface ICasinoPlayer {
 
 	public void setStatus(Status status);
 
-	public BigDecimal getBet();
+	public BigDecimal getTotalBet();
 
-	public void updateStartingBet(BigDecimal bet, ICasinoTable table);
+	public void updateTotalBet(BigDecimal bet, ICasinoTable table);
 
 	public void clearBet();
 
-	public void deriveBalanceFromBet();
+	public void deriveBalanceFromTotalBet();
 
 	public BigDecimal getBalance();
 
