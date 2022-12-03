@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.casino.common.bet.BetUtil;
-import com.casino.common.common.Result;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.table.ICasinoTable;
 
@@ -21,7 +20,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	private BigDecimal bet;
 	private Status status;
 	private ICasinoTable table;
-	private final ReentrantLock balanceLock;
+	private final ReentrantLock playerLock;
 
 	public CasinoPlayer(String name, UUID id, BigDecimal initialBalance, ICasinoTable table) {
 		super();
@@ -31,7 +30,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		this.balance = initialBalance;
 		this.status = null;
 		this.table = table;
-		this.balanceLock = new ReentrantLock(true); // !?
+		this.playerLock = new ReentrantLock(true); // !?
 	}
 
 	@Override
@@ -64,8 +63,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	}
 
-	public ReentrantLock getBalanceLock() {
-		return balanceLock;
+	public ReentrantLock getPlayerLock() {
+		return playerLock;
 	}
 
 	@Override
@@ -102,12 +101,21 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	}
 
 	@Override
-	public void updateBet(BigDecimal bet, ICasinoTable table) {
-		BetUtil.verifyBet(table, this, bet);
-		this.bet = bet;
+	public void updateStartingBet(BigDecimal bet, ICasinoTable table) {
+		try {// player can change starting bet as long as it is GamePhase.BET
+			if (!getPlayerLock().tryLock())
+				throw new ConcurrentModificationException("playerLock was not obtained");
+			BetUtil.verifyStartingBet(table, this, bet);
+			this.bet = bet;
+		} finally {
+			getPlayerLock().unlock();
+		}
+
 	}
 
-	public void increaseBet(BigDecimal increaseAmount) {
+	protected void increaseBet(BigDecimal increaseAmount) {
+		if (!playerLock.isHeldByCurrentThread())
+			throw new IllegalBetException("lock is missing", 8);
 		BetUtil.verifySufficentBalance(increaseAmount, this);
 		if (this.bet == null)
 			throw new IllegalBetException("increase called but no initial bet was found", 6);
@@ -116,8 +124,19 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	}
 
 	@Override
-	public void calculateBalance(Result result) {
-		// TODO Auto-generated method stub
+	public void deriveBalanceFromBet() {
+		try {
+			if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0)
+				throw new IllegalArgumentException("Balance missing or negative. Waiting for manager's call" + balance);
+			if (bet == null || bet.compareTo(BigDecimal.ZERO) < 0)
+				throw new IllegalBetException("Bet missing or negative:" + bet, 9);
+			if (!playerLock.tryLock())
+				throw new ConcurrentModificationException("balance lock was not obtained");
+			this.balance = balance.subtract(bet);
+		} finally {
+			if (playerLock.isHeldByCurrentThread())
+				playerLock.unlock();
+		}
 
 	}
 
@@ -131,17 +150,4 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		this.bet = null;
 	}
 
-	@Override
-	public void updateBalance(BigDecimal balance) {
-		try {
-			if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0)
-				throw new IllegalArgumentException("Balance missing or negative:" + balance);
-			if (!balanceLock.tryLock())
-				throw new ConcurrentModificationException("balance lock was not obtained");
-			this.balance = balance;
-		} finally {
-			if (balanceLock.isHeldByCurrentThread())
-				balanceLock.unlock();
-		}
-	}
 }

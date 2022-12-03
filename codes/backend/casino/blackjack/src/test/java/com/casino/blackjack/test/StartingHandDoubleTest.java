@@ -3,7 +3,6 @@ package com.casino.blackjack.test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -64,7 +63,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		table.placeStartingBet(blackjackPlayer, initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleStartingBet(blackjackPlayer);
-		assertEquals(new BigDecimal("51.56").setScale(2), blackjackPlayer.getBet());
+		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getBet());
 	}
 
 	@Test
@@ -76,7 +75,22 @@ public class StartingHandDoubleTest extends BaseTest {
 		table.placeStartingBet(blackjackPlayer, initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleStartingBet(blackjackPlayer);
-		assertEquals(new BigDecimal("51.56").setScale(2), blackjackPlayer.getBet());
+		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getBet());
+	}
+
+	@Test
+	public void doublingUpdatesBalance() {
+		table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(new BigDecimal("0.01"), MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(6, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("0.01234"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("999.98766"), blackjackPlayer.getBalance());
+		table.doubleStartingBet(blackjackPlayer);
+		assertEquals(new BigDecimal("0.02468"), blackjackPlayer.getBet());
+		assertEquals(new BigDecimal("999.97532"), blackjackPlayer.getBalance());
 	}
 
 }

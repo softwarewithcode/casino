@@ -9,7 +9,7 @@ import com.casino.common.table.phase.GamePhase;
 
 public class BetUtil {
 
-	public static void verifyBet(ICasinoTable table, ICasinoPlayer player, BigDecimal betAttempt) {
+	public static void verifyStartingBet(ICasinoTable table, ICasinoPlayer player, BigDecimal betAttempt) {
 		verify(table, player, betAttempt);
 		verifySufficentBalance(betAttempt, player);
 	}
@@ -25,11 +25,13 @@ public class BetUtil {
 			throw new IllegalBetException("given bet is under table minimum bet " + table.getBetValues().minimumBet().toString() + " bet:" + betAttempt.toString(), 4);
 		if (betAttempt.compareTo(table.getBetValues().maximumBet()) > 0)
 			throw new IllegalBetException("given bet is over table maximum bet " + table.getBetValues().maximumBet().toString() + " bet:" + betAttempt.toString(), 5);
+		if (betAttempt.compareTo(BigDecimal.ZERO) < 0)
+			throw new IllegalBetException("bet cannot be negative" + table + " player:" + player, 9);
 	}
 
 	public static void verifySufficentBalance(BigDecimal attempt, ICasinoPlayer player) {
 		if (player.getBalance().compareTo(attempt) < 0)
 			throw new IllegalArgumentException("player has not enough money: Should have " + attempt.toString() + " has: " + player.getBalance().toString());
-
 	}
+
 }

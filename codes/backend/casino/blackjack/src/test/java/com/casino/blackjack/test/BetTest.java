@@ -13,11 +13,13 @@ import org.junit.jupiter.api.Test;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetThresholds;
+import com.casino.common.bet.BetUtil;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.exception.PlayerNotFoundException;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
+import com.casino.common.table.phase.GamePhase;
 
 public class BetTest extends BaseTest {
 	@Test
@@ -28,6 +30,17 @@ public class BetTest extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS + 1, ChronoUnit.SECONDS);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
 			table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
+		});
+		assertEquals(6, exception.getCode());
+	}
+
+	@Test
+	public void betUtilChecksCorrectPhase() {
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		table.updateGamePhase(GamePhase.BETS_COMPLETED);
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
+			BetUtil.verifyStartingBet(table, blackjackPlayer, MAX_BET);
 		});
 		assertEquals(1, exception.getCode());
 	}

@@ -50,7 +50,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 				dealer.handlePlayerBet(player, bet);
 			else {
 				LOGGER.info("Initial bet is not accepted due to the current gamePhase:" + getGamePhase() + " table:" + this + " player:" + player);
-				throw new IllegalBetException("Initial bet in wrong phase:" + this + " player:" + player + " bet:" + bet.toString(), 1);
+				throw new IllegalBetException("Initial bet in wrong phase:" + this + " player:" + player + " bet:" + bet.toString(), 6);
 			}
 		} finally {
 			LOGGER.exiting(getClass().getName(), "placeStartingBet");
@@ -169,7 +169,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void doubleStartingBet(BlackjackPlayer player) {
 		LOGGER.entering(getClass().getName(), "doubleStartingBet:" + this + " player:" + player);
 		try {
-			if (!isGamePhase(GamePhase.PLAY))
+			if (!isPlayerAllowedToPlay(player))
 				throw new IllegalPhaseException("doubling bet in wrong phase:", getGamePhase(), GamePhase.PLAY);
 			dealer.doubleDown(player);
 		} finally {
