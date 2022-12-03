@@ -1,4 +1,4 @@
-package com.casino.blackjack.test.seat;
+package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
-import com.casino.blackjack.test.BaseTest;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;

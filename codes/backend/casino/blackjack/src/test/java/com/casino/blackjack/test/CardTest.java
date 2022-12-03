@@ -1,4 +1,4 @@
-package com.casino.blackjack.test.card;
+package com.casino.blackjack.test;
 
 import java.math.BigDecimal;
 import java.util.List;
