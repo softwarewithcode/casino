@@ -5,7 +5,6 @@
 		<artifactId>casino</artifactId>
 		<version>0.0.1</version>
 	</parent>
-	<groupId>blackjack</groupId>
 	<artifactId>blackjack</artifactId>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
