@@ -1,4 +1,4 @@
-package com.casino.blackjack.test;
+package com.casino.blackjack.test.card;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -11,14 +11,7 @@ import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 
-public class BlackjackPlayerTest {
-	@Test
-	public void playerHoldsDealtCardsInFirstHand() {
-		BlackjackPlayer player = new BlackjackPlayer("player", UUID.randomUUID(), BigDecimal.TEN, null);
-		player.addCard(player.getHands().get(0), Card.of(13, Suit.CLUB));
-		player.addCard(player.getHands().get(0), Card.of(11, Suit.CLUB));
-		Assertions.assertEquals(1, player.getHands().size());
-	}
+public class CardTest {
 
 	@Test
 	public void handValueIsCalculatedCorrectly() {
