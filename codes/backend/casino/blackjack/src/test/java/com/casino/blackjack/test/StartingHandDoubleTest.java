@@ -43,4 +43,40 @@ public class StartingHandDoubleTest extends BaseTest {
 		}
 	}
 
+	@Test
+	public void doublingNineResultsToDoubleBet() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, initialBet);
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.doubleStartingBet(blackjackPlayer);
+		assertEquals(new BigDecimal("51.56").setScale(2), blackjackPlayer.getBet());
+	}
+
+	@Test
+	public void doublingTenResultsToDoubleBet() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, initialBet);
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.doubleStartingBet(blackjackPlayer);
+		assertEquals(new BigDecimal("51.56").setScale(2), blackjackPlayer.getBet());
+	}
+
+	@Test
+	public void doublingElevenResultsToDoubleBet() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(6, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, initialBet);
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.doubleStartingBet(blackjackPlayer);
+		assertEquals(new BigDecimal("51.56").setScale(2), blackjackPlayer.getBet());
+	}
+
 }
