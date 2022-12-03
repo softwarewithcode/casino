@@ -1,5 +1,6 @@
 package com.casino.blackjack.player;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class BlackjackHand implements IHand {
 	private Instant completed;
 	private boolean active;
 	private boolean doubled;
+	private BigDecimal bet; // Bet here!?
 
 	public BlackjackHand(UUID id, boolean active) {
 		this.id = id;

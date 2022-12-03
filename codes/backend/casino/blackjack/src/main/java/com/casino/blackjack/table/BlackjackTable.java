@@ -63,6 +63,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		if (!isPlayerAllowedToMakeAction(player)) {
 			// Timer might have run out or unauthorized call
 			LOGGER.log(Level.SEVERE, " Player not in turn: " + player + " called stand:" + this);
+			// TODO exception type
 			throw new IllegalArgumentException("Player:" + player + " is not allowed to stand in table :)" + this + " phase:" + getGamePhase());
 		}
 		try {

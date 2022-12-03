@@ -15,12 +15,12 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	private final String name;
 	private final UUID id;
 	private final BigDecimal initialBalance;
+	private final ICasinoTable table;
+	private final ReentrantLock playerLock;
 	private BigDecimal endBalance;
 	private BigDecimal balance;
 	private BigDecimal bet;
 	private Status status;
-	private ICasinoTable table;
-	private final ReentrantLock playerLock;
 
 	public CasinoPlayer(String name, UUID id, BigDecimal initialBalance, ICasinoTable table) {
 		super();
@@ -108,7 +108,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 			BetUtil.verifyStartingBet(table, this, bet);
 			this.bet = bet;
 		} finally {
-			getPlayerLock().unlock();
+			if (getPlayerLock().isHeldByCurrentThread())
+				getPlayerLock().unlock();
 		}
 
 	}

@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.blackjack.table.BlackjackUtil;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
-import com.casino.common.exception.IllegalDoublingException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.CasinoPlayer;
 import com.casino.common.table.ISeatedTable;
@@ -39,7 +37,9 @@ public class BlackjackPlayer extends CasinoPlayer {
 	}
 
 	public void splitStartingHand() {
-		validateSplitConditions();
+		validateSplitPreConditions();
+		if (!getPlayerLock().tryLock())
+			throw new ConcurrentModificationException("no balance lock acquired");
 		IHand splitHand = new BlackjackHand(UUID.randomUUID(), false);
 		Card cardFromStartingHand = hands.get(0).getCards().remove(1);
 		splitHand.addCard(cardFromStartingHand);
@@ -52,30 +52,24 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public void doubleDown() {
 		try {
-			validateDoubleDownConditions();
+			validateDoubleDownPreConditions();
 			if (!getPlayerLock().tryLock())
 				throw new ConcurrentModificationException("no balance lock acquired");
 			increaseBet(getBet());
 			getActiveHand().doubleDown();
-		} catch (IllegalArgumentException e) {
-			LOGGER.log(Level.SEVERE, "Doubling failed ", e);
-			throw new IllegalDoublingException("insufficent funds", 1);
-		} catch (ConcurrentModificationException ce) {
-			LOGGER.log(Level.SEVERE, "Doubling failed ", ce);
-			throw new IllegalDoublingException("balance handling is reserved", 2);
 		} finally {
 			if (getPlayerLock().isHeldByCurrentThread())
 				getPlayerLock().unlock();
 		}
 	}
 
-	private void validateDoubleDownConditions() {
+	private void validateDoubleDownPreConditions() {
 		validateActionConditions();
 		if (getActiveHand().isDoubled())
 			throw new IllegalPlayerActionException("hand has been doubled before ", 10);
 	}
 
-	private void validateSplitConditions() {
+	private void validateSplitPreConditions() {
 		validateActionConditions();
 		if (!BlackjackUtil.haveSameValue(hands.get(0).getCards().get(0), hands.get(0).getCards().get(1)))
 			throw new IllegalPlayerActionException("not equal values", 4);
