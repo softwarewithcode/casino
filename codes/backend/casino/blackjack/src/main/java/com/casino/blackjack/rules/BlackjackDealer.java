@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -24,6 +25,7 @@ import com.casino.common.table.Seat;
 import com.casino.common.table.phase.GamePhase;
 
 public class BlackjackDealer implements IDealer {
+	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
 	private final BetThresholds betThresholds;
 	private final BlackjackTable table;
 	private List<Card> decks; // 6 decks
@@ -120,20 +122,18 @@ public class BlackjackDealer implements IDealer {
 
 	public void finalizeBetPhase() {
 		table.getClock().stopClock();
-		updatePlayers();
+		handlePlayers();
 		table.updateGamePhase(GamePhase.BETS_COMPLETED);
 	}
 
-	private void updatePlayers() {
+	private void handlePlayers() {
 		table.getSeats().stream().filter(seat -> seat.getPlayer() != null).map(seat -> seat.getPlayer()).forEach(player -> {
-			if (player.getTotalBet() == null) {
-				player.setStatus(Status.SIT_OUT);
+			player.setStatus(Status.SIT_OUT);
+			if (!player.hasBet())
 				table.changeFromPlayerToWatcher(player);
-			} else {
-				player.setStatus(Status.AVAILABLE);
+			else {
 				player.subtractTotalBetFromBalance();
-				// Place totalBet amount into first hand when dealing starts.
-				// Same information is now doubled which is not optimal. 
+				player.setStatus(Status.ACTIVE);
 				player.getHands().get(0).updateBet(player.getTotalBet());
 			}
 		});

@@ -288,6 +288,25 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
+	public void splitAddsBetInHandAndBalanceKeepsOnTrack() {
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("6.77"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.splitStartingHand(blackjackPlayer);
+		assertEquals(new BigDecimal("6.77"), blackjackPlayer.getHands().get(0).getBet());
+		assertEquals(new BigDecimal("6.77"), blackjackPlayer.getHands().get(1).getBet());
+		assertEquals(new BigDecimal("13.54"), blackjackPlayer.getTotalBet());
+		assertEquals(new BigDecimal("86.46"), blackjackPlayer.getBalance());
+	}
+
+	@Test
 	public void splitIsNotAllowedWithInsufficentBalance() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
 		List<Card> cards = dealer.getDecks();

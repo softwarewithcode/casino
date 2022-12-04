@@ -5,13 +5,14 @@ import java.util.ConcurrentModificationException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Logger;
 
 import com.casino.common.bet.BetUtil;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.table.ICasinoTable;
 
 public abstract class CasinoPlayer implements ICasinoPlayer {
-
+	private static final Logger LOGGER = Logger.getLogger(CasinoPlayer.class.getName());
 	private final String name;
 	private final UUID id;
 	private final BigDecimal initialBalance;
@@ -107,6 +108,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 				throw new ConcurrentModificationException("playerLock was not obtained");
 			BetUtil.verifyStartingBet(table, this, bet);
 			this.totalBet = bet;
+			System.out.println("TOTAL:" + bet);
 		} finally {
 			if (getPlayerLock().isHeldByCurrentThread())
 				getPlayerLock().unlock();
@@ -132,12 +134,28 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 			if (totalBet == null || totalBet.compareTo(BigDecimal.ZERO) < 0)
 				throw new IllegalBetException("Bet missing or negative:" + totalBet, 9);
 			if (!playerLock.tryLock())
-				throw new ConcurrentModificationException("balance lock was not obtained");
+				throw new ConcurrentModificationException("playerLock was not obtained");
 			this.balance = balance.subtract(totalBet);
 		} finally {
 			if (playerLock.isHeldByCurrentThread())
 				playerLock.unlock();
 		}
+	}
+
+	@Override
+	public void removeTotalBet() {
+		try {
+			if (!playerLock.tryLock())
+				throw new ConcurrentModificationException("playerLock was not obtained");
+			this.totalBet = null;
+		} finally {
+			if (playerLock.isHeldByCurrentThread())
+				playerLock.unlock();
+		}
+	}
+
+	public boolean hasBet() {
+		return this.totalBet != null && totalBet.compareTo(BigDecimal.ZERO) == 1;
 	}
 
 	@Override

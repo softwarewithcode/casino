@@ -24,6 +24,8 @@ public interface ICasinoPlayer {
 
 	public BigDecimal getTotalBet();
 
+	public boolean hasBet();
+
 	public void updateTotalBet(BigDecimal bet, ICasinoTable table);
 
 	public void clearBet();
@@ -33,5 +35,7 @@ public interface ICasinoPlayer {
 	public BigDecimal getBalance();
 
 	public List<IHand> getHands();
+
+	public void removeTotalBet();
 
 }

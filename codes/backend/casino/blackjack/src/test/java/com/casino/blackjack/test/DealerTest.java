@@ -1,6 +1,7 @@
 package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetThresholds;
+import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
@@ -105,4 +107,46 @@ public class DealerTest extends BaseTest {
 		Assertions.assertEquals(312, d.getDecks().size());
 	}
 
+	@Test
+	public void dealerCalculatesBalancesBasedOnLastBets() {
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
+		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
+		table.trySeat(5, blackjackPlayer);
+		table.trySeat(6, blackjackPlayer2);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("11.11"));
+		table.placeStartingBet(blackjackPlayer2, new BigDecimal("22.67"));
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("44.55"));
+		table.placeStartingBet(blackjackPlayer2, new BigDecimal("51.00"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("44.55"), blackjackPlayer.getHands().get(0).getBet());
+		assertEquals(new BigDecimal("44.55"), blackjackPlayer.getTotalBet());
+		assertEquals(new BigDecimal("55.45"), blackjackPlayer.getBalance());
+		assertEquals(new BigDecimal("51.00"), blackjackPlayer2.getHands().get(0).getBet());
+		assertEquals(new BigDecimal("51.00"), blackjackPlayer2.getTotalBet());
+		assertEquals(new BigDecimal("49.00"), blackjackPlayer2.getBalance());
+	}
+
+	@Test
+	public void betChangeDoesNotMakeOnTimeAndLastReceivedBetIsUsed() {
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
+		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
+		table.trySeat(5, blackjackPlayer);
+		table.trySeat(6, blackjackPlayer2);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("11.11"));
+		table.placeStartingBet(blackjackPlayer2, new BigDecimal("22.67"));
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("44.55"));
+		table.placeStartingBet(blackjackPlayer2, new BigDecimal("51.00"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertThrows(IllegalPlayerActionException.class, () -> {
+			table.placeStartingBet(blackjackPlayer2, new BigDecimal("100.0"));
+		});
+		assertEquals(new BigDecimal("44.55"), blackjackPlayer.getHands().get(0).getBet());
+		assertEquals(new BigDecimal("44.55"), blackjackPlayer.getTotalBet());
+		assertEquals(new BigDecimal("55.45"), blackjackPlayer.getBalance());
+		assertEquals(new BigDecimal("51.00"), blackjackPlayer2.getHands().get(0).getBet());
+		assertEquals(new BigDecimal("51.00"), blackjackPlayer2.getTotalBet());
+		assertEquals(new BigDecimal("49.00"), blackjackPlayer2.getBalance());
+	}
 }
