@@ -32,7 +32,7 @@ public class BetTest extends BaseTest {
 		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
 			table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
 		});
-		assertEquals(6, exception.getCode());
+		assertEquals(16, exception.getCode());
 	}
 
 	@Test
