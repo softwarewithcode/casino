@@ -163,7 +163,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void doubleStartingBet(BlackjackPlayer player) {
+	public void doubleDown(BlackjackPlayer player) {
 		LOGGER.entering(getClass().getName(), "doubleStartingBet:" + this + " player:" + player);
 		try {
 			if (!isPlayerAllowedToMakeAction(player))

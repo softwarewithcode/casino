@@ -16,7 +16,7 @@ public interface IBlackjackTable {
 	// public void splitStartingHand(String playerId);
 	public void splitStartingHand(BlackjackPlayer player);
 
-	public void doubleStartingBet(BlackjackPlayer player);
+	public void doubleDown(BlackjackPlayer player);
 
 	public void takeCard(ICasinoPlayer player);
 

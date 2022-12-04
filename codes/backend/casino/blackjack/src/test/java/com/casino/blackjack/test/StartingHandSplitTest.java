@@ -288,7 +288,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void splitIsNotAllowedWithInSufficentBalance() {
+	public void splitIsNotAllowedWithInsufficentBalance() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(11, Suit.DIAMOND));
