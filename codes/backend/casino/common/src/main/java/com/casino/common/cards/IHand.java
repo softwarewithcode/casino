@@ -14,6 +14,8 @@ public interface IHand {
 
 	public boolean isCompleted();
 
+	public boolean isCompleteable();
+
 	public UUID getId();
 
 	public boolean isActive();

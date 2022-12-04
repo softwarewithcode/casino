@@ -18,6 +18,8 @@ public interface ICasinoPlayer {
 
 	public void onLeave();
 
+	public boolean canAct();
+
 	public Status getStatus();
 
 	public void setStatus(Status status);

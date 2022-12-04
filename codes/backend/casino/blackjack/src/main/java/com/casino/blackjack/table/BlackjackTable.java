@@ -66,10 +66,12 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void takeCard(ICasinoPlayer player) {
+	public void takeCard(BlackjackPlayer player) {
 		try {
 			verifyActionClearance(player, "takeCard");
-			dealer.addCard(player);
+			dealer.handleAdditionalCard(player);
+			if (player.getActiveHand() == null)
+				dealer.changeTurn();
 		} finally {
 			completeAction("takeCard");
 		}
@@ -95,7 +97,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		LOGGER.entering(getClass().getName(), actionName, " player:" + player);
 		if (!isPlayerAllowedToMakeAction(player)) {
 			LOGGER.log(Level.SEVERE, " Player not allowed to make action: " + actionName + " phase: " + getGamePhase() + " in table:" + this);
-			throw new IllegalPlayerActionException("not allowed", 14);
+			throw new IllegalPlayerActionException(actionName + " not allowed for player:" + player, 14);
 		}
 		if (!getPlayerInTurnLock().tryLock()) { // .lock()
 			System.out.println("Owner:" + getPlayerInTurnLock() + "  running:" + Thread.currentThread());
@@ -105,7 +107,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	private boolean isPlayerAllowedToMakeAction(ICasinoPlayer player) {
-		return isPlayerInTurn(player) && isGamePhase(GamePhase.PLAY);
+		return isPlayerInTurn(player) && isGamePhase(GamePhase.PLAY) && player.canAct();
 	}
 
 	@Override

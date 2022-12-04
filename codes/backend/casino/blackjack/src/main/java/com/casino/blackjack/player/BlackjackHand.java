@@ -132,4 +132,12 @@ public class BlackjackHand implements IHand {
 		this.doubled = true;
 	}
 
+	@Override
+	public boolean isCompleteable() {
+		List<Integer> vals = calculateValues();
+		if (vals.get(0) == 21)
+			return true;
+		return vals.size() == 2 ? vals.get(1) == 21 : false;
+	}
+
 }

@@ -18,7 +18,7 @@ public interface IBlackjackTable {
 
 	public void doubleDown(BlackjackPlayer player);
 
-	public void takeCard(ICasinoPlayer player);
+	public void takeCard(BlackjackPlayer player);
 
 	public void stand(BlackjackPlayer player); // no more cards
 

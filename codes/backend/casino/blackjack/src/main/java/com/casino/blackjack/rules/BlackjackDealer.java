@@ -77,6 +77,7 @@ public class BlackjackDealer implements IDealer {
 		if (!isAllowedToDealStartingHand())
 			return false;
 		IntStream.range(0, 2).forEach(i -> getPlayersWithBet().forEach(player -> dealCard(player.getHands().get(0), decks.remove(decks.size() - 1))));
+		getPlayersWithBet().forEach(player -> completeActiveHandIfPossible(player));
 		return true;
 	}
 
@@ -84,9 +85,18 @@ public class BlackjackDealer implements IDealer {
 		hand.addCard(card);
 	}
 
-	public void addCard(ICasinoPlayer player) {
+	public void handleAdditionalCard(ICasinoPlayer player) {
 		Card card = decks.remove(decks.size() - 1);
-		getActiveHand(player).addCard(card);
+		IHand activeHand = getActiveHand(player);
+		activeHand.addCard(card);
+		completeActiveHandIfPossible(player);
+	}
+
+	private void completeActiveHandIfPossible(ICasinoPlayer player) {
+		IHand activeHand = getActiveHand(player);
+		if (activeHand != null && activeHand.isCompleteable()) {
+			activeHand.complete();
+		}
 	}
 
 	private IHand getActiveHand(ICasinoPlayer player) {
@@ -146,8 +156,10 @@ public class BlackjackDealer implements IDealer {
 		if (nextPlayer != null) {
 			table.updatePlayerInTurn(nextPlayer.getPlayer());
 			table.updateDealerTurn(false);
-		} else
+		} else {
 			table.updateDealerTurn(true);
+			table.updatePlayerInTurn(null);
+		}
 	}
 
 	public void doubleDown(BlackjackPlayer player) {

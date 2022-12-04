@@ -2,10 +2,10 @@ package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -20,6 +20,7 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
+import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
@@ -45,7 +46,7 @@ public class StandTest extends BaseTest {
 	}
 
 	@Test
-	public void playerInTurnChangesAfterStand() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void playerInTurnChangesAfterStand() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(7, Suit.DIAMOND));
@@ -62,7 +63,7 @@ public class StandTest extends BaseTest {
 	}
 
 	@Test
-	public void dealerGetsTurnAfterLastPlayer() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void dealerGetsTurnAfterLastPlayer() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(7, Suit.DIAMOND));
@@ -77,6 +78,59 @@ public class StandTest extends BaseTest {
 		table.stand(blackjackPlayer);
 		table.stand(blackjackPlayer2);
 		assertTrue(table.isDealerTurn());
+	}
+
+	@Test
+	public void callingStandInAWrongTurnResultsToException() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(7, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.trySeat(6, blackjackPlayer2);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.placeStartingBet(blackjackPlayer2, new BigDecimal("10.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertThrows(IllegalPlayerActionException.class, () -> {
+			table.stand(blackjackPlayer2);
+		});
+	}
+
+	@Test
+	public void callingStandWhileHaving21IsNotAllowedAsHandIsCompleted() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(7, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.takeCard(blackjackPlayer);
+		assertNull(blackjackPlayer.getActiveHand());
+		assertThrows(IllegalPlayerActionException.class, () -> {
+			table.stand(blackjackPlayer);
+		});
+	}
+
+	@Test
+	public void callingStandWhileHavingBlackjackIsNotAllowedAsHandIsCompleted() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(7, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertNull(blackjackPlayer.getActiveHand());
+		assertThrows(IllegalPlayerActionException.class, () -> {
+			table.stand(blackjackPlayer);
+		});
 	}
 
 	@Test

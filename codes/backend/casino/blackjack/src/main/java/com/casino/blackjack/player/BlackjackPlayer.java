@@ -28,6 +28,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public boolean canTake() {
 		IHand hand = getActiveHand();
+		if (hand == null)
+			return false;
 		List<Integer> values = hand.calculateValues(); // Smallest value in 0 pos.
 		return values.get(0) < 21 && !hand.isBlackjack();
 	}
@@ -115,6 +117,11 @@ public class BlackjackPlayer extends CasinoPlayer {
 	@Override
 	public String toString() {
 		return "[name=" + getName() + ", id=" + getId() + ", hands=" + hands + "]";
+	}
+
+	@Override
+	public boolean canAct() {
+		return getActiveHand() != null;
 	}
 
 }
