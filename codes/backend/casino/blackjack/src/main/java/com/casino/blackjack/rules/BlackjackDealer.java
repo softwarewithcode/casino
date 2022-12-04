@@ -131,7 +131,7 @@ public class BlackjackDealer implements IDealer {
 				table.changeFromPlayerToWatcher(player);
 			} else {
 				player.setStatus(Status.AVAILABLE);
-				player.deriveBalanceFromTotalBet();
+				player.subtractTotalBetFromBalance();
 				// Place totalBet amount into first hand when dealing starts.
 				// Same information is now doubled which is not optimal. 
 				player.getHands().get(0).updateBet(player.getTotalBet());

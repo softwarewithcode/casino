@@ -28,7 +28,7 @@ public interface ICasinoPlayer {
 
 	public void clearBet();
 
-	public void deriveBalanceFromTotalBet();
+	public void subtractTotalBetFromBalance();
 
 	public BigDecimal getBalance();
 

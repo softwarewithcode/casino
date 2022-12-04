@@ -125,7 +125,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	}
 
 	@Override
-	public void deriveBalanceFromTotalBet() {
+	public void subtractTotalBetFromBalance() {
 		try {
 			if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0)
 				throw new IllegalArgumentException("Balance missing or negative. Waiting for manager's call" + balance);
