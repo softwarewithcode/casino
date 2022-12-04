@@ -75,6 +75,17 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		}
 	}
 
+	@Override
+	public void splitStartingHand(BlackjackPlayer player) {
+		try {
+			verifyActionClearance(player, "splitStartingHand");
+			dealer.handleSplit(player);
+		} finally {
+			completeAction("splitStartingHand");
+		}
+
+	}
+
 	private void checkDealer(BlackjackPlayer player) {
 		if (player.getActiveHand() == null)
 			dealer.changeTurn();
@@ -169,11 +180,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public int getPlayerTurnTime() {
 		return 20;
-	}
-
-	@Override
-	public void splitStartingHand(BlackjackPlayer player) {
-		dealer.handleSplit(player);
 	}
 
 	@Override
