@@ -102,7 +102,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			throw new IllegalPlayerActionException("not allowed", 14);
 		}
 		if (!playerInTurnLock.tryLock()) {
-			LOGGER.log(Level.INFO, player + "tried:" + actionName + " but lock could not be obtained" + this);
+			LOGGER.log(Level.INFO, player + "tried:" + actionName + " but lock could not be obtained. " + this);
 			throw new ConcurrentModificationException("lock was not obtained");
 		}
 	}
@@ -135,15 +135,18 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void onBetPhaseEnd() {
 		try {
-			if (!canProceedToPlayPhase())
+			if (!canFinalizeBetPhase())
 				throw new IllegalPhaseException("GamePhase is not correct or lock was not acquired", getGamePhase(), GamePhase.BET);
 			dealer.finalizeBetPhase();
 			if (dealer.dealInitialCards()) {
-				updateGamePhase(GamePhase.PLAY);
 				dealer.updateStartingPlayer();
+				updateGamePhase(GamePhase.PLAY);
+			} else {
+				System.out.println("Players sit out. Nobody has bet. No use case specification exist. Either automatically restart betPhase vs. waiting players to join.");
+				// How long sit out player can reserve the seat?
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "betPhaseEnd however something went wrong. Waiting for manager's call.", e);
+			LOGGER.log(Level.SEVERE, "onBetPhaseEnd() something went wrong. Waiting for manager's call.", e);
 			BlackjackUtil.dumpTable(this, "onBetPhaseEnd");
 			updateGamePhase(GamePhase.ERROR);
 		} finally {
@@ -158,7 +161,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	}
 
-	private boolean canProceedToPlayPhase() {
+	private boolean canFinalizeBetPhase() {
 		return isGamePhase(GamePhase.BET) && betPhaseLock.tryLock();
 	}
 

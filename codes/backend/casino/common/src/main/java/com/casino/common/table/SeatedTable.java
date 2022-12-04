@@ -45,6 +45,8 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	@Override
 	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
 		BetUtil.verifySufficentBalance(getBetValues().minimumBet(), player);
+		if (!isAcceptingPlayers())
+			return false;
 		if (seatNumber < 0 || seatNumber >= seats.size())
 			return false;
 		if (hasAlreadySeat(player))
@@ -55,6 +57,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		super.changeFromWatcherToPlayer(player);
 		return true;
 	}
+
 
 	@Override
 	public boolean watch(ICasinoPlayer player) {

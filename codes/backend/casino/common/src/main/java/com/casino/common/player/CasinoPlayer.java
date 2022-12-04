@@ -108,7 +108,6 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 				throw new ConcurrentModificationException("playerLock was not obtained");
 			BetUtil.verifyStartingBet(table, this, bet);
 			this.totalBet = bet;
-			System.out.println("TOTAL:" + bet);
 		} finally {
 			if (getPlayerLock().isHeldByCurrentThread())
 				getPlayerLock().unlock();
@@ -129,12 +128,12 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@Override
 	public void subtractTotalBetFromBalance() {
 		try {
+			if (!playerLock.tryLock())
+				throw new ConcurrentModificationException("playerLock was not obtained");
 			if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0)
 				throw new IllegalArgumentException("Balance missing or negative. Waiting for manager's call" + balance);
 			if (totalBet == null || totalBet.compareTo(BigDecimal.ZERO) < 0)
 				throw new IllegalBetException("Bet missing or negative:" + totalBet, 9);
-			if (!playerLock.tryLock())
-				throw new ConcurrentModificationException("playerLock was not obtained");
 			this.balance = balance.subtract(totalBet);
 		} finally {
 			if (playerLock.isHeldByCurrentThread())

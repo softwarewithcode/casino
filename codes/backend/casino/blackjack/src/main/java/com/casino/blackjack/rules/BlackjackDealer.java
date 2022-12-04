@@ -16,7 +16,6 @@ import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
-import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.PlayerNotFoundException;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.player.Status;
@@ -75,20 +74,17 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public boolean dealInitialCards() {
-		if (!isAllowedToDeal())
+		if (!isAllowedToDealStartingHand())
 			return false;
-		IntStream.range(0, 2).forEach(i -> getPlayersWithBet().forEach(player -> dealCard(player, decks.remove(decks.size() - 1))));
+		IntStream.range(0, 2).forEach(i -> getPlayersWithBet().forEach(player -> dealCard(player.getHands().get(0), decks.remove(decks.size() - 1))));
 		return true;
 	}
 
-	private void dealCard(ICasinoPlayer player, Card card) {
-		System.out.println("Dealer dealCard " + player + " getsCard:" + card);
-		player.getHands().get(0).addCard(card);
+	private void dealCard(IHand hand, Card card) {
+		hand.addCard(card);
 	}
 
 	public void addCard(ICasinoPlayer player) {
-		if (!table.isGamePhase(GamePhase.PLAY))
-			throw new IllegalPhaseException("Wrong phase for add card", table.getGamePhase(), GamePhase.PLAY);
 		Card card = decks.remove(decks.size() - 1);
 		getActiveHand(player).addCard(card);
 	}
@@ -98,17 +94,14 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void handleNewPlayer(ICasinoPlayer player) {
-		System.out.println("Dealer welcomes:" + player + " currentPlayers:" + table.getPlayers().size() + "PHASE:" + table.getGamePhase() + " table:" + table.getId());
 		if (table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS) {
 			table.setStatus(com.casino.common.table.Status.RUNNING);
 			startBetPhase();
 		}
 	}
 
-	private boolean isAllowedToDeal() {
-		if (!table.isGamePhase(GamePhase.BETS_COMPLETED))
-			throw new IllegalPhaseException("Wrong phase for card dealing", table.getGamePhase(), GamePhase.BETS_COMPLETED);
-		return somebodyHasBet();
+	private boolean isAllowedToDealStartingHand() {
+		return table.isGamePhase(GamePhase.BETS_COMPLETED) && somebodyHasBet();
 	}
 
 	private boolean somebodyHasBet() {
@@ -116,7 +109,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private List<ICasinoPlayer> getPlayersWithBet() {
-		List<ICasinoPlayer> playersWithBet = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getTotalBet() != null).map(seat -> seat.getPlayer()).collect(Collectors.toList());
+		List<ICasinoPlayer> playersWithBet = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().hasBet()).map(seat -> seat.getPlayer()).collect(Collectors.toList());
 		return playersWithBet;
 	}
 

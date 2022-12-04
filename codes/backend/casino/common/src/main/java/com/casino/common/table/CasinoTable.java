@@ -172,6 +172,10 @@ public abstract class CasinoTable implements ICasinoTable {
 		return watchers;
 	}
 
+	protected boolean isAcceptingPlayers() {
+		return getStatus() == Status.WAITING_PLAYERS || getStatus() == Status.RUNNING;
+	}
+
 	@Override
 	public Set<ICasinoPlayer> getPlayersAndWatchers() {
 		HashSet<ICasinoPlayer> set = new HashSet<ICasinoPlayer>();
