@@ -63,7 +63,7 @@ public class StandTest extends BaseTest {
 	}
 
 	@Test
-	public void dealerGetsTurnAfterLastPlayer() {
+	public void dealerGetsTurnAfterLastPlayerCallsStand() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(7, Suit.DIAMOND));
@@ -151,5 +151,99 @@ public class StandTest extends BaseTest {
 		table.stand(blackjackPlayer);
 		assertNull(blackjackPlayer.getActiveHand());
 		assertTrue(blackjackPlayer.getHands().get(1).isCompleted());
+	}
+
+	@Test
+	public void callingStandCausesDealerToPlayAndStandOn17() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.stand(blackjackPlayer);
+		assertNull(blackjackPlayer.getActiveHand());
+		assertTrue(dealer.getHand().isCompleted());
+		assertEquals(17, dealer.getHand().calculateValues().get(0));
+	}
+
+	@Test
+	public void callingStandCausesDealerToPlayAndStandOn18() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.stand(blackjackPlayer);
+		assertNull(blackjackPlayer.getActiveHand());
+		assertTrue(dealer.getHand().isCompleted());
+		assertEquals(18, dealer.getHand().calculateValues().get(1));
+	}
+
+	@Test
+	public void callingStandCausesDealerToPlayAndStandOn19() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(4, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.SPADE));
+		cards.add(Card.of(1, Suit.SPADE));
+		cards.add(Card.of(1, Suit.HEART));
+		cards.add(Card.of(1, Suit.HEART));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.stand(blackjackPlayer);
+		assertNull(blackjackPlayer.getActiveHand());
+		assertTrue(dealer.getHand().isCompleted());
+		assertEquals(19, dealer.getHand().calculateValues().get(1));
+	}
+
+	@Test
+	public void callingStandCausesDealerToPlayAndStandOn20() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(4, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.SPADE));
+		cards.add(Card.of(3, Suit.SPADE));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(13, Suit.HEART));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.stand(blackjackPlayer);
+		assertNull(blackjackPlayer.getActiveHand());
+		assertTrue(dealer.getHand().isCompleted());
+		assertEquals(20, dealer.getHand().calculateValues().get(0));
+	}
+
+	@Test
+	public void callingStandCausesDealerToPlayAndStandOn21() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.SPADE));
+		cards.add(Card.of(3, Suit.SPADE));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(13, Suit.HEART));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.stand(blackjackPlayer);
+		assertNull(blackjackPlayer.getActiveHand());
+		assertTrue(dealer.getHand().isCompleted());
+		assertEquals(21, dealer.getHand().calculateValues().get(0));
 	}
 }

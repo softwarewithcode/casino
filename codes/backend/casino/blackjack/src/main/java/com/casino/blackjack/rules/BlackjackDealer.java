@@ -1,14 +1,18 @@
 package com.casino.blackjack.rules;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import com.casino.blackjack.player.BlackjackHand;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetPhaseClockTask;
@@ -28,11 +32,13 @@ public class BlackjackDealer implements IDealer {
 	private final BetThresholds betThresholds;
 	private final BlackjackTable table;
 	private List<Card> decks; // 6 decks
+	private IHand hand;
 
 	public BlackjackDealer(BlackjackTable blackjackTable, BetThresholds betThresholds) {
 		this.table = blackjackTable;
 		this.betThresholds = betThresholds;
 		this.decks = Deck.combineDecks(6);
+		this.hand = new BlackjackDealerHand(UUID.randomUUID(), true);
 	}
 
 	private void startBetPhase() {
@@ -51,6 +57,16 @@ public class BlackjackDealer implements IDealer {
 		}, () -> {
 			throw new PlayerNotFoundException("Player not found in table:" + table + " player:" + tablePlayer, 1);
 		});
+	}
+
+	public IHand getHand() {
+		return hand;
+	}
+
+	public void addCard(Card card) {
+		this.hand.addCard(card);
+		if (hand.isCompleteable())
+			hand.complete();
 	}
 
 	public void initTable() {
@@ -173,5 +189,25 @@ public class BlackjackDealer implements IDealer {
 
 	public void stand(BlackjackPlayer player) {
 		player.stand();
+	}
+
+	@Override
+	public void playTurn() {
+		// first test version
+		while (!hand.isCompleted()) {
+			try {
+				System.out.println("dealer waits");
+				Thread.sleep(Duration.of(500, ChronoUnit.MILLIS));
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Card card = decks.remove(decks.size() - 1);
+			System.out.println("dealer continues and takes card:" + card);
+			addCard(card);
+			System.out.println("Dealer hand value in first:" + hand.calculateValues().get(0));
+		}
+		System.out.println("Dealer hand is completed with value:" + hand.calculateValues().get(0));
+
 	}
 }

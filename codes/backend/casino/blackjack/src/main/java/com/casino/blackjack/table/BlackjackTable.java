@@ -58,8 +58,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		try {
 			verifyActionClearance(player, "stand");
 			dealer.stand(player);
-			if (player.getActiveHand() == null)
-				dealer.changeTurn();
+			checkDealer(player);
 		} finally {
 			completeAction("stand");
 		}
@@ -70,11 +69,17 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		try {
 			verifyActionClearance(player, "takeCard");
 			dealer.handleAdditionalCard(player);
-			if (player.getActiveHand() == null)
-				dealer.changeTurn();
+			checkDealer(player);
 		} finally {
 			completeAction("takeCard");
 		}
+	}
+
+	private void checkDealer(BlackjackPlayer player) {
+		if (player.getActiveHand() == null)
+			dealer.changeTurn();
+		if (isDealerTurn())
+			dealer.playTurn();
 	}
 
 	@Override

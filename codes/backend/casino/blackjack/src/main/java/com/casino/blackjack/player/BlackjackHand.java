@@ -135,9 +135,9 @@ public class BlackjackHand implements IHand {
 	@Override
 	public boolean isCompleteable() {
 		List<Integer> vals = calculateValues();
-		if (vals.get(0) == 21)
+		if (vals.get(0) >= 21)
 			return true;
-		return vals.size() == 2 ? vals.get(1) == 21 : false;
+		return vals.size() == 2 ? vals.get(1) >= 21 : false;
 	}
 
 }
