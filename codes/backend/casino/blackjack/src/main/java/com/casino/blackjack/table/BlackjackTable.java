@@ -10,8 +10,8 @@ import com.casino.blackjack.external.IBlackjackTable;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.common.bet.BetThresholds;
-import com.casino.common.exception.IllegalBetException;
 import com.casino.common.exception.IllegalPhaseException;
+import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.SeatedTable;
@@ -49,8 +49,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			if (isGamePhase(GamePhase.BET))
 				dealer.handlePlayerBet(player, bet);
 			else {
-				LOGGER.info("Initial bet is not accepted due to the current gamePhase:" + getGamePhase() + " table:" + this + " player:" + player);
-				throw new IllegalBetException("Initial bet in wrong phase:" + this + " player:" + player + " bet:" + bet.toString(), 6);
+				LOGGER.severe("Starting bet is not accepted:" + getGamePhase() + " table:" + this + " player:" + player);
+				throw new IllegalPlayerActionException("placeStartingBet is not allowed:" + player + " bet:" + bet.toString(), 16);
 			}
 		} finally {
 			LOGGER.exiting(getClass().getName(), "placeStartingBet");
@@ -61,10 +61,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void stand(BlackjackPlayer player) {
 		LOGGER.entering(getClass().getName(), "stand:" + this + " player:" + player);
 		if (!isPlayerAllowedToMakeAction(player)) {
-			// Timer might have run out or unauthorized call
-			LOGGER.log(Level.SEVERE, " Player not in turn: " + player + " called stand:" + this);
-			// TODO exception type
-			throw new IllegalArgumentException("Player:" + player + " is not allowed to stand in table :)" + this + " phase:" + getGamePhase());
+			LOGGER.log(Level.SEVERE, " Player called illegal stand: " + player + " table:" + this);
+			throw new IllegalPlayerActionException("Player:" + player + " is not allowed to stand in table :", 15);
 		}
 		try {
 			dealer.stand(player);
@@ -81,9 +79,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void takeCard(ICasinoPlayer player) {
 		LOGGER.entering(getClass().getName(), "takeCard:" + this + " player:" + player);
 		if (!isPlayerAllowedToMakeAction(player)) {
-			// Timer might have run out or unauthorized call
-			LOGGER.log(Level.SEVERE, " Player not in turn: " + player + " called takeCard:" + this);
-			throw new IllegalArgumentException("Player:" + player + " is not allowed to take card in table:" + this + " phase:" + getGamePhase());
+			LOGGER.log(Level.SEVERE, " Player not in turn: " + player + " called takeCard in table:" + this);
+			throw new IllegalPlayerActionException("Player:" + player + " is not allowed to take card in table:", 14);
 		}
 		try {
 			if (!playerInTurnLock.tryLock()) {
@@ -112,9 +109,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void onPlayerTimeout(ICasinoPlayer timedOutPlayer) {
 		LOGGER.info("Player timedOut:" + timedOutPlayer);
 		try {
-			if (!playerInTurnLock.tryLock())
-				return;
-			timedOutPlayer.setStatus(com.casino.common.player.Status.SIT_OUT);
+			playerInTurnLock.lock(); 
+			// would require UI action "I'm back" if set to SIT_OUT here
+			//timedOutPlayer.setStatus(com.casino.common.player.Status.SIT_OUT);
 			if (isPlayerInTurn(timedOutPlayer))
 				dealer.changeTurn();
 		} finally {
@@ -166,13 +163,14 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void doubleDown(BlackjackPlayer player) {
 		LOGGER.entering(getClass().getName(), "doubleStartingBet:" + this + " player:" + player);
 		try {
-			if (!isPlayerAllowedToMakeAction(player))
-				throw new IllegalPhaseException("doubling bet in wrong phase:", getGamePhase(), GamePhase.PLAY);
+			if (!isPlayerAllowedToMakeAction(player)) {
+				LOGGER.log(Level.SEVERE, " Player not allowed to doubleDown: " + player + " table:" + this);
+				throw new IllegalPlayerActionException("doublingDown not allowed for:" + player + " phase:" + getGamePhase(), 13);
+			}
 			dealer.doubleDown(player);
 		} finally {
 			LOGGER.exiting(getClass().getName(), "doubleStartingBet");
 		}
-
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.bet.BetUtil;
 import com.casino.common.exception.IllegalBetException;
+import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.exception.PlayerNotFoundException;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
@@ -28,7 +29,7 @@ public class BetTest extends BaseTest {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		table.trySeat(0, blackjackPlayer);
 		sleep(BET_ROUND_TIME_SECONDS + 1, ChronoUnit.SECONDS);
-		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
+		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
 			table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
 		});
 		assertEquals(6, exception.getCode());
