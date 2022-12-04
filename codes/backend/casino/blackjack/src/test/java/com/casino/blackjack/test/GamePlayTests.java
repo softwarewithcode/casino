@@ -167,4 +167,5 @@ public class GamePlayTests extends BaseTest {
 		assertEquals(21, blackjackPlayer.getHands().get(0).calculateValues().get(0));
 		assertFalse(blackjackPlayer.canTake());
 	}
+
 }

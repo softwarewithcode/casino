@@ -2,10 +2,12 @@ package com.casino.common.table;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,6 +38,8 @@ public abstract class CasinoTable implements ICasinoTable {
 	private Clock tableClock;
 	private Clock playerClock;
 	private ICasinoPlayer playerInTurn;
+	private final ReentrantLock playerInTurnLock;
+	private boolean dealerTurn;
 
 	protected CasinoTable(Status initialStatus, BetThresholds betLimit, PlayerRange playerLimit, Type type, UUID id, PhasePath phases) {
 		this.players = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
@@ -49,6 +53,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.tableClock = new Clock();
 		this.playerClock = new Clock();
 		this.phasePath = phases;
+		this.playerInTurnLock = new ReentrantLock(true);
 	}
 
 	@Override
@@ -139,6 +144,19 @@ public abstract class CasinoTable implements ICasinoTable {
 		if (p == null)
 			return false;
 		return players.remove(p);
+	}
+
+	public ReentrantLock getPlayerInTurnLock() {
+		return playerInTurnLock;
+	}
+
+	@Override
+	public boolean isDealerTurn() {
+		return dealerTurn;
+	}
+
+	public void updateDealerTurn(boolean turn) {
+		this.dealerTurn = turn;
 	}
 
 	@Override
@@ -235,8 +253,12 @@ public abstract class CasinoTable implements ICasinoTable {
 		return getPlayerInTurn() != null && getPlayerInTurn().equals(player);
 	}
 
-	public void setPlayerInTurn(ICasinoPlayer player) {
-		playerInTurn = player;
+	// PlayerTimeout timer, stand(),takeCard() calls thi
+	public void updatePlayerInTurn(ICasinoPlayer player) {
+		if (playerInTurnLock.isHeldByCurrentThread())
+			playerInTurn = player;
+		else
+			throw new ConcurrentModificationException("Cannot update playerInTurn, lock is missing");
 	}
 
 	@Override

@@ -138,12 +138,16 @@ public class BlackjackDealer implements IDealer {
 			throw new IllegalStateException("Should start playing but no players with bet");
 		}
 		Seat nextSeat = startingPlayer.get();
-		table.setPlayerInTurn(nextSeat.getPlayer());
+		table.updatePlayerInTurn(nextSeat.getPlayer());
 	}
 
 	public void changeTurn() {
-		// TODO Auto-generated method stub
-
+		Seat nextPlayer = table.getNextSeatWithBet();
+		if (nextPlayer != null) {
+			table.updatePlayerInTurn(nextPlayer.getPlayer());
+			table.updateDealerTurn(false);
+		} else
+			table.updateDealerTurn(true);
 	}
 
 	public void doubleDown(BlackjackPlayer player) {

@@ -1,13 +1,14 @@
 package com.casino.common.table;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.casino.common.bet.BetUtil;
 import com.casino.common.bet.BetThresholds;
+import com.casino.common.bet.BetUtil;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.PhasePath;
 
@@ -41,6 +42,19 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return (int) seats.stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getStatus() != com.casino.common.player.Status.SIT_OUT).count();
 	}
 
+	public Seat getNextSeatWithBet() {
+		Optional<Seat> playerInTurnOptional = seats.stream().filter(seat -> !seat.isAvailable() && seat.getPlayer().equals(getPlayerInTurn())).findFirst();
+		if (playerInTurnOptional.isEmpty())
+			throw new IllegalStateException("No playerInTurn");
+		Seat playerInTurnSeat = playerInTurnOptional.get();
+		Optional<Seat> nextPlayer = seats.stream().filter(seat -> isNextSeatWithBet(playerInTurnSeat, seat)).findFirst();
+		return nextPlayer.orElse(null);
+	}
+
+	private boolean isNextSeatWithBet(Seat playerInTurnSeat, Seat seat) {
+		return !seat.isAvailable() && seat.getPlayer().hasBet() && seat.getNumber() > playerInTurnSeat.getNumber();
+	}
+
 	// public trySeat(..) vs. required join() first ?
 	@Override
 	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
@@ -57,7 +71,6 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		super.changeFromWatcherToPlayer(player);
 		return true;
 	}
-
 
 	@Override
 	public boolean watch(ICasinoPlayer player) {

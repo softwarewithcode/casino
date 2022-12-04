@@ -22,6 +22,8 @@ public interface ICasinoTable {
 
 	public boolean isPrivate();
 
+	public boolean isDealerTurn();
+
 	public void onClose();
 
 	public void onPlayerLeave(ICasinoPlayer player);

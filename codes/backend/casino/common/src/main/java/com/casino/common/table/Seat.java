@@ -25,10 +25,6 @@ public class Seat {
 		this.player = player;
 	}
 
-	public boolean isEmpty() {
-		return player == null;
-	}
-
 	public void leave() {
 		player = null;
 	}

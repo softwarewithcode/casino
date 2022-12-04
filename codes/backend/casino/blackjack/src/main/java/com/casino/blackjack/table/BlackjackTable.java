@@ -3,7 +3,6 @@ package com.casino.blackjack.table;
 import java.math.BigDecimal;
 import java.util.ConcurrentModificationException;
 import java.util.UUID;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,14 +23,11 @@ import com.casino.common.table.phase.PhasePathFactory;
 public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
 	private final BlackjackDealer dealer;
-	private final ReentrantLock betPhaseLock;
-	private final ReentrantLock playerInTurnLock;
 
 	public BlackjackTable(Status initialStatus, BetThresholds betThresholds, PlayerRange playerLimit, Type type, int seats, UUID id) {
 		super(initialStatus, betThresholds, playerLimit, type, seats, id, PhasePathFactory.buildBlackjackPath());
 		this.dealer = new BlackjackDealer(this, betThresholds);
-		betPhaseLock = new ReentrantLock(true);
-		playerInTurnLock = new ReentrantLock(true);
+
 	}
 
 	@Override
@@ -90,18 +86,19 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	private void completeAction(String actionName) {
-		if (playerInTurnLock.isHeldByCurrentThread())
-			playerInTurnLock.unlock();
+		if (getPlayerInTurnLock().isHeldByCurrentThread())
+			getPlayerInTurnLock().unlock();
 		LOGGER.exiting(getClass().getName(), actionName);
 	}
 
 	private void verifyActionClearance(ICasinoPlayer player, String actionName) {
 		LOGGER.entering(getClass().getName(), actionName, " player:" + player);
 		if (!isPlayerAllowedToMakeAction(player)) {
-			LOGGER.log(Level.SEVERE, " Player not allowed to make action: " + actionName + " phase:" + getGamePhase() + "in table:" + this);
+			LOGGER.log(Level.SEVERE, " Player not allowed to make action: " + actionName + " phase: " + getGamePhase() + " in table:" + this);
 			throw new IllegalPlayerActionException("not allowed", 14);
 		}
-		if (!playerInTurnLock.tryLock()) {
+		if (!getPlayerInTurnLock().tryLock()) { // .lock()
+			System.out.println("Owner:" + getPlayerInTurnLock() + "  running:" + Thread.currentThread());
 			LOGGER.log(Level.INFO, player + "tried:" + actionName + " but lock could not be obtained. " + this);
 			throw new ConcurrentModificationException("lock was not obtained");
 		}
@@ -121,22 +118,23 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void onPlayerTimeout(ICasinoPlayer timedOutPlayer) {
 		LOGGER.info("Player timedOut:" + timedOutPlayer);
 		try {
-			playerInTurnLock.lock();
+			getPlayerInTurnLock().lock();
 			// would require UI action "I'm back" if set to SIT_OUT here
 			// timedOutPlayer.setStatus(com.casino.common.player.Status.SIT_OUT);
 			if (isPlayerInTurn(timedOutPlayer))
 				dealer.changeTurn();
 		} finally {
-			if (playerInTurnLock.isHeldByCurrentThread())
-				playerInTurnLock.unlock();
+			if (getPlayerInTurnLock().isHeldByCurrentThread())
+				getPlayerInTurnLock().unlock();
 		}
 	}
 
 	@Override
 	public void onBetPhaseEnd() {
 		try {
-			if (!canFinalizeBetPhase())
+			if (!isGamePhase(GamePhase.BET))
 				throw new IllegalPhaseException("GamePhase is not correct or lock was not acquired", getGamePhase(), GamePhase.BET);
+			getPlayerInTurnLock().lock();
 			dealer.finalizeBetPhase();
 			if (dealer.dealInitialCards()) {
 				dealer.updateStartingPlayer();
@@ -150,8 +148,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			BlackjackUtil.dumpTable(this, "onBetPhaseEnd");
 			updateGamePhase(GamePhase.ERROR);
 		} finally {
-			LOGGER.log(Level.INFO, "onBetPhaseEnd, releasing lock holdCount:" + betPhaseLock.getHoldCount());
-			betPhaseLock.unlock();
+			LOGGER.log(Level.INFO, "onBetPhaseEnd:");
+			getPlayerInTurnLock().unlock();
 		}
 	}
 
@@ -159,10 +157,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void onTableClose() {
 		// TODO Auto-generated method stub
 
-	}
-
-	private boolean canFinalizeBetPhase() {
-		return isGamePhase(GamePhase.BET) && betPhaseLock.tryLock();
 	}
 
 	@Override
