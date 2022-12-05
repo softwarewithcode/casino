@@ -14,7 +14,7 @@ public interface IHand {
 
 	public boolean isCompleted();
 
-	public boolean shouldCompleteHand();
+	public boolean shouldComplete();
 
 	public UUID getId();
 

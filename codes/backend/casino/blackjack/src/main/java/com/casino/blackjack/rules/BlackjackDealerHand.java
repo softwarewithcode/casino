@@ -12,7 +12,7 @@ public class BlackjackDealerHand extends BlackjackHand {
 	}
 
 	@Override
-	public boolean shouldCompleteHand() {
+	public boolean shouldComplete() {
 		List<Integer> values = calculateValues();
 		if (values.size() == 1)
 			return values.get(0) >= 17;

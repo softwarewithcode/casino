@@ -65,7 +65,7 @@ public class BlackjackHand implements IHand {
 		if (isCompleted()) // inactive hand can still get a card in split.
 			throw new IllegalPlayerActionException("Hand is completed cannot add card " + this, 19);
 		this.cards.add(card);
-		if (shouldCompleteHand())
+		if (shouldComplete())
 			complete();
 	}
 
@@ -150,7 +150,7 @@ public class BlackjackHand implements IHand {
 	}
 
 	@Override
-	public boolean shouldCompleteHand() {
+	public boolean shouldComplete() {
 		if (isCompleted())
 			return false;
 		if (isDoubled())
