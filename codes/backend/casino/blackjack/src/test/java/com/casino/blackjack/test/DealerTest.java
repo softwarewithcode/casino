@@ -22,6 +22,7 @@ import com.casino.common.table.Type;
 import com.casino.common.table.phase.GamePhase;
 
 public class DealerTest extends BaseTest {
+
 	@Test
 	public void gamePhaseChangesFromBetToPlayAfterBetPhaseEnd() {
 		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
@@ -110,8 +111,8 @@ public class DealerTest extends BaseTest {
 	@Test
 	public void dealerCalculatesBalancesBasedOnLastBets() {
 		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
-		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
-		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), table);
+		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100"), table);
 		table.trySeat(5, blackjackPlayer);
 		table.trySeat(6, blackjackPlayer2);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("11.11"));
@@ -130,8 +131,8 @@ public class DealerTest extends BaseTest {
 	@Test
 	public void betChangeDoesNotMakeOnTimeAndLastReceivedBetIsUsed() {
 		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
-		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
-		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), table);
+		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100"), table);
 		table.trySeat(5, blackjackPlayer);
 		table.trySeat(6, blackjackPlayer2);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("11.11"));
@@ -140,7 +141,7 @@ public class DealerTest extends BaseTest {
 		table.placeStartingBet(blackjackPlayer2, new BigDecimal("51.00"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.placeStartingBet(blackjackPlayer2, new BigDecimal("100.0"));
+			table.placeStartingBet(blackjackPlayer2, new BigDecimal("99.0"));
 		});
 		assertEquals(new BigDecimal("44.55"), blackjackPlayer.getHands().get(0).getBet());
 		assertEquals(new BigDecimal("44.55"), blackjackPlayer.getTotalBet());
@@ -149,12 +150,12 @@ public class DealerTest extends BaseTest {
 		assertEquals(new BigDecimal("51.00"), blackjackPlayer2.getTotalBet());
 		assertEquals(new BigDecimal("49.00"), blackjackPlayer2.getBalance());
 	}
-	
+
 	@Test
 	public void dealerMustStandOn17() {
 		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
-		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
-		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100"), publicTable);
+		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), table);
+		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100"), table);
 		table.trySeat(5, blackjackPlayer);
 		table.trySeat(6, blackjackPlayer2);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("11.11"));

@@ -22,11 +22,20 @@ import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalPlayerActionException;
+import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.table.ISeatedTable;
 import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
 import com.casino.common.table.Type;
 
 public class StartingHandDoubleTest extends BaseTest {
+	protected static final BigDecimal MIN_BET = new BigDecimal("5.0");
+	protected static final BigDecimal MAX_BET = new BigDecimal("100.0");
+	protected static final Integer BET_ROUND_TIME_SECONDS = 2;
+	protected static final Integer PLAYER_TIME = 10;
+	protected static final Integer INITIAL_DELAY = 0;
+	protected ISeatedTable publicTable;
+	protected ICasinoPlayer blackjackPlayer2;
 	private IBlackjackTable table;
 	private BlackjackPlayer blackjackPlayer;
 	private BlackjackDealer dealer;
@@ -36,8 +45,8 @@ public class StartingHandDoubleTest extends BaseTest {
 	public void initTest() {
 		try {
 			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
-			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
-			blackjackPlayer2 = new BlackjackPlayer("JaneDoes", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
+			blackjackPlayer = new BlackjackPlayer("JohnDoe2", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
+			blackjackPlayer2 = new BlackjackPlayer("JaneDoe2", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
@@ -86,6 +95,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(4, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, initialBet);
@@ -143,6 +153,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(new BigDecimal("0.01"), MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(6, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("0.01234"));

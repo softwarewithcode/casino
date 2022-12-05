@@ -14,7 +14,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.casino.blackjack.external.IBlackjackTable;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.blackjack.table.BlackjackTable;
@@ -26,7 +25,7 @@ import com.casino.common.table.Status;
 import com.casino.common.table.Type;
 
 public class GamePlayTests extends BaseTest {
-	private IBlackjackTable table;
+	private BlackjackTable table;
 	private BlackjackPlayer blackjackPlayer;
 	private BlackjackPlayer blackjackPlayer2;
 	private BlackjackDealer dealer;
@@ -35,8 +34,8 @@ public class GamePlayTests extends BaseTest {
 	public void initTest() {
 		try {
 			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
-			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
-			blackjackPlayer2 = new BlackjackPlayer("JaneDoes", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
+			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+			blackjackPlayer2 = new BlackjackPlayer("JaneDoes", UUID.randomUUID(), new BigDecimal("1000"), table);
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
@@ -51,6 +50,7 @@ public class GamePlayTests extends BaseTest {
 		cards.add(Card.of(4, Suit.CLUB));
 		cards.add(Card.of(8, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(5, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
@@ -75,6 +75,7 @@ public class GamePlayTests extends BaseTest {
 		cards.add(Card.of(4, Suit.CLUB));
 		cards.add(Card.of(7, Suit.HEART));
 		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(5, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
@@ -101,6 +102,7 @@ public class GamePlayTests extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(1, Suit.SPADE));
 		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(1, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
@@ -128,6 +130,7 @@ public class GamePlayTests extends BaseTest {
 	public void dealerPicksUpBlackjackWhenFirstCardIsAce() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(12, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(1, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
@@ -141,6 +144,7 @@ public class GamePlayTests extends BaseTest {
 	public void dealerPicksUpBlackjackWhenSecondCardIsAce() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(10, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
@@ -155,6 +159,7 @@ public class GamePlayTests extends BaseTest {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));

@@ -91,16 +91,19 @@ public class BlackjackDealer implements IDealer {
 	public boolean dealInitialCards() {
 		if (!isAllowedToDealStartingHand())
 			return false;
-		IntStream.range(0, 2).forEach(i -> getPlayersWithBet().forEach(player -> dealCard(player.getHands().get(0), decks.remove(decks.size() - 1))));
-		getPlayersWithBet().forEach(player -> {
+		IntStream.range(0, 1).forEach(i -> getPlayersWithBet().forEach(player -> dealCard(player.getHands().get(0))));
+		dealCard(hand); // Dealer gets one
+		IntStream.range(0, 1).forEach(i -> getPlayersWithBet().forEach(player -> {
+			dealCard(player.getHands().get(0));
 			IHand activeHand = getActiveHand(player);
 			if (activeHand.isCompleteable())
 				activeHand.complete();
-		});
+		}));
 		return true;
 	}
 
-	private void dealCard(IHand hand, Card card) {
+	private void dealCard(IHand hand) {
+		Card card = decks.remove(decks.size() - 1);
 		hand.addCard(card);
 	}
 
