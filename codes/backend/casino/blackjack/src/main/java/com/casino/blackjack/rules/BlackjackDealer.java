@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import com.casino.blackjack.player.BlackjackHand;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.bet.BetPhaseClockTask;
@@ -93,7 +92,11 @@ public class BlackjackDealer implements IDealer {
 		if (!isAllowedToDealStartingHand())
 			return false;
 		IntStream.range(0, 2).forEach(i -> getPlayersWithBet().forEach(player -> dealCard(player.getHands().get(0), decks.remove(decks.size() - 1))));
-		getPlayersWithBet().forEach(player -> completeActiveHandIfPossible(player));
+		getPlayersWithBet().forEach(player -> {
+			IHand activeHand = getActiveHand(player);
+			if (activeHand.isCompleteable())
+				activeHand.complete();
+		});
 		return true;
 	}
 
@@ -105,14 +108,8 @@ public class BlackjackDealer implements IDealer {
 		Card card = decks.remove(decks.size() - 1);
 		IHand activeHand = getActiveHand(player);
 		activeHand.addCard(card);
-		completeActiveHandIfPossible(player);
-	}
-
-	private void completeActiveHandIfPossible(ICasinoPlayer player) {
-		IHand activeHand = getActiveHand(player);
-		if (activeHand != null && activeHand.isCompleteable()) {
+		if (activeHand.isCompleteable())
 			activeHand.complete();
-		}
 	}
 
 	private IHand getActiveHand(ICasinoPlayer player) {
@@ -179,7 +176,9 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void doubleDown(BlackjackPlayer player) {
-		player.doubleDown();
+		Card cardReference = decks.get(decks.size() - 1);
+		player.doubleDown(cardReference);
+		decks.remove(decks.size() - 1);
 	}
 
 	public void handleSplit(BlackjackPlayer player) {

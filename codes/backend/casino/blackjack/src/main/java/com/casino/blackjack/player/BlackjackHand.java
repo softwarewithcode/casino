@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
+import com.casino.common.exception.IllegalPlayerActionException;
 
 public class BlackjackHand implements IHand {
 	private final UUID id;
@@ -61,8 +62,8 @@ public class BlackjackHand implements IHand {
 	public void addCard(Card card) {
 		if (card == null)
 			throw new IllegalArgumentException("Card is missing");
-		if (isCompleted())
-			throw new IllegalArgumentException("Hand is completed cannot add card " + this);
+		if (isCompleted()) // inactive hand gets card in splitOperation
+			throw new IllegalPlayerActionException("Hand is completed cannot add card " + this, 19);
 		this.cards.add(card);
 	}
 
@@ -113,6 +114,8 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public void complete() {
+		if (isCompleted())
+			throw new IllegalPlayerActionException("complete called on completed hand", 15);
 		this.completed = Instant.now();
 		this.active = false;
 	}
@@ -128,12 +131,28 @@ public class BlackjackHand implements IHand {
 	}
 
 	@Override
-	public void doubleDown() {
+	public void doubleDown(Card ref) {
+		if (isCompleted() || isDoubled())
+			throw new IllegalPlayerActionException("doubled hand cannot bet doubled", 15);
 		this.doubled = true;
+		this.bet = this.bet.multiply(BigDecimal.TWO);
+		this.cards.add(ref);
+		this.complete();
+	}
+
+	@Override
+	public void stand() {
+		if (isCompleted())
+			throw new IllegalPlayerActionException("stand called on completed hand", 15);
+		this.complete();
 	}
 
 	@Override
 	public boolean isCompleteable() {
+		if (isCompleted())
+			return false;
+		if (isDoubled())
+			return true;
 		List<Integer> vals = calculateValues();
 		if (vals.get(0) >= 21)
 			return true;

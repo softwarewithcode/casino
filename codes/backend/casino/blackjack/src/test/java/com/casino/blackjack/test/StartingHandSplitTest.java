@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.external.IBlackjackTable;
@@ -79,9 +78,8 @@ public class StartingHandSplitTest extends BaseTest {
 		assertEquals(1, exception.getCode());
 	}
 
-	@Disabled // TODO check why fails
 	@Test
-	public void splitInactiveHandIsNotPossible() {
+	public void splitIsNotPossible() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));
@@ -108,7 +106,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void startingHandIsNotPossibleToSplitWithoutEqualRanks() {
+	public void startingHandIsNotPossibleToSplitWithoutEqualValues() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));

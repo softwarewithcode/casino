@@ -26,11 +26,13 @@ public interface IHand {
 
 	public boolean isDoubled();
 
-	public void doubleDown();
+	public void doubleDown(Card c);
 
 	public boolean isBlackjack();
 
 	public BigDecimal getBet();
 
 	public void updateBet(BigDecimal bet);
+
+	public void stand();
 }

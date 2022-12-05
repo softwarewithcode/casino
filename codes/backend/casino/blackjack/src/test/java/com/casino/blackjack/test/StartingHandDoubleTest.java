@@ -1,7 +1,9 @@
 package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -53,7 +55,47 @@ public class StartingHandDoubleTest extends BaseTest {
 		table.placeStartingBet(blackjackPlayer, initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(blackjackPlayer);
-		assertEquals(new BigDecimal("51.56").setScale(2), blackjackPlayer.getTotalBet());
+		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getTotalBet());
+		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getHands().get(0).getBet());
+	}
+
+	@Test
+	public void doubledHandGetsCompleted() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, initialBet);
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.doubleDown(blackjackPlayer);
+		assertTrue(blackjackPlayer.getHands().get(0).isCompleted());
+		assertNull(blackjackPlayer.getActiveHand());
+		assertThrows(IllegalPlayerActionException.class, () -> {
+			table.takeCard(blackjackPlayer);
+		});
+		assertThrows(IllegalPlayerActionException.class, () -> {
+			table.stand(blackjackPlayer);
+		});
+		assertThrows(IllegalPlayerActionException.class, () -> {
+			table.doubleDown(blackjackPlayer);
+		});
+	}
+
+	@Test
+	public void doubledHandGetsOneAdditionalCard() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, initialBet);
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.doubleDown(blackjackPlayer);
+		assertTrue(blackjackPlayer.getHands().get(0).isCompleted());
+		assertEquals(10, blackjackPlayer.getHands().get(0).calculateValues().get(0));
+		assertEquals(20, blackjackPlayer.getHands().get(0).calculateValues().get(1));
+		assertEquals(3, blackjackPlayer.getHands().get(0).getCards().size());
+		assertNull(blackjackPlayer.getActiveHand());
 	}
 
 	@Test
@@ -78,6 +120,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(blackjackPlayer);
 		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getTotalBet());
+		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getHands().get(0).getBet());
 	}
 
 	@Test
@@ -108,10 +151,8 @@ public class StartingHandDoubleTest extends BaseTest {
 		table.doubleDown(blackjackPlayer);
 		assertEquals(new BigDecimal("0.02468"), blackjackPlayer.getTotalBet());
 		assertEquals(new BigDecimal("999.97532"), blackjackPlayer.getBalance());
-		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
+		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.doubleDown(blackjackPlayer);
 		});
-		assertEquals(10, exception.getCode());
 	}
-
 }

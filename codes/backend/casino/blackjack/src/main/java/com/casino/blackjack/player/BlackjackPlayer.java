@@ -31,7 +31,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		if (hand == null)
 			return false;
 		List<Integer> values = hand.calculateValues(); // Smallest value in 0 pos.
-		return values.get(0) < 21 && !hand.isBlackjack();
+		return values.get(0) < 21;
 	}
 
 	public BlackjackHand createNewHand(boolean active) {
@@ -53,19 +53,19 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public void stand() {
 		IHand activeHand = getActiveHand();
-		activeHand.complete();
+		activeHand.stand();
 		if (getHands().indexOf(activeHand) == 0 && getHands().size() == 2) {
 			getHands().get(1).activate();
 		}
 	}
 
-	public void doubleDown() {
+	public void doubleDown(Card ref) {
 		try {
 			validateDoubleDownPreConditions();
 			if (!getPlayerLock().tryLock())
 				throw new ConcurrentModificationException("no balance lock acquired");
 			increaseTotalBet(getTotalBet());
-			getActiveHand().doubleDown();
+			getActiveHand().doubleDown(ref);
 		} finally {
 			if (getPlayerLock().isHeldByCurrentThread())
 				getPlayerLock().unlock();
