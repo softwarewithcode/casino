@@ -62,9 +62,11 @@ public class BlackjackHand implements IHand {
 	public void addCard(Card card) {
 		if (card == null)
 			throw new IllegalArgumentException("Card is missing");
-		if (isCompleted()) // inactive hand gets card in splitOperation
+		if (isCompleted()) // inactive hand can still get a card in split.
 			throw new IllegalPlayerActionException("Hand is completed cannot add card " + this, 19);
 		this.cards.add(card);
+		if (shouldCompleteHand())
+			complete();
 	}
 
 	public boolean isDoubled() {
@@ -132,7 +134,7 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public void doubleDown(Card ref) {
-		if (isCompleted() || isDoubled())
+		if (isCompleted())
 			throw new IllegalPlayerActionException("doubled hand cannot bet doubled", 15);
 		this.doubled = true;
 		this.bet = this.bet.multiply(BigDecimal.TWO);
@@ -148,15 +150,14 @@ public class BlackjackHand implements IHand {
 	}
 
 	@Override
-	public boolean isCompleteable() {
+	public boolean shouldCompleteHand() {
 		if (isCompleted())
 			return false;
 		if (isDoubled())
 			return true;
 		List<Integer> vals = calculateValues();
-		if (vals.get(0) >= 21)
+		if (vals.size() == 2 && vals.get(1) == 21)
 			return true;
-		return vals.size() == 2 ? vals.get(1) >= 21 : false;
+		return vals.get(0) >= 21 ? true : false;
 	}
-
 }

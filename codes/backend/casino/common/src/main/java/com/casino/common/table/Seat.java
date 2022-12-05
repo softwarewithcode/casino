@@ -19,6 +19,14 @@ public class Seat {
 		return true;
 	}
 
+	public boolean hasPlayerWithBet() {
+		return hasPlayer() && this.player.hasBet();
+	}
+
+	public boolean hasPlayer() {
+		return this.player != null;
+	}
+
 	public Seat(int number, ICasinoPlayer player) {
 		super();
 		this.number = number;

@@ -64,8 +64,6 @@ public class BlackjackDealer implements IDealer {
 
 	public void addCard(Card card) {
 		this.hand.addCard(card);
-		if (hand.isCompleteable())
-			hand.complete();
 	}
 
 	public void initTable() {
@@ -91,19 +89,18 @@ public class BlackjackDealer implements IDealer {
 	public boolean dealInitialCards() {
 		if (!isAllowedToDealStartingHand())
 			return false;
-		IntStream.range(0, 1).forEach(i -> getPlayersWithBet().forEach(player -> dealCard(player.getHands().get(0))));
-		dealCard(hand); // Dealer gets one
-		IntStream.range(0, 1).forEach(i -> getPlayersWithBet().forEach(player -> {
+		List<ICasinoPlayer> orderedPlayers = getOrderedPlayersWithBet();
+		orderedPlayers.forEach(player -> dealCard(player.getHands().get(0))); // first the players
+		dealCard(hand); // then dealer
+		orderedPlayers.forEach(player -> { // then players again
 			dealCard(player.getHands().get(0));
-			IHand activeHand = getActiveHand(player);
-			if (activeHand.isCompleteable())
-				activeHand.complete();
-		}));
+		});
 		return true;
 	}
 
 	private void dealCard(IHand hand) {
 		Card card = decks.remove(decks.size() - 1);
+		System.out.println("DEAL:" + card + " hand:");
 		hand.addCard(card);
 	}
 
@@ -111,8 +108,6 @@ public class BlackjackDealer implements IDealer {
 		Card card = decks.remove(decks.size() - 1);
 		IHand activeHand = getActiveHand(player);
 		activeHand.addCard(card);
-		if (activeHand.isCompleteable())
-			activeHand.complete();
 	}
 
 	private IHand getActiveHand(ICasinoPlayer player) {
@@ -131,12 +126,11 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private boolean somebodyHasBet() {
-		return getPlayersWithBet() != null && getPlayersWithBet().size() > 0;
+		return getOrderedPlayersWithBet() != null && getOrderedPlayersWithBet().size() > 0;
 	}
 
-	private List<ICasinoPlayer> getPlayersWithBet() {
-		List<ICasinoPlayer> playersWithBet = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().hasBet()).map(seat -> seat.getPlayer()).collect(Collectors.toList());
-		return playersWithBet;
+	private List<ICasinoPlayer> getOrderedPlayersWithBet() {
+		return table.getSeats().stream().filter(seat -> seat.hasPlayerWithBet()).sorted(Comparator.comparing(Seat::getNumber)).map(seat -> seat.getPlayer()).collect(Collectors.toList());
 	}
 
 	public void finalizeBetPhase() {
@@ -146,7 +140,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void handlePlayers() {
-		table.getSeats().stream().filter(seat -> seat.getPlayer() != null).map(seat -> seat.getPlayer()).forEach(player -> {
+		table.getSeats().stream().filter(seat -> seat.hasPlayer()).map(seat -> seat.getPlayer()).forEach(player -> {
 			player.setStatus(Status.SIT_OUT);
 			if (!player.hasBet())
 				table.changeFromPlayerToWatcher(player);
@@ -159,7 +153,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void updateStartingPlayer() {
-		Optional<Seat> startingPlayer = table.getSeats().stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getTotalBet() != null).min(Comparator.comparing(Seat::getNumber));
+		Optional<Seat> startingPlayer = table.getSeats().stream().filter(seat -> seat.hasPlayerWithBet()).min(Comparator.comparing(Seat::getNumber));
 		if (startingPlayer.isEmpty()) {
 			throw new IllegalStateException("Should start playing but no players with bet");
 		}

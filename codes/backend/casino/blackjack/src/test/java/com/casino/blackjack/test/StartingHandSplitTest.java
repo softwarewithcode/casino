@@ -28,7 +28,6 @@ import com.casino.common.table.Type;
 public class StartingHandSplitTest extends BaseTest {
 	private BlackjackTable table;
 	private BlackjackPlayer blackjackPlayer;
-	private BlackjackPlayer blackjackPlayer2;
 	private BlackjackDealer dealer;
 
 	@BeforeEach
@@ -36,7 +35,6 @@ public class StartingHandSplitTest extends BaseTest {
 		try {
 			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-			blackjackPlayer2 = new BlackjackPlayer("JaneDoes", UUID.randomUUID(), new BigDecimal("1000"), table);
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);

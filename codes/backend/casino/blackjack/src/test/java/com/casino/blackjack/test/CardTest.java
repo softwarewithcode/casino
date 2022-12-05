@@ -56,7 +56,7 @@ public class CardTest {
 	}
 
 	@Test
-	public void addedAceCreatesTwoValuesButGoesBackToOneValueWhenSecondValueGoesOver21() {
+	public void addedAceCreatesCompletesHandWhen21Reached() {
 		BlackjackPlayer player = createPlayer();
 		player.addCard(player.getHands().get(0), Card.of(5, Suit.CLUB));
 		player.addCard(player.getHands().get(0), Card.of(4, Suit.CLUB));
@@ -71,10 +71,7 @@ public class CardTest {
 		Assertions.assertEquals(2, values.size());
 		Assertions.assertEquals(11, values.get(0));
 		Assertions.assertEquals(21, values.get(1));
-		player.addCard(player.getHands().get(0), Card.of(1, Suit.DIAMOND));
-		values = player.getHands().get(0).calculateValues();
-		Assertions.assertEquals(12, values.get(0));
-		Assertions.assertEquals(1, values.size());
+		Assertions.assertTrue(player.getHands().get(0).isCompleted());
 	}
 
 	private BlackjackPlayer createPlayer() {

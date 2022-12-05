@@ -100,8 +100,6 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void addCard(IHand hand, Card card) {
 		if (hand == null)
 			throw new IllegalArgumentException("cannot add card to non existing hand");
-		if (!hand.isActive())
-			throw new IllegalArgumentException("hand is not active");
 		hand.addCard(card);
 	}
 
