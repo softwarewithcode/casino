@@ -160,4 +160,16 @@ public class BlackjackHand implements IHand {
 			return true;
 		return vals.get(0) >= 21 ? true : false;
 	}
+
+	@Override
+	public Integer getFinalValue() {
+		if (!isCompleted() || getCards().size() < 2)
+			throw new IllegalArgumentException("not enough cards or not completed" + getCards().size() + " completed:" + completed);
+		List<Integer> values = calculateValues();
+		Integer first = values.get(0);
+		if (values.size() != 2)
+			return first;
+		return values.get(1) > 21 ? first : values.get(1);
+	}
+
 }

@@ -99,7 +99,7 @@ public class StandTest extends BaseTest {
 	}
 
 	@Test
-	public void callingStandWhileHaving21IsNotAllowedAsHandIsCompleted() {
+	public void callingStandWhenHandIsCompletedForReachingOver21() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(7, Suit.DIAMOND));

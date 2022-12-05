@@ -34,13 +34,18 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	@Override
 	public Integer getReservedSeatCount() {
-		return (int) seats.stream().filter(seat -> seat.getPlayer() != null).count();
+		return (int) seats.stream().filter(seat -> seat.hasPlayer()).count();
 	}
 
 	@Override
 	public Integer getActivePlayerCount() {
-		return (int) seats.stream().filter(seat -> seat.getPlayer() != null && seat.getPlayer().getStatus() != com.casino.common.player.Status.SIT_OUT).count();
+		return (int) seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != com.casino.common.player.Status.SIT_OUT).count();
 	}
+
+	public boolean hasWaitingPlayers() {
+		return seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().isWaitingForDealer()).findFirst().isPresent();
+	}
+
 
 	public Seat getNextSeatWithBet() {
 		Optional<Seat> playerInTurnOptional = seats.stream().filter(seat -> !seat.isAvailable() && seat.getPlayer().equals(getPlayerInTurn())).findFirst();

@@ -5,5 +5,6 @@ import com.casino.common.player.ICasinoPlayer;
 public interface IDealer {
 	public void handleNewPlayer(ICasinoPlayer player);
 
-	public void playTurn();
+	public void completeRound();
+
 }

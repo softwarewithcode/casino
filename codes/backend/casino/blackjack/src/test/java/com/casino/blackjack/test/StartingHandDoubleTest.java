@@ -44,7 +44,7 @@ public class StartingHandDoubleTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(new BigDecimal("0.001"), MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 			blackjackPlayer = new BlackjackPlayer("JohnDoe2", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoe2", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
 			Field f = table.getClass().getDeclaredField("dealer");
@@ -59,6 +59,7 @@ public class StartingHandDoubleTest extends BaseTest {
 	public void doublingNineResultsToDoubleBet() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, initialBet);
@@ -72,6 +73,7 @@ public class StartingHandDoubleTest extends BaseTest {
 	public void doubledHandGetsCompleted() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, initialBet);
@@ -112,6 +114,7 @@ public class StartingHandDoubleTest extends BaseTest {
 	public void doublingTenResultsToDoubleBet() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, initialBet);
@@ -124,6 +127,7 @@ public class StartingHandDoubleTest extends BaseTest {
 	public void doublingElevenResultsToDoubleBet() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(6, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, initialBet);
@@ -135,22 +139,28 @@ public class StartingHandDoubleTest extends BaseTest {
 
 	@Test
 	public void doublingUpdatesBalance() {
-		table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(new BigDecimal("0.01"), MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(6, Suit.DIAMOND));
+		cards.add(Card.of(6, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.DIAMOND));
-		cards.add(Card.of(6, Suit.SPADE));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(4, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("0.01234"));
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("10.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("999.98766"), blackjackPlayer.getBalance());
+		assertEquals(new BigDecimal("990.0"), blackjackPlayer.getBalance());
+		assertEquals(new BigDecimal("10.0"), blackjackPlayer.getTotalBet());
+		assertEquals(4, blackjackPlayer.getActiveHand().getCards().get(0).getRank());
+		assertEquals(5, blackjackPlayer.getActiveHand().getCards().get(1).getRank());
 		table.doubleDown(blackjackPlayer);
-		assertEquals(new BigDecimal("0.02468"), blackjackPlayer.getTotalBet());
-		assertEquals(new BigDecimal("999.97532"), blackjackPlayer.getBalance());
+		assertEquals(20, blackjackPlayer.getHands().get(0).getFinalValue());
+		assertEquals(new BigDecimal("20.0"), blackjackPlayer.getTotalBet());
+		assertEquals(new BigDecimal("1020.0"), blackjackPlayer.getBalance());
 	}
 
 	@Test
 	public void doublingIsAllowedOnlyOnce() {
-		table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(new BigDecimal("0.01"), MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.DIAMOND));

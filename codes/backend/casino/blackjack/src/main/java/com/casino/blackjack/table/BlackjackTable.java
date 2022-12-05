@@ -90,7 +90,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		if (player.getActiveHand() == null)
 			dealer.changeTurn();
 		if (isDealerTurn())
-			dealer.playTurn();
+			dealer.completeRound();
 	}
 
 	@Override
@@ -98,6 +98,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		try {
 			verifyActionClearance(player, "doubleDown");
 			dealer.doubleDown(player);
+			checkDealer(player);
 		} finally {
 			completeAction("doubleDown");
 		}

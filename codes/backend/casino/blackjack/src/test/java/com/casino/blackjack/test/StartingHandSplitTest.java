@@ -71,10 +71,9 @@ public class StartingHandSplitTest extends BaseTest {
 		assertEquals(1, blackjackPlayer.getHands().size());
 		table.splitStartingHand(blackjackPlayer);
 		assertEquals(2, blackjackPlayer.getHands().size());
-		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
+		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.splitStartingHand(blackjackPlayer);
 		});
-		assertEquals(1, exception.getCode());
 	}
 
 	@Test
@@ -85,23 +84,25 @@ public class StartingHandSplitTest extends BaseTest {
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
+		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.splitStartingHand(blackjackPlayer);
 		});
-		assertEquals(4, exception.getCode());
 	}
 
 	@Test
 	public void splitIsPossibleOnlyWith2Cards() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.SPADE));
+		cards.add(Card.of(4, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.takeCard(blackjackPlayer);
 		assertEquals(3, blackjackPlayer.getHands().get(0).getCards().size());
-		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
+		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.splitStartingHand(blackjackPlayer);
 		});
-		assertEquals(14, exception.getCode());
 	}
 
 	@Test
@@ -112,10 +113,9 @@ public class StartingHandSplitTest extends BaseTest {
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
+		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.splitStartingHand(blackjackPlayer);
 		});
-		assertEquals(4, exception.getCode());
 	}
 
 	@Test

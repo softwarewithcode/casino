@@ -14,6 +14,8 @@ public interface ICasinoPlayer {
 
 	public BigDecimal getEndBalance();
 
+	public void increaseBalance(BigDecimal amount);
+
 	public UUID getId();
 
 	public void onLeave();
@@ -30,7 +32,7 @@ public interface ICasinoPlayer {
 
 	public void updateTotalBet(BigDecimal bet, ICasinoTable table);
 
-	public void clearBet();
+	public void reset();
 
 	public void subtractTotalBetFromBalance();
 
@@ -39,5 +41,7 @@ public interface ICasinoPlayer {
 	public List<IHand> getHands();
 
 	public void removeTotalBet();
+
+	public boolean isWaitingForDealer();
 
 }

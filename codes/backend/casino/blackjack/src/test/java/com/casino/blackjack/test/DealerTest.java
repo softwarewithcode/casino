@@ -238,4 +238,78 @@ public class DealerTest extends BaseTest {
 		assertTrue(table.isDealerTurn());
 		assertNull(table.getPlayerInTurn());
 	}
+
+	@Test
+	public void dealerChangesTurnWhenPlayerGoesOver21() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.HEART));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(10, Suit.HEART));
+		cards.add(Card.of(10, Suit.SPADE));
+		assertFalse(table.isDealerTurn());
+		table.trySeat(0, blackjackPlayer);
+		table.trySeat(3, blackjackPlayer2);
+		table.trySeat(6, blackjackPlayer3);
+		assertFalse(table.isDealerTurn());
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("11.11"));
+		table.placeStartingBet(blackjackPlayer2, new BigDecimal("22.67"));
+		table.placeStartingBet(blackjackPlayer3, new BigDecimal("44.55"));
+		assertFalse(table.isDealerTurn());
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(blackjackPlayer, table.getPlayerInTurn());
+		assertFalse(table.isDealerTurn());
+		table.takeCard(blackjackPlayer);
+		assertFalse(table.isDealerTurn());
+		assertEquals(blackjackPlayer2, table.getPlayerInTurn());
+		assertFalse(table.isDealerTurn());
+		table.takeCard(blackjackPlayer2);
+		assertFalse(table.isDealerTurn());
+		assertEquals(blackjackPlayer3, table.getPlayerInTurn());
+		table.takeCard(blackjackPlayer3);
+		assertTrue(table.isDealerTurn());
+		assertNull(table.getPlayerInTurn());
+	}
+
+	@Test
+	public void dealerChangesAfterPlayerDoublesDown() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.HEART));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(10, Suit.HEART));
+		cards.add(Card.of(10, Suit.SPADE));
+		assertFalse(table.isDealerTurn());
+		table.trySeat(0, blackjackPlayer);
+		table.trySeat(3, blackjackPlayer2);
+		table.trySeat(6, blackjackPlayer3);
+		assertFalse(table.isDealerTurn());
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("11.11"));
+		table.placeStartingBet(blackjackPlayer2, new BigDecimal("22.67"));
+		table.placeStartingBet(blackjackPlayer3, new BigDecimal("44.55"));
+		assertFalse(table.isDealerTurn());
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(blackjackPlayer, table.getPlayerInTurn());
+		assertFalse(table.isDealerTurn());
+		table.takeCard(blackjackPlayer);
+		assertFalse(table.isDealerTurn());
+		assertEquals(blackjackPlayer2, table.getPlayerInTurn());
+		assertFalse(table.isDealerTurn());
+		table.takeCard(blackjackPlayer2);
+		assertFalse(table.isDealerTurn());
+		assertEquals(blackjackPlayer3, table.getPlayerInTurn());
+		table.takeCard(blackjackPlayer3);
+		assertTrue(table.isDealerTurn());
+		assertNull(table.getPlayerInTurn());
+	}
 }

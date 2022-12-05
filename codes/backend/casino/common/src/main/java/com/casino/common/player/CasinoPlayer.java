@@ -141,6 +141,17 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		}
 	}
 
+	public void increaseBalance(BigDecimal amount) {
+		try {
+			if (!playerLock.tryLock())
+				throw new ConcurrentModificationException("playerLock was not obtained");
+			this.balance = balance.add(totalBet);
+		} finally {
+			if (playerLock.isHeldByCurrentThread())
+				playerLock.unlock();
+		}
+	}
+
 	@Override
 	public void removeTotalBet() {
 		try {
@@ -163,7 +174,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	}
 
 	@Override
-	public void clearBet() {
+	public void reset() {
 		this.totalBet = null;
 	}
 

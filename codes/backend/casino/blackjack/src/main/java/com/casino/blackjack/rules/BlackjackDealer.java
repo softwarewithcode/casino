@@ -1,19 +1,18 @@
 package com.casino.blackjack.rules;
 
 import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
+import com.casino.blackjack.table.BlackjackUtil;
 import com.casino.common.bet.BetPhaseClockTask;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
@@ -28,16 +27,17 @@ import com.casino.common.table.phase.GamePhase;
 
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
+	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
 	private final BetThresholds betThresholds;
 	private final BlackjackTable table;
 	private List<Card> decks; // 6 decks
-	private IHand hand;
+	private BlackjackDealerHand dealerHand;
 
 	public BlackjackDealer(BlackjackTable blackjackTable, BetThresholds betThresholds) {
 		this.table = blackjackTable;
 		this.betThresholds = betThresholds;
 		this.decks = Deck.combineDecks(6);
-		this.hand = new BlackjackDealerHand(UUID.randomUUID(), true);
+		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 	}
 
 	private void startBetPhase() {
@@ -50,7 +50,7 @@ public class BlackjackDealer implements IDealer {
 
 	public void handlePlayerBet(ICasinoPlayer tablePlayer, BigDecimal bet) {
 		Stream<Seat> seatStream = table.getSeats().stream();
-		Optional<Seat> playerOptional = seatStream.filter(seat -> seat.getPlayer() != null && seat.getPlayer().equals(tablePlayer)).findFirst();
+		Optional<Seat> playerOptional = seatStream.filter(seat -> seat.hasPlayer() && seat.getPlayer().equals(tablePlayer)).findFirst();
 		playerOptional.ifPresentOrElse(seat -> {
 			seat.getPlayer().updateTotalBet(bet, table);
 		}, () -> {
@@ -59,11 +59,11 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public IHand getHand() {
-		return hand;
+		return dealerHand;
 	}
 
 	public void addCard(Card card) {
-		this.hand.addCard(card);
+		this.dealerHand.addCard(card);
 	}
 
 	public void initTable() {
@@ -91,7 +91,7 @@ public class BlackjackDealer implements IDealer {
 			return false;
 		List<ICasinoPlayer> orderedPlayers = getOrderedPlayersWithBet();
 		orderedPlayers.forEach(player -> dealCard(player.getHands().get(0))); // first the players
-		dealCard(hand); // then dealer
+		dealCard(dealerHand); // then dealer
 		orderedPlayers.forEach(player -> { // then players again
 			dealCard(player.getHands().get(0));
 		});
@@ -188,22 +188,43 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	@Override
-	public void playTurn() {
-		// first test version
-		while (!hand.isCompleted()) {
-			try {
-				System.out.println("dealer waits");
-				Thread.sleep(Duration.of(500, ChronoUnit.MILLIS));
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	public void completeRound() {
+		try {
+			if (table.hasWaitingPlayers()) {
+				takeCards();
+				payout();
 			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Something unexpected happend. Waiting for brush to arrive.", e);
+			BlackjackUtil.dumpTable(table, "dealer player turn:" + e);
+			throw new IllegalStateException("what to do");
+		}
+	}
+
+	private void payout() {
+		List<ICasinoPlayer> playersWaitingPayout = table.getPlayers().stream().filter(player -> player.isWaitingForDealer()).collect(Collectors.toList());
+		playersWaitingPayout.stream().forEach(player -> player.getHands().forEach(hand -> {
+			int comparison = dealerHand.compareTo(hand);
+			if (comparison == 0)
+				player.increaseBalance(hand.getBet());
+			if (comparison > 0) {
+				if (hand.isBlackjack())
+					player.increaseBalance(hand.getBet().multiply(BLACKJACK_FACTOR));
+				else
+					player.increaseBalance(hand.getBet().multiply(BigDecimal.TWO));
+			}
+
+			System.out.println("Comparison:" + comparison + " dealer:" + dealerHand + " oterher:" + hand);
+		}));
+	}
+
+	private void takeCards() {
+		while (!dealerHand.isCompleted()) {
 			Card card = decks.remove(decks.size() - 1);
 			System.out.println("dealer continues and takes card:" + card);
 			addCard(card);
-			System.out.println("Dealer hand value in first:" + hand.calculateValues().get(0));
+			System.out.println("Dealer hand value in first:" + dealerHand.calculateValues().get(0));
 		}
-		System.out.println("Dealer hand is completed with value:" + hand.calculateValues().get(0));
-
+		System.out.println("Dealer hand is completed with value:" + dealerHand.calculateValues().get(0));
 	}
 }

@@ -70,7 +70,7 @@ public class GamePlayTests extends BaseTest {
 	}
 
 	@Test
-	public void playerCannotTakeCardsWhenHandValueIs21() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void playerCannotTakeCardsWhenHandValueIs21() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(4, Suit.CLUB));
 		cards.add(Card.of(7, Suit.HEART));
@@ -95,7 +95,7 @@ public class GamePlayTests extends BaseTest {
 	}
 
 	@Test // starting ace makes a second value if not blackjack
-	public void secondValueOfHandIsRemovedIfHandGoesOver21() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void secondValueOfHandIsRemovedIfHandGoesOver21() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(8, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.DIAMOND));
@@ -127,7 +127,7 @@ public class GamePlayTests extends BaseTest {
 	}
 
 	@Test // starting ace makes a second value if not blackjack
-	public void dealerPicksUpBlackjackWhenFirstCardIsAce() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void dealerPicksUpBlackjackWhenFirstCardIsAce() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(12, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.HEART));
@@ -141,7 +141,7 @@ public class GamePlayTests extends BaseTest {
 	}
 
 	@Test
-	public void dealerPicksUpBlackjackWhenSecondCardIsAce() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void dealerPicksUpBlackjackWhenSecondCardIsAce() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.HEART));
@@ -155,7 +155,7 @@ public class GamePlayTests extends BaseTest {
 	}
 
 	@Test
-	public void blackjackRequiresExactlyTwoCards() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public void blackjackRequiresExactlyTwoCards() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));

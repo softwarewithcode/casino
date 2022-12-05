@@ -22,8 +22,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public BlackjackPlayer(String name, UUID id, BigDecimal startBalance, ISeatedTable table) {
 		super(name, id, startBalance, table);
 		hands = new ArrayList<IHand>();
-		IHand hand = createNewHand(true);
-		hands.add(hand);
+		hands.add(createNewHand(true));
 	}
 
 	public boolean canTake() {
@@ -54,9 +53,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void stand() {
 		IHand activeHand = getActiveHand();
 		activeHand.stand();
-		if (getHands().indexOf(activeHand) == 0 && getHands().size() == 2) {
+		if (getHands().indexOf(activeHand) == 0 && getHands().size() == 2)
 			getHands().get(1).activate();
-		}
 	}
 
 	public void doubleDown(Card ref) {
@@ -76,6 +74,10 @@ public class BlackjackPlayer extends CasinoPlayer {
 		validateActionConditions();
 		if (getActiveHand().isDoubled())
 			throw new IllegalPlayerActionException("hand has been doubled before ", 10);
+		List<Integer> values = getActiveHand().calculateValues();
+		int val = values.get(0);
+		if (!(val >= 9 && val <= 11))
+			throw new IllegalPlayerActionException("hand value does not allow doubling; " + val, 10);
 	}
 
 	private void validateSplitPreConditions() {
@@ -122,4 +124,15 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return getActiveHand() != null;
 	}
 
+	@Override
+	public boolean isWaitingForDealer() {
+		return hands.stream().filter(hand -> hand.getFinalValue() != null).findFirst().isPresent();
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		hands = new ArrayList<IHand>();
+		// hands.add(createNewHand(true));
+	}
 }

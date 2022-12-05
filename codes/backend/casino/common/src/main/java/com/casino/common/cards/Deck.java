@@ -29,11 +29,6 @@ public class Deck implements IDeck {
 		}
 	}
 
-	public void shuffle() {
-		List<Card> c = new ArrayList<Card>(cards);
-		Collections.shuffle(c);
-	}
-
 	public Set<Card> getCards() {
 		return cards;
 	}
@@ -49,6 +44,7 @@ public class Deck implements IDeck {
 		decks.forEach(deck -> {
 			cards.addAll(deck.getCards());
 		});
+		Collections.shuffle(cards);
 		return cards;
 	}
 }
