@@ -124,7 +124,7 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public boolean isActive() {
-		return active;
+		return active && !isCompleted();
 	}
 
 	@Override

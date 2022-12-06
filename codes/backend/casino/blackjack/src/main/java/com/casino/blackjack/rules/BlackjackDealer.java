@@ -99,19 +99,15 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void dealCard(IHand hand) {
-		Card card = decks.remove(decks.size() - 1);
+		Card card = getCard();
 		System.out.println("DEAL:" + card + " hand:");
 		hand.addCard(card);
 	}
 
 	public void handleAdditionalCard(ICasinoPlayer player) {
-		Card card = decks.remove(decks.size() - 1);
-		IHand activeHand = getActiveHand(player);
+		Card card = getCard();
+		IHand activeHand = player.getActiveHand();
 		activeHand.addCard(card);
-	}
-
-	private IHand getActiveHand(ICasinoPlayer player) {
-		return player.getHands().stream().filter(hand -> !hand.isCompleted()).findFirst().orElseThrow();
 	}
 
 	public void handleNewPlayer(ICasinoPlayer player) {
@@ -174,12 +170,21 @@ public class BlackjackDealer implements IDealer {
 	public void doubleDown(BlackjackPlayer player) {
 		Card cardReference = decks.get(decks.size() - 1);
 		player.doubleDown(cardReference);
-		decks.remove(decks.size() - 1);
+		getCard();
 	}
 
 	public void handleSplit(BlackjackPlayer player) {
 		player.splitStartingHand();
-		player.getHands().get(0).addCard(decks.remove(decks.size() - 1));
+		IHand firstHand = player.getActiveHand();
+		firstHand.addCard(getCard());
+		if (firstHand.isCompleted()) {
+			player.getHands().get(1).activate();
+			player.getHands().get(1).addCard(getCard());
+		}
+	}
+
+	private Card getCard() {
+		return decks.remove(decks.size() - 1);
 	}
 
 	public void stand(BlackjackPlayer player) {
@@ -219,7 +224,7 @@ public class BlackjackDealer implements IDealer {
 
 	private void takeCards() {
 		while (!dealerHand.isCompleted()) {
-			Card card = decks.remove(decks.size() - 1);
+			Card card = getCard();
 			System.out.println("dealer continues and takes card:" + card);
 			addCard(card);
 			System.out.println("Dealer hand value in first:" + dealerHand.calculateValues().get(0));

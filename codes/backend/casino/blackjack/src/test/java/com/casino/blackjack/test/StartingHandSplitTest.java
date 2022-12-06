@@ -2,6 +2,7 @@ package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -326,5 +327,32 @@ public class StartingHandSplitTest extends BaseTest {
 		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.splitStartingHand(blackjackPlayer);
 		});
+	}
+
+	@Test
+	public void splitProducesTwoBlackjacksAndBothHandsAreCompleted() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(6, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(12, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(11, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("10.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.splitStartingHand(blackjackPlayer);
+		assertNull(blackjackPlayer.getActiveHand());
+		assertEquals(2, blackjackPlayer.getHands().size());
+		assertEquals(11, blackjackPlayer.getHands().get(0).getCards().get(0).getRank());
+		assertEquals(1, blackjackPlayer.getHands().get(0).getCards().get(1).getRank());
+		assertEquals(12, blackjackPlayer.getHands().get(1).getCards().get(0).getRank());
+		assertEquals(1, blackjackPlayer.getHands().get(1).getCards().get(1).getRank());
+		assertTrue(blackjackPlayer.getHands().get(0).isBlackjack());
+		assertTrue(blackjackPlayer.getHands().get(1).isBlackjack());
+		assertTrue(blackjackPlayer.getHands().get(0).isCompleted());
+		assertTrue(blackjackPlayer.getHands().get(1).isCompleted());
+		assertFalse(blackjackPlayer.getHands().get(0).isActive());
+		assertFalse(blackjackPlayer.getHands().get(1).isActive());
 	}
 }

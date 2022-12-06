@@ -98,7 +98,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	}
 
 	public IHand getActiveHand() {
-		return hands.stream().filter(hand -> !hand.isCompleted() && hand.isActive()).findFirst().orElse(null);
+		return hands.stream().filter(hand -> hand.isActive()).findFirst().orElse(null);
 	}
 
 	public void addCard(IHand hand, Card card) {

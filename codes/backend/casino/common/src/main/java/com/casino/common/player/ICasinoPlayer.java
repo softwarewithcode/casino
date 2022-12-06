@@ -40,6 +40,8 @@ public interface ICasinoPlayer {
 
 	public List<IHand> getHands();
 
+	public IHand getActiveHand();
+
 	public void removeTotalBet();
 
 	public boolean isWaitingForDealer();
