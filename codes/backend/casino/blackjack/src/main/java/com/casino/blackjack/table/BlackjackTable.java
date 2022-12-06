@@ -57,7 +57,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		try {
 			verifyActionClearance(player, "stand");
 			dealer.stand(player);
-			checkDealer(player);
+			checkDealer();
 		} finally {
 			completeAction("stand");
 		}
@@ -68,7 +68,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		try {
 			verifyActionClearance(player, "takeCard");
 			dealer.handleAdditionalCard(player);
-			checkDealer(player);
+			checkDealer();
 		} finally {
 			completeAction("takeCard");
 		}
@@ -82,11 +82,10 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		} finally {
 			completeAction("splitStartingHand");
 		}
-
 	}
 
-	private void checkDealer(BlackjackPlayer player) {
-		if (player.getActiveHand() == null)
+	private void checkDealer() {
+		if (getPlayerInTurn().getActiveHand() == null)
 			dealer.changeTurn();
 		if (isDealerTurn())
 			dealer.completeRound();
@@ -97,7 +96,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		try {
 			verifyActionClearance(player, "doubleDown");
 			dealer.doubleDown(player);
-			checkDealer(player);
+			checkDealer();
 		} finally {
 			completeAction("doubleDown");
 		}
@@ -153,6 +152,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			dealer.finalizeBetPhase();
 			if (dealer.dealInitialCards()) {
 				dealer.updateStartingPlayer();
+				checkDealer();
 				updateGamePhase(GamePhase.PLAY);
 			} else {
 				System.out.println("Players sit out. Nobody has bet. No use case specification exist. Either automatically restart betPhase vs. waiting players to join.");

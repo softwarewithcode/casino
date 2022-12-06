@@ -1,6 +1,7 @@
 package com.casino.common.player;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ConcurrentModificationException;
 import java.util.Objects;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		this.id = id;
 		this.initialBalance = initialBalance;
 		this.balance = initialBalance;
+		this.balance = this.balance.setScale(2, RoundingMode.DOWN);
 		this.status = null;
 		this.table = table;
 		this.playerLock = new ReentrantLock(true); // !?
@@ -98,7 +100,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public BigDecimal getTotalBet() {
-		return totalBet;
+		return this.totalBet.setScale(2, RoundingMode.DOWN);
 	}
 
 	@Override
@@ -136,6 +138,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	public void increaseBalance(BigDecimal amount) {
 		if (!playerLock.tryLock())
 			throw new ConcurrentModificationException("playerLock was not obtained");
+		System.out.println("BalanceIncrease:" + amount);
 		this.balance = balance.add(amount);
 	}
 
@@ -157,7 +160,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public BigDecimal getBalance() {
-		return balance;
+		return balance.setScale(2, RoundingMode.DOWN);
 	}
 
 	@Override

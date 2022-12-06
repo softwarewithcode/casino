@@ -78,19 +78,6 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void splitIsNotPossible() {
-		List<Card> cards = dealer.getDecks();
-		cards.add(Card.of(5, Suit.DIAMOND));
-		cards.add(Card.of(3, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
-		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.splitStartingHand(blackjackPlayer);
-		});
-	}
-
-	@Test
 	public void splitIsPossibleOnlyWith2Cards() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
@@ -109,6 +96,7 @@ public class StartingHandSplitTest extends BaseTest {
 	@Test
 	public void startingHandIsNotPossibleToSplitWithoutEqualValues() {
 		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(7, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
@@ -258,23 +246,6 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void splitReducesTotalBalance() {
-		List<Card> cards = dealer.getDecks();
-		cards.add(Card.of(11, Suit.DIAMOND));
-		cards.add(Card.of(5, Suit.DIAMOND));
-		cards.add(Card.of(9, Suit.DIAMOND));
-		cards.add(Card.of(3, Suit.DIAMOND));
-		cards.add(Card.of(13, Suit.HEART));
-		cards.add(Card.of(3, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.1"));
-		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("949.9"), blackjackPlayer.getBalance());
-		table.splitStartingHand(blackjackPlayer);
-		assertEquals(new BigDecimal("899.8"), blackjackPlayer.getBalance());
-	}
-
-	@Test
 	public void splitAddsBetInHandAndBalanceKeepsOnTrack() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), table);
 		List<Card> cards = dealer.getDecks();
@@ -307,7 +278,7 @@ public class StartingHandSplitTest extends BaseTest {
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.1"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("49.9"), blackjackPlayer.getBalance());
+		assertEquals(new BigDecimal("49.90"), blackjackPlayer.getBalance());
 		assertThrows(IllegalArgumentException.class, () -> {
 			table.splitStartingHand(blackjackPlayer);
 		});

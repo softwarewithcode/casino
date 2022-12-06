@@ -21,6 +21,7 @@ public class BlackjackHand implements IHand {
 	private boolean active;
 	private boolean doubled;
 	private BigDecimal bet;
+	private boolean insured;
 
 	public BlackjackHand(UUID id, boolean active) {
 		this.id = id;
@@ -170,6 +171,23 @@ public class BlackjackHand implements IHand {
 		if (values.size() != 2)
 			return first;
 		return values.get(1) > 21 ? first : values.get(1);
+	}
+
+	@Override
+	public boolean isInsured() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void insure() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean hasWinningChance() {
+		return getFinalValue() <= 21 || isInsured();
 	}
 
 }

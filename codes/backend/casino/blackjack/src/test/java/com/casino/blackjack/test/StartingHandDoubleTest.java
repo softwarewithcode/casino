@@ -137,28 +137,6 @@ public class StartingHandDoubleTest extends BaseTest {
 	}
 
 	@Test
-	public void doublingUpdatesBalance() {
-		List<Card> cards = dealer.getDecks();
-		cards.add(Card.of(6, Suit.DIAMOND));
-		cards.add(Card.of(6, Suit.DIAMOND));
-		cards.add(Card.of(1, Suit.DIAMOND));
-		cards.add(Card.of(5, Suit.DIAMOND));
-		cards.add(Card.of(10, Suit.SPADE));
-		cards.add(Card.of(4, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("10.0"));
-		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("990.0"), blackjackPlayer.getBalance());
-		assertEquals(new BigDecimal("10.0"), blackjackPlayer.getTotalBet());
-		assertEquals(4, blackjackPlayer.getActiveHand().getCards().get(0).getRank());
-		assertEquals(5, blackjackPlayer.getActiveHand().getCards().get(1).getRank());
-		table.doubleDown(blackjackPlayer);
-		assertEquals(20, blackjackPlayer.getHands().get(0).getFinalValue());
-		assertEquals(new BigDecimal("20.0"), blackjackPlayer.getTotalBet());
-		assertEquals(new BigDecimal("1020.0"), blackjackPlayer.getBalance());
-	}
-
-	@Test
 	public void doublingBlackjackIsPrevented() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(6, Suit.DIAMOND));
@@ -184,9 +162,9 @@ public class StartingHandDoubleTest extends BaseTest {
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("0.01234"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("999.98766"), blackjackPlayer.getBalance());
+		assertEquals(new BigDecimal("999.98"), blackjackPlayer.getBalance());
 		table.doubleDown(blackjackPlayer);
-		assertEquals(new BigDecimal("0.02468"), blackjackPlayer.getTotalBet());
+		assertEquals(new BigDecimal("0.02"), blackjackPlayer.getTotalBet());
 		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.doubleDown(blackjackPlayer);
 		});

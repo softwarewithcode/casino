@@ -43,11 +43,10 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	}
 
 	public boolean hasWaitingPlayers() {
-		return seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().isWaitingForDealer()).findFirst().isPresent();
+		return seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().hasWinningChance()).findFirst().isPresent();
 	}
 
-
-	public Seat getNextSeatWithBet() {
+	public Seat getNextPlayerWithActiveActiveHand() {
 		Optional<Seat> playerInTurnOptional = seats.stream().filter(seat -> !seat.isAvailable() && seat.getPlayer().equals(getPlayerInTurn())).findFirst();
 		if (playerInTurnOptional.isEmpty())
 			throw new IllegalStateException("No playerInTurn");
@@ -57,7 +56,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	}
 
 	private boolean isNextSeatWithBet(Seat playerInTurnSeat, Seat seat) {
-		return !seat.isAvailable() && seat.getPlayer().hasBet() && seat.getNumber() > playerInTurnSeat.getNumber();
+		return !seat.isAvailable() && seat.getPlayer().hasActiveHand() && seat.getNumber() > playerInTurnSeat.getNumber();
 	}
 
 	// public trySeat(..) vs. required join() first ?

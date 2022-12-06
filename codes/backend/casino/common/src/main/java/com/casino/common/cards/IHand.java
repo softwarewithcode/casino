@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-public interface IHand  {
+public interface IHand {
 
 	public List<Integer> calculateValues();
 
@@ -13,6 +13,10 @@ public interface IHand  {
 	public List<Card> getCards();
 
 	public boolean isCompleted();
+
+	public boolean isInsured();
+
+	public void insure();
 
 	public boolean shouldComplete();
 
@@ -37,5 +41,7 @@ public interface IHand  {
 	public void stand();
 
 	public Integer getFinalValue();
+
+	public boolean hasWinningChance();
 
 }

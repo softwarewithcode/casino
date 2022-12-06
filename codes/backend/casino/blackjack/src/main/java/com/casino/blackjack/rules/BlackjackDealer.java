@@ -28,6 +28,7 @@ import com.casino.common.table.phase.GamePhase;
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
 	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
+	private static final BigDecimal INSURANCE_FACTOR = new BigDecimal("0.5");
 	private final BetThresholds betThresholds;
 	private final BlackjackTable table;
 	private List<Card> decks; // 6 decks
@@ -100,7 +101,6 @@ public class BlackjackDealer implements IDealer {
 
 	private void dealCard(IHand hand) {
 		Card card = getCard();
-		System.out.println("DEAL:" + card + " hand:");
 		hand.addCard(card);
 	}
 
@@ -157,7 +157,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void changeTurn() {
-		Seat nextPlayer = table.getNextSeatWithBet();
+		Seat nextPlayer = table.getNextPlayerWithActiveActiveHand();
 		if (nextPlayer != null) {
 			table.updatePlayerInTurn(nextPlayer.getPlayer());
 			table.updateDealerTurn(false);
@@ -206,20 +206,29 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void payout() {
-		List<ICasinoPlayer> playersWaitingPayout = table.getPlayers().stream().filter(player -> player.isWaitingForDealer()).collect(Collectors.toList());
-		playersWaitingPayout.stream().forEach(player -> player.getHands().forEach(hand -> {
-			int comparison = dealerHand.compareTo(hand);
-			if (comparison == 0)
-				player.increaseBalance(hand.getBet());
-			if (comparison > 0) {
-				if (hand.isBlackjack())
-					player.increaseBalance(hand.getBet().multiply(BLACKJACK_FACTOR));
+		List<ICasinoPlayer> playersWithWinningChances = table.getPlayers().stream().filter(player -> player.hasWinningChance()).collect(Collectors.toList());
+		playersWithWinningChances.stream().forEach(player -> player.getHands().forEach(playerHand -> {
+			int comparison = dealerHand.compareTo(playerHand);
+			if (dealerHand.isBlackjack() && playerHand.isInsured())
+				player.increaseBalance(playerHand.getBet().multiply(INSURANCE_FACTOR));
+			if (evenResult(comparison))
+				player.increaseBalance(playerHand.getBet());
+			else if (playerWins(comparison)) {
+				if (playerHand.isBlackjack())
+					player.increaseBalance(playerHand.getBet().multiply(BLACKJACK_FACTOR));
 				else
-					player.increaseBalance(hand.getBet().multiply(BigDecimal.TWO));
+					player.increaseBalance(playerHand.getBet().multiply(BigDecimal.TWO));
 			}
-
-			System.out.println("Comparison:" + comparison + " dealer:" + dealerHand + " oterher:" + hand);
+			System.out.println("Comparison:" + comparison + " dealer:" + dealerHand + " oterher:" + playerHand);
 		}));
+	}
+
+	private boolean evenResult(int comparison) {
+		return comparison == 0;
+	}
+
+	private boolean playerWins(int comparison) {
+		return comparison > 0;
 	}
 
 	private void takeCards() {

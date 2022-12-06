@@ -37,6 +37,10 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return new BlackjackHand(UUID.randomUUID(), active);
 	}
 
+	public boolean hasActiveHand() {
+		return hands.stream().filter(hand -> hand.isActive()).findAny().isPresent();
+	}
+
 	public void splitStartingHand() {
 		validateSplitPreConditions();
 		if (!getPlayerLock().tryLock())
@@ -53,8 +57,16 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void stand() {
 		IHand activeHand = getActiveHand();
 		activeHand.stand();
-		if (getHands().indexOf(activeHand) == 0 && getHands().size() == 2)
-			getHands().get(1).activate();
+		if (hasSecondHand(activeHand))
+			activateSecondHand();
+	}
+
+	private boolean hasSecondHand(IHand activeHand) {
+		return getHands().indexOf(activeHand) == 0 && getHands().size() == 2;
+	}
+
+	private void activateSecondHand() {
+		getHands().get(1).activate();
 	}
 
 	public void doubleDown(Card ref) {
@@ -127,8 +139,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 	}
 
 	@Override
-	public boolean isWaitingForDealer() {
-		return hands.stream().filter(hand -> hand.getFinalValue() != null).findFirst().isPresent();
+	public boolean hasWinningChance() {
+		return hands.stream().filter(hand -> hand.hasWinningChance()).findAny().isPresent();
 	}
 
 	@Override
