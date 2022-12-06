@@ -1,7 +1,6 @@
 package com.casino.blackjack.table;
 
 import java.math.BigDecimal;
-import java.util.ConcurrentModificationException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -116,11 +115,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			LOGGER.log(Level.SEVERE, " Player not allowed to make action: " + actionName + " phase: " + getGamePhase() + " in table:" + this);
 			throw new IllegalPlayerActionException(actionName + " not allowed for player:" + player, 14);
 		}
-		if (!getPlayerInTurnLock().tryLock()) { // .lock()
-			System.out.println("Owner:" + getPlayerInTurnLock() + "  running:" + Thread.currentThread());
-			LOGGER.log(Level.INFO, player + "tried:" + actionName + " but lock could not be obtained. " + this);
-			throw new ConcurrentModificationException("lock was not obtained");
-		}
+		getPlayerInTurnLock().lock();
 	}
 
 	private boolean isPlayerAllowedToMakeAction(ICasinoPlayer player) {
@@ -152,7 +147,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void onBetPhaseEnd() {
 		try {
 			if (!isGamePhase(GamePhase.BET))
-				throw new IllegalPhaseException("GamePhase is not correct or lock was not acquired", getGamePhase(), GamePhase.BET);
+				throw new IllegalPhaseException("GamePhase is not what is expected on betPhaseEnd", getGamePhase(), GamePhase.BET);
+			updateGamePhase(GamePhase.BETS_COMPLETED);
 			getPlayerInTurnLock().lock();
 			dealer.finalizeBetPhase();
 			if (dealer.dealInitialCards()) {

@@ -52,7 +52,7 @@ public class BlackjackDealer implements IDealer {
 		Stream<Seat> seatStream = table.getSeats().stream();
 		Optional<Seat> playerOptional = seatStream.filter(seat -> seat.hasPlayer() && seat.getPlayer().equals(tablePlayer)).findFirst();
 		playerOptional.ifPresentOrElse(seat -> {
-			seat.getPlayer().updateTotalBet(bet, table);
+			seat.getPlayer().updateStartingBet(bet, table);
 		}, () -> {
 			throw new PlayerNotFoundException("Player not found in table:" + table + " player:" + tablePlayer, 1);
 		});
@@ -136,7 +136,6 @@ public class BlackjackDealer implements IDealer {
 	public void finalizeBetPhase() {
 		table.getClock().stopClock();
 		handlePlayers();
-		table.updateGamePhase(GamePhase.BETS_COMPLETED);
 	}
 
 	private void handlePlayers() {

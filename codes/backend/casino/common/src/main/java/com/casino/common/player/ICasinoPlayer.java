@@ -30,7 +30,7 @@ public interface ICasinoPlayer {
 
 	public boolean hasBet();
 
-	public void updateTotalBet(BigDecimal bet, ICasinoTable table);
+	public void updateStartingBet(BigDecimal bet, ICasinoTable table);
 
 	public void reset();
 

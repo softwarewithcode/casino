@@ -11,9 +11,9 @@ public class Clock {
 
 	public void startClock(TimerTask task, int millis) {
 		stopClock();
+		this.ticking = true;
 		timer = new Timer(UUID.randomUUID().toString());
 		timer.schedule(task, 0, millis);
-		this.ticking = true;
 	}
 
 	public void stopClock() {

@@ -35,6 +35,7 @@ public class StandTest extends BaseTest {
 	public void initTest() {
 		try {
 			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+			System.out.println("NEW TABLE");
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoes", UUID.randomUUID(), new BigDecimal("1000"), table);
 			Field f = table.getClass().getDeclaredField("dealer");
@@ -99,7 +100,7 @@ public class StandTest extends BaseTest {
 	}
 
 	@Test
-	public void callingStandWhenHandIsCompletedForReachingOver21() {
+	public void callingStandWhenHandIsCompletedResultsToException() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(7, Suit.DIAMOND));
@@ -155,6 +156,7 @@ public class StandTest extends BaseTest {
 
 	@Test
 	public void callingStandCausesDealerToPlayAndStandOn17() {
+		System.out.println("****");
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
@@ -173,6 +175,7 @@ public class StandTest extends BaseTest {
 
 	@Test
 	public void callingStandCausesDealerToPlayAndStandOn18() {
+		System.out.println("****");
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.DIAMOND));

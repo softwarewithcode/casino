@@ -19,8 +19,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	private final ICasinoTable table;
 	private final ReentrantLock playerLock;
 	private BigDecimal endBalance;
-	private BigDecimal balance;
-	private BigDecimal totalBet;
+	private volatile BigDecimal balance;
+	private volatile BigDecimal totalBet;
 	private Status status;
 
 	public CasinoPlayer(String name, UUID id, BigDecimal initialBalance, ICasinoTable table) {
@@ -102,17 +102,9 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	}
 
 	@Override
-	public void updateTotalBet(BigDecimal bet, ICasinoTable table) {
-		try {// player can change starting bet as long as it is GamePhase.BET
-			if (!getPlayerLock().tryLock())
-				throw new ConcurrentModificationException("playerLock was not obtained");
-			BetUtil.verifyStartingBet(table, this, bet);
-			this.totalBet = bet;
-		} finally {
-			if (getPlayerLock().isHeldByCurrentThread())
-				getPlayerLock().unlock();
-		}
-
+	public void updateStartingBet(BigDecimal bet, ICasinoTable table) {
+		BetUtil.verifyStartingBet(table, this, bet);
+		this.totalBet = bet;
 	}
 
 	protected void increaseTotalBet(BigDecimal increaseAmount) {
@@ -142,14 +134,9 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	}
 
 	public void increaseBalance(BigDecimal amount) {
-		try {
-			if (!playerLock.tryLock())
-				throw new ConcurrentModificationException("playerLock was not obtained");
-			this.balance = balance.add(totalBet);
-		} finally {
-			if (playerLock.isHeldByCurrentThread())
-				playerLock.unlock();
-		}
+		if (!playerLock.tryLock())
+			throw new ConcurrentModificationException("playerLock was not obtained");
+		this.balance = balance.add(amount);
 	}
 
 	@Override
