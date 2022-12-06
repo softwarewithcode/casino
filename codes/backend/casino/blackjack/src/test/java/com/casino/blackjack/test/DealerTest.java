@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.blackjack.table.BlackjackTable;
+import com.casino.blackjack.table.InsuranceInfo;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
@@ -38,13 +39,20 @@ public class DealerTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID(), new InsuranceInfo(5));
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			blackjackPlayer3 = new BlackjackPlayer("JaneDoe2", UUID.randomUUID(), new BigDecimal("1000"), table);
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
+			dealer = (BlackjackDealer) f.get(table);
+			List<Card> cards = dealer.getDecks();
+			cards.add(Card.of(4, Suit.CLUB));
+			cards.add(Card.of(8, Suit.DIAMOND));
+			cards.add(Card.of(9, Suit.DIAMOND));
+			cards.add(Card.of(9, Suit.HEART));
+			cards.add(Card.of(5, Suit.SPADE));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -52,7 +60,6 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void gamePhaseChangesFromBetToPlayAfterBetPhaseEnd() {
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		assertEquals(GamePhase.BET, table.getGamePhase());
 		table.trySeat(1, blackjackPlayer);
@@ -64,7 +71,6 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void tableStatusChangesFromWaitingToRunningAfterFirstPlayerTakesSeat() {
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		assertTrue(table.getStatus() == Status.WAITING_PLAYERS);
 		assertTrue(table.trySeat(1, blackjackPlayer));
@@ -73,7 +79,7 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void initialHandIsDealtAfterBetRoundHasEnded() {
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, 2, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID());
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, 2, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID(), new InsuranceInfo(5));
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"), table);
 		table.trySeat(0, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("49.9"));
@@ -84,7 +90,6 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void twoCardsIsAddedToStartingHandAfterPlacingBet() {
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		assertEquals(1, blackjackPlayer.getHands().size());
 		assertEquals(0, blackjackPlayer.getHands().get(0).getCards().size());
@@ -96,7 +101,6 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void playersReceiveTwoCardsInFirstHandDuringInitialDeal() {
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		table.trySeat(1, blackjackPlayer);
@@ -116,7 +120,6 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void onlyPlayerWithBetReceivesStartingHand() {
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		assertTrue(table.trySeat(1, blackjackPlayer));
@@ -137,7 +140,6 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void betChangeDoesNotMakeOnTimeAndLastReceivedBetIsUsed() {
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), table);
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100"), table);
 		table.trySeat(5, blackjackPlayer);

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.blackjack.table.BlackjackTable;
+import com.casino.blackjack.table.InsuranceInfo;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
@@ -34,7 +35,7 @@ public class StandTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID(), new InsuranceInfo(5));
 			System.out.println("NEW TABLE");
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoes", UUID.randomUUID(), new BigDecimal("1000"), table);
@@ -156,7 +157,6 @@ public class StandTest extends BaseTest {
 
 	@Test
 	public void callingStandCausesDealerToPlayAndStandOn17() {
-		System.out.println("****");
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
@@ -178,10 +178,10 @@ public class StandTest extends BaseTest {
 		System.out.println("****");
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(1, Suit.DIAMOND));
-		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.DIAMOND));
-		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(12, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
@@ -189,19 +189,19 @@ public class StandTest extends BaseTest {
 		table.stand(blackjackPlayer);
 		assertNull(blackjackPlayer.getActiveHand());
 		assertTrue(dealer.getHand().isCompleted());
-		assertEquals(18, dealer.getHand().calculateValues().get(1));
+		assertEquals(18, dealer.getHand().calculateValues().get(0));
 	}
 
 	@Test
 	public void callingStandCausesDealerToPlayAndStandOn19() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(4, Suit.DIAMOND));
-		cards.add(Card.of(1, Suit.DIAMOND));
-		cards.add(Card.of(1, Suit.SPADE));
-		cards.add(Card.of(1, Suit.SPADE));
-		cards.add(Card.of(1, Suit.HEART));
 		cards.add(Card.of(3, Suit.DIAMOND));
-		cards.add(Card.of(1, Suit.HEART));
+		cards.add(Card.of(4, Suit.SPADE));
+		cards.add(Card.of(4, Suit.SPADE));
+		cards.add(Card.of(4, Suit.HEART));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
@@ -209,7 +209,7 @@ public class StandTest extends BaseTest {
 		table.stand(blackjackPlayer);
 		assertNull(blackjackPlayer.getActiveHand());
 		assertTrue(dealer.getHand().isCompleted());
-		assertEquals(19, dealer.getHand().calculateValues().get(1));
+		assertEquals(19, dealer.getHand().calculateValues().get(0));
 	}
 
 	@Test

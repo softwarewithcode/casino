@@ -7,4 +7,6 @@ public interface IDealer {
 
 	public void completeRound();
 
+	public boolean hasStartingAce();
+
 }

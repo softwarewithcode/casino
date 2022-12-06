@@ -175,13 +175,12 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public boolean isInsured() {
-		// TODO Auto-generated method stub
-		return false;
+		return insured;
 	}
 
 	@Override
 	public void insure() {
-		// TODO Auto-generated method stub
+		insured = true;
 
 	}
 

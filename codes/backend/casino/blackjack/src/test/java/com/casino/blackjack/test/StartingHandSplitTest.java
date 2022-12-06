@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.blackjack.table.BlackjackTable;
+import com.casino.blackjack.table.InsuranceInfo;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
@@ -34,7 +35,7 @@ public class StartingHandSplitTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID());
+			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 7), Type.PUBLIC, 7, UUID.randomUUID(), new InsuranceInfo(5));
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
@@ -64,7 +65,7 @@ public class StartingHandSplitTest extends BaseTest {
 	public void onlyOneTimeSplitIsPossible() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(1, Suit.DIAMOND));
-		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(1, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
@@ -289,7 +290,7 @@ public class StartingHandSplitTest extends BaseTest {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(10, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.DIAMOND));
-		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(1, Suit.SPADE));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));

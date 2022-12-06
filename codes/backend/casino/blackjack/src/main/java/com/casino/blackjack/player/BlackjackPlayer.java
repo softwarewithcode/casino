@@ -82,6 +82,28 @@ public class BlackjackPlayer extends CasinoPlayer {
 		}
 	}
 
+	public void insure() {
+		try {
+			validateInsuringConditions();
+			if (!getPlayerLock().tryLock())
+				throw new ConcurrentModificationException("no player lock acquired");
+			getHands().get(0).insure();
+		} finally {
+			if (getPlayerLock().isHeldByCurrentThread())
+				getPlayerLock().unlock();
+		}
+	}
+
+	private void validateInsuringConditions() {
+		validateActionConditions();
+		if (getHands().get(0).isInsured())
+			throw new IllegalPlayerActionException("hand has been insured earlier ", 10);
+		if (getHands().get(0).isDoubled())
+			throw new IllegalPlayerActionException("cannot insure, hand has been doubled earlier ", 10);
+		if (getHands().get(0).isBlackjack())
+			throw new IllegalPlayerActionException("cannot insure, hand is blackjack ", 10);
+	}
+
 	private void validateDoubleDownPreConditions() {
 		validateActionConditions();
 		if (getActiveHand().isDoubled())

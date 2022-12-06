@@ -22,11 +22,12 @@ import com.casino.common.table.phase.PhasePathFactory;
 public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
 	private final BlackjackDealer dealer;
+	private final InsuranceInfo insuranceInfo;
 
-	public BlackjackTable(Status initialStatus, BetThresholds betThresholds, PlayerRange playerLimit, Type type, int seats, UUID id) {
+	public BlackjackTable(Status initialStatus, BetThresholds betThresholds, PlayerRange playerLimit, Type type, int seats, UUID id, InsuranceInfo insuranceInfo) {
 		super(initialStatus, betThresholds, playerLimit, type, seats, id, PhasePathFactory.buildBlackjackPath());
 		this.dealer = new BlackjackDealer(this, betThresholds);
-
+		this.insuranceInfo = insuranceInfo;
 	}
 
 	@Override
@@ -46,6 +47,20 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			else {
 				LOGGER.severe("Starting bet is not accepted:phase " + getGamePhase() + " table:" + this + " player:" + player);
 				throw new IllegalPlayerActionException("placeStartingBet is not allowed:" + player + " bet:" + bet.toString(), 16);
+			}
+		} finally {
+			LOGGER.exiting(getClass().getName(), "placeStartingBet");
+		}
+	}
+
+	@Override
+	public void insure(BlackjackPlayer player) {
+		try {
+			if (isGamePhase(GamePhase.INSURE))
+				dealer.insure(player);
+			else {
+				LOGGER.severe("insuring is not accepted:phase " + getGamePhase() + " table:" + this + " player:" + player);
+				throw new IllegalPlayerActionException("insuring is not allowed:" + getGamePhase() + " table:" + this + " player:" + player, 16);
 			}
 		} finally {
 			LOGGER.exiting(getClass().getName(), "placeStartingBet");
@@ -147,25 +162,51 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		try {
 			if (!isGamePhase(GamePhase.BET))
 				throw new IllegalPhaseException("GamePhase is not what is expected on betPhaseEnd", getGamePhase(), GamePhase.BET);
-			updateGamePhase(GamePhase.BETS_COMPLETED);
+			System.out.println("onBetPhaseEnd -starts");
 			getPlayerInTurnLock().lock();
+			updateGamePhase(GamePhase.BETS_COMPLETED);
 			dealer.finalizeBetPhase();
-			if (dealer.dealInitialCards()) {
-				dealer.updateStartingPlayer();
+			if (!dealer.dealInitialCards()) {
+				System.out.println("Players sit out. Nobody has bet. No use case specification exist. Either automatically restart betPhase vs. waiting players to join.");
+				return;
+			}
+			dealer.updateStartingPlayer();
+			if (dealer.hasStartingAce()) {
+				dealer.startInsurancePhase();
+			} else {
 				checkDealer();
 				updateGamePhase(GamePhase.PLAY);
-			} else {
-				System.out.println("Players sit out. Nobody has bet. No use case specification exist. Either automatically restart betPhase vs. waiting players to join.");
-				// How long sit out player can reserve the seat?
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "onBetPhaseEnd() something went wrong. Waiting for manager's call.", e);
 			BlackjackUtil.dumpTable(this, "onBetPhaseEnd");
 			updateGamePhase(GamePhase.ERROR);
 		} finally {
-			LOGGER.log(Level.INFO, "onBetPhaseEnd:");
+			System.out.println("onBetPhaseEnd -ends");
 			getPlayerInTurnLock().unlock();
 		}
+	}
+
+	@Override
+	public void onInsurancePhaseEnd() {
+		try {
+			if (!isGamePhase(GamePhase.INSURE))
+				throw new IllegalPhaseException("GamePhase is not what is expected on insurancePhaseEnd", getGamePhase(), GamePhase.INSURE);
+			System.out.println("onInsurancePhaseEnd start");
+			getPlayerInTurnLock().lock();
+			updateGamePhase(GamePhase.PLAY);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "onInsurancePhaseEnd() something went wrong. Waiting for manager's call.", e);
+			BlackjackUtil.dumpTable(this, "onBetPhaseEnd");
+			updateGamePhase(GamePhase.ERROR);
+		} finally {
+			System.out.println("onInsurancePhaseEnd -end");
+			getPlayerInTurnLock().unlock();
+		}
+	}
+
+	public InsuranceInfo getInsuranceInfo() {
+		return insuranceInfo;
 	}
 
 	@Override
@@ -177,12 +218,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public int getPlayerTurnTime() {
 		return 20;
-	}
-
-	@Override
-	public void insure(ICasinoPlayer player) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

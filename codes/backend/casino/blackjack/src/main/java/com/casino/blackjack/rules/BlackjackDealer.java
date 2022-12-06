@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.blackjack.table.BlackjackUtil;
+import com.casino.blackjack.table.InsurancePhaseClockTask;
 import com.casino.common.bet.BetPhaseClockTask;
 import com.casino.common.bet.BetThresholds;
 import com.casino.common.cards.Card;
@@ -47,6 +48,21 @@ public class BlackjackDealer implements IDealer {
 			BetPhaseClockTask task = new BetPhaseClockTask(table);
 			this.getTable().getClock().startClock(task, 1000);
 		}
+	}
+
+	public void startInsurancePhase() {
+		System.out.println("starting insurancePhase");
+		table.updateGamePhase(GamePhase.INSURE);
+		if (table.getActivePlayerCount() > 0) {
+			InsurancePhaseClockTask task = new InsurancePhaseClockTask(table);
+			this.getTable().getClock().startClock(task, 1000);
+		}
+	}
+
+	@Override
+	public boolean hasStartingAce() {
+		Card card = dealerHand.getCards().get(0);
+		return card != null & card.isAce();
 	}
 
 	public void handlePlayerBet(ICasinoPlayer tablePlayer, BigDecimal bet) {
@@ -130,7 +146,6 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void finalizeBetPhase() {
-		table.getClock().stopClock();
 		handlePlayers();
 	}
 
@@ -191,6 +206,10 @@ public class BlackjackDealer implements IDealer {
 		player.stand();
 	}
 
+	public void insure(BlackjackPlayer player) {
+		player.insure();
+	}
+
 	@Override
 	public void completeRound() {
 		try {
@@ -240,4 +259,5 @@ public class BlackjackDealer implements IDealer {
 		}
 		System.out.println("Dealer hand is completed with value:" + dealerHand.calculateValues().get(0));
 	}
+
 }
