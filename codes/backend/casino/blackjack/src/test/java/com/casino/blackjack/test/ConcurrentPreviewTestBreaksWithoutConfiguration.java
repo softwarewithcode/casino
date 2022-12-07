@@ -32,7 +32,7 @@ import com.casino.common.table.Type;
  * One approach In Eclipse:<br>
  * -> Mouse right click on top of this file <br>
  * -> "run as" -> "run configurations.." -> "Arguments tab" <br>
- * -> Add VM Arguments -> "-ea --enable-preview" <br>
+ * -> Use VM Arguments -> "-ea --enable-preview" <br>
  * With other IDEs something similar.
  */
 public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
