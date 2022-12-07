@@ -1,10 +1,12 @@
 package com.casino.blackjack.rules;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -33,15 +35,18 @@ public class BlackjackDealer implements IDealer {
 	private final BlackjackTable table;
 	private List<Card> decks; // 6 decks
 	private BlackjackDealerHand dealerHand;
+	private ReentrantLock betPhaseLock;
 
 	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds tableConstants) {
 		this.table = blackjackTable;
 		this.thresholds = tableConstants;
 		this.decks = Deck.combineDecks(6);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
+		betPhaseLock = new ReentrantLock();
 	}
 
 	private void startBetPhase() {
+
 		table.updateGamePhase(GamePhase.BET);
 		if (table.getActivePlayerCount() > 0) {
 			BetPhaseClockTask task = new BetPhaseClockTask(table);
@@ -124,9 +129,21 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void handleNewPlayer(ICasinoPlayer player) {
-		if (table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS) {
-			table.setStatus(com.casino.common.table.Status.RUNNING);
-			startBetPhase();
+		try {
+			System.out.println("Thread::" + Thread.currentThread() + " handlingNewPlayer " + Instant.now());
+			betPhaseLock.tryLock();
+			if (table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS) {
+				table.setStatus(com.casino.common.table.Status.RUNNING);
+				System.out.println("Thread::" + Thread.currentThread() + " changed tableStatus to:" + table.getStatus() + " " + Instant.now());
+				startBetPhase();
+			} else
+				System.out.println("Thread::+" + Thread.currentThread() + "  got the lock but status was not WAITING_PLAYERS. so did not change anything " + Instant.now());
+		} finally {
+			if (betPhaseLock.isHeldByCurrentThread()) {
+				System.out.println("Thread::" + Thread.currentThread() + "had the lock and releasing " + Instant.now());
+				betPhaseLock.unlock();
+			} else
+				System.out.println("Thread::" + Thread.currentThread() + " did not have lock, byPassing status change " + Instant.now());
 		}
 	}
 
@@ -218,7 +235,7 @@ public class BlackjackDealer implements IDealer {
 	@Override
 	public void completeRound() {
 		try {
-			if (table.hasWaitingPlayers()) {
+			if (table.hasPlayersWithWinningChances()) {
 				takeCards();
 				payout();
 			}

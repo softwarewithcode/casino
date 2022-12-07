@@ -41,7 +41,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return (int) seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != com.casino.common.player.Status.SIT_OUT).count();
 	}
 
-	public boolean hasWaitingPlayers() {
+	public boolean hasPlayersWithWinningChances() {
 		return seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().hasWinningChance()).findFirst().isPresent();
 	}
 
