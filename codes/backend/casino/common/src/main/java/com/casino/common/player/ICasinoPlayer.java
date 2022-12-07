@@ -40,6 +40,8 @@ public interface ICasinoPlayer {
 
 	public List<IHand> getHands();
 
+	public IHand getFirstHand();
+
 	public boolean hasActiveHand();
 
 	public IHand getActiveHand();
@@ -47,5 +49,7 @@ public interface ICasinoPlayer {
 	public void removeTotalBet();
 
 	public boolean hasWinningChance();
+
+	public boolean isCompensable();
 
 }

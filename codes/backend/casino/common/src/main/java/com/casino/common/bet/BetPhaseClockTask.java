@@ -9,7 +9,6 @@ public class BetPhaseClockTask extends TimerTask {
 	private int secondsLeft;
 
 	public BetPhaseClockTask(ICasinoTable table) {
-		System.out.println("BetPhaseClockTask:" + table.getId());
 		this.table = table;
 		BetThresholds thresholds = table.getBetValues();
 		secondsLeft = thresholds.betRoundTime();
@@ -21,7 +20,6 @@ public class BetPhaseClockTask extends TimerTask {
 			return;
 		}
 		secondsLeft--;
-		System.out.println("BetPhaseClockTask time left:" + secondsLeft + " table:" + table.getId());
 		if (secondsLeft == 0) {
 			table.getClock().stopClock();
 			table.onBetPhaseEnd();

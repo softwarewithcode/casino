@@ -21,7 +21,7 @@ public class BlackjackHand implements IHand {
 	private boolean active;
 	private boolean doubled;
 	private BigDecimal bet;
-	private boolean insured;
+	private BigDecimal insuranceBet;
 
 	public BlackjackHand(UUID id, boolean active) {
 		this.id = id;
@@ -135,8 +135,10 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public void doubleDown(Card ref) {
-		if (isCompleted())
-			throw new IllegalPlayerActionException("doubled hand cannot bet doubled", 15);
+		if (!isActive())
+			throw new IllegalPlayerActionException("inactive hand cannot be doubled", 15);
+		if (isDoubled())
+			throw new IllegalPlayerActionException("doubled hand cannot be doubled", 15);
 		this.doubled = true;
 		this.bet = this.bet.multiply(BigDecimal.TWO);
 		this.cards.add(ref);
@@ -145,8 +147,8 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public void stand() {
-		if (isCompleted())
-			throw new IllegalPlayerActionException("stand called on completed hand", 15);
+		if (!isActive())
+			throw new IllegalPlayerActionException("stand called on inactive hand", 15);
 		this.complete();
 	}
 
@@ -175,18 +177,30 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public boolean isInsured() {
-		return insured;
+		return insuranceBet != null;
 	}
 
 	@Override
 	public void insure() {
-		insured = true;
-
+		if (!isActive())
+			throw new IllegalPlayerActionException("inactive hand cannot bet insured", 15);
+		if (isInsured() || isBlackjack())
+			throw new IllegalPlayerActionException("insurance not allowed:" + this, 15);
+		insuranceBet = bet.multiply(new BigDecimal("0.5"));
 	}
 
 	@Override
 	public boolean hasWinningChance() {
 		return getFinalValue() <= 21 || isInsured();
+	}
+
+	public BigDecimal getInsuranceBet() {
+		return insuranceBet;
+	}
+
+	@Override
+	public boolean isInsuranceCompensable() {
+		return isInsured() && isCompleted() && getFinalValue() <= 21;
 	}
 
 }

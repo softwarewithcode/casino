@@ -7,7 +7,6 @@ public class InsurancePhaseClockTask extends TimerTask {
 	private int secondsLeft;
 
 	public InsurancePhaseClockTask(BlackjackTable table) {
-		System.out.println("InsurancePhaseTask:" + table.getId());
 		this.table = table;
 		secondsLeft = table.getInsuranceInfo().insuranceRoundTime();
 	}
@@ -18,7 +17,6 @@ public class InsurancePhaseClockTask extends TimerTask {
 			return;
 		}
 		secondsLeft--;
-		System.out.println("InsurancePhaseTask time left:" + secondsLeft + " table:" + table.getId());
 		if (secondsLeft == 0) {
 			table.onInsurancePhaseEnd();
 			table.getClock().stopClock();

@@ -17,6 +17,7 @@ import com.casino.common.table.ISeatedTable;
 
 public class BlackjackPlayer extends CasinoPlayer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackPlayer.class.getName());
+	private static final BigDecimal INSURANCE_FACTOR = new BigDecimal("0.5");
 	private List<IHand> hands;
 
 	public BlackjackPlayer(String name, UUID id, BigDecimal startBalance, ISeatedTable table) {
@@ -28,7 +29,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public boolean canTake() {
 		IHand hand = getActiveHand();
 		if (hand == null)
-			return false;
+			return false; 
 		List<Integer> values = hand.calculateValues(); // Smallest value in 0 pos.
 		return values.get(0) < 21;
 	}
@@ -41,10 +42,14 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return hands.stream().filter(hand -> hand.isActive()).findAny().isPresent();
 	}
 
+	public boolean isInsuranceCompensable() {
+		return getFirstHand().isInsuranceCompensable();
+	}
+
 	public void splitStartingHand() {
 		validateSplitPreConditions();
-		if (!getPlayerLock().tryLock())
-			throw new ConcurrentModificationException("no balance lock acquired");
+		if (!isPlayerModifyible())
+			throw new ConcurrentModificationException("no playerLock acquired");
 		BetUtil.verifySufficentBalance(hands.get(0).getBet(), this); // Check balance after getting lock
 		IHand splitHand = new BlackjackHand(UUID.randomUUID(), false);
 		Card cardFromStartingHand = hands.get(0).getCards().remove(1);
@@ -72,7 +77,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void doubleDown(Card ref) {
 		try {
 			validateDoubleDownPreConditions();
-			if (!getPlayerLock().tryLock())
+			if (!isPlayerModifyible())
 				throw new ConcurrentModificationException("no balance lock acquired");
 			increaseTotalBet(getTotalBet());
 			getActiveHand().doubleDown(ref);
@@ -85,22 +90,27 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void insure() {
 		try {
 			validateInsuringConditions();
-			if (!getPlayerLock().tryLock())
+			if (!isPlayerModifyible())
 				throw new ConcurrentModificationException("no player lock acquired");
-			getHands().get(0).insure();
+			getFirstHand().insure();
+			increaseTotalBet(getFirstHand().getBet().multiply(INSURANCE_FACTOR));
 		} finally {
 			if (getPlayerLock().isHeldByCurrentThread())
 				getPlayerLock().unlock();
 		}
 	}
 
+	private boolean isPlayerModifyible() {
+		return getPlayerLock().getHoldCount() == 0 && getPlayerLock().tryLock();
+	}
+
 	private void validateInsuringConditions() {
 		validateActionConditions();
-		if (getHands().get(0).isInsured())
+		if (getFirstHand().isInsured())
 			throw new IllegalPlayerActionException("hand has been insured earlier ", 10);
-		if (getHands().get(0).isDoubled())
+		if (getFirstHand().isDoubled())
 			throw new IllegalPlayerActionException("cannot insure, hand has been doubled earlier ", 10);
-		if (getHands().get(0).isBlackjack())
+		if (getFirstHand().isBlackjack())
 			throw new IllegalPlayerActionException("cannot insure, hand is blackjack ", 10);
 	}
 
@@ -120,6 +130,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 		validateActionConditions();
 		if (!BlackjackUtil.haveSameValue(hands.get(0).getCards().get(0), hands.get(0).getCards().get(1)))
 			throw new IllegalPlayerActionException("not equal values", 4);
+		if (hands.get(0).isInsured())
+			throw new IllegalPlayerActionException("cannot split insured hand", 4);
 	}
 
 	private void validateActionConditions() {
@@ -170,5 +182,14 @@ public class BlackjackPlayer extends CasinoPlayer {
 		super.reset();
 		hands = new ArrayList<IHand>();
 		// hands.add(createNewHand(true));
+	}
+
+	@Override
+	public boolean isCompensable() {
+		return getFirstHand().isInsuranceCompensable();
+	}
+
+	public IHand getFirstHand() {
+		return getHands().get(0);
 	}
 }

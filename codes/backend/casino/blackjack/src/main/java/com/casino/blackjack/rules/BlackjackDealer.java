@@ -29,7 +29,6 @@ import com.casino.common.table.phase.GamePhase;
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
 	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
-	private static final BigDecimal INSURANCE_FACTOR = new BigDecimal("0.5");
 	private final BetThresholds betThresholds;
 	private final BlackjackTable table;
 	private List<Card> decks; // 6 decks
@@ -51,8 +50,6 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void startInsurancePhase() {
-		System.out.println("starting insurancePhase");
-		table.updateGamePhase(GamePhase.INSURE);
 		if (table.getActivePlayerCount() > 0) {
 			InsurancePhaseClockTask task = new InsurancePhaseClockTask(table);
 			this.getTable().getClock().startClock(task, 1000);
@@ -228,8 +225,9 @@ public class BlackjackDealer implements IDealer {
 		List<ICasinoPlayer> playersWithWinningChances = table.getPlayers().stream().filter(player -> player.hasWinningChance()).collect(Collectors.toList());
 		playersWithWinningChances.stream().forEach(player -> player.getHands().forEach(playerHand -> {
 			int comparison = dealerHand.compareTo(playerHand);
-			if (dealerHand.isBlackjack() && playerHand.isInsured())
-				player.increaseBalance(playerHand.getBet().multiply(INSURANCE_FACTOR));
+			if (player.isCompensable() && dealerHand.isBlackjack()) {
+				player.increaseBalance(player.getFirstHand().getInsuranceBet().multiply(BigDecimal.TWO));
+			}
 			if (evenResult(comparison))
 				player.increaseBalance(playerHand.getBet());
 			else if (playerWins(comparison)) {
@@ -238,7 +236,6 @@ public class BlackjackDealer implements IDealer {
 				else
 					player.increaseBalance(playerHand.getBet().multiply(BigDecimal.TWO));
 			}
-			System.out.println("Comparison:" + comparison + " dealer:" + dealerHand + " oterher:" + playerHand);
 		}));
 	}
 
@@ -253,11 +250,8 @@ public class BlackjackDealer implements IDealer {
 	private void takeCards() {
 		while (!dealerHand.isCompleted()) {
 			Card card = getCard();
-			System.out.println("dealer continues and takes card:" + card);
+			LOGGER.fine("Dealer gets card:" + card + " in table:" + table);
 			addCard(card);
-			System.out.println("Dealer hand value in first:" + dealerHand.calculateValues().get(0));
 		}
-		System.out.println("Dealer hand is completed with value:" + dealerHand.calculateValues().get(0));
 	}
-
 }

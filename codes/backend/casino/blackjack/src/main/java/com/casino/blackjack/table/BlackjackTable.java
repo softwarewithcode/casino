@@ -126,7 +126,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	private void verifyActionClearance(ICasinoPlayer player, String actionName) {
 		LOGGER.entering(getClass().getName(), actionName, " player:" + player);
 		if (!isPlayerAllowedToMakeAction(player)) {
-			LOGGER.log(Level.SEVERE, " Player not allowed to make action: " + actionName + " phase: " + getGamePhase() + " in table:" + this);
+			LOGGER.log(Level.SEVERE, "Player:" + player + " not allowed to make action: " + actionName + " phase: " + getGamePhase() + " in table:" + this);
 			throw new IllegalPlayerActionException(actionName + " not allowed for player:" + player, 14);
 		}
 		getPlayerInTurnLock().lock();
@@ -159,20 +159,20 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	@Override
 	public void onBetPhaseEnd() {
+		LOGGER.entering(getClass().getName(), "onBetPhaseEnd");
 		try {
 			if (!isGamePhase(GamePhase.BET))
 				throw new IllegalPhaseException("GamePhase is not what is expected on betPhaseEnd", getGamePhase(), GamePhase.BET);
-			System.out.println("onBetPhaseEnd -starts");
 			getPlayerInTurnLock().lock();
 			updateGamePhase(GamePhase.BETS_COMPLETED);
 			dealer.finalizeBetPhase();
 			if (!dealer.dealInitialCards()) {
-				System.out.println("Players sit out. Nobody has bet. No use case specification exist. Either automatically restart betPhase vs. waiting players to join.");
 				return;
 			}
 			dealer.updateStartingPlayer();
 			if (dealer.hasStartingAce()) {
 				dealer.startInsurancePhase();
+				updateGamePhase(GamePhase.INSURE);
 			} else {
 				checkDealer();
 				updateGamePhase(GamePhase.PLAY);
@@ -182,17 +182,17 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			BlackjackUtil.dumpTable(this, "onBetPhaseEnd");
 			updateGamePhase(GamePhase.ERROR);
 		} finally {
-			System.out.println("onBetPhaseEnd -ends");
 			getPlayerInTurnLock().unlock();
+			LOGGER.exiting(getClass().getName(), "onBetPhaseEnd");
 		}
 	}
 
 	@Override
 	public void onInsurancePhaseEnd() {
+		LOGGER.entering(getClass().getName(), "onInsurancePhaseEnd");
 		try {
 			if (!isGamePhase(GamePhase.INSURE))
 				throw new IllegalPhaseException("GamePhase is not what is expected on insurancePhaseEnd", getGamePhase(), GamePhase.INSURE);
-			System.out.println("onInsurancePhaseEnd start");
 			getPlayerInTurnLock().lock();
 			updateGamePhase(GamePhase.PLAY);
 		} catch (Exception e) {
@@ -200,8 +200,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			BlackjackUtil.dumpTable(this, "onBetPhaseEnd");
 			updateGamePhase(GamePhase.ERROR);
 		} finally {
-			System.out.println("onInsurancePhaseEnd -end");
 			getPlayerInTurnLock().unlock();
+			LOGGER.exiting(getClass().getName(), "onInsurancePhaseEnd");
 		}
 	}
 

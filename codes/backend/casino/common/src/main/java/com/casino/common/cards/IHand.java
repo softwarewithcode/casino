@@ -36,6 +36,8 @@ public interface IHand {
 
 	public BigDecimal getBet();
 
+	public BigDecimal getInsuranceBet();
+
 	public void updateBet(BigDecimal bet);
 
 	public void stand();
@@ -43,5 +45,7 @@ public interface IHand {
 	public Integer getFinalValue();
 
 	public boolean hasWinningChance();
+
+	public boolean isInsuranceCompensable();
 
 }
