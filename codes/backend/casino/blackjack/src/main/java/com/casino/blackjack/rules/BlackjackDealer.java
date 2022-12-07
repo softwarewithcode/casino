@@ -180,12 +180,16 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void doubleDown(BlackjackPlayer player) {
+		if (!table.hasSeat(player))
+			throw new PlayerNotFoundException("cannot doubleDown(), player not found from table:" + player, 0);
 		Card cardReference = decks.get(decks.size() - 1);
 		player.doubleDown(cardReference);
 		getCard();
 	}
 
 	public void handleSplit(BlackjackPlayer player) {
+		if (!table.hasSeat(player))
+			throw new PlayerNotFoundException("cannot handleSplit(), player not found from table:" + player, 0);
 		player.splitStartingHand();
 		IHand firstHand = player.getActiveHand();
 		firstHand.addCard(getCard());
@@ -200,10 +204,14 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void stand(BlackjackPlayer player) {
+		if (!table.hasSeat(player))
+			throw new PlayerNotFoundException("cannot stand(), player not found from table:" + player, 0);
 		player.stand();
 	}
 
 	public void insure(BlackjackPlayer player) {
+		if (!table.hasSeat(player))
+			throw new PlayerNotFoundException("cannot insure(), player not found from table:" + player, 0);
 		player.insure();
 	}
 

@@ -66,7 +66,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 			return false;
 		if (seatNumber < 0 || seatNumber >= seats.size())
 			return false;
-		if (hasAlreadySeat(player))
+		if (hasSeat(player))
 			return false;
 		Seat seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().orElse(null);
 		if (seat == null || !seat.take(player))
@@ -96,7 +96,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return seats;
 	}
 
-	private boolean hasAlreadySeat(ICasinoPlayer p) {
+	public boolean hasSeat(ICasinoPlayer p) {
 		return p == null ? false : seats.stream().anyMatch(seat -> p.equals(seat.getPlayer()));
 	}
 
