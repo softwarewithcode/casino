@@ -1,6 +1,8 @@
-package com.casino.blackjack.table;
+package com.casino.blackjack.table.timing;
 
 import java.util.TimerTask;
+
+import com.casino.blackjack.table.BlackjackTable;
 
 public class InsurancePhaseClockTask extends TimerTask {
 	private BlackjackTable table;

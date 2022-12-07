@@ -1,8 +1,6 @@
-package com.casino.common.bet;
+package com.casino.common.table;
 
 import java.math.BigDecimal;
-
-import com.casino.common.table.Type;
 
 public record Thresholds(
 		BigDecimal minimumBet, 

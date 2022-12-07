@@ -11,10 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
-import com.casino.blackjack.table.InsuranceInfo;
-import com.casino.common.bet.Thresholds;
-import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
+import com.casino.common.table.Thresholds;
 import com.casino.common.table.Type;
 
 public class SeatTest extends BaseTest {

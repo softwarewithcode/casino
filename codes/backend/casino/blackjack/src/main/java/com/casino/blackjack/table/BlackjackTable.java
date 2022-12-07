@@ -8,12 +8,12 @@ import java.util.logging.Logger;
 import com.casino.blackjack.external.IBlackjackTable;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
-import com.casino.common.bet.Thresholds;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
+import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
 
@@ -25,7 +25,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		super(initialStatus, thresholds, id, PhasePathFactory.buildBlackjackPath());
 		this.dealer = new BlackjackDealer(this, thresholds);
 	}
-
+//
 	@Override
 	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
 		boolean gotSeat = super.trySeat(seatNumber, player);

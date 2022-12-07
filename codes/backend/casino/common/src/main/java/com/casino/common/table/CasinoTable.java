@@ -11,11 +11,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.casino.common.bet.Thresholds;
 import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePath;
+import com.casino.common.table.timing.Clock;
 
 /**
  * Base class for all casino tables. Gather here common data and operations what

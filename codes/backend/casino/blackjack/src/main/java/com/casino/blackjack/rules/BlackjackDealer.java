@@ -13,9 +13,7 @@ import java.util.stream.Stream;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.blackjack.table.BlackjackUtil;
-import com.casino.blackjack.table.InsurancePhaseClockTask;
-import com.casino.common.bet.BetPhaseClockTask;
-import com.casino.common.bet.Thresholds;
+import com.casino.blackjack.table.timing.InsurancePhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
@@ -24,7 +22,9 @@ import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.player.Status;
 import com.casino.common.table.IDealer;
 import com.casino.common.table.Seat;
+import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
+import com.casino.common.table.timing.BetPhaseClockTask;
 
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());

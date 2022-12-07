@@ -18,15 +18,13 @@ import com.casino.blackjack.external.IBlackjackTable;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.blackjack.table.BlackjackTable;
-import com.casino.blackjack.table.InsuranceInfo;
-import com.casino.common.bet.Thresholds;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.ISeatedTable;
-import com.casino.common.table.PlayerRange;
 import com.casino.common.table.Status;
+import com.casino.common.table.Thresholds;
 import com.casino.common.table.Type;
 
 public class StartingHandDoubleTest extends BaseTest {

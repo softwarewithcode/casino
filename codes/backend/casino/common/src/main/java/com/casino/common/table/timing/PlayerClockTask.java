@@ -1,7 +1,8 @@
-package com.casino.common.player;
+package com.casino.common.table.timing;
 
 import java.util.TimerTask;
 
+import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.ICasinoTable;
 
 public class PlayerClockTask extends TimerTask {

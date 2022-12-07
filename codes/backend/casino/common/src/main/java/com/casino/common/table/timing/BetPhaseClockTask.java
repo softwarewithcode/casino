@@ -1,8 +1,9 @@
-package com.casino.common.bet;
+package com.casino.common.table.timing;
 
 import java.util.TimerTask;
 
 import com.casino.common.table.ICasinoTable;
+import com.casino.common.table.Thresholds;
 
 public class BetPhaseClockTask extends TimerTask {
 	private ICasinoTable table;

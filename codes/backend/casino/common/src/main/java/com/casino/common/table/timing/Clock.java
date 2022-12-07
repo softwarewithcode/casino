@@ -1,4 +1,4 @@
-package com.casino.common.table;
+package com.casino.common.table.timing;
 
 import java.util.Timer;
 import java.util.TimerTask;
