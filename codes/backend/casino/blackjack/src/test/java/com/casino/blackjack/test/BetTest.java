@@ -17,7 +17,7 @@ import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.blackjack.table.InsuranceInfo;
-import com.casino.common.bet.BetThresholds;
+import com.casino.common.bet.Thresholds;
 import com.casino.common.bet.BetUtil;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
@@ -36,7 +36,8 @@ public class BetTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID(), new InsuranceInfo(5));
+			table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
+					UUID.randomUUID());
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
@@ -145,8 +146,8 @@ public class BetTest extends BaseTest {
 
 	@Test
 	public void negativeStartingBetIsPreventeted() { // In error case where minimum bet is negative
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new BetThresholds(new BigDecimal("-1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY), new PlayerRange(1, 6), Type.PUBLIC, 15, UUID.randomUUID(),
-				new InsuranceInfo(5));
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS,
+				new Thresholds(new BigDecimal("-1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC), UUID.randomUUID());
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		table.trySeat(0, blackjackPlayer);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {

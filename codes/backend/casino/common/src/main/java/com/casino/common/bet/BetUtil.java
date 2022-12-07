@@ -21,10 +21,10 @@ public class BetUtil {
 			throw new IllegalBetException("no bet is given in table:" + table + " player:" + player, 2);
 		if (player.getBalance().compareTo(betAttempt) < 0)
 			throw new IllegalBetException("given bet is more than player can afford " + table + " player:" + player + " bet" + betAttempt.toString(), 3);
-		if (betAttempt.compareTo(table.getBetValues().minimumBet()) < 0)
-			throw new IllegalBetException("given bet is under table minimum bet " + table.getBetValues().minimumBet().toString() + " bet:" + betAttempt.toString(), 4);
-		if (betAttempt.compareTo(table.getBetValues().maximumBet()) > 0)
-			throw new IllegalBetException("given bet is over table maximum bet " + table.getBetValues().maximumBet().toString() + " bet:" + betAttempt.toString(), 5);
+		if (betAttempt.compareTo(table.getThresholds().minimumBet()) < 0)
+			throw new IllegalBetException("given bet is under table minimum bet " + table.getThresholds().minimumBet().toString() + " bet:" + betAttempt.toString(), 4);
+		if (betAttempt.compareTo(table.getThresholds().maximumBet()) > 0)
+			throw new IllegalBetException("given bet is over table maximum bet " + table.getThresholds().maximumBet().toString() + " bet:" + betAttempt.toString(), 5);
 		if (betAttempt.compareTo(BigDecimal.ZERO) < 0)
 			throw new IllegalBetException("bet cannot be negative" + table + " player:" + player, 9);
 	}

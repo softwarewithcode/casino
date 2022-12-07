@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.casino.common.bet.BetThresholds;
+import com.casino.common.bet.Thresholds;
 import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.GamePhase;
@@ -29,8 +29,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	private Set<ICasinoPlayer> players;
 	private Set<ICasinoPlayer> watchers;
 	private Status status;
-	private PlayerRange playerLimit;
-	private BetThresholds betValues;
 	private Type type;
 	private Language language;
 	private UUID id;
@@ -40,16 +38,16 @@ public abstract class CasinoTable implements ICasinoTable {
 	private ICasinoPlayer playerInTurn;
 	private final ReentrantLock playerInTurnLock;
 	private boolean dealerTurn;
+	private Thresholds constants;
 
-	protected CasinoTable(Status initialStatus, BetThresholds betLimit, PlayerRange playerLimit, Type type, UUID id, PhasePath phases) {
+	protected CasinoTable(Status initialStatus, Thresholds tableConstants, UUID id, PhasePath phases) {
 		this.players = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.watchers = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
 		this.status = initialStatus;
-		this.type = type;
+		this.type = tableConstants.tableType();
 		this.id = id;
 		this.created = Instant.now();
-		this.betValues = betLimit;
-		this.playerLimit = playerLimit;
+		this.constants = tableConstants;
 		this.tableClock = new Clock();
 		this.playerClock = new Clock();
 		this.phasePath = phases;
@@ -88,7 +86,7 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public boolean isMultiplayer() {
-		return playerLimit.maximumPlayers() > 1;
+		return constants.maxPlayers() > 1;
 	}
 
 	@Override
@@ -125,11 +123,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public Language getLanguage() {
 		return language;
-	}
-
-	@Override
-	public PlayerRange getPlayerLimit() {
-		return playerLimit;
 	}
 
 	@Override
@@ -218,11 +211,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public BetThresholds getBetValues() {
-		return betValues;
-	}
-
-	@Override
 	public int hashCode() {
 		return Objects.hash(id);
 	}
@@ -269,6 +257,10 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public GamePhase getGamePhase() {
 		return phasePath.getPhase();
+	}
+
+	public Thresholds getThresholds() {
+		return constants;
 	}
 
 	@Override

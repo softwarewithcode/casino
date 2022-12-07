@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-import com.casino.common.bet.BetThresholds;
+import com.casino.common.bet.Thresholds;
 import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.GamePhase;
@@ -36,8 +36,6 @@ public interface ICasinoTable {
 
 	public boolean watch(ICasinoPlayer player);
 
-	public PlayerRange getPlayerLimit();
-
 	public Language getLanguage();
 
 	public ICasinoPlayer getPlayerInTurn();
@@ -62,14 +60,13 @@ public interface ICasinoTable {
 
 	public void onBetPhaseEnd();
 
-
-	public BetThresholds getBetValues();
-
 	public GamePhase getGamePhase();
 
 	public UUID getId();
 
 	public Clock getClock();
+
+	public Thresholds getThresholds();
 
 	public GamePhase updateGamePhase(GamePhase phase);
 

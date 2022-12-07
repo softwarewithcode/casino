@@ -8,26 +8,22 @@ import java.util.logging.Logger;
 import com.casino.blackjack.external.IBlackjackTable;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
-import com.casino.common.bet.BetThresholds;
+import com.casino.common.bet.Thresholds;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
-import com.casino.common.table.PlayerRange;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
-import com.casino.common.table.Type;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
 
 public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
 	private final BlackjackDealer dealer;
-	private final InsuranceInfo insuranceInfo;
 
-	public BlackjackTable(Status initialStatus, BetThresholds betThresholds, PlayerRange playerLimit, Type type, int seats, UUID id, InsuranceInfo insuranceInfo) {
-		super(initialStatus, betThresholds, playerLimit, type, seats, id, PhasePathFactory.buildBlackjackPath());
-		this.dealer = new BlackjackDealer(this, betThresholds);
-		this.insuranceInfo = insuranceInfo;
+	public BlackjackTable(Status initialStatus, Thresholds thresholds, UUID id) {
+		super(initialStatus, thresholds, id, PhasePathFactory.buildBlackjackPath());
+		this.dealer = new BlackjackDealer(this, thresholds);
 	}
 
 	@Override
@@ -205,8 +201,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		}
 	}
 
-	public InsuranceInfo getInsuranceInfo() {
-		return insuranceInfo;
+	public Thresholds getThresholds() {
+		return super.getThresholds();
 	}
 
 	@Override

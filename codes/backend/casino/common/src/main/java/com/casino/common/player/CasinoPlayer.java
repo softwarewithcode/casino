@@ -138,7 +138,6 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	public void increaseBalance(BigDecimal amount) {
 		if (!playerLock.tryLock())
 			throw new ConcurrentModificationException("playerLock was not obtained");
-		System.out.println("BalanceIncrease:" + amount);
 		this.balance = balance.add(amount);
 	}
 

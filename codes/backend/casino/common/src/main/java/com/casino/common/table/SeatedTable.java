@@ -7,7 +7,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.casino.common.bet.BetThresholds;
+import com.casino.common.bet.Thresholds;
 import com.casino.common.bet.BetUtil;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.PhasePath;
@@ -20,11 +20,11 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	private Set<Seat> seats;
 
-	protected SeatedTable(Status initialStatus, BetThresholds betValues, PlayerRange playerRange, Type tableType, int seatCount, UUID tableId, PhasePath phasePath) {
-		super(initialStatus, betValues, playerRange, tableType, tableId, phasePath);
-		if (playerRange.maximumPlayers() > seatCount)
+	protected SeatedTable(Status initialStatus, Thresholds tableConstants, UUID tableId, PhasePath phasePath) {
+		super(initialStatus, tableConstants, tableId, phasePath);
+		if (tableConstants.maxPlayers() > tableConstants.seatCount())
 			throw new IllegalArgumentException("not enough seats for the players");
-		createSeats(seatCount);
+		createSeats(tableConstants.seatCount());
 	}
 
 	private void createSeats(int seatCount) {
@@ -62,7 +62,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	// public trySeat(..) vs. required join() first ?
 	@Override
 	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
-		BetUtil.verifySufficentBalance(getBetValues().minimumBet(), player);
+		BetUtil.verifySufficentBalance(getThresholds().minimumBet(), player);
 		if (!isAcceptingPlayers())
 			return false;
 		if (seatNumber < 0 || seatNumber >= seats.size())

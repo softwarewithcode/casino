@@ -10,8 +10,8 @@ public class BetPhaseClockTask extends TimerTask {
 
 	public BetPhaseClockTask(ICasinoTable table) {
 		this.table = table;
-		BetThresholds thresholds = table.getBetValues();
-		secondsLeft = thresholds.betRoundTime();
+		Thresholds thresholds = table.getThresholds();
+		secondsLeft = thresholds.betPhaseTime();
 	}
 
 	@Override

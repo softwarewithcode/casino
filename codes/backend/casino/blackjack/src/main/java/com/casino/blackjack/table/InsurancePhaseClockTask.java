@@ -8,7 +8,7 @@ public class InsurancePhaseClockTask extends TimerTask {
 
 	public InsurancePhaseClockTask(BlackjackTable table) {
 		this.table = table;
-		secondsLeft = table.getInsuranceInfo().insuranceRoundTime();
+		secondsLeft = table.getThresholds().secondPhaseTime();
 	}
 
 	@Override
