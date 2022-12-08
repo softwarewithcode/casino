@@ -17,12 +17,13 @@ public class BetPhaseClockTask extends TimerTask {
 
 	@Override
 	public void run() {
-		if (!table.getClock().isTicking()) {
+		if (!table.isClockTicking()) {
 			return;
 		}
 		secondsLeft--;
+		System.out.println("BetPhase left:" + secondsLeft);
 		if (secondsLeft == 0) {
-			table.getClock().stopClock();
+			table.stopClock();
 			table.onBetPhaseEnd();
 		}
 	}

@@ -6,6 +6,7 @@ import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -33,8 +34,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private Language language;
 	private UUID id;
 	private Instant created;
-	private Clock tableClock;
-	private Clock playerClock;
+	private final Clock clock;
 	private ICasinoPlayer playerInTurn;
 	private final ReentrantLock playerInTurnLock;
 	private boolean dealerTurn;
@@ -48,8 +48,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.id = id;
 		this.created = Instant.now();
 		this.constants = tableConstants;
-		this.tableClock = new Clock();
-		this.playerClock = new Clock();
+		this.clock = new Clock();
 		this.phasePath = phases;
 		this.playerInTurnLock = new ReentrantLock(true);
 	}
@@ -77,6 +76,22 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	protected void setPhasePath(PhasePath path) {
 		this.phasePath = path;
+	}
+
+	public void startClock(TimerTask task) {
+		if (this.clock.isTicking())
+			throw new IllegalArgumentException("Table clock already running, timing error");
+		this.clock.startClock(task, 1000);
+	}
+
+	@Override
+	public void stopClock() {
+		this.clock.stopClock();
+	}
+
+	@Override
+	public boolean isClockTicking() {
+		return this.clock.isTicking();
 	}
 
 	@Override
@@ -113,11 +128,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	public void onClose() {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public Clock getClock() {
-		return this.tableClock;
 	}
 
 	@Override
@@ -167,10 +177,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	public void changeFromPlayerToWatcher(ICasinoPlayer player) {
 		players.remove(player);
 		watchers.add(player);
-	}
-
-	public void stopPlayerClock() {
-		playerClock.stopClock();
 	}
 
 	@Override

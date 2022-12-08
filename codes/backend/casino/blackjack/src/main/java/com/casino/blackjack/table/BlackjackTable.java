@@ -157,6 +157,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void onBetPhaseEnd() {
 		LOGGER.entering(getClass().getName(), "onBetPhaseEnd");
+		System.out.println("BetPhaseEnded");
 		try {
 			if (!isGamePhase(GamePhase.BET))
 				throw new IllegalPhaseException("GamePhase is not what is expected on betPhaseEnd", getGamePhase(), GamePhase.BET);

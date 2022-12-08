@@ -15,13 +15,13 @@ public class InsurancePhaseClockTask extends TimerTask {
 
 	@Override
 	public void run() {
-		if (!table.getClock().isTicking()) {
+		if (!table.isClockTicking()) {
 			return;
 		}
 		secondsLeft--;
 		if (secondsLeft == 0) {
+			table.stopClock();
 			table.onInsurancePhaseEnd();
-			table.getClock().stopClock();
 		}
 	}
 }

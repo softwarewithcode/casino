@@ -2,12 +2,12 @@ package com.casino.common.table;
 
 import java.time.Instant;
 import java.util.Set;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.GamePhase;
-import com.casino.common.table.timing.Clock;
 
 public interface ICasinoTable {
 	public boolean isClosed();
@@ -64,7 +64,11 @@ public interface ICasinoTable {
 
 	public UUID getId();
 
-	public Clock getClock();
+	public void startClock(TimerTask task);
+
+	public void stopClock();
+
+	public boolean isClockTicking();
 
 	public Thresholds getThresholds();
 

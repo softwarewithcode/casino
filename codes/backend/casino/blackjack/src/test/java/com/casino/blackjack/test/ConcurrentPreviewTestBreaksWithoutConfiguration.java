@@ -98,6 +98,17 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		assertEquals(51, rejectedCount);
 	}
 
+	@Test
+	public void placeBet() throws InterruptedException, BrokenBarrierException {
+		table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, 490, 490, Type.PUBLIC), UUID.randomUUID());
+		CyclicBarrier casinoBarrier = new CyclicBarrier(491);
+		List<Thread> threads = createCasinoPlayers2(490, casinoBarrier);
+		threads.forEach(Thread::start);
+		casinoBarrier.await();
+		sleep(3, ChronoUnit.SECONDS);
+		assertEquals(490, table.getReservedSeatCount());
+	}
+
 	private List<Thread> createCasinoPlayers(int amount, CyclicBarrier casinoDoor) {
 		return IntStream.rangeClosed(0, amount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
 			BlackjackPlayer b = new BlackjackPlayer("player:" + index, UUID.randomUUID(), MAX_BET, table);
@@ -108,14 +119,35 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				}
 				casinoDoor.await();
 				if (!table.trySeat(seatNumber, b)) {
-					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCount _before updating " + rejectedCount + " 	** " + System.currentTimeMillis());
+//					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCount _before updating " + rejectedCount + " 	** " + System.nanoTime());
 					addRejected();
-					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCounter _after update " + rejectedCount + " 	** " + System.currentTimeMillis());
+//					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCounter _after update " + rejectedCount + " 	** " + System.nanoTime());
 				} else {
-					System.out.println(b.getName() + " got seat " + seatNumber + " sees acceptedCount before_ updating " + acceptedCount + " 	** " + System.currentTimeMillis());
+//					System.out.println(b.getName() + " got seat " + seatNumber + " sees acceptedCount before_ updating " + acceptedCount + " 	** " + System.nanoTime());
 					addAccepted();
-					System.out.println(b.getName() + " got seat " + seatNumber + "  sees acceptedCount after_ update " + acceptedCount + " ** " + System.currentTimeMillis());
+//					System.out.println(b.getName() + " got seat " + seatNumber + "  sees acceptedCount after_ update " + acceptedCount + " ** " + System.nanoTime());
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (BrokenBarrierException e) {
+				e.printStackTrace();
+			}
+		})).toList();
+	}
+
+	private List<Thread> createCasinoPlayers2(int amount, CyclicBarrier casinoDoor) {
+		return IntStream.rangeClosed(0, amount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
+			BlackjackPlayer b = new BlackjackPlayer("player:" + index, UUID.randomUUID(), MAX_BET, table);
+			try {
+				int seatNumber = index;
+				if (index >= table.getSeats().size()) {
+					seatNumber = ThreadLocalRandom.current().nextInt(0, table.getSeats().size() - 1);
+				}
+				casinoDoor.await();
+				if (!table.trySeat(seatNumber, b))
+					return;
+				System.out.println("got seat:" + b.getName());
+				table.placeStartingBet(b, MAX_BET);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (BrokenBarrierException e) {

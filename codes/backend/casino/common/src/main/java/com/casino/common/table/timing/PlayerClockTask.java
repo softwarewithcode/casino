@@ -18,7 +18,7 @@ public class PlayerClockTask extends TimerTask {
 
 	@Override
 	public void run() {
-		if (!table.getClock().isTicking()) {
+		if (!table.isClockTicking()) {
 			return;
 		}
 		secondsLeft--;

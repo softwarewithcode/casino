@@ -44,19 +44,15 @@ public class BlackjackDealer implements IDealer {
 		betPhaseLock = new ReentrantLock();
 	}
 
-	private void startBetPhase() {
-		table.updateGamePhase(GamePhase.BET);
-		if (table.getActivePlayerCount() > 0) {
-			BetPhaseClockTask task = new BetPhaseClockTask(table);
-			this.getTable().getClock().startClock(task, 1000);
-		}
+	private void startBetPhaseClock() {
+		System.out.println("START BET PHASE counter");
+		BetPhaseClockTask task = new BetPhaseClockTask(table);
+		getTable().startClock(task);
 	}
 
 	public void startInsurancePhase() {
-		if (table.getActivePlayerCount() > 0) {
-			InsurancePhaseClockTask task = new InsurancePhaseClockTask(table);
-			this.getTable().getClock().startClock(task, 1000);
-		}
+		InsurancePhaseClockTask task = new InsurancePhaseClockTask(table);
+		getTable().startClock(task);
 	}
 
 	@Override
@@ -66,6 +62,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void handlePlayerBet(ICasinoPlayer tablePlayer, BigDecimal bet) {
+		System.out.println("Place bet:" + tablePlayer + " bet");
 		Stream<Seat> seatStream = table.getSeats().stream();
 		Optional<Seat> playerOptional = seatStream.filter(seat -> seat.hasPlayer() && seat.getPlayer().equals(tablePlayer)).findFirst();
 		playerOptional.ifPresentOrElse(seat -> {
@@ -130,7 +127,7 @@ public class BlackjackDealer implements IDealer {
 		try {
 			if (shouldStartBetPhase()) {
 				table.setStatus(com.casino.common.table.Status.RUNNING);
-				startBetPhase();
+				startBetPhaseClock();
 			}
 		} finally {
 			if (betPhaseLock.isHeldByCurrentThread())
@@ -139,11 +136,21 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private boolean shouldStartBetPhase() {
-		return betPhaseLock.tryLock() && table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS;
+		return betPhaseLock.tryLock() && table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS && table.getActivePlayerCount() > 0;
 	}
 
 	private boolean isAllowedToDealStartingHand() {
-		return table.isGamePhase(GamePhase.BETS_COMPLETED) && somebodyHasBet();
+		return table.isGamePhase(GamePhase.BETS_COMPLETED) && somebodyHasBet() && isEnoughCardsForPlayersAndDealer();
+	}
+
+	private boolean isEnoughCardsForPlayersAndDealer() {
+		// Amount of decks used can vary. For example using 100 decks combined.
+		int dealer = 1;
+		return (table.getPlayers().size() + dealer) * getMaximumNumberOfCardsPlayerCanHold() < decks.size();
+	}
+
+	private int getMaximumNumberOfCardsPlayerCanHold() {
+		return 12;
 	}
 
 	private boolean somebodyHasBet() {
