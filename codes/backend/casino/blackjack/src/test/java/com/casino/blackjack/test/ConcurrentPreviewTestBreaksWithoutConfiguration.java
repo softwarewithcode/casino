@@ -13,7 +13,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.player.BlackjackPlayer;
@@ -41,8 +40,8 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	private BlackjackPlayer blackjackPlayer;
 	private BlackjackPlayer blackjackPlayer2;
 	private BlackjackDealer dealer;
-	private int acceptedCount;
-	private int rejectedCount;
+	private volatile int acceptedCount;
+	private volatile int rejectedCount;
 
 	@BeforeEach
 	public void initTest() {
@@ -83,6 +82,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		casinoBarrier.await();
 		sleep(2, ChronoUnit.SECONDS);// MainThread waits 2 seconds for VirtualThreads to finish
 		assertEquals(3, rejectedCount);
+		assertEquals(7, acceptedCount);
 	}
 
 	@Test
@@ -94,6 +94,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		casinoBarrier.await();
 		sleep(3, ChronoUnit.SECONDS);
 		assertEquals(49, table.getReservedSeatCount());
+		assertEquals(49, acceptedCount);
 		assertEquals(51, rejectedCount);
 	}
 
@@ -107,11 +108,13 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				}
 				casinoDoor.await();
 				if (!table.trySeat(seatNumber, b)) {
+					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCount _before updating " + rejectedCount + " 	** " + System.currentTimeMillis());
 					addRejected();
-//					System.out.println("did not get seat:" + b.getName() + " " + seatNumber + " rejected:" + rejectedCount);
+					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCounter _after update " + rejectedCount + " 	** " + System.currentTimeMillis());
 				} else {
-//					System.out.println("got seat:" + b.getName() + " " + seatNumber);
+					System.out.println(b.getName() + " got seat " + seatNumber + " sees acceptedCount before_ updating " + acceptedCount + " 	** " + System.currentTimeMillis());
 					addAccepted();
+					System.out.println(b.getName() + " got seat " + seatNumber + "  sees acceptedCount after_ update " + acceptedCount + " ** " + System.currentTimeMillis());
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
