@@ -132,10 +132,10 @@ public class DealerTest extends BaseTest {
 	}
 
 	@Test
-	public void dealerCreatesSixDecks() {
+	public void dealerCreatesEightDecks() {
 		Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC);
 		BlackjackDealer d = new BlackjackDealer(null, thresholds);
-		Assertions.assertEquals(312, d.getDecks().size());
+		Assertions.assertEquals(416, d.getDecks().size());
 	}
 
 	@Test

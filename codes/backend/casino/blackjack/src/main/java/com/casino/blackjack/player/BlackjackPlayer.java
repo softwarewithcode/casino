@@ -29,7 +29,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public boolean canTake() {
 		IHand hand = getActiveHand();
 		if (hand == null)
-			return false; 
+			return false;
 		List<Integer> values = hand.calculateValues(); // Smallest value in 0 pos.
 		return values.get(0) < 21;
 	}
@@ -76,9 +76,9 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public void doubleDown(Card ref) {
 		try {
-			validateDoubleDownPreConditions();
 			if (!isPlayerModifyible())
 				throw new ConcurrentModificationException("no balance lock acquired");
+			validateDoubleDownPreConditions();
 			increaseTotalBet(getTotalBet());
 			getActiveHand().doubleDown(ref);
 		} finally {
@@ -89,9 +89,9 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public void insure() {
 		try {
-			validateInsuringConditions();
 			if (!isPlayerModifyible())
 				throw new ConcurrentModificationException("no player lock acquired");
+			validateInsuringConditions();
 			getFirstHand().insure();
 			increaseTotalBet(getFirstHand().getBet().multiply(INSURANCE_FACTOR));
 		} finally {
@@ -116,11 +116,11 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	private void validateDoubleDownPreConditions() {
 		validateActionConditions();
-		if (getActiveHand().isDoubled())
+		if (getFirstHand().isDoubled())
 			throw new IllegalPlayerActionException("hand has been doubled before ", 10);
-		if (getActiveHand().isBlackjack())
+		if (getFirstHand().isBlackjack())
 			throw new IllegalPlayerActionException("blacjack cannot be doubled ", 10);
-		List<Integer> values = getActiveHand().calculateValues();
+		List<Integer> values = getFirstHand().calculateValues();
 		int val = values.get(0);
 		if (!(val >= 9 && val <= 11))
 			throw new IllegalPlayerActionException("hand value does not allow doubling; " + val, 10);
@@ -128,10 +128,12 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	private void validateSplitPreConditions() {
 		validateActionConditions();
-		if (!BlackjackUtil.haveSameValue(hands.get(0).getCards().get(0), hands.get(0).getCards().get(1)))
+		if (!BlackjackUtil.haveSameValue(getFirstHand().getCards().get(0), getFirstHand().getCards().get(1)))
 			throw new IllegalPlayerActionException("not equal values", 4);
-		if (hands.get(0).isInsured())
+		if (getFirstHand().isInsured())
 			throw new IllegalPlayerActionException("cannot split insured hand", 4);
+		if (getFirstHand().isDoubled())
+			throw new IllegalPlayerActionException("hand has been doubled before ", 10);
 	}
 
 	private void validateActionConditions() {

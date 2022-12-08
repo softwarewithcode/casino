@@ -57,7 +57,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 				dealer.insure(player);
 			else {
 				LOGGER.severe("insuring is not accepted:phase " + getGamePhase() + " table:" + this + " player:" + player);
-				throw new IllegalPlayerActionException("insuring is not allowed:" + getGamePhase() + " table:" + this + " player:" + player, 16);
+				throw new IllegalPlayerActionException("insuring is not allowed:" + getGamePhase() + " table:" + this + " player:" + player, 44);// 44=number for JUnit test to catch
 			}
 		} finally {
 			LOGGER.exiting(getClass().getName(), "placeStartingBet");

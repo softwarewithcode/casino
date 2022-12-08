@@ -39,7 +39,7 @@ public class BlackjackDealer implements IDealer {
 	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds tableConstants) {
 		this.table = blackjackTable;
 		this.thresholds = tableConstants;
-		this.decks = Deck.combineDecks(6);
+		this.decks = Deck.combineDecks(8);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		betPhaseLock = new ReentrantLock();
 	}
@@ -62,7 +62,6 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void handlePlayerBet(ICasinoPlayer tablePlayer, BigDecimal bet) {
-		System.out.println("Place bet:" + tablePlayer + " bet");
 		Stream<Seat> seatStream = table.getSeats().stream();
 		Optional<Seat> playerOptional = seatStream.filter(seat -> seat.hasPlayer() && seat.getPlayer().equals(tablePlayer)).findFirst();
 		playerOptional.ifPresentOrElse(seat -> {
