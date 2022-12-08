@@ -28,7 +28,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private PhasePath phasePath;
 	private Set<ICasinoPlayer> players;
 	private Set<ICasinoPlayer> watchers;
-	private Status status;
+	private volatile Status status;
 	private Type type;
 	private Language language;
 	private UUID id;

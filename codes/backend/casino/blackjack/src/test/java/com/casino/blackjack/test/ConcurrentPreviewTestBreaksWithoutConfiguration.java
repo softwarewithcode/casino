@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.player.BlackjackPlayer;
@@ -40,6 +41,8 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	private BlackjackPlayer blackjackPlayer;
 	private BlackjackPlayer blackjackPlayer2;
 	private BlackjackDealer dealer;
+	private int acceptedCount;
+	private int rejectedCount;
 
 	@BeforeEach
 	public void initTest() {
@@ -49,6 +52,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			rejectedCount = 0;
+			acceptedCount = 0;
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
@@ -63,7 +67,13 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		}
 	}
 
-	private Integer rejectedCount = 0;
+	private synchronized void addRejected() {
+		rejectedCount++;
+	}
+
+	private synchronized void addAccepted() {
+		acceptedCount++;
+	}
 
 	@Test
 	public void threeOutOfTenConcurrentPlayersDontGetSeatInASevenSeatedTable() throws InterruptedException, BrokenBarrierException {
@@ -71,7 +81,6 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		List<Thread> threads = createCasinoPlayers(10, casinoBarrier);
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
-		System.out.println("casino opens. Conductor is:" + Thread.currentThread());
 		sleep(2, ChronoUnit.SECONDS);// MainThread waits 2 seconds for VirtualThreads to finish
 		assertEquals(3, rejectedCount);
 	}
@@ -83,7 +92,6 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		List<Thread> threads = createCasinoPlayers(100, casinoBarrier);
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
-		System.out.println("casino opens. Conductor is:" + Thread.currentThread());
 		sleep(3, ChronoUnit.SECONDS);
 		assertEquals(49, table.getReservedSeatCount());
 		assertEquals(51, rejectedCount);
@@ -96,15 +104,14 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				int seatNumber = index;
 				if (index >= table.getSeats().size()) {
 					seatNumber = ThreadLocalRandom.current().nextInt(0, table.getSeats().size() - 1);
-					System.out.println("random seat number to try:" + seatNumber);
 				}
-				System.out.println(b.getName() + " waits for casino to open:");
 				casinoDoor.await();
-				if (table.trySeat(seatNumber, b))
-					System.out.println(b.getName() + " got seat    " + seatNumber + " ");
-				else {
-					System.out.println(b.getName() + " failed seat " + seatNumber);
-					rejectedCount++;
+				if (!table.trySeat(seatNumber, b)) {
+					addRejected();
+//					System.out.println("did not get seat:" + b.getName() + " " + seatNumber + " rejected:" + rejectedCount);
+				} else {
+//					System.out.println("got seat:" + b.getName() + " " + seatNumber);
+					addAccepted();
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();

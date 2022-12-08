@@ -1,7 +1,6 @@
 package com.casino.blackjack.table;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +29,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 //
 	@Override
 	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
-		System.out.println("BlackjackTable trySeat() " + player.getName() + " tries seat " + seatNumber + " -> thread:" + Thread.currentThread() + " " + Instant.now());
 		boolean gotSeat = super.trySeat(seatNumber, player);
 		if (gotSeat)
 			dealer.handleNewPlayer(player);
