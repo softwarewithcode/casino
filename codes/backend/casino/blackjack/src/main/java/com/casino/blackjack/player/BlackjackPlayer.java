@@ -121,7 +121,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		if (getFirstHand().isDoubled())
 			throw new IllegalPlayerActionException("hand has been doubled before ", 10);
 		if (getFirstHand().isBlackjack())
-			throw new IllegalPlayerActionException("blacjack cannot be doubled ", 10);
+			throw new IllegalPlayerActionException("blackjack cannot be doubled ", 10);
 		List<Integer> values = getFirstHand().calculateValues();
 		int val = values.get(0);
 		if (!(val >= 9 && val <= 11))

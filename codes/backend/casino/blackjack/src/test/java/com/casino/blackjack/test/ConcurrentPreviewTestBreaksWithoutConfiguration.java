@@ -254,12 +254,12 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				if (index == 0) {
 					table.trySeat(0, doubler1);
 					table.placeStartingBet(doubler1, MAX_BET);
-					sleep(BET_ROUND_TIME_SECONDS + INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+					sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
 					table.doubleDown(doubler1);
 				} else {
 					table.trySeat(seatNumber, b);
 					table.placeStartingBet(b, MAX_BET);
-					sleep(BET_ROUND_TIME_SECONDS + INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+					sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
 					table.doubleDown(doubler1);//// All these players try to doubleDown for the first player
 				}
 
