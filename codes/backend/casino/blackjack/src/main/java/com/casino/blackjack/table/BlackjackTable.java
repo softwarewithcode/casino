@@ -89,8 +89,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			tryLockingPlayerInTurn(player, "takeCard");
 			verifyActionClearance(player, "takeCard");// Lock releases immediately if player is not in turn
 			dealer.addPlayerCard(player);
-			if (dealer.shouldChangeTurn())
-				dealer.updateTableActor();
+			dealer.updateTableActor();
 		} finally {
 			completeAction("takeCard");
 		}

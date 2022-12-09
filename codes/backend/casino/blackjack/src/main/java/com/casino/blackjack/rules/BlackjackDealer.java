@@ -124,7 +124,7 @@ public class BlackjackDealer implements IDealer {
 
 	public void handleNewPlayer(ICasinoPlayer player) {
 		try {
-			if (shouldStartBetPhase()) {
+			if (betPhaseLock.tryLock() && shouldStartBetPhase()) {
 				table.setStatus(com.casino.common.table.Status.RUNNING);
 				startBetPhaseClock();
 			}
@@ -135,7 +135,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private boolean shouldStartBetPhase() {
-		return betPhaseLock.tryLock() && table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS && table.getActivePlayerCount() > 0;
+		return table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS && table.getActivePlayerCount() > 0;
 	}
 
 	private boolean shouldDealStartingHands() {
