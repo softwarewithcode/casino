@@ -100,16 +100,17 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public BigDecimal getTotalBet() {
-		return this.totalBet.setScale(2, RoundingMode.DOWN);
+		return this.totalBet != null ? this.totalBet.setScale(2, RoundingMode.DOWN) : null;
 	}
 
 	@Override
 	public void updateStartingBet(BigDecimal bet, ICasinoTable table) {
 		BetUtil.verifyStartingBet(table, this, bet);
 		this.totalBet = bet;
+		this.getFirstHand().updateBet(totalBet);
 	}
 
-	protected void increaseTotalBet(BigDecimal increaseAmount) {
+	protected void updateBalanceAndBet(BigDecimal increaseAmount) {
 		if (!playerLock.isHeldByCurrentThread())
 			throw new IllegalBetException("lock is missing", 8);
 		BetUtil.verifySufficentBalance(increaseAmount, this);

@@ -95,7 +95,7 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public String toString() {
-		return "BlackjackHand [id=" + id + ", created=" + created + ", cards=" + cards + "]";
+		return "BlackjackHand [id=" + id + ", created=" + created + ", cards=" + cards + ", completed=" + completed + ", active=" + active + ", doubled=" + doubled + ", bet=" + bet + ", insuranceBet=" + insuranceBet + "]";
 	}
 
 	@Override
@@ -186,7 +186,7 @@ public class BlackjackHand implements IHand {
 			throw new IllegalPlayerActionException("inactive hand cannot bet insured", 15);
 		if (isInsured() || isBlackjack())
 			throw new IllegalPlayerActionException("insurance not allowed:" + this, 15);
-		insuranceBet = bet.multiply(new BigDecimal("0.5"));
+		insuranceBet = bet.divide(BigDecimal.TWO);
 	}
 
 	@Override

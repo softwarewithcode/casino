@@ -7,7 +7,7 @@ public record Thresholds(
 		BigDecimal	maximumBet, 
 		Integer betPhaseTime,
 		Integer secondPhaseTime,
-		Integer playerActTime,
+		Integer playerHandTime,
 		Integer phaseDelay,
 		Integer minPlayers,
 		Integer maxPlayers,

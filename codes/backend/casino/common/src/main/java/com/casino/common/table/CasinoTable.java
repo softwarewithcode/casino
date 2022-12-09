@@ -17,6 +17,7 @@ import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePath;
 import com.casino.common.table.timing.Clock;
+import com.casino.common.table.timing.PlayerClockTask;
 
 /**
  * Base class for all casino tables. Gather here common data and operations what
@@ -247,11 +248,15 @@ public abstract class CasinoTable implements ICasinoTable {
 		return getPlayerInTurn() != null && getPlayerInTurn().equals(player);
 	}
 
-	// PlayerTimeout timer, stand(),takeCard() calls thi
 	public void updatePlayerInTurn(ICasinoPlayer player) {
-		if (playerInTurnLock.isHeldByCurrentThread())
+		if (playerInTurnLock.isHeldByCurrentThread()) {
 			playerInTurn = player;
-		else
+			if (playerInTurn != null) {
+				stopClock();
+				PlayerClockTask playerTimer = new PlayerClockTask(this, player);
+				startClock(playerTimer);
+			}
+		} else
 			throw new ConcurrentModificationException("Cannot update playerInTurn, lock is missing");
 	}
 

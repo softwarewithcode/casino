@@ -32,9 +32,10 @@ public class BlackjackDealer implements IDealer {
 	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
 	private final Thresholds thresholds;
 	private final BlackjackTable table;
-	private List<Card> decks; // 6 decks
+	private List<Card> decks;
 	private BlackjackDealerHand dealerHand;
 	private ReentrantLock betPhaseLock;
+	private boolean roundCompleted;
 
 	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds tableConstants) {
 		this.table = blackjackTable;
@@ -45,12 +46,12 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void startBetPhaseClock() {
-		System.out.println("START BET PHASE counter");
 		BetPhaseClockTask task = new BetPhaseClockTask(table);
 		getTable().startClock(task);
 	}
 
-	public void startInsurancePhase() {
+	public void activateInsurancePhase() {
+		table.updateGamePhase(GamePhase.INSURE);
 		InsurancePhaseClockTask task = new InsurancePhaseClockTask(table);
 		getTable().startClock(task);
 	}
@@ -99,9 +100,8 @@ public class BlackjackDealer implements IDealer {
 		return table;
 	}
 
-	public boolean dealInitialCards() {
-		if (!isAllowedToDealStartingHand())
-			return false;
+	public boolean dealStartingHands() {
+
 		List<ICasinoPlayer> orderedPlayers = getOrderedPlayersWithBet();
 		orderedPlayers.forEach(player -> dealCard(player.getHands().get(0))); // first the players
 		dealCard(dealerHand); // then dealer
@@ -116,7 +116,7 @@ public class BlackjackDealer implements IDealer {
 		hand.addCard(card);
 	}
 
-	public void handleAdditionalCard(ICasinoPlayer player) {
+	public void addPlayerCard(ICasinoPlayer player) {
 		Card card = getCard();
 		IHand activeHand = player.getActiveHand();
 		activeHand.addCard(card);
@@ -138,7 +138,7 @@ public class BlackjackDealer implements IDealer {
 		return betPhaseLock.tryLock() && table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS && table.getActivePlayerCount() > 0;
 	}
 
-	private boolean isAllowedToDealStartingHand() {
+	private boolean shouldDealStartingHands() {
 		return table.isGamePhase(GamePhase.BETS_COMPLETED) && somebodyHasBet() && isEnoughCardsForPlayersAndDealer();
 	}
 
@@ -161,10 +161,20 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void finalizeBetPhase() {
-		handlePlayers();
+		table.updateGamePhase(GamePhase.BETS_COMPLETED);
+		if (!shouldDealStartingHands())
+			return;
+		updateActivePlayers();
+		dealStartingHands();
+		if (hasStartingAce()) {
+			activateInsurancePhase();
+			return;
+		}
+		table.updateGamePhase(GamePhase.PLAY);
+		updateTableActor();
 	}
 
-	private void handlePlayers() {
+	private void updateActivePlayers() {
 		table.getSeats().stream().filter(seat -> seat.hasPlayer()).map(seat -> seat.getPlayer()).forEach(player -> {
 			player.setStatus(Status.SIT_OUT);
 			if (!player.hasBet())
@@ -177,24 +187,18 @@ public class BlackjackDealer implements IDealer {
 		});
 	}
 
-	public void updateStartingPlayer() {
-		Optional<Seat> startingPlayer = table.getSeats().stream().filter(seat -> seat.hasPlayerWithBet()).min(Comparator.comparing(Seat::getNumber));
-		if (startingPlayer.isEmpty()) {
-			throw new IllegalStateException("Should start playing but no players with bet");
-		}
-		Seat nextSeat = startingPlayer.get();
-		table.updatePlayerInTurn(nextSeat.getPlayer());
+	public void updateTableActor() {
+		Optional<Seat> optionalPlayerActor = table.getSeats().stream().filter(seat -> seat.hasPlayerWithBet() && seat.getPlayer().hasActiveHand()).min(Comparator.comparing(Seat::getNumber));
+		if (optionalPlayerActor.isEmpty())
+			changeTurnToDealer();
+		else
+			table.updatePlayerInTurn(optionalPlayerActor.get().getPlayer());
 	}
 
-	public void changeTurn() {
-		Seat nextPlayer = table.getNextPlayerWithActiveActiveHand();
-		if (nextPlayer != null) {
-			table.updatePlayerInTurn(nextPlayer.getPlayer());
-			table.updateDealerTurn(false);
-		} else {
-			table.updateDealerTurn(true);
-			table.updatePlayerInTurn(null);
-		}
+	private void changeTurnToDealer() {
+		table.updateDealerTurn(true);
+		table.updatePlayerInTurn(null);
+		completeRound();
 	}
 
 	public void doubleDown(BlackjackPlayer player) {
@@ -221,6 +225,10 @@ public class BlackjackDealer implements IDealer {
 		return decks.remove(decks.size() - 1);
 	}
 
+	public boolean shouldChangeTurn() {
+		return table.getPlayerInTurn() != null && !table.getPlayerInTurn().hasActiveHand();
+	}
+
 	public void stand(BlackjackPlayer player) {
 		if (!table.hasSeat(player))
 			throw new PlayerNotFoundException("cannot stand(), player not found from table:" + player, 0);
@@ -235,10 +243,15 @@ public class BlackjackDealer implements IDealer {
 
 	@Override
 	public void completeRound() {
+		if (roundCompleted) {
+			LOGGER.severe("complete round called on completed round");
+			return;
+		}
 		try {
 			if (table.hasPlayersWithWinningChances()) {
-				takeCards();
+				takeDealerCards();
 				payout();
+				roundCompleted = true;
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Something unexpected happend. Waiting for brush to arrive.", e);
@@ -273,11 +286,16 @@ public class BlackjackDealer implements IDealer {
 		return comparison > 0;
 	}
 
-	private void takeCards() {
+	private void takeDealerCards() {
 		while (!dealerHand.isCompleted()) {
 			Card card = getCard();
 			LOGGER.fine("Dealer gets card:" + card + " in table:" + table);
 			addCard(card);
 		}
+	}
+
+	public void finalizeInsurancePhase() {
+		table.updateGamePhase(GamePhase.PLAY);
+		updateTableActor();
 	}
 }

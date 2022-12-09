@@ -65,7 +65,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		if (!isAcceptingPlayers())
 			return false;
 		if (seatNumber < 0 || seatNumber >= seats.size())
-			return false;
+			throw new IllegalArgumentException("seat number is incorrect " + seatNumber);
 		if (hasSeat(player))
 			return false;
 		Seat seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().orElse(null);

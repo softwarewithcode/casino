@@ -22,8 +22,8 @@ public class PlayerClockTask extends TimerTask {
 			return;
 		}
 		secondsLeft--;
-		System.out.println("PlayerClockTask time left:" + secondsLeft + " table:" + table.getId());
 		if (secondsLeft == 0) {
+			table.stopClock();
 			table.onPlayerTimeout(player);
 		}
 	}

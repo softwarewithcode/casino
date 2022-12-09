@@ -17,7 +17,6 @@ import com.casino.common.table.ISeatedTable;
 
 public class BlackjackPlayer extends CasinoPlayer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackPlayer.class.getName());
-	private static final BigDecimal INSURANCE_FACTOR = new BigDecimal("0.5");
 	private List<IHand> hands;
 
 	public BlackjackPlayer(String name, UUID id, BigDecimal startBalance, ISeatedTable table) {
@@ -54,18 +53,18 @@ public class BlackjackPlayer extends CasinoPlayer {
 		Card cardFromStartingHand = hands.get(0).getCards().remove(1);
 		splitHand.addCard(cardFromStartingHand);
 		splitHand.updateBet(hands.get(0).getBet());// immutable BigDecimal
-		increaseTotalBet(splitHand.getBet());
+		updateBalanceAndBet(splitHand.getBet());
 		hands.add(splitHand);
 	}
 
 	public void stand() {
 		IHand activeHand = getActiveHand();
 		activeHand.stand();
-		if (hasSecondHand(activeHand))
+		if (shouldActivateSecondHand(activeHand))
 			activateSecondHand();
 	}
 
-	private boolean hasSecondHand(IHand activeHand) {
+	private boolean shouldActivateSecondHand(IHand activeHand) {
 		return getHands().indexOf(activeHand) == 0 && getHands().size() == 2;
 	}
 
@@ -77,7 +76,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		try {
 			checkPlayerLock();
 			validateDoubleDownPreConditions();
-			increaseTotalBet(getTotalBet());
+			updateBalanceAndBet(getTotalBet());
 			getFirstHand().doubleDown(ref);
 		} finally {
 			if (getPlayerLock().isHeldByCurrentThread())
@@ -95,7 +94,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 			checkPlayerLock();
 			validateInsuringConditions();
 			getFirstHand().insure();
-			increaseTotalBet(getFirstHand().getBet().multiply(INSURANCE_FACTOR));
+			updateBalanceAndBet(getFirstHand().getBet().divide(BigDecimal.TWO));
 		} finally {
 			if (getPlayerLock().isHeldByCurrentThread())
 				getPlayerLock().unlock();

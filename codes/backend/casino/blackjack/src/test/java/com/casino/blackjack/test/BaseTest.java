@@ -11,7 +11,7 @@ public class BaseTest {
 	protected static final BigDecimal MAX_BET = new BigDecimal("100.0");
 	protected static final Integer BET_ROUND_TIME_SECONDS = 2;
 	protected static final Integer INSURANCE_ROUND_TIME_SECONDS = 3;
-	protected static final Integer PLAYER_TIME = 10;
+	protected static final Integer PLAYER_TIME = 4;
 	protected static final Integer INITIAL_DELAY = 0;
 	protected static final Integer MIN_PLAYERS = 0;
 	protected static final Integer MAX_PLAYERS = 7;

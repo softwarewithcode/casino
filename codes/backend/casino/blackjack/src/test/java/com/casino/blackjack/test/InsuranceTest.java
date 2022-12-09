@@ -42,7 +42,7 @@ public class InsuranceTest extends BaseTest {
 			List<Card> cards = dealer.getDecks();
 			cards.add(Card.of(4, Suit.CLUB));
 			cards.add(Card.of(8, Suit.DIAMOND));
-			cards.add(Card.of(9, Suit.DIAMOND));
+			cards.add(Card.of(9, Suit.CLUB));
 			cards.add(Card.of(1, Suit.HEART));
 			cards.add(Card.of(5, Suit.SPADE));
 		} catch (Exception e) {
@@ -135,9 +135,9 @@ public class InsuranceTest extends BaseTest {
 
 	@Test
 	public void splitNotAllowedDuringInsurancePhase() {
-		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		dealer.getDecks().add(Card.of(1, Suit.HEART));
+		dealer.getDecks().add(Card.of(5, Suit.CLUB));
+		dealer.getDecks().add(Card.of(5, Suit.SPADE));
+		dealer.getDecks().add(Card.of(1, Suit.DIAMOND));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
@@ -150,9 +150,9 @@ public class InsuranceTest extends BaseTest {
 	@Test
 	public void insuredHandLosesInsuranceAndBetWhenDealerGets21() {
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		dealer.getDecks().add(Card.of(5, Suit.HEART));
+		dealer.getDecks().add(Card.of(5, Suit.CLUB));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
-		dealer.getDecks().add(Card.of(4, Suit.HEART));
+		dealer.getDecks().add(Card.of(4, Suit.DIAMOND));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
 		table.trySeat(5, blackjackPlayer);
@@ -176,9 +176,9 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
 		dealer.getDecks().add(Card.of(8, Suit.HEART));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
-		dealer.getDecks().add(Card.of(4, Suit.HEART));
+		dealer.getDecks().add(Card.of(4, Suit.SPADE));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
-		dealer.getDecks().add(Card.of(5, Suit.HEART));
+		dealer.getDecks().add(Card.of(5, Suit.CLUB));
 		table.trySeat(5, blackjackPlayer);
 		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
@@ -189,6 +189,7 @@ public class InsuranceTest extends BaseTest {
 		assertEquals(10, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		assertEquals(20, blackjackPlayer.getActiveHand().calculateValues().get(1));
 		table.stand(blackjackPlayer);
+		System.out.println("check");
 		assertEquals(19, dealer.getHand().getFinalValue());
 		assertTrue(blackjackPlayer.getHands().get(0).isInsured());
 		assertEquals(new BigDecimal("75.00"), blackjackPlayer.getTotalBet());
@@ -200,7 +201,7 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
 		dealer.getDecks().add(Card.of(13, Suit.HEART));
 		dealer.getDecks().add(Card.of(9, Suit.HEART));
-		dealer.getDecks().add(Card.of(4, Suit.HEART));
+		dealer.getDecks().add(Card.of(4, Suit.CLUB));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
 		table.trySeat(5, blackjackPlayer);
@@ -213,7 +214,8 @@ public class InsuranceTest extends BaseTest {
 		assertEquals(18, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		table.stand(blackjackPlayer);
 		assertTrue(dealer.getHand().isBlackjack());
-		assertTrue(blackjackPlayer.getHands().get(0).isInsured());
+		assertTrue(blackjackPlayer.getFirstHand().isInsured());
+		assertTrue(blackjackPlayer.getFirstHand().isCompleted());
 		assertEquals(new BigDecimal("75.00"), blackjackPlayer.getTotalBet());
 		assertEquals(new BigDecimal("975.00"), blackjackPlayer.getBalance());
 	}

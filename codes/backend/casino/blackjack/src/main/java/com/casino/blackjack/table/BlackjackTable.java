@@ -61,7 +61,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 				throw new IllegalPlayerActionException("insuring is not allowed:" + getGamePhase() + " table:" + this + " player:" + player, 44);// 44=number for JUnit test to catch
 			}
 		} finally {
-			LOGGER.exiting(getClass().getName(), "placeStartingBet");
+			LOGGER.exiting(getClass().getName(), "insure");
 		}
 	}
 
@@ -71,7 +71,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			tryLockingPlayerInTurn(player, "stand");
 			verifyActionClearance(player, "stand");// Lock releases immediately if player is not in turn
 			dealer.stand(player);
-			checkDealer();
+			dealer.updateTableActor();
 		} finally {
 			completeAction("stand");
 		}
@@ -88,8 +88,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		try {
 			tryLockingPlayerInTurn(player, "takeCard");
 			verifyActionClearance(player, "takeCard");// Lock releases immediately if player is not in turn
-			dealer.handleAdditionalCard(player);
-			checkDealer();
+			dealer.addPlayerCard(player);
+			if (dealer.shouldChangeTurn())
+				dealer.updateTableActor();
 		} finally {
 			completeAction("takeCard");
 		}
@@ -106,20 +107,13 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		}
 	}
 
-	private void checkDealer() {
-		if (getPlayerInTurn().getActiveHand() == null)
-			dealer.changeTurn();
-		if (isDealerTurn())
-			dealer.completeRound();
-	}
-
 	@Override
 	public void doubleDown(BlackjackPlayer player) {
 		try {
 			tryLockingPlayerInTurn(player, "doubleDown");
 			verifyActionClearance(player, "doubleDown");
 			dealer.doubleDown(player);
-			checkDealer();
+			dealer.updateTableActor();
 		} finally {
 			completeAction("doubleDown");
 		}
@@ -153,10 +147,10 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		LOGGER.info("Player timedOut:" + timedOutPlayer);
 		try {
 			getPlayerInTurnLock().lock();
-			// would require UI action "I'm back" if set to SIT_OUT here
-			// timedOutPlayer.setStatus(com.casino.common.player.Status.SIT_OUT);
+			if (timedOutPlayer.hasActiveHand())
+				timedOutPlayer.getActiveHand().complete();
 			if (isPlayerInTurn(timedOutPlayer))
-				dealer.changeTurn();
+				dealer.updateTableActor();
 		} finally {
 			if (getPlayerInTurnLock().isHeldByCurrentThread())
 				getPlayerInTurnLock().unlock();
@@ -170,19 +164,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			if (!isGamePhase(GamePhase.BET))
 				throw new IllegalPhaseException("GamePhase is not what is expected on betPhaseEnd", getGamePhase(), GamePhase.BET);
 			getPlayerInTurnLock().lock();
-			updateGamePhase(GamePhase.BETS_COMPLETED);
 			dealer.finalizeBetPhase();
-			if (!dealer.dealInitialCards()) {
-				return;
-			}
-			dealer.updateStartingPlayer();
-			if (dealer.hasStartingAce()) {
-				dealer.startInsurancePhase();
-				updateGamePhase(GamePhase.INSURE);
-			} else {
-				checkDealer();
-				updateGamePhase(GamePhase.PLAY);
-			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "onBetPhaseEnd() something went wrong. Waiting for manager's call.", e);
 			BlackjackUtil.dumpTable(this, "onBetPhaseEnd");
@@ -200,7 +182,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			if (!isGamePhase(GamePhase.INSURE))
 				throw new IllegalPhaseException("GamePhase is not what is expected on insurancePhaseEnd", getGamePhase(), GamePhase.INSURE);
 			getPlayerInTurnLock().lock();
-			updateGamePhase(GamePhase.PLAY);
+			dealer.finalizeInsurancePhase();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "onInsurancePhaseEnd() something went wrong. Waiting for manager's call.", e);
 			BlackjackUtil.dumpTable(this, "onBetPhaseEnd");
@@ -223,7 +205,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	@Override
 	public int getPlayerTurnTime() {
-		return 20;
+		return getThresholds().playerHandTime();
 	}
 
 }
