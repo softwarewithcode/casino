@@ -76,6 +76,14 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	}
 
 	@Override
+	public ICasinoPlayer getPlayer(int seatNumber) {
+		if (seatNumber < 0 || seatNumber > seats.size() - 1)
+			return null;
+		Optional<Seat> optionalSeat = getSeats().stream().filter(seat -> seat.getNumber() == seatNumber).findAny();
+		return optionalSeat.isPresent() ? optionalSeat.get().getPlayer() : null;
+	}
+
+	@Override
 	public boolean watch(ICasinoPlayer player) {
 		return super.joinAsWatcher(player);
 	}

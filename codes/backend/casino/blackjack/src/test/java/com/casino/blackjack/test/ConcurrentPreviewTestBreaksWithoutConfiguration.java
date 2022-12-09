@@ -1,6 +1,7 @@
 package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -41,9 +42,10 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	private BlackjackPlayer blackjackPlayer;
 	private BlackjackPlayer blackjackPlayer2;
 	private BlackjackDealer dealer;
-	private volatile int acceptedCount;
-	private volatile int rejectedCount;
+	private volatile int playersWhoGotSeat;
+	private volatile int playerWhoDidNotGetSeat;
 	private volatile int rejectedInsurances;
+	private volatile int rejectedDoubles;
 	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(ConcurrentPreviewTestBreaksWithoutConfiguration.class.getName());
 
 	@BeforeEach
@@ -53,8 +55,8 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 					UUID.randomUUID());
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-			rejectedCount = 0;
-			acceptedCount = 0;
+			playerWhoDidNotGetSeat = 0;
+			playersWhoGotSeat = 0;
 			BlackjackDealer dealer = getDealer(table);
 			List<Card> cards = dealer.getDecks();
 			cards.add(Card.of(4, Suit.CLUB));
@@ -82,15 +84,19 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	}
 
 	private synchronized void addRejected() {
-		rejectedCount++;
+		playerWhoDidNotGetSeat++;
 	}
 
 	private synchronized void addAccepted() {
-		acceptedCount++;
+		playersWhoGotSeat++;
 	}
 
 	private synchronized void updateRejectedInsuranceCount() {
 		rejectedInsurances++;
+	}
+
+	private synchronized void updateRejectedDoubles() {
+		rejectedDoubles++;
 	}
 
 	@Test
@@ -100,8 +106,8 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
 		sleep(2, ChronoUnit.SECONDS);// MainThread waits 2 seconds for VirtualThreads to finish
-		assertEquals(3, rejectedCount);
-		assertEquals(7, acceptedCount);
+		assertEquals(3, playerWhoDidNotGetSeat);
+		assertEquals(7, playersWhoGotSeat);
 	}
 
 	@Test
@@ -113,8 +119,8 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		casinoBarrier.await();
 		sleep(3, ChronoUnit.SECONDS);
 		assertEquals(49, table.getReservedSeatCount());
-		assertEquals(49, acceptedCount);
-		assertEquals(51, rejectedCount);
+		assertEquals(49, playersWhoGotSeat);
+		assertEquals(51, playerWhoDidNotGetSeat);
 	}
 
 	@Test
@@ -154,9 +160,114 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		List<Thread> threads = sendSimultaneouslyMultipleInsuranceRequestsFromSelectedPlayer(28, casinoBarrier);
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
-		sleep(BET_ROUND_TIME_SECONDS + INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		sleep(BET_ROUND_TIME_SECONDS + INSURANCE_ROUND_TIME_SECONDS + 1, ChronoUnit.SECONDS);
 		assertEquals(27, rejectedInsurances);
 
+	}
+
+	@Test
+	public void doubleDownCanBeDoneOnlyOnce() throws InterruptedException, BrokenBarrierException {
+		table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, 49, 49, Type.PUBLIC), UUID.randomUUID());
+		List<Card> cards = getDealer(table).getDecks();
+		cards.add(Card.of(6, Suit.DIAMOND));// Double card for player2
+		cards.add(Card.of(5, Suit.DIAMOND));// Double card for player1
+		cards.add(Card.of(4, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(2, Suit.SPADE));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(2, Suit.SPADE));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(2, Suit.SPADE));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(2, Suit.SPADE));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(2, Suit.SPADE));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.HEART));
+		cards.add(Card.of(7, Suit.HEART));// Player2 second
+		cards.add(Card.of(5, Suit.DIAMOND));// Player1 second
+		cards.add(Card.of(1, Suit.DIAMOND));// Dealer's card
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(2, Suit.SPADE));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(2, Suit.SPADE));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(2, Suit.SPADE));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(2, Suit.SPADE));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(6, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.HEART));
+		cards.add(Card.of(9, Suit.CLUB));
+		cards.add(Card.of(7, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.HEART)); // player2 first card
+		cards.add(Card.of(5, Suit.SPADE));// player1 first card
+		CyclicBarrier casinoBarrier = new CyclicBarrier(29);
+		List<Thread> threads = sendSimultaneouslyMultipleDoubleDownsFromPlayers(28, casinoBarrier);
+		threads.forEach(Thread::start);
+		casinoBarrier.await();
+		int waitSecondsForPlayersToFinish = 9;
+		sleep(BET_ROUND_TIME_SECONDS + waitSecondsForPlayersToFinish, ChronoUnit.SECONDS);
+		assertEquals(15, table.getPlayer(0).getFirstHand().getFinalValue());
+		assertEquals(MAX_BET.multiply(BigDecimal.TWO).setScale(2), table.getPlayer(0).getTotalBet());
+		assertEquals(MAX_BET.multiply(BigDecimal.TWO).setScale(2), table.getPlayer(0).getFirstHand().getBet());
+		assertTrue(table.getPlayer(0).getFirstHand().isDoubled());
+		assertEquals(27, rejectedDoubles);
+	}
+
+	private List<Thread> sendSimultaneouslyMultipleDoubleDownsFromPlayers(int playerAmount, CyclicBarrier casinoDoor) {
+		UUID uuid = UUID.randomUUID();
+		BlackjackPlayer doubler1 = new BlackjackPlayer("player:" + 0, uuid, new BigDecimal("10000000.0"), table);
+		return IntStream.rangeClosed(0, playerAmount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
+			BlackjackPlayer b = null;
+			if (index > 0)
+				b = new BlackjackPlayer("player:" + index, UUID.randomUUID(), new BigDecimal("10000000.0"), table);
+			try {
+				int seatNumber = index;
+				casinoDoor.await();
+				if (index == 0) {
+					table.trySeat(0, doubler1);
+					table.placeStartingBet(doubler1, MAX_BET);
+					sleep(BET_ROUND_TIME_SECONDS + INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+					table.doubleDown(doubler1);
+				} else {
+					table.trySeat(seatNumber, b);
+					table.placeStartingBet(b, MAX_BET);
+					sleep(BET_ROUND_TIME_SECONDS + INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+					table.doubleDown(doubler1);//// All these players try to doubleDown for the first player
+				}
+
+			} catch (Exception e) {
+				LOGGER.log(Level.INFO, "doubling down excption:", e);
+				updateRejectedDoubles();
+			}
+		})).toList();
 	}
 
 	private List<Thread> sendSimultaneouslyMultipleInsuranceRequestsFromSelectedPlayer(int amount, CyclicBarrier casinoDoor) {
@@ -182,8 +293,6 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				}
 
 			} catch (Exception e) {
-				// Arrives in the forms of ConcurrentModificationException and
-				// IllegalPlayerActionException, depending who got the lock and who not
 				LOGGER.log(Level.INFO, "insurance excption:", e);
 				updateRejectedInsuranceCount();
 			}

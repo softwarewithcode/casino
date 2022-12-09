@@ -33,7 +33,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		this.balance = this.balance.setScale(2, RoundingMode.DOWN);
 		this.status = null;
 		this.table = table;
-		this.playerLock = new ReentrantLock(true); // !?
+		this.playerLock = new ReentrantLock();
 	}
 
 	@Override

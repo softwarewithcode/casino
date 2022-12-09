@@ -69,6 +69,11 @@ public class Seat {
 	}
 
 	@Override
+	public String toString() {
+		return "Seat [number=" + number + ", player=" + player + "]";
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

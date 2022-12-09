@@ -1,6 +1,7 @@
 package com.casino.blackjack.table;
 
 import java.math.BigDecimal;
+import java.util.ConcurrentModificationException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,7 +68,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void stand(BlackjackPlayer player) {
 		try {
-			verifyActionClearance(player, "stand");
+			tryLockingPlayerInTurn(player, "stand");
+			verifyActionClearance(player, "stand");// Lock releases immediately if player is not in turn
 			dealer.stand(player);
 			checkDealer();
 		} finally {
@@ -75,10 +77,17 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		}
 	}
 
+	private void tryLockingPlayerInTurn(BlackjackPlayer player, String method) {
+		if (!getPlayerInTurnLock().tryLock()) {
+			throw new ConcurrentModificationException(method + " called but no lock " + player);
+		}
+	}
+
 	@Override
 	public void takeCard(BlackjackPlayer player) {
 		try {
-			verifyActionClearance(player, "takeCard");
+			tryLockingPlayerInTurn(player, "takeCard");
+			verifyActionClearance(player, "takeCard");// Lock releases immediately if player is not in turn
 			dealer.handleAdditionalCard(player);
 			checkDealer();
 		} finally {
@@ -89,6 +98,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void splitStartingHand(BlackjackPlayer player) {
 		try {
+			tryLockingPlayerInTurn(player, "splitStartingHand");
 			verifyActionClearance(player, "splitStartingHand");
 			dealer.handleSplit(player);
 		} finally {
@@ -106,6 +116,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void doubleDown(BlackjackPlayer player) {
 		try {
+			tryLockingPlayerInTurn(player, "doubleDown");
 			verifyActionClearance(player, "doubleDown");
 			dealer.doubleDown(player);
 			checkDealer();
@@ -121,12 +132,10 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	private void verifyActionClearance(ICasinoPlayer player, String actionName) {
-		LOGGER.entering(getClass().getName(), actionName, " player:" + player);
 		if (!isPlayerAllowedToMakeAction(player)) {
-			LOGGER.log(Level.SEVERE, "Player:" + player + " not allowed to make action: " + actionName + " phase: " + getGamePhase() + " in table:" + this);
+			LOGGER.log(Level.SEVERE, "Player:" + player + " not allowed to make action: " + actionName + " in turn:" + getPlayerInTurn() + " phase: " + getGamePhase() + " in table:" + this);
 			throw new IllegalPlayerActionException(actionName + " not allowed for player:" + player, 14);
 		}
-		getPlayerInTurnLock().lock();
 	}
 
 	private boolean isPlayerAllowedToMakeAction(ICasinoPlayer player) {
@@ -157,7 +166,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void onBetPhaseEnd() {
 		LOGGER.entering(getClass().getName(), "onBetPhaseEnd");
-		System.out.println("BetPhaseEnded");
 		try {
 			if (!isGamePhase(GamePhase.BET))
 				throw new IllegalPhaseException("GamePhase is not what is expected on betPhaseEnd", getGamePhase(), GamePhase.BET);

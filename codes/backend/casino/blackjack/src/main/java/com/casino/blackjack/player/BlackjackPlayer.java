@@ -47,9 +47,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 	}
 
 	public void splitStartingHand() {
+		checkPlayerLock();
 		validateSplitPreConditions();
-		if (!isPlayerModifyible())
-			throw new ConcurrentModificationException("no playerLock acquired");
 		BetUtil.verifySufficentBalance(hands.get(0).getBet(), this); // Check balance after getting lock
 		IHand splitHand = new BlackjackHand(UUID.randomUUID(), false);
 		Card cardFromStartingHand = hands.get(0).getCards().remove(1);
@@ -76,21 +75,24 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public void doubleDown(Card ref) {
 		try {
-			if (!isPlayerModifyible())
-				throw new ConcurrentModificationException("no balance lock acquired");
+			checkPlayerLock();
 			validateDoubleDownPreConditions();
 			increaseTotalBet(getTotalBet());
-			getActiveHand().doubleDown(ref);
+			getFirstHand().doubleDown(ref);
 		} finally {
 			if (getPlayerLock().isHeldByCurrentThread())
 				getPlayerLock().unlock();
 		}
 	}
 
+	private void checkPlayerLock() {
+		if (!isPlayerInTurnLocked())
+			throw new ConcurrentModificationException("no playerLock acquired earlier");
+	}
+
 	public void insure() {
 		try {
-			if (!isPlayerModifyible())
-				throw new ConcurrentModificationException("no player lock acquired");
+			checkPlayerLock();
 			validateInsuringConditions();
 			getFirstHand().insure();
 			increaseTotalBet(getFirstHand().getBet().multiply(INSURANCE_FACTOR));
@@ -100,8 +102,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 		}
 	}
 
-	private boolean isPlayerModifyible() {
-		return getPlayerLock().getHoldCount() == 0 && getPlayerLock().tryLock();
+	private boolean isPlayerInTurnLocked() {
+		return getPlayerLock().tryLock();
 	}
 
 	private void validateInsuringConditions() {
@@ -123,7 +125,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		List<Integer> values = getFirstHand().calculateValues();
 		int val = values.get(0);
 		if (!(val >= 9 && val <= 11))
-			throw new IllegalPlayerActionException("hand value does not allow doubling; " + val, 10);
+			throw new IllegalPlayerActionException("hand value does not allow doubling; " + getFirstHand().getCards().get(0) + " " + getFirstHand().getCards().get(1), 10);
 	}
 
 	private void validateSplitPreConditions() {
@@ -138,11 +140,11 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	private void validateActionConditions() {
 		if (this.hands.size() != 1)
-			throw new IllegalPlayerActionException("wrong hand count:" + hands.size(), 1);
+			throw new IllegalPlayerActionException("wrong hand count:" + getName() + " " + hands.size(), 1);
 		if (!hands.get(0).isActive())
-			throw new IllegalPlayerActionException("first hand is not active", 2);
+			throw new IllegalPlayerActionException("first hand is not active " + getName(), 2);
 		if (hands.get(0).getCards().size() != 2)
-			throw new IllegalPlayerActionException("starting hand does not contain exactly two cards:" + hands.get(0).getCards(), 3);
+			throw new IllegalPlayerActionException("starting hand does not contain exactly two cards:" + getName() + " " + hands.get(0).getCards(), 3);
 	}
 
 	public IHand getActiveHand() {
