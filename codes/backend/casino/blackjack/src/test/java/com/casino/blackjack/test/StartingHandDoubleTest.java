@@ -154,6 +154,24 @@ public class StartingHandDoubleTest extends BaseTest {
 	}
 
 	@Test
+	public void doublingAllowedOnlyIfEnoughBalance() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(6, Suit.DIAMOND));
+		cards.add(Card.of(6, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(8, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(2, Suit.SPADE));
+		blackjackPlayer = new BlackjackPlayer("JohnDoe2", UUID.randomUUID(), new BigDecimal("199.99"), publicTable);
+		table.trySeat(5, blackjackPlayer);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("100"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertThrows(IllegalArgumentException.class, () -> {
+			table.doubleDown(blackjackPlayer);
+		});
+	}
+
+	@Test
 	public void doublingIsAllowedOnlyOnce() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(5, Suit.DIAMOND));
