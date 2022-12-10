@@ -38,9 +38,9 @@ public class BlackjackPlayer extends CasinoPlayer {
 	}
 
 	public void prepareNextRound() {
-//		hands = new ArrayList<IHand>();
-//		hands.add(createNewHand(true));
-//		this.removeTotalBet();
+		hands = new ArrayList<IHand>();
+		hands.add(createNewHand(true));
+		this.removeTotalBet();
 	}
 
 	public boolean hasActiveHand() {

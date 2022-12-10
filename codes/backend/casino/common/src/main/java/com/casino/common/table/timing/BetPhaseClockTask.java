@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import com.casino.common.table.ICasinoTable;
 import com.casino.common.table.Thresholds;
+import com.casino.common.table.phase.GamePhase;
 
 public class BetPhaseClockTask extends TimerTask {
 	private static final Logger LOGGER = Logger.getLogger(BetPhaseClockTask.class.getName());
@@ -21,25 +22,24 @@ public class BetPhaseClockTask extends TimerTask {
 	@Override
 	public void run() {
 		if (!table.isClockTicking()) {
+			LOGGER.fine("BetPhaseClockTask, clock not ticking:" + secondsLeft);
 			return;
 		}
-//		try {
-//			if (shouldInitBetPhase())
-//				table.restartBetPhase();
-//		} catch (Exception e) {
-//			LOGGER.log(Level.SEVERE, " error starting betPhase, cannot continue ", e);
-//			table.stopClock();
-//			throw e;
-//		}
+		if (shouldPrepareNewRound()) {
+			LOGGER.fine("BetPhaseClockTask, clear previous round" + table);
+			table.prepareNewRound();
+		}
 		secondsLeft--;
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine("BetPhaseClockTask, secondsLeft:" + secondsLeft);
 		if (secondsLeft == 0) {
 			table.stopClock();
 			table.onBetPhaseEnd();
 		}
 	}
 
-	private boolean shouldInitBetPhase() {
-		return secondsLeft == table.getThresholds().betPhaseTime();
+	private boolean shouldPrepareNewRound() {
+		return secondsLeft == table.getThresholds().betPhaseTime() && table.getGamePhase() == GamePhase.ROUND_COMPLETED;
 	}
 
 }

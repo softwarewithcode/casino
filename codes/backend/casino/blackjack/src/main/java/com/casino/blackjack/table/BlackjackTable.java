@@ -126,7 +126,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	private void verifyActionClearance(ICasinoPlayer player, String actionName) {
 		if (!isPlayerAllowedToMakeAction(player)) {
-			LOGGER.log(Level.SEVERE, "Player:" + player + " not allowed to make action: " + actionName + " in turn:" + getPlayerInTurn() + " phase: " + getGamePhase() + " in table:" + this);
+			LOGGER.log(Level.SEVERE, "Player:" + player + " not allowed to make action: '" + actionName + "' playerInTurn:" + getPlayerInTurn() + " phase: " + getGamePhase() + " in table:" + this);
 			throw new IllegalPlayerActionException(actionName + " not allowed for player:" + player, 14);
 		}
 	}
@@ -208,7 +208,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void restartBetPhase() {
-		dealer.restartBetPhase();
+	public void prepareNewRound() {
+		dealer.prepareNewRound();
 	}
 }

@@ -76,6 +76,6 @@ public interface ICasinoTable {
 
 	boolean isGamePhase(GamePhase phase);
 
-	public void restartBetPhase();
+	public void prepareNewRound();
 
 }

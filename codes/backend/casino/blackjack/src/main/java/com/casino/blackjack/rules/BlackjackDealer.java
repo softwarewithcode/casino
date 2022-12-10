@@ -35,7 +35,6 @@ public class BlackjackDealer implements IDealer {
 	private List<Card> decks;
 	private BlackjackDealerHand dealerHand;
 	private ReentrantLock betPhaseLock;
-	private boolean roundCompleted;
 
 	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds tableConstants) {
 		this.table = blackjackTable;
@@ -77,7 +76,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public boolean isRoundCompleted() {
-		return roundCompleted;
+		return table.getGamePhase() == GamePhase.ROUND_COMPLETED;
 	}
 
 	public void addCard(Card card) {
@@ -206,19 +205,16 @@ public class BlackjackDealer implements IDealer {
 
 	private void carryOutDealerTurn() {
 		completeRound();
-		System.out.println("round completed");
 		if (shouldRestartBetPhase()) {
-			System.out.println("starting new round");
 			startBetPhaseClock(table.getThresholds().phaseDelay());
 		}
 	}
 
-	public void restartBetPhase() {
-		System.out.println("restarting betPhase");
+	public void prepareNewRound() {
 		table.getPlayers().forEach(ICasinoPlayer::prepareNextRound);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		table.updateGamePhase(GamePhase.BET);
-		roundCompleted = false;
+		decks = Deck.combineDecks(8);
 		table.getPlayers().forEach(ICasinoPlayer::getBalance);
 	}
 
@@ -272,16 +268,16 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void completeRound() {
-		if (roundCompleted) {
+		if (table.getGamePhase() == GamePhase.ROUND_COMPLETED) {
 			LOGGER.severe("complete round called on completed round");
 			return;
 		}
 		try {
 			if (table.hasPlayersWithWinningChances()) {
-				takeDealerCards();
+				addDealerCards();
 				payout();
 			}
-			roundCompleted = true;
+			table.updateGamePhase(GamePhase.ROUND_COMPLETED);
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Something unexpected happend. Waiting for brush to arrive.", e);
 			BlackjackUtil.dumpTable(table, "dealer player turn:" + e);
@@ -315,11 +311,9 @@ public class BlackjackDealer implements IDealer {
 		return comparison > 0;
 	}
 
-	private void takeDealerCards() {
+	private void addDealerCards() {
 		while (!dealerHand.isCompleted()) {
 			Card card = getCard();
-			LOGGER.fine("Dealer gets card:" + card + " in table:" + table);
-			System.out.println("Dealer gets:"+card);
 			addCard(card);
 		}
 	}
