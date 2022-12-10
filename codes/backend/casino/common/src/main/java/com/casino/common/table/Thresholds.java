@@ -8,9 +8,9 @@ public record Thresholds(
 		Integer betPhaseTime,
 		Integer secondPhaseTime,
 		Integer playerHandTime,
-		Integer phaseDelay,
+		long phaseDelay,
 		Integer minPlayers,
 		Integer maxPlayers,
 		Integer seatCount,
 		Type tableType) {
-}
+} 

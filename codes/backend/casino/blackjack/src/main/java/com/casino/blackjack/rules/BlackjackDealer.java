@@ -45,15 +45,15 @@ public class BlackjackDealer implements IDealer {
 		betPhaseLock = new ReentrantLock();
 	}
 
-	private void startBetPhaseClock() {
+	private void startBetPhaseClock(long initialDelay) {
 		BetPhaseClockTask task = new BetPhaseClockTask(table);
-		getTable().startClock(task);
+		getTable().startClock(task, initialDelay);
 	}
 
-	public void activateInsurancePhase() {
+	public void startInsurancePhase() {
 		table.updateGamePhase(GamePhase.INSURE);
 		InsurancePhaseClockTask task = new InsurancePhaseClockTask(table);
-		getTable().startClock(task);
+		getTable().startClock(task, 0);
 	}
 
 	@Override
@@ -74,6 +74,10 @@ public class BlackjackDealer implements IDealer {
 
 	public IHand getHand() {
 		return dealerHand;
+	}
+
+	public boolean isRoundCompleted() {
+		return roundCompleted;
 	}
 
 	public void addCard(Card card) {
@@ -124,9 +128,9 @@ public class BlackjackDealer implements IDealer {
 
 	public void handleNewPlayer(ICasinoPlayer player) {
 		try {
-			if (betPhaseLock.tryLock() && shouldStartBetPhase()) {
+			if (betPhaseLock.tryLock() && shouldStartGame()) {
 				table.setStatus(com.casino.common.table.Status.RUNNING);
-				startBetPhaseClock();
+				startBetPhaseClock(0l);
 			}
 		} finally {
 			if (betPhaseLock.isHeldByCurrentThread())
@@ -134,7 +138,7 @@ public class BlackjackDealer implements IDealer {
 		}
 	}
 
-	private boolean shouldStartBetPhase() {
+	private boolean shouldStartGame() {
 		return table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS && table.getActivePlayerCount() > 0;
 	}
 
@@ -167,7 +171,7 @@ public class BlackjackDealer implements IDealer {
 		updateActivePlayers();
 		dealStartingHands();
 		if (hasStartingAce()) {
-			activateInsurancePhase();
+			startInsurancePhase();
 			return;
 		}
 		table.updateGamePhase(GamePhase.PLAY);
@@ -189,16 +193,42 @@ public class BlackjackDealer implements IDealer {
 
 	public void updateTableActor() {
 		Optional<Seat> optionalPlayerActor = table.getSeats().stream().filter(seat -> seat.hasPlayerWithBet() && seat.getPlayer().hasActiveHand()).min(Comparator.comparing(Seat::getNumber));
-		if (optionalPlayerActor.isEmpty())
+		table.stopClock();
+		if (optionalPlayerActor.isEmpty()) {
 			changeTurnToDealer();
-		else
-			table.updatePlayerInTurn(optionalPlayerActor.get().getPlayer());
+			carryOutDealerTurn();
+		} else {
+			// Actor can be same as previous ->split hand
+			ICasinoPlayer player = optionalPlayerActor.get().getPlayer();
+			table.updatePlayerInTurn(player);
+		}
+	}
+
+	private void carryOutDealerTurn() {
+		completeRound();
+		System.out.println("round completed");
+		if (shouldRestartBetPhase()) {
+			System.out.println("starting new round");
+			startBetPhaseClock(table.getThresholds().phaseDelay());
+		}
+	}
+
+	public void restartBetPhase() {
+		System.out.println("restarting betPhase");
+		table.getPlayers().forEach(ICasinoPlayer::prepareNextRound);
+		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
+		table.updateGamePhase(GamePhase.BET);
+		roundCompleted = false;
+		table.getPlayers().forEach(ICasinoPlayer::getBalance);
+	}
+
+	private boolean shouldRestartBetPhase() {
+		return table.getStatus() == com.casino.common.table.Status.RUNNING && table.getActivePlayerCount() > 0;
 	}
 
 	private void changeTurnToDealer() {
 		table.updateDealerTurn(true);
 		table.updatePlayerInTurn(null);
-		completeRound();
 	}
 
 	public void doubleDown(BlackjackPlayer player) {
@@ -241,8 +271,7 @@ public class BlackjackDealer implements IDealer {
 		player.insure();
 	}
 
-	@Override
-	public void completeRound() {
+	private void completeRound() {
 		if (roundCompleted) {
 			LOGGER.severe("complete round called on completed round");
 			return;
@@ -251,8 +280,8 @@ public class BlackjackDealer implements IDealer {
 			if (table.hasPlayersWithWinningChances()) {
 				takeDealerCards();
 				payout();
-				roundCompleted = true;
 			}
+			roundCompleted = true;
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Something unexpected happend. Waiting for brush to arrive.", e);
 			BlackjackUtil.dumpTable(table, "dealer player turn:" + e);
@@ -290,6 +319,7 @@ public class BlackjackDealer implements IDealer {
 		while (!dealerHand.isCompleted()) {
 			Card card = getCard();
 			LOGGER.fine("Dealer gets card:" + card + " in table:" + table);
+			System.out.println("Dealer gets:"+card);
 			addCard(card);
 		}
 	}

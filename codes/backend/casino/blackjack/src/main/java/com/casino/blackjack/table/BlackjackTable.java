@@ -143,7 +143,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	@Override
 	public void onPlayerTimeout(ICasinoPlayer timedOutPlayer) {
-		LOGGER.info("Player timedOut:" + timedOutPlayer);
+		LOGGER.entering(getClass().getName(), "onPlayerTimeout");
 		try {
 			getPlayerInTurnLock().lock();
 			if (timedOutPlayer.hasActiveHand())
@@ -151,8 +151,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			if (isPlayerInTurn(timedOutPlayer))
 				dealer.updateTableActor();
 		} finally {
-			if (getPlayerInTurnLock().isHeldByCurrentThread())
-				getPlayerInTurnLock().unlock();
+			getPlayerInTurnLock().unlock();
+			LOGGER.exiting(getClass().getName(), "onPlayerTimeout");
 		}
 	}
 
@@ -207,4 +207,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		return getThresholds().playerHandTime();
 	}
 
+	@Override
+	public void restartBetPhase() {
+		dealer.restartBetPhase();
+	}
 }

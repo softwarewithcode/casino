@@ -79,10 +79,10 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.phasePath = path;
 	}
 
-	public void startClock(TimerTask task) {
+	public void startClock(TimerTask task, long initialDelay) {
 		if (this.clock.isTicking())
 			throw new IllegalArgumentException("Table clock already running, timing error");
-		this.clock.startClock(task, 1000);
+		this.clock.startClock(task, initialDelay, 1000);
 	}
 
 	@Override
@@ -254,7 +254,7 @@ public abstract class CasinoTable implements ICasinoTable {
 			if (playerInTurn != null) {
 				stopClock();
 				PlayerClockTask playerTimer = new PlayerClockTask(this, player);
-				startClock(playerTimer);
+				startClock(playerTimer, 0);
 			}
 		} else
 			throw new ConcurrentModificationException("Cannot update playerInTurn, lock is missing");

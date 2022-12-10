@@ -32,7 +32,7 @@ public class InsuranceTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
+			table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
 					UUID.randomUUID());
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
@@ -189,7 +189,6 @@ public class InsuranceTest extends BaseTest {
 		assertEquals(10, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		assertEquals(20, blackjackPlayer.getActiveHand().calculateValues().get(1));
 		table.stand(blackjackPlayer);
-		System.out.println("check");
 		assertEquals(19, dealer.getHand().getFinalValue());
 		assertTrue(blackjackPlayer.getHands().get(0).isInsured());
 		assertEquals(new BigDecimal("75.00"), blackjackPlayer.getTotalBet());

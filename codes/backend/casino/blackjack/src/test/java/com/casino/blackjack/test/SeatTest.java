@@ -27,7 +27,7 @@ public class SeatTest extends BaseTest {
 	}
 
 	private BlackjackTable createNewTable() {
-		return new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
+		return new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
 				UUID.randomUUID());
 	}
 
@@ -62,7 +62,7 @@ public class SeatTest extends BaseTest {
 
 	@Test
 	public void seatsAreCreatedPerSeatRequirement() {
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, 6, 15, Type.PUBLIC),
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 6, 15, Type.PUBLIC),
 				UUID.randomUUID());
 		Assertions.assertEquals(15, table.getSeats().size());
 	}
@@ -71,7 +71,7 @@ public class SeatTest extends BaseTest {
 	public void exceptionIsThrownIfNotEnoughSeatsForMaximumAmountPlayers() {
 		String expectedMessage = "not enough seats for the players";
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, 6, 2, Type.PUBLIC), UUID.randomUUID());
+			new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 6, 2, Type.PUBLIC), UUID.randomUUID());
 		});
 		String actualMessage = exception.getMessage();
 		assertEquals(expectedMessage, actualMessage);

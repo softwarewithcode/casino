@@ -52,4 +52,6 @@ public interface ICasinoPlayer {
 
 	public boolean isCompensable();
 
+	public void prepareNextRound();
+
 }

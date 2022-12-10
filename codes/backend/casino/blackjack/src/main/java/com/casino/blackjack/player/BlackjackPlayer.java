@@ -33,8 +33,14 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return values.get(0) < 21;
 	}
 
-	public BlackjackHand createNewHand(boolean active) {
+	private BlackjackHand createNewHand(boolean active) {
 		return new BlackjackHand(UUID.randomUUID(), active);
+	}
+
+	public void prepareNextRound() {
+//		hands = new ArrayList<IHand>();
+//		hands.add(createNewHand(true));
+//		this.removeTotalBet();
 	}
 
 	public boolean hasActiveHand() {

@@ -64,7 +64,7 @@ public interface ICasinoTable {
 
 	public UUID getId();
 
-	public void startClock(TimerTask task);
+	public void startClock(TimerTask task, long initialDelay);
 
 	public void stopClock();
 
@@ -75,5 +75,7 @@ public interface ICasinoTable {
 	public GamePhase updateGamePhase(GamePhase phase);
 
 	boolean isGamePhase(GamePhase phase);
+
+	public void restartBetPhase();
 
 }

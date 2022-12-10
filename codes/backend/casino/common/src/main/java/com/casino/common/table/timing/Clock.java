@@ -9,11 +9,11 @@ public class Clock {
 	private Timer timer;
 	private boolean ticking;
 
-	public void startClock(TimerTask task, int millis) {
+	public void startClock(TimerTask task, long initialDelay, int millis) {
 		stopClock();
 		this.ticking = true;
 		timer = new Timer(UUID.randomUUID().toString());
-		timer.schedule(task, 0, millis);
+		timer.schedule(task, initialDelay, millis);
 	}
 
 	public void stopClock() {

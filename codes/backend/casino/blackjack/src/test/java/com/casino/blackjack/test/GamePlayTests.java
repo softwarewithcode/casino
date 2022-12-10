@@ -26,15 +26,18 @@ public class GamePlayTests extends BaseTest {
 	private BlackjackTable table;
 	private BlackjackPlayer blackjackPlayer;
 	private BlackjackPlayer blackjackPlayer2;
+	private BlackjackPlayer blackjackPlayer3;
 	private BlackjackDealer dealer;
 
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
+			table = new BlackjackTable(Status.WAITING_PLAYERS,
+					new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
 					UUID.randomUUID());
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoes", UUID.randomUUID(), new BigDecimal("1000"), table);
+			blackjackPlayer3 = new BlackjackPlayer("JaneDoe2", UUID.randomUUID(), new BigDecimal("1000"), table);
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
@@ -170,6 +173,59 @@ public class GamePlayTests extends BaseTest {
 		assertFalse(blackjackPlayer.getHands().get(0).isBlackjack());
 		assertEquals(21, blackjackPlayer.getHands().get(0).calculateValues().get(0));
 		assertFalse(blackjackPlayer.canTake());
+	}
+
+	@Test
+	public void playersDoNotReactOnTimeButWinBecauseDealerGetsOver21() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(7, Suit.HEART));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(6, Suit.DIAMOND));// dealer's first
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		table.trySeat(5, blackjackPlayer);
+		table.trySeat(6, blackjackPlayer2);
+		table.trySeat(2, blackjackPlayer3);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.placeStartingBet(blackjackPlayer2, new BigDecimal("10.0"));
+		table.placeStartingBet(blackjackPlayer3, new BigDecimal("25.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		sleep(PLAYER_TIME_SECONDS * 3 + 1, ChronoUnit.SECONDS); // 3 players waiting time +1 second
+		assertEquals(new BigDecimal("1099.00"), blackjackPlayer.getBalance());
+		assertEquals(new BigDecimal("1010.00"), blackjackPlayer2.getBalance());
+		assertEquals(new BigDecimal("1025.00"), blackjackPlayer3.getBalance());
+	}
+
+	@Test
+	public void onlyOnePlayerReactsOnTimeButAllWinsBecauseDealerGetsOver21() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(7, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(13, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(6, Suit.DIAMOND));// dealer
+		cards.add(Card.of(1, Suit.HEART));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.SPADE));
+		table.trySeat(0, blackjackPlayer);
+		table.trySeat(2, blackjackPlayer2);
+		table.trySeat(6, blackjackPlayer3);
+		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.placeStartingBet(blackjackPlayer2, new BigDecimal("10.0"));
+		table.placeStartingBet(blackjackPlayer3, new BigDecimal("25.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.takeCard(blackjackPlayer);
+		sleep(PLAYER_TIME_SECONDS * 3 + 1, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("1099.00"), blackjackPlayer.getBalance());
+		assertEquals(new BigDecimal("1015.00"), blackjackPlayer2.getBalance());
+		assertEquals(new BigDecimal("1037.50"), blackjackPlayer3.getBalance());
 	}
 
 }

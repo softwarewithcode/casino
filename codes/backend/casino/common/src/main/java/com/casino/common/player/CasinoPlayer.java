@@ -123,23 +123,29 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@Override
 	public void subtractTotalBetFromBalance() {
 		try {
-			if (!playerLock.tryLock())
-				throw new ConcurrentModificationException("playerLock was not obtained");
+			if (!getPlayerLock().tryLock())
+				throw new ConcurrentModificationException("playerLock was not obtained" + playerLock + " t:" + Thread.currentThread());
 			if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0)
 				throw new IllegalArgumentException("Balance missing or negative. Waiting for manager's call" + balance);
 			if (totalBet == null || totalBet.compareTo(BigDecimal.ZERO) < 0)
 				throw new IllegalBetException("Bet missing or negative:" + totalBet, 9);
 			this.balance = balance.subtract(totalBet);
 		} finally {
-			if (playerLock.isHeldByCurrentThread())
-				playerLock.unlock();
+			if (getPlayerLock().isHeldByCurrentThread())
+				getPlayerLock().unlock();
 		}
 	}
 
 	public void increaseBalance(BigDecimal amount) {
-		if (!playerLock.tryLock())
-			throw new ConcurrentModificationException("playerLock was not obtained");
-		this.balance = balance.add(amount);
+		try {
+			if (!getPlayerLock().tryLock())
+				throw new ConcurrentModificationException("playerLock was not obtained " + amount);
+			this.balance = balance.add(amount);
+			System.out.println("incrase:"+amount+" total:"+balance+ " player:"+this.getName());
+		} finally {
+			if (getPlayerLock().isHeldByCurrentThread())
+				getPlayerLock().unlock();
+		}
 	}
 
 	@Override
@@ -160,6 +166,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public BigDecimal getBalance() {
+		System.out.println("balance:"+balance+" "+getName());
 		return balance.setScale(2, RoundingMode.DOWN);
 	}
 

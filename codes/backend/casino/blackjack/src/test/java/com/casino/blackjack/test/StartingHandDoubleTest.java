@@ -28,10 +28,10 @@ import com.casino.common.table.Thresholds;
 import com.casino.common.table.Type;
 
 public class StartingHandDoubleTest extends BaseTest {
-	protected static final BigDecimal MIN_BET = new BigDecimal("5.0");
-	protected static final BigDecimal MAX_BET = new BigDecimal("100.0");
-	protected static final Integer PLAYER_TIME = 10;
-	protected static final Integer INITIAL_DELAY = 0;
+//	protected static final BigDecimal MIN_BET = new BigDecimal("5.0");
+//	protected static final BigDecimal MAX_BET = new BigDecimal("100.0");
+//	protected static final Integer PLAYER_TIME = 10;
+//	protected static final Integer INITIAL_DELAY = 0;
 	protected ISeatedTable publicTable;
 	protected ICasinoPlayer blackjackPlayer2;
 	private IBlackjackTable table;
@@ -43,7 +43,7 @@ public class StartingHandDoubleTest extends BaseTest {
 	public void initTest() {
 		try {
 			table = new BlackjackTable(Status.WAITING_PLAYERS,
-					new Thresholds(new BigDecimal("0.001"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC), UUID.randomUUID());
+					new Thresholds(new BigDecimal("0.001"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC), UUID.randomUUID());
 			blackjackPlayer = new BlackjackPlayer("JohnDoe2", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoe2", UUID.randomUUID(), new BigDecimal("1000"), publicTable);
 			Field f = table.getClass().getDeclaredField("dealer");

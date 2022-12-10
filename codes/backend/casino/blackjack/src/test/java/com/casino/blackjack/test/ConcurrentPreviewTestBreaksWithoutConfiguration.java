@@ -51,7 +51,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
+			table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
 					UUID.randomUUID());
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
@@ -112,7 +112,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 
 	@Test
 	public void fiftyOneOutHundredPlayersGetsRejectedAnd49GetsAcceptedIn49SeatedTable() throws InterruptedException, BrokenBarrierException {
-		table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, 49, 49, Type.PUBLIC), UUID.randomUUID());
+		table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 49, 49, Type.PUBLIC), UUID.randomUUID());
 		CyclicBarrier casinoBarrier = new CyclicBarrier(101);
 		List<Thread> threads = createCasinoPlayers(100, casinoBarrier);
 		threads.forEach(Thread::start);
@@ -125,7 +125,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 
 	@Test
 	public void insuranceCanBetSetOnlyOnce() throws InterruptedException, BrokenBarrierException {
-		table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, 49, 49, Type.PUBLIC), UUID.randomUUID());
+		table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 49, 49, Type.PUBLIC), UUID.randomUUID());
 		List<Card> cards = getDealer(table).getDecks();
 		cards.add(Card.of(1, Suit.DIAMOND));// Dealer's ace
 		cards.add(Card.of(2, Suit.DIAMOND));
@@ -167,7 +167,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 
 	@Test
 	public void doubleDownCanBeDoneOnlyOnce() throws InterruptedException, BrokenBarrierException {
-		table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME, INITIAL_DELAY, MIN_PLAYERS, 49, 49, Type.PUBLIC), UUID.randomUUID());
+		table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 49, 49, Type.PUBLIC), UUID.randomUUID());
 		List<Card> cards = getDealer(table).getDecks();
 		cards.add(Card.of(6, Suit.DIAMOND));// Double card for player2
 		cards.add(Card.of(5, Suit.DIAMOND));// Double card for player1
