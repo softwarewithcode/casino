@@ -174,7 +174,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		}
 	}
 
-	@Override
 	public void onInsurancePhaseEnd() {
 		LOGGER.entering(getClass().getName(), "onInsurancePhaseEnd");
 		try {

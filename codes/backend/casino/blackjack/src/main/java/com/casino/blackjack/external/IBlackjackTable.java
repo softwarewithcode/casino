@@ -10,17 +10,14 @@ public interface IBlackjackTable {
 
 	public void bet(ICasinoPlayer player, BigDecimal bet);
 
-	// public void splitStartingHand(String playerId);
 	public void split(BlackjackPlayer player);
 
 	public void doubleDown(BlackjackPlayer player);
 
 	public void hit(BlackjackPlayer player);
 
-	public void stand(BlackjackPlayer player); // no more cards
+	public void stand(BlackjackPlayer player);
 
 	public void insure(BlackjackPlayer player);
-
-	public void onInsurancePhaseEnd();
 
 }
