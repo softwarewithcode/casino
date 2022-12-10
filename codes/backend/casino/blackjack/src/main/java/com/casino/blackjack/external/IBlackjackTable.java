@@ -6,16 +6,16 @@ import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.common.player.ICasinoPlayer;
 
 public interface IBlackjackTable {
-	public boolean trySeat(int seatNumber, ICasinoPlayer player);
+	public boolean join(int seatNumber, ICasinoPlayer player);
 
-	public void placeStartingBet(ICasinoPlayer player, BigDecimal bet);
+	public void bet(ICasinoPlayer player, BigDecimal bet);
 
 	// public void splitStartingHand(String playerId);
-	public void splitStartingHand(BlackjackPlayer player);
+	public void split(BlackjackPlayer player);
 
 	public void doubleDown(BlackjackPlayer player);
 
-	public void takeCard(BlackjackPlayer player);
+	public void hit(BlackjackPlayer player);
 
 	public void stand(BlackjackPlayer player); // no more cards
 

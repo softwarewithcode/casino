@@ -29,7 +29,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 //
 	@Override
-	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
+	public boolean join(int seatNumber, ICasinoPlayer player) {
 		boolean gotSeat = super.trySeat(seatNumber, player);
 		if (gotSeat)
 			dealer.handleNewPlayer(player);
@@ -37,7 +37,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void placeStartingBet(ICasinoPlayer player, BigDecimal bet) {
+	public void bet(ICasinoPlayer player, BigDecimal bet) {
 		// Replaces previous bet if bet is allowed. UI handles usability
 		try {
 			if (isGamePhase(GamePhase.BET))
@@ -84,7 +84,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void takeCard(BlackjackPlayer player) {
+	public void hit(BlackjackPlayer player) {
 		try {
 			tryLockingPlayerInTurn(player, "takeCard");
 			verifyActionClearance(player, "takeCard");// Lock releases immediately if player is not in turn
@@ -96,7 +96,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void splitStartingHand(BlackjackPlayer player) {
+	public void split(BlackjackPlayer player) {
 		try {
 			tryLockingPlayerInTurn(player, "splitStartingHand");
 			verifyActionClearance(player, "splitStartingHand");

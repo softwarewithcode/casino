@@ -53,8 +53,8 @@ public class BalanceTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
 		cards.add(Card.of(4, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("10.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("10.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("990.00"), blackjackPlayer.getBalance());
 		assertEquals(new BigDecimal("10.00"), blackjackPlayer.getTotalBet());
@@ -70,12 +70,12 @@ public class BalanceTest extends BaseTest {
 	public void dealerCalculatesBalancesBasedOnLastAcceptedBets() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), table);
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100"), table);
-		table.trySeat(5, blackjackPlayer);
-		table.trySeat(6, blackjackPlayer2);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("11.11"));
-		table.placeStartingBet(blackjackPlayer2, new BigDecimal("22.67"));
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("44.55"));
-		table.placeStartingBet(blackjackPlayer2, new BigDecimal("51.00"));
+		table.join(5, blackjackPlayer);
+		table.join(6, blackjackPlayer2);
+		table.bet(blackjackPlayer, new BigDecimal("11.11"));
+		table.bet(blackjackPlayer2, new BigDecimal("22.67"));
+		table.bet(blackjackPlayer, new BigDecimal("44.55"));
+		table.bet(blackjackPlayer2, new BigDecimal("51.00"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("44.55"), blackjackPlayer.getHands().get(0).getBet());
 		assertEquals(new BigDecimal("44.55"), blackjackPlayer.getTotalBet());
@@ -94,11 +94,11 @@ public class BalanceTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.1"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("50.1"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("949.90"), blackjackPlayer.getBalance());
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		assertEquals(new BigDecimal("899.80"), blackjackPlayer.getBalance());
 	}
 
@@ -111,8 +111,8 @@ public class BalanceTest extends BaseTest {
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(13, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.1"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("50.1"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("1075.15"), blackjackPlayer.getBalance());
 	}
@@ -126,10 +126,10 @@ public class BalanceTest extends BaseTest {
 		cards.add(Card.of(13, Suit.DIAMOND));
 		cards.add(Card.of(12, Suit.HEART));
 		cards.add(Card.of(11, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.trySeat(6, blackjackPlayer2);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.1"));
-		table.placeStartingBet(blackjackPlayer2, new BigDecimal("12.77"));
+		table.join(5, blackjackPlayer);
+		table.join(6, blackjackPlayer2);
+		table.bet(blackjackPlayer, new BigDecimal("50.1"));
+		table.bet(blackjackPlayer2, new BigDecimal("12.77"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.stand(blackjackPlayer);
 		assertTrue(table.isDealerTurn());

@@ -60,8 +60,8 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, initialBet);
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(blackjackPlayer);
 		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getTotalBet());
@@ -74,14 +74,14 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, initialBet);
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(blackjackPlayer);
 		assertTrue(blackjackPlayer.getHands().get(0).isCompleted());
 		assertNull(blackjackPlayer.getActiveHand());
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.takeCard(blackjackPlayer);
+			table.hit(blackjackPlayer);
 		});
 		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.stand(blackjackPlayer);
@@ -98,8 +98,8 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(4, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, initialBet);
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(blackjackPlayer);
 		assertTrue(blackjackPlayer.getHands().get(0).isCompleted());
@@ -115,8 +115,8 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, initialBet);
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(blackjackPlayer);
 		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getTotalBet());
@@ -128,8 +128,8 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(6, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, initialBet);
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(blackjackPlayer);
 		assertEquals(new BigDecimal("51.56"), blackjackPlayer.getTotalBet());
@@ -145,8 +145,8 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(12, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
 		cards.add(Card.of(1, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("10.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("10.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.doubleDown(blackjackPlayer);
@@ -163,8 +163,8 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(10, Suit.SPADE));
 		cards.add(Card.of(2, Suit.SPADE));
 		blackjackPlayer = new BlackjackPlayer("JohnDoe2", UUID.randomUUID(), new BigDecimal("199.99"), publicTable);
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("100"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("100"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalArgumentException.class, () -> {
 			table.doubleDown(blackjackPlayer);
@@ -177,8 +177,8 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(6, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("0.01234"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("0.01234"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("999.98"), blackjackPlayer.getBalance());
 		table.doubleDown(blackjackPlayer);

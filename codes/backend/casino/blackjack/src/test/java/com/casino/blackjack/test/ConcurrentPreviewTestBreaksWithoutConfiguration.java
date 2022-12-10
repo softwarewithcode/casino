@@ -252,13 +252,13 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				int seatNumber = index;
 				casinoDoor.await();
 				if (index == 0) {
-					table.trySeat(0, doubler1);
-					table.placeStartingBet(doubler1, MAX_BET);
+					table.join(0, doubler1);
+					table.bet(doubler1, MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
 					table.doubleDown(doubler1);
 				} else {
-					table.trySeat(seatNumber, b);
-					table.placeStartingBet(b, MAX_BET);
+					table.join(seatNumber, b);
+					table.bet(b, MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
 					table.doubleDown(doubler1);//// All these players try to doubleDown for the first player
 				}
@@ -281,13 +281,13 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				int seatNumber = index;
 				casinoDoor.await();
 				if (index == 0) {
-					table.trySeat(seatNumber, insurerRef);
-					table.placeStartingBet(insurerRef, MAX_BET);
+					table.join(seatNumber, insurerRef);
+					table.bet(insurerRef, MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 					table.insure(insurerRef);
 				} else {
-					table.trySeat(seatNumber, b);
-					table.placeStartingBet(b, MAX_BET);
+					table.join(seatNumber, b);
+					table.bet(b, MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 					table.insure(insurerRef);
 				}
@@ -308,7 +308,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 					seatNumber = ThreadLocalRandom.current().nextInt(0, table.getSeats().size() - 1);
 				}
 				casinoDoor.await();
-				if (!table.trySeat(seatNumber, b)) {
+				if (!table.join(seatNumber, b)) {
 //					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCount _before updating " + rejectedCount + " 	** " + System.nanoTime());
 					addRejected();
 //					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCounter _after update " + rejectedCount + " 	** " + System.nanoTime());

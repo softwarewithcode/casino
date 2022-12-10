@@ -52,8 +52,8 @@ public class InsuranceTest extends BaseTest {
 
 	@Test
 	public void playerCanInsureHandWhenDealerHasStartingAce() {
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(blackjackPlayer);
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
@@ -64,8 +64,8 @@ public class InsuranceTest extends BaseTest {
 	public void playerCannotInsureHandWhenDealerHasNotAce() {
 		dealer.getDecks().add(Card.of(2, Suit.HEART));
 		dealer.getDecks().add(Card.of(2, Suit.HEART));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.insure(blackjackPlayer);
@@ -75,9 +75,9 @@ public class InsuranceTest extends BaseTest {
 
 	@Test
 	public void playerWithoutBetCannotInsure() {
-		table.trySeat(5, blackjackPlayer);
-		table.trySeat(6, blackjackPlayer2);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.join(6, blackjackPlayer2);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(blackjackPlayer);
 		assertThrows(IllegalPlayerActionException.class, () -> {
@@ -88,8 +88,8 @@ public class InsuranceTest extends BaseTest {
 
 	@Test
 	public void insuredHandCannotBeInsured() {
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(blackjackPlayer);
 		assertThrows(IllegalPlayerActionException.class, () -> {
@@ -99,8 +99,8 @@ public class InsuranceTest extends BaseTest {
 
 	@Test
 	public void standNotAllowedDuringInsurancePhase() {
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.stand(blackjackPlayer);
@@ -109,8 +109,8 @@ public class InsuranceTest extends BaseTest {
 
 	@Test
 	public void doublingNotAllowedDuringInsurancePhase() {
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.doubleDown(blackjackPlayer);
@@ -125,8 +125,8 @@ public class InsuranceTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(1, Suit.HEART));
 		cards.add(Card.of(5, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(blackjackPlayer);
@@ -139,11 +139,11 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(5, Suit.SPADE));
 		dealer.getDecks().add(Card.of(1, Suit.DIAMOND));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.splitStartingHand(blackjackPlayer);
+			table.split(blackjackPlayer);
 		});
 	}
 
@@ -155,13 +155,13 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(4, Suit.DIAMOND));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(blackjackPlayer);
 		assertTrue(blackjackPlayer.getHands().get(0).isInsured());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.takeCard(blackjackPlayer);
+		table.hit(blackjackPlayer);
 		assertEquals(10, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		assertEquals(20, blackjackPlayer.getActiveHand().calculateValues().get(1));
 		table.stand(blackjackPlayer);
@@ -179,13 +179,13 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(4, Suit.SPADE));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.CLUB));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(blackjackPlayer);
 		assertTrue(blackjackPlayer.getHands().get(0).isInsured());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.takeCard(blackjackPlayer);
+		table.hit(blackjackPlayer);
 		assertEquals(10, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		assertEquals(20, blackjackPlayer.getActiveHand().calculateValues().get(1));
 		table.stand(blackjackPlayer);
@@ -203,13 +203,13 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(4, Suit.CLUB));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(blackjackPlayer);
 		assertTrue(blackjackPlayer.getHands().get(0).isInsured());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.takeCard(blackjackPlayer);
+		table.hit(blackjackPlayer);
 		assertEquals(18, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		table.stand(blackjackPlayer);
 		assertTrue(dealer.getHand().isBlackjack());
@@ -227,15 +227,15 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(4, Suit.HEART));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(blackjackPlayer);
 		assertTrue(blackjackPlayer.getHands().get(0).isInsured());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.takeCard(blackjackPlayer);
+		table.hit(blackjackPlayer);
 		assertEquals(18, blackjackPlayer.getActiveHand().calculateValues().get(0));
-		table.takeCard(blackjackPlayer);
+		table.hit(blackjackPlayer);
 		assertEquals(28, blackjackPlayer.getFirstHand().getFinalValue());
 		assertTrue(dealer.getHand().isBlackjack());
 		assertTrue(blackjackPlayer.getHands().get(0).isInsured());
@@ -251,13 +251,13 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(4, Suit.HEART));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(blackjackPlayer);
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.splitStartingHand(blackjackPlayer);
+			table.split(blackjackPlayer);
 		});
 	}
 }

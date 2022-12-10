@@ -35,7 +35,7 @@ public class SeatTest extends BaseTest {
 	public void takingSeatChangesWatcherToPlayer() {
 		BlackjackTable table = createNewTable();
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		table.trySeat(0, blackjackPlayer);
+		table.join(0, blackjackPlayer);
 		Assertions.assertEquals(0, table.getWatchers().size());
 		Assertions.assertEquals(1, table.getPlayers().size());
 	}
@@ -45,8 +45,8 @@ public class SeatTest extends BaseTest {
 		BlackjackTable table = createNewTable();
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		table.trySeat(0, blackjackPlayer);
-		table.trySeat(0, blackjackPlayer2);
+		table.join(0, blackjackPlayer);
+		table.join(0, blackjackPlayer2);
 		Assertions.assertEquals(blackjackPlayer, table.getSeats().stream().filter(seat -> seat.getPlayer() != null).findFirst().get().getPlayer());
 	}
 
@@ -55,7 +55,7 @@ public class SeatTest extends BaseTest {
 		BlackjackTable table = createNewTable();
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("4.99"), table);
 		assertThrows(IllegalArgumentException.class, () -> {
-			table.trySeat(0, blackjackPlayer);
+			table.join(0, blackjackPlayer);
 		});
 		Assertions.assertEquals(0, table.getPlayers().size());
 	}

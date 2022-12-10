@@ -50,11 +50,11 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(5, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(1, blackjackPlayer.getHands().size());
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		assertEquals(2, blackjackPlayer.getHands().size());
 		assertTrue(blackjackPlayer.getHands().get(0).isActive());
 		assertFalse(blackjackPlayer.getHands().get(1).isActive());
@@ -66,14 +66,14 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(1, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(1, blackjackPlayer.getHands().size());
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		assertEquals(2, blackjackPlayer.getHands().size());
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.splitStartingHand(blackjackPlayer);
+			table.split(blackjackPlayer);
 		});
 	}
 
@@ -83,13 +83,13 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));
 		cards.add(Card.of(4, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.takeCard(blackjackPlayer);
+		table.hit(blackjackPlayer);
 		assertEquals(3, blackjackPlayer.getHands().get(0).getCards().size());
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.splitStartingHand(blackjackPlayer);
+			table.split(blackjackPlayer);
 		});
 	}
 
@@ -99,11 +99,11 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(7, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.splitStartingHand(blackjackPlayer);
+			table.split(blackjackPlayer);
 		});
 	}
 
@@ -113,10 +113,10 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(9, Suit.SPADE));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(9, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		assertEquals(2, blackjackPlayer.getActiveHand().getCards().size());
 	}
 
@@ -127,10 +127,10 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(12, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(12, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		assertEquals(1, blackjackPlayer.getHands().get(1).getCards().size());
 	}
 
@@ -141,10 +141,10 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(12, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(12, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		assertEquals(2, blackjackPlayer.getActiveHand().getCards().size());
 		assertEquals(19, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		assertEquals(10, blackjackPlayer.getHands().get(1).calculateValues().get(0));
@@ -158,12 +158,12 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		assertEquals(12, blackjackPlayer.getActiveHand().calculateValues().get(0));
-		table.takeCard(blackjackPlayer);
+		table.hit(blackjackPlayer);
 		assertEquals(17, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		assertEquals(3, blackjackPlayer.getHands().get(1).calculateValues().get(0));
 	}
@@ -177,12 +177,12 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		assertEquals(12, blackjackPlayer.getActiveHand().calculateValues().get(0));
-		table.takeCard(blackjackPlayer);
+		table.hit(blackjackPlayer);
 		assertEquals(17, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		assertEquals(3, blackjackPlayer.getHands().get(1).calculateValues().get(0));
 		table.stand(blackjackPlayer);
@@ -198,13 +198,13 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.splitStartingHand(blackjackPlayer);
-		table.takeCard(blackjackPlayer);
+		table.split(blackjackPlayer);
+		table.hit(blackjackPlayer);
 		table.stand(blackjackPlayer);
-		table.takeCard(blackjackPlayer);
+		table.hit(blackjackPlayer);
 		assertEquals(2, blackjackPlayer.getActiveHand().getCards().size());
 		assertEquals(13, blackjackPlayer.getActiveHand().calculateValues().get(0));
 	}
@@ -216,10 +216,10 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(11, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.HEART));
 		cards.add(Card.of(12, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		assertEquals(19, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		assertEquals(10, blackjackPlayer.getHands().get(1).calculateValues().get(0));
 	}
@@ -232,10 +232,10 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(1, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		List<Integer> activeHandValues = blackjackPlayer.getActiveHand().calculateValues();
 		assertEquals(2, activeHandValues.size());
 		assertEquals(2, blackjackPlayer.getHands().get(1).calculateValues().size());
@@ -255,10 +255,10 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("6.77"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("6.77"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		assertEquals(new BigDecimal("6.77"), blackjackPlayer.getHands().get(0).getBet());
 		assertEquals(new BigDecimal("6.77"), blackjackPlayer.getHands().get(1).getBet());
 		assertEquals(new BigDecimal("13.54"), blackjackPlayer.getTotalBet());
@@ -275,12 +275,12 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("50.1"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("50.1"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("49.90"), blackjackPlayer.getBalance());
 		assertThrows(IllegalArgumentException.class, () -> {
-			table.splitStartingHand(blackjackPlayer);
+			table.split(blackjackPlayer);
 		});
 	}
 
@@ -291,12 +291,12 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(1, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("99.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.takeCard(blackjackPlayer);
+		table.hit(blackjackPlayer);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.splitStartingHand(blackjackPlayer);
+			table.split(blackjackPlayer);
 		});
 	}
 
@@ -309,10 +309,10 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(12, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
 		cards.add(Card.of(11, Suit.SPADE));
-		table.trySeat(5, blackjackPlayer);
-		table.placeStartingBet(blackjackPlayer, new BigDecimal("10.0"));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("10.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.splitStartingHand(blackjackPlayer);
+		table.split(blackjackPlayer);
 		assertNull(blackjackPlayer.getActiveHand());
 		assertEquals(2, blackjackPlayer.getHands().size());
 		assertEquals(11, blackjackPlayer.getHands().get(0).getCards().get(0).getRank());
