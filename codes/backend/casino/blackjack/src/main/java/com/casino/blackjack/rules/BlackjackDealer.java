@@ -32,9 +32,9 @@ public class BlackjackDealer implements IDealer {
 	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
 	private final Thresholds thresholds;
 	private final BlackjackTable table;
+	private final ReentrantLock betPhaseLock;
 	private List<Card> decks;
 	private BlackjackDealerHand dealerHand;
-	private ReentrantLock betPhaseLock;
 
 	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds tableConstants) {
 		this.table = blackjackTable;
@@ -61,7 +61,7 @@ public class BlackjackDealer implements IDealer {
 		return card != null & card.isAce();
 	}
 
-	public void handlePlayerBet(ICasinoPlayer tablePlayer, BigDecimal bet) {
+	public void updatePlayerBet(ICasinoPlayer tablePlayer, BigDecimal bet) {
 		Stream<Seat> seatStream = table.getSeats().stream();
 		Optional<Seat> playerOptional = seatStream.filter(seat -> seat.hasPlayer() && seat.getPlayer().equals(tablePlayer)).findFirst();
 		playerOptional.ifPresentOrElse(seat -> {
@@ -163,7 +163,7 @@ public class BlackjackDealer implements IDealer {
 		return table.getSeats().stream().filter(seat -> seat.hasPlayerWithBet()).sorted(Comparator.comparing(Seat::getNumber)).map(seat -> seat.getPlayer()).collect(Collectors.toList());
 	}
 
-	public void finalizeBetPhase() {
+	public synchronized void finalizeBetPhase() {
 		table.updateGamePhase(GamePhase.BETS_COMPLETED);
 		if (!shouldDealStartingHands())
 			return;
@@ -210,7 +210,9 @@ public class BlackjackDealer implements IDealer {
 		}
 	}
 
-	public void prepareNewRound() {
+	public synchronized void prepareNewRound() {
+		if (table.getGamePhase() != GamePhase.ROUND_COMPLETED)
+			throw new IllegalArgumentException("not allowed");
 		table.getPlayers().forEach(ICasinoPlayer::prepareNextRound);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		table.updateGamePhase(GamePhase.BET);
@@ -228,16 +230,19 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void doubleDown(BlackjackPlayer player) {
-		if (!table.hasSeat(player))
-			throw new PlayerNotFoundException("cannot doubleDown(), player not found from table:" + player, 0);
+		verifyPlayerHasSeat(player);
 		Card cardReference = decks.get(decks.size() - 1);
 		player.doubleDown(cardReference);
 		getCard();
 	}
 
-	public void handleSplit(BlackjackPlayer player) {
+	private void verifyPlayerHasSeat(BlackjackPlayer player) {
 		if (!table.hasSeat(player))
-			throw new PlayerNotFoundException("cannot handleSplit(), player not found from table:" + player, 0);
+			throw new PlayerNotFoundException("cannot doubleDown(), player not found from table:" + player, 0);
+	}
+
+	public void handleSplit(BlackjackPlayer player) {
+		verifyPlayerHasSeat(player);
 		player.splitStartingHand();
 		IHand firstHand = player.getActiveHand();
 		firstHand.addCard(getCard());
@@ -256,14 +261,12 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void stand(BlackjackPlayer player) {
-		if (!table.hasSeat(player))
-			throw new PlayerNotFoundException("cannot stand(), player not found from table:" + player, 0);
+		verifyPlayerHasSeat(player);
 		player.stand();
 	}
 
 	public void insure(BlackjackPlayer player) {
-		if (!table.hasSeat(player))
-			throw new PlayerNotFoundException("cannot insure(), player not found from table:" + player, 0);
+		verifyPlayerHasSeat(player);
 		player.insure();
 	}
 

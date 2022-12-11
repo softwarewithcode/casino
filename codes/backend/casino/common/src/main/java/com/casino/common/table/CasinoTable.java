@@ -27,19 +27,19 @@ import com.casino.common.table.timing.PlayerClockTask;
 public abstract class CasinoTable implements ICasinoTable {
 
 	private static final Logger LOGGER = Logger.getLogger(CasinoTable.class.getName());
-	private PhasePath phasePath;
+	private final PhasePath phasePath;
 	private Set<ICasinoPlayer> players;
 	private Set<ICasinoPlayer> watchers;
 	private volatile Status status;
 	private Type type;
 	private Language language;
-	private UUID id;
-	private Instant created;
+	private final UUID id;
+	private final Instant created;
 	private final Clock clock;
 	private ICasinoPlayer playerInTurn;
 	private final ReentrantLock playerInTurnLock;
 	private boolean dealerTurn;
-	private Thresholds constants;
+	private final Thresholds constants;
 
 	protected CasinoTable(Status initialStatus, Thresholds tableConstants, UUID id, PhasePath phases) {
 		this.players = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
@@ -75,18 +75,14 @@ public abstract class CasinoTable implements ICasinoTable {
 		return true;
 	}
 
-	protected void setPhasePath(PhasePath path) {
-		this.phasePath = path;
-	}
-
-	public void startClock(TimerTask task, long initialDelay) {
+	public synchronized void startClock(TimerTask task, long initialDelay) {
 		if (this.clock.isTicking())
 			throw new IllegalArgumentException("Table clock already running, timing error");
 		this.clock.startClock(task, initialDelay, 1000);
 	}
 
 	@Override
-	public void stopClock() {
+	public synchronized void stopClock() {
 		this.clock.stopClock();
 	}
 

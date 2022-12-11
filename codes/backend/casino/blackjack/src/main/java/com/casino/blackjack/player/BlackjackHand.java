@@ -13,6 +13,9 @@ import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPlayerActionException;
 
+/*
+ * This class is not thread safe by itself. Caller should prevent simultaneous modifications.
+ */
 public class BlackjackHand implements IHand {
 	private final UUID id;
 	private final Instant created;
@@ -135,10 +138,8 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public void doubleDown(Card ref) {
-		if (!isActive())
-			throw new IllegalPlayerActionException("inactive hand cannot be doubled", 15);
-		if (isDoubled())
-			throw new IllegalPlayerActionException("doubled hand cannot be doubled", 15);
+		if (!isActive() || isDoubled())
+			throw new IllegalPlayerActionException("doubling not allowed active:" + isActive(), 15);
 		this.doubled = true;
 		this.bet = this.bet.multiply(BigDecimal.TWO);
 		this.cards.add(ref);
@@ -182,9 +183,7 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public void insure() {
-		if (!isActive())
-			throw new IllegalPlayerActionException("inactive hand cannot bet insured", 15);
-		if (isInsured() || isBlackjack())
+		if (!isActive() || isInsured() || isBlackjack())
 			throw new IllegalPlayerActionException("insurance not allowed:" + this, 15);
 		insuranceBet = bet.divide(BigDecimal.TWO);
 	}

@@ -1,7 +1,6 @@
 package com.casino.blackjack.table;
 
 import java.math.BigDecimal;
-import java.util.ConcurrentModificationException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,7 +40,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		// Replaces previous bet if bet is allowed. UI handles usability
 		try {
 			if (isGamePhase(GamePhase.BET))
-				dealer.handlePlayerBet(player, bet);
+				dealer.updatePlayerBet(player, bet);
 			else {
 				LOGGER.severe("Starting bet is not accepted:phase " + getGamePhase() + " table:" + this + " player:" + player);
 				throw new IllegalPlayerActionException("placeStartingBet is not allowed:" + player + " bet:" + bet.toString(), 16);
@@ -68,57 +67,58 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void stand(BlackjackPlayer player) {
 		try {
-			tryLockingPlayerInTurn(player, "stand");
-			verifyActionClearance(player, "stand");// Lock releases immediately if player is not in turn
+			lockPlayerInTurn(player, "stand");// Lock releases immediately if player is not in turn
+			verifyActionClearance(player, "stand");
 			dealer.stand(player);
 			dealer.updateTableActor();
 		} finally {
-			completeAction("stand");
+			unlockPlayerInTurn("stand");
 		}
 	}
 
-	private void tryLockingPlayerInTurn(BlackjackPlayer player, String method) {
-		if (!getPlayerInTurnLock().tryLock()) {
-			throw new ConcurrentModificationException(method + " called but no lock " + player);
-		}
+	private void lockPlayerInTurn(BlackjackPlayer player, String method) {
+		getPlayerInTurnLock().lock();
+//		if (!getPlayerInTurnLock().tryLock()) {
+//			throw new ConcurrentModificationException(method + " called but no lock " + player);
+//		}
 	}
 
 	@Override
 	public void hit(BlackjackPlayer player) {
 		try {
-			tryLockingPlayerInTurn(player, "takeCard");
-			verifyActionClearance(player, "takeCard");// Lock releases immediately if player is not in turn
+			lockPlayerInTurn(player, "takeCard");// Lock releases immediately if player is not in turn
+			verifyActionClearance(player, "takeCard");
 			dealer.addPlayerCard(player);
 			dealer.updateTableActor();
 		} finally {
-			completeAction("takeCard");
+			unlockPlayerInTurn("takeCard");
 		}
 	}
 
 	@Override
 	public void split(BlackjackPlayer player) {
 		try {
-			tryLockingPlayerInTurn(player, "splitStartingHand");
+			lockPlayerInTurn(player, "splitStartingHand");
 			verifyActionClearance(player, "splitStartingHand");
 			dealer.handleSplit(player);
 		} finally {
-			completeAction("splitStartingHand");
+			unlockPlayerInTurn("splitStartingHand");
 		}
 	}
 
 	@Override
 	public void doubleDown(BlackjackPlayer player) {
 		try {
-			tryLockingPlayerInTurn(player, "doubleDown");
+			lockPlayerInTurn(player, "doubleDown");
 			verifyActionClearance(player, "doubleDown");
 			dealer.doubleDown(player);
 			dealer.updateTableActor();
 		} finally {
-			completeAction("doubleDown");
+			unlockPlayerInTurn("doubleDown");
 		}
 	}
 
-	private void completeAction(String actionName) {
+	private void unlockPlayerInTurn(String actionName) {
 		if (getPlayerInTurnLock().isHeldByCurrentThread())
 			getPlayerInTurnLock().unlock();
 		LOGGER.exiting(getClass().getName(), actionName);
@@ -136,7 +136,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void onPlayerLeave(ICasinoPlayer player) {
+	public synchronized void onPlayerLeave(ICasinoPlayer player) {
 		// TODO Auto-generated method stub
 
 	}
@@ -160,9 +160,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void onBetPhaseEnd() {
 		LOGGER.entering(getClass().getName(), "onBetPhaseEnd");
 		try {
+			getPlayerInTurnLock().lock();
 			if (!isGamePhase(GamePhase.BET))
 				throw new IllegalPhaseException("GamePhase is not what is expected on betPhaseEnd", getGamePhase(), GamePhase.BET);
-			getPlayerInTurnLock().lock();
 			dealer.finalizeBetPhase();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "onBetPhaseEnd() something went wrong. Waiting for manager's call.", e);
@@ -177,9 +177,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void onInsurancePhaseEnd() {
 		LOGGER.entering(getClass().getName(), "onInsurancePhaseEnd");
 		try {
+			getPlayerInTurnLock().lock();
 			if (!isGamePhase(GamePhase.INSURE))
 				throw new IllegalPhaseException("GamePhase is not what is expected on insurancePhaseEnd", getGamePhase(), GamePhase.INSURE);
-			getPlayerInTurnLock().lock();
 			dealer.finalizeInsurancePhase();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "onInsurancePhaseEnd() something went wrong. Waiting for manager's call.", e);
@@ -196,7 +196,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void onTableClose() {
+	public synchronized void onTableClose() {
 		// TODO Auto-generated method stub
 
 	}
