@@ -12,6 +12,7 @@ import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.CasinoPlayer;
+import com.casino.common.table.ICasinoTable;
 import com.casino.common.table.ISeatedTable;
 
 public class BlackjackPlayer extends CasinoPlayer {
@@ -102,10 +103,16 @@ public class BlackjackPlayer extends CasinoPlayer {
 		}
 	}
 
-//	private void tryTakingModificationLock() {
-//		if (!getPlayerLock().tryLock())
-//			throw new ConcurrentModificationException("no playerLock acquired earlier");
-//	}
+	@Override
+	public void updateStartingBet(BigDecimal bet, ICasinoTable table) {
+		try {
+			tryTakingModificationLock();
+			super.updateStartingBet(bet, table);
+			// getFirstHand().updateBet(bet);
+		} finally {
+			releaseModificationLockIfOwner();
+		}
+	}
 
 	public void insure() {
 		try {
@@ -217,7 +224,57 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return getFirstHand().isInsuranceCompensable();
 	}
 
-	public IHand getFirstHand() {
+	private IHand getFirstHand() {
 		return getHands().get(0);
 	}
+
+	public boolean hasDoubled() {
+		return getFirstHand().isDoubled();
+	}
+
+	public boolean hasInsured() {
+		return getFirstHand().isInsured();
+	}
+
+	public boolean hasSplit() {
+		return hands.size() == 2;
+	}
+
+	@Override
+	public BigDecimal getInsuranceAmount() {
+		return getFirstHand().getInsuranceBet();
+	}
+
+	public boolean hasCompletedFirstHand() {
+		return getFirstHand().isCompleted();
+	}
+
+	public Integer getFirstHandFinalValue() {
+		return getFirstHand().getFinalValue();
+	}
+
+	public BigDecimal getBet(int handNumber) {
+		if (handNumber < 0 || handNumber > 1)
+			throw new IllegalArgumentException("no such hand " + handNumber);
+		return getHands().get(handNumber).getBet();
+	}
+
+	// first or second hand can be active. second hand might need additional card to
+	// reach minimum of 2 cards
+	@Override
+	public <T> T autoplay(T t) {
+		if (!hasActiveHand() || !(t instanceof Card card))
+			return t;
+		if (getFirstHand().isActive())
+			getFirstHand().complete();
+		if (getHands().size() != 2)
+			return t;
+		IHand secondHand = getHands().get(1);
+		if (secondHand.getCards().size() < 2)
+			secondHand.addCard(card);
+		if (!secondHand.isCompleted())// Automatic blackjack can have completed the hand
+			secondHand.complete();
+		return null;
+	}
+
 }

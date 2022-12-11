@@ -146,10 +146,11 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		LOGGER.entering(getClass().getName(), "onPlayerTimeout");
 		try {
 			getPlayerInTurnLock().lock();
-			if (timedOutPlayer.hasActiveHand())
-				timedOutPlayer.getActiveHand().complete();
-			if (isPlayerInTurn(timedOutPlayer))
-				dealer.updateTableActor();
+			if (!isPlayerInTurn(timedOutPlayer)) {
+				return;
+			}
+			dealer.autoplay(timedOutPlayer);
+			dealer.updateTableActor();
 		} finally {
 			getPlayerInTurnLock().unlock();
 			LOGGER.exiting(getClass().getName(), "onPlayerTimeout");

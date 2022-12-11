@@ -115,12 +115,12 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void dealCard(IHand hand) {
-		Card card = getCard();
+		Card card = removeCardFromDeck();
 		hand.addCard(card);
 	}
 
 	public void addPlayerCard(ICasinoPlayer player) {
-		Card card = getCard();
+		Card card = removeCardFromDeck();
 		IHand activeHand = player.getActiveHand();
 		activeHand.addCard(card);
 	}
@@ -233,7 +233,11 @@ public class BlackjackDealer implements IDealer {
 		verifyPlayerHasSeat(player);
 		Card cardReference = decks.get(decks.size() - 1);
 		player.doubleDown(cardReference);
-		getCard();
+		removeCardFromDeck();
+	}
+
+	public Card getNextCard() {
+		return decks.get(decks.size() - 1);
 	}
 
 	private void verifyPlayerHasSeat(BlackjackPlayer player) {
@@ -245,14 +249,19 @@ public class BlackjackDealer implements IDealer {
 		verifyPlayerHasSeat(player);
 		player.splitStartingHand();
 		IHand firstHand = player.getActiveHand();
-		firstHand.addCard(getCard());
+		firstHand.addCard(removeCardFromDeck());
 		if (firstHand.isCompleted()) {
 			player.getHands().get(1).activate();
-			player.getHands().get(1).addCard(getCard());
+			player.getHands().get(1).addCard(removeCardFromDeck());
 		}
 	}
 
-	private Card getCard() {
+	public void autoplay(ICasinoPlayer player) {
+		if (player.autoplay(getNextCard()) != null)
+			removeCardFromDeck();
+	}
+
+	private Card removeCardFromDeck() {
 		return decks.remove(decks.size() - 1);
 	}
 
@@ -293,7 +302,7 @@ public class BlackjackDealer implements IDealer {
 		playersWithWinningChances.stream().forEach(player -> player.getHands().forEach(playerHand -> {
 			int comparison = dealerHand.compareTo(playerHand);
 			if (player.isCompensable() && dealerHand.isBlackjack()) {
-				player.increaseBalance(player.getFirstHand().getInsuranceBet().multiply(BigDecimal.TWO));
+				player.increaseBalance(player.getInsuranceAmount().multiply(BigDecimal.TWO));
 			}
 			if (evenResult(comparison))
 				player.increaseBalance(playerHand.getBet());
@@ -316,7 +325,7 @@ public class BlackjackDealer implements IDealer {
 
 	private void addDealerCards() {
 		while (!dealerHand.isCompleted()) {
-			Card card = getCard();
+			Card card = removeCardFromDeck();
 			addCard(card);
 		}
 	}

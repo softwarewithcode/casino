@@ -32,7 +32,8 @@ public class InsuranceTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
+			table = new BlackjackTable(Status.WAITING_PLAYERS,
+					new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
 					UUID.randomUUID());
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
@@ -130,7 +131,7 @@ public class InsuranceTest extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(blackjackPlayer);
-		assertTrue(blackjackPlayer.getFirstHand().isDoubled());
+		assertTrue(blackjackPlayer.hasDoubled());
 	}
 
 	@Test
@@ -213,8 +214,8 @@ public class InsuranceTest extends BaseTest {
 		assertEquals(18, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		table.stand(blackjackPlayer);
 		assertTrue(dealer.getHand().isBlackjack());
-		assertTrue(blackjackPlayer.getFirstHand().isInsured());
-		assertTrue(blackjackPlayer.getFirstHand().isCompleted());
+		assertTrue(blackjackPlayer.hasInsured());
+		assertTrue(blackjackPlayer.hasCompletedFirstHand());
 		assertEquals(new BigDecimal("75.00"), blackjackPlayer.getTotalBet());
 		assertEquals(new BigDecimal("975.00"), blackjackPlayer.getBalance());
 	}
@@ -236,7 +237,7 @@ public class InsuranceTest extends BaseTest {
 		table.hit(blackjackPlayer);
 		assertEquals(18, blackjackPlayer.getActiveHand().calculateValues().get(0));
 		table.hit(blackjackPlayer);
-		assertEquals(28, blackjackPlayer.getFirstHand().getFinalValue());
+		assertEquals(28, blackjackPlayer.getFirstHandFinalValue());
 		assertTrue(dealer.getHand().isBlackjack());
 		assertTrue(blackjackPlayer.getHands().get(0).isInsured());
 		assertEquals(new BigDecimal("75.00"), blackjackPlayer.getTotalBet());

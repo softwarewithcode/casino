@@ -40,8 +40,6 @@ public interface ICasinoPlayer {
 
 	public List<IHand> getHands();
 
-	public IHand getFirstHand();
-
 	public boolean hasActiveHand();
 
 	public IHand getActiveHand();
@@ -53,5 +51,9 @@ public interface ICasinoPlayer {
 	public boolean isCompensable();
 
 	public void prepareNextRound();
+
+	public BigDecimal getInsuranceAmount();
+
+	public <T> T autoplay(T t);
 
 }

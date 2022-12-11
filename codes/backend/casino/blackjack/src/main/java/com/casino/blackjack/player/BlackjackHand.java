@@ -168,7 +168,7 @@ public class BlackjackHand implements IHand {
 	@Override
 	public Integer getFinalValue() {
 		if (!isCompleted() || getCards().size() < 2)
-			throw new IllegalArgumentException("hand has not enough cards " + getCards().size() + " or is not completed:" + completed);
+			throw new IllegalArgumentException("hand has not enough cards or is not completed:" + this);
 		List<Integer> values = calculateValues();
 		Integer first = values.get(0);
 		if (values.size() != 2)

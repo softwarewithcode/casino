@@ -105,18 +105,13 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public void updateStartingBet(BigDecimal bet, ICasinoTable table) {
-		try {
-			tryTakingModificationLock();
-			BetUtil.verifyStartingBet(table, this, bet);
-			this.totalBet = bet;
-			this.getFirstHand().updateBet(totalBet);
-		} finally {
-			releaseModificationLockIfOwner();
-		}
+		verifyCallersLock();
+		BetUtil.verifyStartingBet(table, this, bet);
+		this.totalBet = bet;
 	}
 
 	protected void updateBalanceAndBet(BigDecimal increaseAmount) {
-		verifyLockHasBeenAcquiredEarlier();
+		verifyCallersLock();
 		BetUtil.verifySufficentBalance(increaseAmount, this);
 		if (this.totalBet == null)
 			throw new IllegalBetException("increase called but no initial bet was found", 6);
@@ -124,7 +119,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		this.totalBet = getTotalBet().add(increaseAmount);
 	}
 
-	private void verifyLockHasBeenAcquiredEarlier() {
+	private void verifyCallersLock() {
 		if (!playerLock.isHeldByCurrentThread())
 			throw new IllegalBetException("lock is missing", 8);
 	}
@@ -184,7 +179,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public void reset() {
-		verifyLockHasBeenAcquiredEarlier();
+		verifyCallersLock();
 		this.totalBet = null;
 	}
 
