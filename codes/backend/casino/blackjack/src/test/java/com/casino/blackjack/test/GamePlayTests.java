@@ -178,7 +178,7 @@ public class GamePlayTests extends BaseTest {
 	@Test
 	public void playersDoNotReactOnTimeButWinBecauseDealerGetsOver21() {
 		List<Card> cards = dealer.getDecks();
-		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.SPADE));
 		cards.add(Card.of(7, Suit.HEART));
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
@@ -195,10 +195,34 @@ public class GamePlayTests extends BaseTest {
 		table.bet(blackjackPlayer2, new BigDecimal("10.0"));
 		table.bet(blackjackPlayer3, new BigDecimal("25.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		sleep(PLAYER_TIME_SECONDS * 3 + 1, ChronoUnit.SECONDS); // 3 players waiting time +1 second
+		sleep(PLAYER_TIME_SECONDS * 3, ChronoUnit.SECONDS); // 3 players waiting time +1 second
 		assertEquals(new BigDecimal("1099.00"), blackjackPlayer.getBalance());
 		assertEquals(new BigDecimal("1010.00"), blackjackPlayer2.getBalance());
 		assertEquals(new BigDecimal("1025.00"), blackjackPlayer3.getBalance());
+	}
+
+	@Test
+	public void splitHandGetsAdditionalCardAndCompletedWhenFirstHandIsActiveWhileTimingOut() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(9, Suit.SPADE));
+		cards.add(Card.of(7, Suit.HEART));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE)); // dealer's second card
+		cards.add(Card.of(1, Suit.DIAMOND)); // autoplay card for second hand
+		cards.add(Card.of(6, Suit.DIAMOND)); // automatically added to first hand
+		cards.add(Card.of(10, Suit.CLUB));
+		cards.add(Card.of(8, Suit.DIAMOND));// dealer's first
+		cards.add(Card.of(10, Suit.SPADE));
+		table.join(5, blackjackPlayer);
+		table.bet(blackjackPlayer, new BigDecimal("10.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.split(blackjackPlayer);
+		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("20.00"), blackjackPlayer.getTotalBet());
+		assertEquals(16, blackjackPlayer.getHands().get(0).getFinalValue());
+		assertEquals(21, blackjackPlayer.getHands().get(1).getFinalValue());
+		assertEquals(new BigDecimal("1005.00"), blackjackPlayer.getBalance());
 	}
 
 	@Test

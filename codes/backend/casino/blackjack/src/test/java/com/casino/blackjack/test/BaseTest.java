@@ -12,7 +12,7 @@ public class BaseTest {
 	protected static final Integer BET_ROUND_TIME_SECONDS = 2;
 	protected static final Integer INSURANCE_ROUND_TIME_SECONDS = 3;
 	protected static final Integer PLAYER_TIME_SECONDS = 4;
-	protected static final long DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS = 2000l;
+	protected static final long DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS = 2500l;
 	protected static final Integer MIN_PLAYERS = 0;
 	protected static final Integer MAX_PLAYERS = 7;
 	protected static final Integer DEFAULT_SEAT_COUNT = 7;

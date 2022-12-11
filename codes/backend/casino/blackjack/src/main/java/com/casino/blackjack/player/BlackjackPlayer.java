@@ -250,7 +250,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 	}
 
 	public Integer getFirstHandFinalValue() {
-		return getFirstHand().getFinalValue();
+		IHand hand = getFirstHand();
+		return hand.isCompleted() ? hand.getFinalValue() : null;
 	}
 
 	public BigDecimal getBet(int handNumber) {
@@ -263,8 +264,9 @@ public class BlackjackPlayer extends CasinoPlayer {
 	// reach minimum of 2 cards
 	@Override
 	public <T> T autoplay(T t) {
-		if (!hasActiveHand() || !(t instanceof Card card))
+		if (!hasActiveHand() || !(t instanceof Card card)) {
 			return t;
+		}
 		if (getFirstHand().isActive())
 			getFirstHand().complete();
 		if (getHands().size() != 2)

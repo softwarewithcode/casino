@@ -257,8 +257,9 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void autoplay(ICasinoPlayer player) {
-		if (player.autoplay(getNextCard()) != null)
+		if (player.autoplay(getNextCard()) == null) {
 			removeCardFromDeck();
+		}
 	}
 
 	private Card removeCardFromDeck() {

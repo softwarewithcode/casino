@@ -49,32 +49,6 @@ public class StandTest extends BaseTest {
 	}
 
 	@Test
-	public void playersDoNotReactOnTimeButWinBecauseDealerGetsOver21() {
-		List<Card> cards = dealer.getDecks();
-		cards.add(Card.of(9, Suit.DIAMOND));
-		cards.add(Card.of(7, Suit.HEART));
-		cards.add(Card.of(9, Suit.DIAMOND));
-		cards.add(Card.of(2, Suit.DIAMOND));
-		cards.add(Card.of(10, Suit.SPADE));
-		cards.add(Card.of(9, Suit.DIAMOND));
-		cards.add(Card.of(6, Suit.DIAMOND));// dealer's first
-		cards.add(Card.of(9, Suit.DIAMOND));
-		cards.add(Card.of(2, Suit.DIAMOND));
-		cards.add(Card.of(10, Suit.SPADE));
-		table.join(5, blackjackPlayer);
-		table.join(6, blackjackPlayer2);
-		table.join(2, blackjackPlayer3);
-		table.bet(blackjackPlayer, new BigDecimal("99.0"));
-		table.bet(blackjackPlayer2, new BigDecimal("10.0"));
-		table.bet(blackjackPlayer3, new BigDecimal("25.0"));
-		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		sleep(PLAYER_TIME_SECONDS * 3 + 1, ChronoUnit.SECONDS); // 3 players waiting time +1 second
-		assertEquals(new BigDecimal("1099.00"), blackjackPlayer.getBalance());
-		assertEquals(new BigDecimal("1010.00"), blackjackPlayer2.getBalance());
-		assertEquals(new BigDecimal("1025.00"), blackjackPlayer3.getBalance());
-	}
-
-	@Test
 	public void onlyOnePlayerReactsOnTimeButAllWinsBecauseDealerGetsOver21() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
