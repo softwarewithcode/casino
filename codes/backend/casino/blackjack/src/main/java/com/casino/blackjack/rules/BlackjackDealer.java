@@ -198,8 +198,9 @@ public class BlackjackDealer implements IDealer {
 			carryOutDealerTurn();
 		} else {
 			// Actor can be same as previous ->split hand
-			ICasinoPlayer player = optionalPlayerActor.get().getPlayer();
-			table.updatePlayerInTurn(player);
+			BlackjackPlayer player = (BlackjackPlayer) optionalPlayerActor.get().getPlayer();
+			table.changePlayer(player);
+			player.updateActions();
 		}
 	}
 
@@ -226,7 +227,7 @@ public class BlackjackDealer implements IDealer {
 
 	private void changeTurnToDealer() {
 		table.updateDealerTurn(true);
-		table.updatePlayerInTurn(null);
+		table.changePlayer(null);
 	}
 
 	public void doubleDown(BlackjackPlayer player) {

@@ -14,15 +14,18 @@ import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.CasinoPlayer;
 import com.casino.common.table.ICasinoTable;
 import com.casino.common.table.ISeatedTable;
+import com.casino.common.user.Action;
 
 public class BlackjackPlayer extends CasinoPlayer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackPlayer.class.getName());
 	private List<IHand> hands;
+	private List<Action> actions;
 
 	public BlackjackPlayer(String name, UUID id, BigDecimal startBalance, ISeatedTable table) {
 		super(name, id, startBalance, table);
 		hands = new ArrayList<IHand>();
 		hands.add(createNewHand(true));
+		actions = new ArrayList<>(4);
 	}
 
 	public boolean canTake() {
@@ -37,11 +40,47 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return new BlackjackHand(UUID.randomUUID(), active);
 	}
 
+	public void updateActions() {
+		try {
+			tryTakingPlayerLock();
+			actions = new ArrayList<>();
+			if (!hasActiveHand())
+				return;
+			actions.add(Action.TAKE);
+			actions.add(Action.STAND);
+			if (!getFirstHand().isActive()) {
+				return;
+			}
+			if (getFirstHand().getCards().size() != 2)
+				return;
+			Card first = getFirstHand().getCards().get(0);
+			Card second = getFirstHand().getCards().get(1);
+			if (first.getRank() == second.getRank() && !hasSecondHand())
+				actions.add(Action.SPLIT);
+			else if (first.getRank() > 9 && second.getRank() > 9 && !hasSecondHand())
+				actions.add(Action.SPLIT);
+			int handValue = getFirstHand().calculateValues().get(0);
+			if (handValue >= 9 && handValue <= 11 && !hasSecondHand())
+				actions.add(Action.DOUBLE);
+		} finally {
+			releasePlayerLock();
+		}
+	}
+
+	private IHand getSecondHand() {
+		return getHands().get(1);
+	}
+
+	private boolean hasSecondHand() {
+		return getHands().size() > 1;
+	}
+
 	public void prepareNextRound() {
 		try {
 			tryTakingPlayerLock();
 			hands = new ArrayList<IHand>();
 			hands.add(createNewHand(true));
+			updateActions();
 			this.removeTotalBet();
 		} finally {
 			releasePlayerLock();
@@ -89,7 +128,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	}
 
 	private void activateSecondHand() {
-		getHands().get(1).activate();
+		getSecondHand().activate();
 	}
 
 	public void doubleDown(Card ref) {
@@ -271,7 +310,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 			getFirstHand().complete();
 		if (getHands().size() != 2)
 			return t;
-		IHand secondHand = getHands().get(1);
+		IHand secondHand = getSecondHand();
 		if (secondHand.getCards().size() < 2)
 			secondHand.addCard(card);
 		if (!secondHand.isCompleted())// Automatic blackjack can have completed the hand

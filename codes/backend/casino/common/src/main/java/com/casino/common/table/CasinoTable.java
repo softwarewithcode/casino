@@ -244,7 +244,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		return getPlayerInTurn() != null && getPlayerInTurn().equals(player);
 	}
 
-	public void updatePlayerInTurn(ICasinoPlayer player) {
+	public void changePlayer(ICasinoPlayer player) {
 		if (playerInTurnLock.isHeldByCurrentThread()) {
 			playerInTurn = player;
 			if (playerInTurn != null) {
