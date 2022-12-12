@@ -34,7 +34,8 @@ public class BetTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
+			table = new BlackjackTable(Status.WAITING_PLAYERS,
+					new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
 					UUID.randomUUID());
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
@@ -53,10 +54,10 @@ public class BetTest extends BaseTest {
 	@Test
 	public void placingBetWhenBetPhaseIsCompleteResultsToException() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		table.join(0, blackjackPlayer);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
 		sleep(BET_ROUND_TIME_SECONDS + 1, ChronoUnit.SECONDS);
 		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
-			table.bet(blackjackPlayer, new BigDecimal("50.0"));
+			table.bet(blackjackPlayer.getId(), new BigDecimal("50.0"));
 		});
 		assertEquals(16, exception.getCode());
 	}
@@ -74,9 +75,9 @@ public class BetTest extends BaseTest {
 	@Test
 	public void emptyBetResultsToException() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		table.join(0, blackjackPlayer);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
-			table.bet(blackjackPlayer, null);
+			table.bet(blackjackPlayer.getId(), null);
 		});
 		assertEquals(2, exception.getCode());
 	}
@@ -84,9 +85,9 @@ public class BetTest extends BaseTest {
 	@Test
 	public void placingBetOverBalanceButWithinTableLimitsResultsToException() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50.0"), table);
-		table.join(0, blackjackPlayer);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
-			table.bet(blackjackPlayer, new BigDecimal("50.001"));
+			table.bet(blackjackPlayer.getId(), new BigDecimal("50.001"));
 		});
 		assertEquals(3, exception.getCode());
 	}
@@ -95,9 +96,9 @@ public class BetTest extends BaseTest {
 	public void placingBetToPlayerNotInTableResultsInException() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		table.join(0, blackjackPlayer);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
 		PlayerNotFoundException exception = assertThrows(PlayerNotFoundException.class, () -> {
-			table.bet(blackjackPlayer2, new BigDecimal("7.0"));
+			table.bet(blackjackPlayer2.getId(), new BigDecimal("7.0"));
 		});
 		assertEquals(1, exception.getCode());
 	}
@@ -105,9 +106,9 @@ public class BetTest extends BaseTest {
 	@Test
 	public void placingBetUnderTableMinimumResultsException() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		table.join(0, blackjackPlayer);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
-			table.bet(blackjackPlayer, new BigDecimal("4.99"));
+			table.bet(blackjackPlayer.getId(), new BigDecimal("4.99"));
 		});
 		assertEquals(4, exception.getCode());
 	}
@@ -115,9 +116,9 @@ public class BetTest extends BaseTest {
 	@Test
 	public void placingBetOverTableMaximuResultsToException() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe!!", UUID.randomUUID(), new BigDecimal("1000"), table);
-		table.join(0, blackjackPlayer);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
-			table.bet(blackjackPlayer, new BigDecimal("100.1"));
+			table.bet(blackjackPlayer.getId(), new BigDecimal("100.1"));
 		});
 		assertEquals(5, exception.getCode());
 	}
@@ -125,31 +126,31 @@ public class BetTest extends BaseTest {
 	@Test
 	public void placingAllowedBetSetsTheBetForPlayer() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("50"), table);
-		table.join(0, blackjackPlayer);
-		table.bet(blackjackPlayer, new BigDecimal("49.9"));
-		assertEquals("49.90", blackjackPlayer.getTotalBet().toString());
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
+		table.bet(blackjackPlayer.getId(), new BigDecimal("49.9"));
+		assertEquals("49.90", table.getPlayer(blackjackPlayer.getId()).getTotalBet().toString());
 	}
 
 	@Test
 	public void playersBetsAreAccepted() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		assertTrue(table.join(1, blackjackPlayer));
-		assertTrue(table.join(2, blackjackPlayer2));
-		table.bet(blackjackPlayer, new BigDecimal("50.0"));
-		table.bet(blackjackPlayer2, new BigDecimal("99.7"));
-		assertEquals("50.00", blackjackPlayer.getTotalBet().toString());
-		assertEquals("99.70", blackjackPlayer2.getTotalBet().toString());
+		assertTrue(table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 1));
+		assertTrue(table.join(blackjackPlayer2.getId(), blackjackPlayer2.getName(), blackjackPlayer2.getBalance(), 2));
+		table.bet(blackjackPlayer.getId(), new BigDecimal("50.0"));
+		table.bet(blackjackPlayer2.getId(), new BigDecimal("99.7"));
+		assertEquals("50.00", table.getPlayer(blackjackPlayer.getId()).getTotalBet().toString());
+		assertEquals("99.70", table.getPlayer(blackjackPlayer2.getId()).getTotalBet().toString());
 	}
 
 	@Test
 	public void negativeStartingBetIsPreventeted() { // In error case where minimum bet is negative
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS,
-				new Thresholds(new BigDecimal("-1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC), UUID.randomUUID());
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(new BigDecimal("-1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS,
+				DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC), UUID.randomUUID());
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		table.join(0, blackjackPlayer);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 1);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
-			table.bet(blackjackPlayer, new BigDecimal("-10.1"));
+			table.bet(blackjackPlayer.getId(), new BigDecimal("-10.1"));
 		});
 		assertEquals(9, exception.getCode());
 	}

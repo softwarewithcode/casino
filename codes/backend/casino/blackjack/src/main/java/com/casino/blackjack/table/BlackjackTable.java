@@ -5,12 +5,12 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.casino.blackjack.external.IBlackjackTable;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.table.IBlackjackTable;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
 import com.casino.common.table.Thresholds;
@@ -28,7 +28,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 //
 	@Override
-	public boolean join(int seatNumber, ICasinoPlayer player) {
+	public boolean join(UUID playerId, String playerName, BigDecimal balance, int seatNumber) {
+		BlackjackPlayer player = new BlackjackPlayer(playerName, playerId, balance, this);
 		boolean gotSeat = super.trySeat(seatNumber, player);
 		if (gotSeat)
 			dealer.handleNewPlayer(player);
@@ -36,9 +37,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void bet(ICasinoPlayer player, BigDecimal bet) {
-		// Replaces previous bet if bet is allowed. UI handles usability
+	public void bet(UUID playerId, BigDecimal bet) {
 		try {
+			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
 			if (isGamePhase(GamePhase.BET))
 				dealer.updatePlayerBet(player, bet);
 			else {
@@ -51,8 +52,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void insure(BlackjackPlayer player) {
+	public void insure(UUID playerId) {
 		try {
+			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
 			if (isGamePhase(GamePhase.INSURE))
 				dealer.insure(player);
 			else {
@@ -65,8 +67,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void stand(BlackjackPlayer player) {
+	public void stand(UUID playerId) {
 		try {
+			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
 			lockPlayerInTurn(player, "stand");// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "stand");
 			dealer.stand(player);
@@ -84,8 +87,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void hit(BlackjackPlayer player) {
+	public void hit(UUID playerId) {
 		try {
+			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
 			lockPlayerInTurn(player, "takeCard");// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "takeCard");
 			dealer.addPlayerCard(player);
@@ -96,8 +100,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void split(BlackjackPlayer player) {
+	public void split(UUID playerId) {
 		try {
+			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
 			lockPlayerInTurn(player, "splitStartingHand");
 			verifyActionClearance(player, "splitStartingHand");
 			dealer.handleSplit(player);
@@ -107,8 +112,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public void doubleDown(BlackjackPlayer player) {
+	public void doubleDown(UUID playerId) {
 		try {
+			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
 			lockPlayerInTurn(player, "doubleDown");
 			verifyActionClearance(player, "doubleDown");
 			dealer.doubleDown(player);

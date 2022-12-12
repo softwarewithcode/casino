@@ -27,7 +27,8 @@ public class SeatTest extends BaseTest {
 	}
 
 	private BlackjackTable createNewTable() {
-		return new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
+		return new BlackjackTable(Status.WAITING_PLAYERS,
+				new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
 				UUID.randomUUID());
 	}
 
@@ -35,7 +36,7 @@ public class SeatTest extends BaseTest {
 	public void takingSeatChangesWatcherToPlayer() {
 		BlackjackTable table = createNewTable();
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		table.join(0, blackjackPlayer);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
 		Assertions.assertEquals(0, table.getWatchers().size());
 		Assertions.assertEquals(1, table.getPlayers().size());
 	}
@@ -45,8 +46,8 @@ public class SeatTest extends BaseTest {
 		BlackjackTable table = createNewTable();
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		table.join(0, blackjackPlayer);
-		table.join(0, blackjackPlayer2);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
+		table.join(blackjackPlayer2.getId(), blackjackPlayer2.getName(), blackjackPlayer2.getBalance(), 0);
 		Assertions.assertEquals(blackjackPlayer, table.getSeats().stream().filter(seat -> seat.getPlayer() != null).findFirst().get().getPlayer());
 	}
 
@@ -55,15 +56,15 @@ public class SeatTest extends BaseTest {
 		BlackjackTable table = createNewTable();
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("4.99"), table);
 		assertThrows(IllegalArgumentException.class, () -> {
-			table.join(0, blackjackPlayer);
+			table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
 		});
 		Assertions.assertEquals(0, table.getPlayers().size());
 	}
 
 	@Test
 	public void seatsAreCreatedPerSeatRequirement() {
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 6, 15, Type.PUBLIC),
-				UUID.randomUUID());
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS,
+				new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 6, 15, Type.PUBLIC), UUID.randomUUID());
 		Assertions.assertEquals(15, table.getSeats().size());
 	}
 
@@ -71,7 +72,8 @@ public class SeatTest extends BaseTest {
 	public void exceptionIsThrownIfNotEnoughSeatsForMaximumAmountPlayers() {
 		String expectedMessage = "not enough seats for the players";
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 6, 2, Type.PUBLIC), UUID.randomUUID());
+			new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 6, 2, Type.PUBLIC),
+					UUID.randomUUID());
 		});
 		String actualMessage = exception.getMessage();
 		assertEquals(expectedMessage, actualMessage);

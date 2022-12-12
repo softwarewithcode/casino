@@ -62,9 +62,9 @@ public class DealerTest extends BaseTest {
 	public void gamePhaseChangesFromBetToPlayAfterBetPhaseEnd() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		assertEquals(GamePhase.BET, table.getGamePhase());
-		table.join(1, blackjackPlayer);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 1);
 		assertEquals(GamePhase.BET, table.getGamePhase());
-		table.bet(blackjackPlayer, new BigDecimal("99.0"));
+		table.bet(blackjackPlayer.getId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(GamePhase.PLAY, table.getGamePhase());
 	}
@@ -73,51 +73,42 @@ public class DealerTest extends BaseTest {
 	public void tableStatusChangesFromWaitingToRunningAfterFirstPlayerTakesSeat() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		assertTrue(table.getStatus() == Status.WAITING_PLAYERS);
-		assertTrue(table.join(1, blackjackPlayer));
+		assertTrue(table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 1));
 		assertTrue(table.getStatus() == Status.RUNNING);
 	}
 
 	@Test
 	public void twoCardsIsAddedToStartingHandAfterPlacingBet() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		assertEquals(1, blackjackPlayer.getHands().size());
-		assertEquals(0, blackjackPlayer.getHands().get(0).getCards().size());
-		table.join(6, blackjackPlayer);
-		table.bet(blackjackPlayer, new BigDecimal("50.0"));
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 6);
+		table.bet(blackjackPlayer.getId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(2, blackjackPlayer.getHands().get(0).getCards().size());
+		assertEquals(2, table.getPlayer(blackjackPlayer.getId()).getHands().get(0).getCards().size());
 	}
 
 	@Test
-	public void playersReceiveTwoCardsInFirstHandDuringInitialDeal() {
+	public void playersBalanceGetAdjustedAccordingToBet() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		table.join(1, blackjackPlayer);
-		table.join(2, blackjackPlayer2);
-		table.bet(blackjackPlayer, new BigDecimal("54.0"));
-		table.bet(blackjackPlayer2, new BigDecimal("51.0"));
-		assertEquals(1, blackjackPlayer.getHands().size());
-		assertEquals(0, blackjackPlayer.getHands().get(0).getCards().size());
-		assertEquals(1, blackjackPlayer2.getHands().size());
-		assertEquals(0, blackjackPlayer2.getHands().get(0).getCards().size());
-		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS); //
-		assertEquals(2, blackjackPlayer.getHands().get(0).getCards().size());
-		assertEquals(2, blackjackPlayer2.getHands().get(0).getCards().size());
-		assertEquals(1, blackjackPlayer.getHands().size());
-		assertEquals(1, blackjackPlayer2.getHands().size());
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 1);
+		table.join(blackjackPlayer2.getId(), blackjackPlayer2.getName(), blackjackPlayer2.getBalance(), 2);
+		table.bet(blackjackPlayer.getId(), new BigDecimal("54.0"));
+		table.bet(blackjackPlayer2.getId(), new BigDecimal("51.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("946.00"), table.getPlayer(blackjackPlayer.getId()).getBalance());
+		assertEquals(new BigDecimal("949.00"), table.getPlayer(blackjackPlayer2.getId()).getBalance());
 	}
 
 	@Test
 	public void onlyPlayerWithBetReceivesStartingHand() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
-		assertTrue(table.join(1, blackjackPlayer));
-		assertTrue(table.join(2, blackjackPlayer2));
-		// var dealer = (BlackjackDealer) table.getDealer();
-		table.bet(blackjackPlayer, new BigDecimal("50.0"));
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 1);
+		table.join(blackjackPlayer2.getId(), blackjackPlayer2.getName(), blackjackPlayer2.getBalance(), 2);
+		table.bet(blackjackPlayer.getId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS); // w for the dealer to complete. Just a number
-		assertEquals(2, blackjackPlayer.getHands().get(0).getCards().size());
-		assertEquals(0, blackjackPlayer2.getHands().get(0).getCards().size());
+		assertEquals(2, table.getPlayer(blackjackPlayer.getId()).getHands().get(0).getCards().size());
+		assertEquals(0, table.getPlayer(blackjackPlayer2.getId()).getHands().get(0).getCards().size());
 	}
 
 	@Test
@@ -132,22 +123,22 @@ public class DealerTest extends BaseTest {
 	public void betChangeDoesNotMakeOnTimeAndLastReceivedBetIsUsed() {
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("100"), table);
 		BlackjackPlayer blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("100"), table);
-		table.join(5, blackjackPlayer);
-		table.join(6, blackjackPlayer2);
-		table.bet(blackjackPlayer, new BigDecimal("11.11"));
-		table.bet(blackjackPlayer2, new BigDecimal("22.67"));
-		table.bet(blackjackPlayer, new BigDecimal("44.55"));
-		table.bet(blackjackPlayer2, new BigDecimal("51.00"));
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 1);
+		table.join(blackjackPlayer2.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 2);
+		table.bet(blackjackPlayer.getId(), new BigDecimal("11.11"));
+		table.bet(blackjackPlayer2.getId(), new BigDecimal("22.67"));
+		table.bet(blackjackPlayer.getId(), new BigDecimal("44.55"));
+		table.bet(blackjackPlayer2.getId(), new BigDecimal("51.00"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.bet(blackjackPlayer2, new BigDecimal("99.0"));
+			table.bet(blackjackPlayer2.getId(), new BigDecimal("99.0"));
 		});
-		assertEquals(new BigDecimal("44.55"), blackjackPlayer.getHands().get(0).getBet());
-		assertEquals(new BigDecimal("44.55"), blackjackPlayer.getTotalBet());
-		assertEquals(new BigDecimal("55.45"), blackjackPlayer.getBalance());
-		assertEquals(new BigDecimal("51.00"), blackjackPlayer2.getHands().get(0).getBet());
-		assertEquals(new BigDecimal("51.00"), blackjackPlayer2.getTotalBet());
-		assertEquals(new BigDecimal("49.00"), blackjackPlayer2.getBalance());
+		assertEquals(new BigDecimal("44.55"), table.getPlayer(blackjackPlayer.getId()).getHands().get(0).getBet());
+		assertEquals(new BigDecimal("44.55"), table.getPlayer(blackjackPlayer.getId()).getTotalBet());
+		assertEquals(new BigDecimal("55.45"), table.getPlayer(blackjackPlayer.getId()).getBalance());
+		assertEquals(new BigDecimal("51.00"), table.getPlayer(blackjackPlayer2.getId()).getHands().get(0).getBet());
+		assertEquals(new BigDecimal("51.00"), table.getPlayer(blackjackPlayer2.getId()).getTotalBet());
+		assertEquals(new BigDecimal("49.00"), table.getPlayer(blackjackPlayer2.getId()).getBalance());
 	}
 
 	@Test
@@ -160,19 +151,19 @@ public class DealerTest extends BaseTest {
 		cards.add(Card.of(4, Suit.SPADE));
 		cards.add(Card.of(3, Suit.HEART));
 		cards.add(Card.of(2, Suit.SPADE));
-		table.join(0, blackjackPlayer);
-		table.join(3, blackjackPlayer2);
-		table.join(6, blackjackPlayer3);
-		table.bet(blackjackPlayer, new BigDecimal("11.11"));
-		table.bet(blackjackPlayer2, new BigDecimal("22.67"));
-		table.bet(blackjackPlayer3, new BigDecimal("44.55"));
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
+		table.join(blackjackPlayer2.getId(), blackjackPlayer2.getName(), blackjackPlayer2.getBalance(), 3);
+		table.join(blackjackPlayer3.getId(), blackjackPlayer3.getName(), blackjackPlayer3.getBalance(), 6);
+		table.bet(blackjackPlayer.getId(), new BigDecimal("11.11"));
+		table.bet(blackjackPlayer2.getId(), new BigDecimal("22.67"));
+		table.bet(blackjackPlayer3.getId(), new BigDecimal("44.55"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(2, blackjackPlayer.getActiveHand().getCards().get(0).getRank());
-		assertEquals(6, blackjackPlayer.getActiveHand().getCards().get(1).getRank());
-		assertEquals(3, blackjackPlayer2.getActiveHand().getCards().get(0).getRank());
-		assertEquals(7, blackjackPlayer2.getActiveHand().getCards().get(1).getRank());
-		assertEquals(4, blackjackPlayer3.getActiveHand().getCards().get(0).getRank());
-		assertEquals(8, blackjackPlayer3.getActiveHand().getCards().get(1).getRank());
+		assertEquals(2, table.getPlayer(blackjackPlayer.getId()).getActiveHand().getCards().get(0).getRank());
+		assertEquals(6, table.getPlayer(blackjackPlayer.getId()).getActiveHand().getCards().get(1).getRank());
+		assertEquals(3, table.getPlayer(blackjackPlayer2.getId()).getActiveHand().getCards().get(0).getRank());
+		assertEquals(7, table.getPlayer(blackjackPlayer2.getId()).getActiveHand().getCards().get(1).getRank());
+		assertEquals(4, table.getPlayer(blackjackPlayer3.getId()).getActiveHand().getCards().get(0).getRank());
+		assertEquals(8, table.getPlayer(blackjackPlayer3.getId()).getActiveHand().getCards().get(1).getRank());
 		assertEquals(5, dealer.getHand().getCards().get(0).getRank());
 		assertEquals(1, dealer.getHand().getCards().size());
 	}
@@ -188,25 +179,25 @@ public class DealerTest extends BaseTest {
 		cards.add(Card.of(3, Suit.HEART));
 		cards.add(Card.of(2, Suit.SPADE));
 		assertFalse(table.isDealerTurn());
-		table.join(0, blackjackPlayer);
-		table.join(3, blackjackPlayer2);
-		table.join(6, blackjackPlayer3);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 0);
+		table.join(blackjackPlayer2.getId(), blackjackPlayer2.getName(), blackjackPlayer2.getBalance(), 3);
+		table.join(blackjackPlayer3.getId(), blackjackPlayer3.getName(), blackjackPlayer3.getBalance(), 6);
 		assertFalse(table.isDealerTurn());
-		table.bet(blackjackPlayer, new BigDecimal("11.11"));
-		table.bet(blackjackPlayer2, new BigDecimal("22.67"));
-		table.bet(blackjackPlayer3, new BigDecimal("44.55"));
+		table.bet(blackjackPlayer.getId(), new BigDecimal("11.11"));
+		table.bet(blackjackPlayer2.getId(), new BigDecimal("22.67"));
+		table.bet(blackjackPlayer3.getId(), new BigDecimal("44.55"));
 		assertFalse(table.isDealerTurn());
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(blackjackPlayer, table.getPlayerInTurn());
+		assertEquals(blackjackPlayer, table.getPlayerInTurn()); // equals compares UUID -> both have the same
 		assertFalse(table.isDealerTurn());
-		table.stand(blackjackPlayer);
+		table.stand(blackjackPlayer.getId());
 		assertFalse(table.isDealerTurn());
 		assertEquals(blackjackPlayer2, table.getPlayerInTurn());
 		assertFalse(table.isDealerTurn());
-		table.stand(blackjackPlayer2);
+		table.stand(blackjackPlayer2.getId());
 		assertFalse(table.isDealerTurn());
 		assertEquals(blackjackPlayer3, table.getPlayerInTurn());
-		table.stand(blackjackPlayer3);
+		table.stand(blackjackPlayer3.getId());
 		assertTrue(table.isDealerTurn());
 		assertNull(table.getPlayerInTurn());
 	}
@@ -225,25 +216,25 @@ public class DealerTest extends BaseTest {
 		cards.add(Card.of(10, Suit.HEART));
 		cards.add(Card.of(10, Suit.SPADE));
 		assertFalse(table.isDealerTurn());
-		table.join(0, blackjackPlayer);
-		table.join(3, blackjackPlayer2);
-		table.join(6, blackjackPlayer3);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 1);
+		table.join(blackjackPlayer2.getId(), blackjackPlayer2.getName(), blackjackPlayer2.getBalance(), 3);
+		table.join(blackjackPlayer3.getId(), blackjackPlayer3.getName(), blackjackPlayer3.getBalance(), 6);
 		assertFalse(table.isDealerTurn());
-		table.bet(blackjackPlayer, new BigDecimal("11.11"));
-		table.bet(blackjackPlayer2, new BigDecimal("22.67"));
-		table.bet(blackjackPlayer3, new BigDecimal("44.55"));
+		table.bet(blackjackPlayer.getId(), new BigDecimal("11.11"));
+		table.bet(blackjackPlayer2.getId(), new BigDecimal("22.67"));
+		table.bet(blackjackPlayer3.getId(), new BigDecimal("44.55"));
 		assertFalse(table.isDealerTurn());
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(blackjackPlayer, table.getPlayerInTurn());
 		assertFalse(table.isDealerTurn());
-		table.hit(blackjackPlayer);
+		table.hit(blackjackPlayer.getId());
 		assertFalse(table.isDealerTurn());
 		assertEquals(blackjackPlayer2, table.getPlayerInTurn());
 		assertFalse(table.isDealerTurn());
-		table.hit(blackjackPlayer2);
+		table.hit(blackjackPlayer2.getId());
 		assertFalse(table.isDealerTurn());
 		assertEquals(blackjackPlayer3, table.getPlayerInTurn());
-		table.hit(blackjackPlayer3);
+		table.hit(blackjackPlayer3.getId());
 		assertTrue(table.isDealerTurn());
 		assertNull(table.getPlayerInTurn());
 	}
@@ -262,25 +253,25 @@ public class DealerTest extends BaseTest {
 		cards.add(Card.of(10, Suit.HEART));
 		cards.add(Card.of(10, Suit.SPADE));
 		assertFalse(table.isDealerTurn());
-		table.join(0, blackjackPlayer);
-		table.join(3, blackjackPlayer2);
-		table.join(6, blackjackPlayer3);
+		table.join(blackjackPlayer.getId(), blackjackPlayer.getName(), blackjackPlayer.getBalance(), 1);
+		table.join(blackjackPlayer2.getId(), blackjackPlayer2.getName(), blackjackPlayer2.getBalance(), 4);
+		table.join(blackjackPlayer3.getId(), blackjackPlayer3.getName(), blackjackPlayer3.getBalance(), 5);
 		assertFalse(table.isDealerTurn());
-		table.bet(blackjackPlayer, new BigDecimal("11.11"));
-		table.bet(blackjackPlayer2, new BigDecimal("22.67"));
-		table.bet(blackjackPlayer3, new BigDecimal("44.55"));
+		table.bet(blackjackPlayer.getId(), new BigDecimal("11.11"));
+		table.bet(blackjackPlayer2.getId(), new BigDecimal("22.67"));
+		table.bet(blackjackPlayer3.getId(), new BigDecimal("44.55"));
 		assertFalse(table.isDealerTurn());
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(blackjackPlayer, table.getPlayerInTurn());
 		assertFalse(table.isDealerTurn());
-		table.hit(blackjackPlayer);
+		table.hit(blackjackPlayer.getId());
 		assertFalse(table.isDealerTurn());
 		assertEquals(blackjackPlayer2, table.getPlayerInTurn());
 		assertFalse(table.isDealerTurn());
-		table.hit(blackjackPlayer2);
+		table.hit(blackjackPlayer2.getId());
 		assertFalse(table.isDealerTurn());
-		assertEquals(blackjackPlayer3, table.getPlayerInTurn());
-		table.hit(blackjackPlayer3);
+		assertEquals(blackjackPlayer3, table.getPlayerInTurn()); // equals compares UUID
+		table.hit(blackjackPlayer3.getId());
 		assertTrue(table.isDealerTurn());
 		assertNull(table.getPlayerInTurn());
 	}

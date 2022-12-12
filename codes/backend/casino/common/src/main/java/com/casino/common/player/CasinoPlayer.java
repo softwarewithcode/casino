@@ -12,8 +12,9 @@ import com.casino.common.bet.BetUtil;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.table.ICasinoTable;
 
-public abstract class CasinoPlayer implements ICasinoPlayer {
+public abstract class CasinoPlayer<T> implements ICasinoPlayer {
 	private static final Logger LOGGER = Logger.getLogger(CasinoPlayer.class.getName());
+	private T type;
 	private final String name;
 	private final UUID id;
 	private final BigDecimal initialBalance;

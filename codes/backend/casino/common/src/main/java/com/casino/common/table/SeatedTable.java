@@ -83,6 +83,14 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return optionalSeat.isPresent() ? optionalSeat.get().getPlayer() : null;
 	}
 
+
+	public ICasinoPlayer getPlayer(UUID playerId) {
+		if (playerId == null)
+			return null;
+		Optional<Seat> optionalSeat = getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getId().equals(playerId)).findAny();
+		return optionalSeat.isPresent() ? optionalSeat.get().getPlayer() : null;
+	}
+
 	@Override
 	public boolean watch(ICasinoPlayer player) {
 		return super.joinAsWatcher(player);
