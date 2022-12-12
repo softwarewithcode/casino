@@ -1,15 +1,29 @@
 package com.casino.common.user;
 
-import java.util.List;
 import java.util.UUID;
 
-public interface User {
+public class User {
 
-	public String getName();
+	private final String name;
+	private final UUID tableId;
+	private final UUID id;
 
-	public UUID getId();
+	public User(String name, UUID tableId, UUID id) {
+		super();
+		this.name = name;
+		this.tableId = tableId;
+		this.id = id;
+	}
 
-	public Status getStatus();
+	public String getName() {
+		return name;
+	}
 
-	public List<UUID> getTables();
+	public UUID getTableId() {
+		return tableId;
+	}
+
+	public UUID getId() {
+		return id;
+	}
 }
