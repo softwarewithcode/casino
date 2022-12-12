@@ -66,7 +66,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	}
 
-	public ReentrantLock getPlayerLock() {
+	protected ReentrantLock getPlayerLock() {
 		return playerLock;
 	}
 
@@ -127,40 +127,40 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@Override
 	public void subtractTotalBetFromBalance() {
 		try {
-			tryTakingModificationLock();
+			tryTakingPlayerLock();
 			if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0)
 				throw new IllegalArgumentException("Balance missing or negative. Waiting for manager's call" + balance);
 			if (totalBet == null || totalBet.compareTo(BigDecimal.ZERO) < 0)
 				throw new IllegalBetException("Bet missing or negative:" + totalBet, 9);
 			this.balance = balance.subtract(totalBet);
 		} finally {
-			releaseModificationLockIfOwner();
+			releasePlayerLock();
 		}
 	}
 
-	protected void releaseModificationLockIfOwner() {
+	protected void releasePlayerLock() {
 		if (getPlayerLock().isHeldByCurrentThread())
 			getPlayerLock().unlock();
 	}
 
-	protected void tryTakingModificationLock() {
+	protected void tryTakingPlayerLock() {
 		if (!getPlayerLock().tryLock())
 			throw new ConcurrentModificationException("playerLock was not obtained" + playerLock + " t:" + Thread.currentThread());
 	}
 
 	public void increaseBalance(BigDecimal amount) {
 		try {
-			tryTakingModificationLock();
+			tryTakingPlayerLock();
 			this.balance = balance.add(amount);
 		} finally {
-			releaseModificationLockIfOwner();
+			releasePlayerLock();
 		}
 	}
 
 	@Override
 	public void removeTotalBet() {
 		try {
-			tryTakingModificationLock();
+			tryTakingPlayerLock();
 			this.totalBet = null;
 		} finally {
 			if (playerLock.isHeldByCurrentThread())

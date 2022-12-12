@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import com.casino.common.cards.Card;
@@ -14,23 +15,26 @@ import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPlayerActionException;
 
 /*
- * This class is not thread safe by itself. Caller should prevent simultaneous modifications.
+ * Player(s) and internal timers are possible concurrent actors. BlackjackPlayer getHands() - hands out references to these hands.
+ * 
  */
 public class BlackjackHand implements IHand {
 	private final UUID id;
 	private final Instant created;
 	private final List<Card> cards;
-	private Instant completed;
-	private boolean active;
-	private boolean doubled;
-	private BigDecimal bet;
-	private BigDecimal insuranceBet;
+	private volatile Instant completed;
+	private volatile boolean active;
+	private volatile boolean doubled;
+	private volatile BigDecimal bet;
+	private volatile BigDecimal insuranceBet;
+	private ReentrantLock lock;
 
 	public BlackjackHand(UUID id, boolean active) {
 		this.id = id;
 		this.created = Instant.now();
 		cards = new ArrayList<Card>();
 		this.active = active;
+		lock = new ReentrantLock();
 	}
 
 	@Override
@@ -64,13 +68,18 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public void addCard(Card card) {
-		if (card == null)
-			throw new IllegalArgumentException("Card is missing");
-		if (isCompleted()) // inactive hand can still get a card in split.
-			throw new IllegalPlayerActionException("Hand is completed cannot add card " + this, 19);
-		this.cards.add(card);
-		if (shouldComplete())
-			complete();
+		try {
+			lock.lock();
+			if (card == null)
+				throw new IllegalArgumentException("Card is missing");
+			if (isCompleted()) // inactive hand can still get a card in split.
+				throw new IllegalStateException("Hand is completed, cannot add card " + this);
+			this.cards.add(card);
+			if (shouldComplete())
+				complete();
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	public boolean isDoubled() {
@@ -120,10 +129,15 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public void complete() {
-		if (isCompleted())
-			throw new IllegalPlayerActionException("complete called on completed hand", 15);
-		this.completed = Instant.now();
-		this.active = false;
+		try {
+//			lock.lock();
+			if (isCompleted())
+				throw new IllegalStateException("complete called on completed hand");
+			this.completed = Instant.now();
+			this.active = false;
+		} finally {
+//			lock.unlock();
+		}
 	}
 
 	@Override
@@ -133,24 +147,41 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public void activate() {
-		active = true;
+		try {
+			lock.lock();
+			if (isCompleted())
+				throw new IllegalStateException("cannot activate completed hand " + this);
+			active = true;
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
 	public void doubleDown(Card ref) {
-		if (!isActive() || isDoubled())
-			throw new IllegalPlayerActionException("doubling not allowed active:" + isActive(), 15);
-		this.doubled = true;
-		this.bet = this.bet.multiply(BigDecimal.TWO);
-		this.cards.add(ref);
-		this.complete();
+		try {
+			lock.lock();
+			if (!isActive() || isDoubled())
+				throw new IllegalPlayerActionException("doubling not allowed active:" + this, 15);
+			this.doubled = true;
+			this.bet = this.bet.multiply(BigDecimal.TWO);
+			this.cards.add(ref);
+			this.complete();
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
 	public void stand() {
-		if (!isActive())
-			throw new IllegalPlayerActionException("stand called on inactive hand", 15);
-		this.complete();
+		try {
+			lock.lock();
+			if (!isActive())
+				throw new IllegalPlayerActionException("stand called on inactive hand", 15);
+			this.complete();
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
@@ -168,7 +199,7 @@ public class BlackjackHand implements IHand {
 	@Override
 	public Integer getFinalValue() {
 		if (!isCompleted() || getCards().size() < 2)
-			throw new IllegalArgumentException("hand has not enough cards or is not completed:" + this);
+			throw new IllegalArgumentException("hand has not enough cards " + getCards().size() + " or is not completed:" + completed);
 		List<Integer> values = calculateValues();
 		Integer first = values.get(0);
 		if (values.size() != 2)
@@ -183,9 +214,14 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public void insure() {
-		if (!isActive() || isInsured() || isBlackjack())
-			throw new IllegalPlayerActionException("insurance not allowed:" + this, 15);
-		insuranceBet = bet.divide(BigDecimal.TWO);
+		try {
+			lock.lock();
+			if (!isActive() || isInsured() || isBlackjack())
+				throw new IllegalPlayerActionException("insurance not allowed:" + this, 15);
+			insuranceBet = bet.divide(BigDecimal.TWO);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override

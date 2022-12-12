@@ -39,12 +39,12 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public void prepareNextRound() {
 		try {
-			tryTakingModificationLock();
+			tryTakingPlayerLock();
 			hands = new ArrayList<IHand>();
 			hands.add(createNewHand(true));
 			this.removeTotalBet();
 		} finally {
-			releaseModificationLockIfOwner();
+			releasePlayerLock();
 		}
 	}
 
@@ -58,7 +58,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public void splitStartingHand() {
 		try {
-			tryTakingModificationLock();
+			tryTakingPlayerLock();
 			validateSplitPreConditions();
 			BetUtil.verifySufficentBalance(hands.get(0).getBet(), this); // Check balance after getting lock
 			IHand splitHand = new BlackjackHand(UUID.randomUUID(), false);
@@ -68,19 +68,19 @@ public class BlackjackPlayer extends CasinoPlayer {
 			updateBalanceAndBet(splitHand.getBet());
 			hands.add(splitHand);
 		} finally {
-			releaseModificationLockIfOwner();
+			releasePlayerLock();
 		}
 	}
 
 	public void stand() {
 		try {
-			tryTakingModificationLock();
+			tryTakingPlayerLock();
 			IHand activeHand = getActiveHand();
 			activeHand.stand();
 			if (shouldActivateSecondHand(activeHand))
 				activateSecondHand();
 		} finally {
-			releaseModificationLockIfOwner();
+			releasePlayerLock();
 		}
 	}
 
@@ -94,29 +94,29 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public void doubleDown(Card ref) {
 		try {
-			tryTakingModificationLock();
+			tryTakingPlayerLock();
 			validateDoubleDownPreConditions();
 			updateBalanceAndBet(getTotalBet());
 			getFirstHand().doubleDown(ref);
 		} finally {
-			releaseModificationLockIfOwner();
+			releasePlayerLock();
 		}
 	}
 
 	@Override
 	public void updateStartingBet(BigDecimal bet, ICasinoTable table) {
 		try {
-			tryTakingModificationLock();
+			tryTakingPlayerLock();
 			super.updateStartingBet(bet, table);
 			// getFirstHand().updateBet(bet);
 		} finally {
-			releaseModificationLockIfOwner();
+			releasePlayerLock();
 		}
 	}
 
 	public void insure() {
 		try {
-			tryTakingModificationLock();
+			tryTakingPlayerLock();
 			validateInsuringConditions();
 			getFirstHand().insure();
 			updateBalanceAndBet(getFirstHand().getBet().divide(BigDecimal.TWO));
@@ -175,15 +175,15 @@ public class BlackjackPlayer extends CasinoPlayer {
 		if (hand == null)
 			throw new IllegalArgumentException("cannot add card to non existing hand");
 		try {
-			tryTakingModificationLock();
+			tryTakingPlayerLock();
 			hand.addCard(card);
 		} finally {
-			releaseModificationLockIfOwner();
+			releasePlayerLock();
 		}
 	}
 
 	public void clearHands() {
-		tryTakingModificationLock();
+		tryTakingPlayerLock();
 		hands.clear();
 	}
 
@@ -210,11 +210,11 @@ public class BlackjackPlayer extends CasinoPlayer {
 	@Override
 	public void reset() {
 		try {
-			tryTakingModificationLock();
+			tryTakingPlayerLock();
 			super.reset();
 			hands = new ArrayList<IHand>();
 		} finally {
-			releaseModificationLockIfOwner();
+			releasePlayerLock();
 		}
 		// hands.add(createNewHand(true));
 	}

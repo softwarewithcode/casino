@@ -17,6 +17,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.casino.blackjack.player.BlackjackHand;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.blackjack.table.BlackjackTable;
@@ -41,6 +42,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	private BlackjackTable table;
 	private BlackjackPlayer blackjackPlayer;
 	private BlackjackPlayer blackjackPlayer2;
+	BlackjackPlayer doubleDownPlayer;
 	private BlackjackDealer dealer;
 	private volatile int playersWhoGotSeat;
 	private volatile int playerWhoDidNotGetSeat;
@@ -56,8 +58,13 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 					UUID.randomUUID());
 			blackjackPlayer = new BlackjackPlayer("JohnDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
 			blackjackPlayer2 = new BlackjackPlayer("JaneDoe", UUID.randomUUID(), new BigDecimal("1000"), table);
+			doubleDownPlayer = new BlackjackPlayer("player:" + 0, UUID.randomUUID(), new BigDecimal("10000000.0"), table);
 			playerWhoDidNotGetSeat = 0;
 			playersWhoGotSeat = 0;
+			rejectedDoubles = 0;
+			rejectedInsurances = 0;
+			playersWhoGotSeat = 0;
+			playerWhoDidNotGetSeat = 0;
 			BlackjackDealer dealer = getDealer(table);
 			List<Card> cards = dealer.getDecks();
 			cards.add(Card.of(4, Suit.CLUB));
@@ -96,7 +103,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		rejectedInsurances++;
 	}
 
-	private synchronized void updateRejectedDoubles() {
+	private synchronized void updateRejectedDoubleDowns() {
 		rejectedDoubles++;
 	}
 
@@ -126,7 +133,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	}
 
 	@Test
-	public void insuranceCanBetSetOnlyOnce() throws InterruptedException, BrokenBarrierException {
+	public void insuranceCanBetSetOnlyOnceByPlayer() throws InterruptedException, BrokenBarrierException {
 		table = new BlackjackTable(Status.WAITING_PLAYERS,
 				new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 49, 49, Type.PUBLIC), UUID.randomUUID());
 		List<Card> cards = getDealer(table).getDecks();
@@ -165,11 +172,23 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		casinoBarrier.await();
 		sleep(BET_ROUND_TIME_SECONDS + INSURANCE_ROUND_TIME_SECONDS + 1, ChronoUnit.SECONDS);
 		assertEquals(27, rejectedInsurances);
-
 	}
 
 	@Test
-	public void doubleDownCanBeDoneOnlyOnce() throws InterruptedException, BrokenBarrierException {
+	public void doubleDownCanDoneOnlyOnceDirectlyCallingHand() throws InterruptedException, BrokenBarrierException {
+		table = new BlackjackTable(Status.WAITING_PLAYERS,
+				new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 49, 49, Type.PUBLIC), UUID.randomUUID());
+		System.out.println(doubleDownPlayer.getBalance());
+		CyclicBarrier casinoBarrier = new CyclicBarrier(1001);
+		List<Thread> threads = createDoubleDownThreads(1000, casinoBarrier);
+		threads.forEach(Thread::start);
+		casinoBarrier.await();
+		sleep(1, ChronoUnit.SECONDS);
+		assertEquals(999, rejectedDoubles);
+	}
+
+	@Test
+	public void doubleDownCanBeDoneOnlyOnceByPlayer() throws InterruptedException, BrokenBarrierException {
 		table = new BlackjackTable(Status.WAITING_PLAYERS,
 				new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 49, 49, Type.PUBLIC), UUID.randomUUID());
 		List<Card> cards = getDealer(table).getDecks();
@@ -270,7 +289,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 
 			} catch (Exception e) {
 				LOGGER.log(Level.INFO, "doubling down excption:", e);
-				updateRejectedDoubles();
+				updateRejectedDoubleDowns();
 			}
 		})).toList();
 	}
@@ -300,6 +319,24 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 			} catch (Exception e) {
 				LOGGER.log(Level.INFO, "insurance excption:", e);
 				updateRejectedInsuranceCount();
+			}
+		})).toList();
+	}
+
+	private List<Thread> createDoubleDownThreads(int amount, CyclicBarrier casinoDoor) {
+		BlackjackHand hand = (BlackjackHand) doubleDownPlayer.getActiveHand();
+		hand.addCard(Card.of(2, Suit.CLUB));
+		hand.addCard(Card.of(2, Suit.HEART));
+		hand.updateBet(new BigDecimal("10.0"));
+		return IntStream.rangeClosed(0, amount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
+			try {
+				BlackjackHand hand_ = (BlackjackHand) doubleDownPlayer.getHands().get(0);
+				casinoDoor.await();
+				hand_.doubleDown(Card.of(3, Suit.CLUB));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				updateRejectedDoubleDowns();
 			}
 		})).toList();
 	}
