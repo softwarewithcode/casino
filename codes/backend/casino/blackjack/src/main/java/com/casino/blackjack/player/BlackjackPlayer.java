@@ -12,13 +12,12 @@ import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.CasinoPlayer;
-import com.casino.common.table.IBlackjackPlayer;
 import com.casino.common.table.ICasinoTable;
 import com.casino.common.table.ISeatedTable;
 import com.casino.common.user.Action;
 import com.casino.common.user.Bridge;
 
-public class BlackjackPlayer extends CasinoPlayer implements IBlackjackPlayer {
+public class BlackjackPlayer extends CasinoPlayer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackPlayer.class.getName());
 	private List<IHand> hands;
 	private List<Action> actions;

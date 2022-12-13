@@ -10,6 +10,6 @@ module casino.common {
 	exports com.casino.common.common;
 	exports com.casino.common.table.timing;
 
+	requires jakarta.websocket;
 	requires java.logging;
-	requires transitive jakarta.websocket;
 }

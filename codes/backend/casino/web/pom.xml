@@ -16,6 +16,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>casino</groupId>
+			<artifactId>blackjack</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>casino</groupId>
 			<artifactId>common</artifactId>
 			<version>0.0.1</version>
 		</dependency>
@@ -54,11 +59,6 @@
 			<version>3.1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>jakarta.enterprise</groupId>
-			<artifactId>jakarta.enterprise.cdi-api</artifactId>
-			<version>4.0.1</version>
-		</dependency>
-		<dependency>
 			<groupId>jakarta.json</groupId>
 			<artifactId>jakarta.json-api</artifactId>
 			<version>2.0.1</version>
@@ -73,10 +73,16 @@
 			<artifactId>yasson</artifactId>
 			<version>3.0.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.9.1</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
-		<finalName>casino-web</finalName>
+		<finalName>casino.web</finalName>
 		<pluginManagement>
 			<plugins>
 				<plugin>

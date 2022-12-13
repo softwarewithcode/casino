@@ -5,12 +5,12 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.casino.blackjack.ext.BlackjackTableProxy;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
-import com.casino.common.table.IBlackjackTable;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
 import com.casino.common.table.Thresholds;
@@ -18,7 +18,7 @@ import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
 import com.casino.common.user.Bridge;
 
-public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
+public final class BlackjackTable extends SeatedTable implements BlackjackTableProxy {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
 	private final BlackjackDealer dealer;
 
@@ -34,6 +34,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		boolean gotSeat = super.trySeat(seatNumber, player);
 		if (gotSeat)
 			dealer.handleNewPlayer(player);
+		System.out.println("player Joined:" + player);
 		return gotSeat;
 	}
 
@@ -41,6 +42,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void bet(UUID playerId, BigDecimal bet) {
 		try {
 			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
+			System.out.println("player bet:" + bet);
 			if (isGamePhase(GamePhase.BET))
 				dealer.updatePlayerBet(player, bet);
 			else {

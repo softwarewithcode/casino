@@ -18,7 +18,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>common</finalName>
+		<finalName>casino.common</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
