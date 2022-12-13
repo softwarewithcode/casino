@@ -1,5 +1,6 @@
 package com.casino.common.table;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -13,11 +14,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.common.language.Language;
+import com.casino.common.player.CasinoPlayer;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePath;
 import com.casino.common.table.timing.Clock;
 import com.casino.common.table.timing.PlayerClockTask;
+import com.casino.common.user.Title;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.websocket.EncodeException;
 
 /**
  * Base class for all casino tables. Gather here common data and operations what
@@ -118,7 +124,7 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public boolean isOpen() {
-		return status == Status.WAITING_PLAYERS;
+		return status == Status.WAITING_PLAYERS || status == Status.RUNNING;
 	}
 
 	@Override
@@ -282,4 +288,20 @@ public abstract class CasinoTable implements ICasinoTable {
 		return Objects.equals(id, other.id);
 	}
 
+	protected synchronized void notifyPlayers(Title title) {
+		getPlayersAndWatchers().forEach(iplayer -> {
+			CasinoPlayer player = (CasinoPlayer) iplayer;
+			if (!player.getBridge().session().isOpen())
+				LOGGER.severe("websocket not open for:" + player);
+			System.out.println("Sending table to:" + player.getName());
+//			ObjectMapper objectMapper = new ObjectMapper();
+//			objectMapper.writ
+			try {
+				player.getBridge().session().getBasicRemote().sendText("Table " + getId() + " " + title);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+	}
 }

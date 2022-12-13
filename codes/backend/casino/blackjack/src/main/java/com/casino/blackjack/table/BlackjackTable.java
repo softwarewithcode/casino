@@ -17,6 +17,7 @@ import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
 import com.casino.common.user.Bridge;
+import com.casino.common.user.Title;
 
 public final class BlackjackTable extends SeatedTable implements BlackjackTableProxy {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
@@ -34,7 +35,8 @@ public final class BlackjackTable extends SeatedTable implements BlackjackTableP
 		boolean gotSeat = super.trySeat(seatNumber, player);
 		if (gotSeat)
 			dealer.handleNewPlayer(player);
-		System.out.println("player Joined:" + player);
+		System.out.println("New player joined " + bridge.name() + " with " + bridge.initialBalance());
+		notifyPlayers(Title.NEW_PLAYER);
 		return gotSeat;
 	}
 
@@ -170,6 +172,7 @@ public final class BlackjackTable extends SeatedTable implements BlackjackTableP
 	public void onBetPhaseEnd() {
 		LOGGER.entering(getClass().getName(), "onBetPhaseEnd");
 		try {
+			System.out.println("betphase has ended");
 			getPlayerInTurnLock().lock();
 			if (!isGamePhase(GamePhase.BET))
 				throw new IllegalPhaseException("GamePhase is not what is expected on betPhaseEnd", getGamePhase(), GamePhase.BET);

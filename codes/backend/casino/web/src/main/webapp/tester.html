@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Casino</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<script>
+	console.log("connecting")
+		let socket= new WebSocket('ws://localhost:8080/casino/blackjack/e021c3bf-ffd9-4f75-953f-61639222e50d');
+	 	if(socket){
+	 		console.log("got connection")
+	 	}
+		// Connection opened
+		socket.addEventListener('open', (event) => {
+			console.log("open")		
+		});
+		function join(message){
+			const json = {userId:'',action:'JOIN'}
+			const jsonObj = JSON.stringify(json);
+			console.log("obj:"+jsonObj)
+		    socket.send(jsonObj);
+		}
+		function placeBet(message){
+			const json = {amount:'55.75'}
+			const jsonObj = JSON.stringify(json);
+			console.log("obj:"+jsonObj)
+		    socket.send(jsonObj);
+		}
+		function take(message){
+			const json = {userId:''}
+			const jsonObj = JSON.stringify(json);
+			console.log("obj:"+jsonObj)
+		    socket.send(jsonObj);
+		}
+		socket.addEventListener('message', (event) => {
+			console.log("table sends:"+event)
+		    alert('Message from table: '+ event.data);
+		});
+</script>
+	Casino
+
+<br>
+<br>
+	<button  onclick="join()">Join table first</button>
+<br>
+	<br>
+<!--  	<button  onclick="placeBet()">Place bet</button>
+	<br><br>
+	<button  onclick="take()">Take</button>
+-->
+</body>
+</html>
+
+

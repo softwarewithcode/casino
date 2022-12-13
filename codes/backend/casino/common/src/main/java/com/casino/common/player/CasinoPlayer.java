@@ -174,6 +174,10 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		return balance.setScale(2, RoundingMode.DOWN);
 	}
 
+	public Bridge getBridge() {
+		return bridge;
+	}
+
 	@Override
 	public void reset() {
 		verifyCallersLock();

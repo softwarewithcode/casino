@@ -1,6 +1,8 @@
 package com.casino.blackjack.ext;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.casino.blackjack.table.BlackjackTable;
@@ -19,10 +21,23 @@ public class BlackjackTableService {
 	protected static final Integer MAX_PLAYERS = 7;
 	protected static final Integer DEFAULT_SEAT_COUNT = 7;
 
-	public BlackjackTableProxy getTable(UUID id) {
-		return new BlackjackTable(Status.WAITING_PLAYERS,
+	private List<BlackjackTable> tables = new ArrayList<>();
+
+	public BlackjackTableService() {
+		super();
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS,
 				new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
-				UUID.randomUUID());
+				UUID.fromString("e021c3bf-ffd9-4f75-953f-61639222e50d"));
+		tables.add(table);
 	}
 
+	public void monitorTables() {
+		// create new tables as tables get full?
+	}
+
+	public BlackjackTableProxy getTable(UUID id) {
+		if (id == null)
+			throw new IllegalArgumentException("no such table:" + id);
+		return tables.stream().filter(table -> table.getId().equals(id)&& table.isOpen()).findAny().orElse(null);
+	}
 }
