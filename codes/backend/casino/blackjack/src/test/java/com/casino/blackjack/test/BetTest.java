@@ -140,14 +140,31 @@ public class BetTest extends BaseTest {
 	}
 
 	@Test
-	public void negativeStartingBetIsPreventeted() { // In error case where minimum bet is negative
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(new BigDecimal("-1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS,
-				DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC), UUID.randomUUID());
+	public void creatingATableWithNegativeBetAmountIsNotAllowed() { // In error case where minimum bet is negative
+		assertThrows(IllegalArgumentException.class, () -> {
+			new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(new BigDecimal("-1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS,
+					MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC), UUID.randomUUID());
+		});
+	}
+
+	@Test
+	public void tableCannotBeCreatedIfMaximumBetIsLessThanMinimumBet() { // In error case where minimum bet is negative
+		assertThrows(IllegalArgumentException.class, () -> {
+			new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(new BigDecimal("1000.0"), new BigDecimal("100.0"), BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS,
+					MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC), UUID.randomUUID());
+
+		});
+	}
+
+	@Test
+	public void negativeStartingBetIsPrevented() { // In error case where minimum bet is negative
+		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS,
+				new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
+				UUID.randomUUID());
 		bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 		table.join(bridge, 1);
-		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
+		assertThrows(IllegalBetException.class, () -> {
 			table.bet(bridge.playerId(), new BigDecimal("-10.1"));
 		});
-		assertEquals(9, exception.getCode());
 	}
 }
