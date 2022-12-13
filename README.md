@@ -4,6 +4,7 @@
 Web module and tester html page can run on different servers that supports Jakarta EE 9.1 and WebSockets. 
 <br>For example TomEE Plume 9.0.0.RC1 <br> https://tomee.apache.org/download.html <br>
 http://localhost:8080/casino/ -> context-root and port from the logs or by custom configuration <br>
+Browser tries to contact ws://localhost:8080/casino/blackjack/.. -> if app is running http://localhost:8080/casino.web/ -> change tester.html accordingly
 ## initial idea and goals 25/11/2022
 * Build a casino where play money is used 
 * Start with a blackjack game 
