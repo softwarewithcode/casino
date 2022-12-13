@@ -3,8 +3,12 @@ package com.casino.common.table;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import com.casino.common.user.Bridge;
+
 public interface IBlackjackTable {
-	public boolean join(UUID playerId, String playerName, BigDecimal balance, int seatNumber);
+	public boolean join(Bridge user, int seatNumber);
+
+	public boolean watch(Bridge user);
 
 	public void bet(UUID playerId, BigDecimal bet);
 

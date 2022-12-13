@@ -11,4 +11,5 @@ module casino.common {
 	exports com.casino.common.table.timing;
 
 	requires java.logging;
+	requires transitive jakarta.websocket;
 }

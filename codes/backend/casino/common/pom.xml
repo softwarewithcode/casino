@@ -10,6 +10,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>19</maven.compiler.release>
 	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>jakarta.websocket</groupId>
+			<artifactId>jakarta.websocket-api</artifactId>
+			<version>2.0.0</version>
+		</dependency>
+	</dependencies>
 	<build>
 		<finalName>common</finalName>
 		<plugins>

@@ -16,14 +16,15 @@ import com.casino.common.table.IBlackjackPlayer;
 import com.casino.common.table.ICasinoTable;
 import com.casino.common.table.ISeatedTable;
 import com.casino.common.user.Action;
+import com.casino.common.user.Bridge;
 
 public class BlackjackPlayer extends CasinoPlayer implements IBlackjackPlayer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackPlayer.class.getName());
 	private List<IHand> hands;
 	private List<Action> actions;
 
-	public BlackjackPlayer(String name, UUID id, BigDecimal startBalance, ISeatedTable table) {
-		super(name, id, startBalance, table);
+	public BlackjackPlayer(Bridge bridge, ISeatedTable table) {
+		super(bridge, table);
 		hands = new ArrayList<IHand>();
 		hands.add(createNewHand(true));
 		actions = new ArrayList<>(4);

@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
 import com.casino.common.table.Type;
+import com.casino.common.user.Bridge;
 
 public class BaseTest {
 	protected static final BigDecimal MIN_BET = new BigDecimal("5.0");
@@ -17,6 +18,9 @@ public class BaseTest {
 	protected static final Integer MAX_PLAYERS = 7;
 	protected static final Integer DEFAULT_SEAT_COUNT = 7;
 	protected static final Type PUBLIC_TABLE_TYPE = Type.PUBLIC;
+	protected Bridge bridge;
+	protected Bridge bridge2;
+	protected Bridge bridge3;
 
 	protected void sleep(int i, ChronoUnit unit) {
 		try {

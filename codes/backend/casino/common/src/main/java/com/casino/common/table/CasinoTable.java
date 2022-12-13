@@ -57,14 +57,14 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public abstract void onPlayerLeave(ICasinoPlayer player);
 
-	protected boolean joinAsWatcher(ICasinoPlayer player) {
-		if (player == null)
+	protected <T extends ICasinoPlayer> boolean joinAsWatcher(T watcher) {
+		if (watcher == null)
 			return false;
-		if (players.contains(player)) {
-			LOGGER.log(Level.INFO, "Player is playing, tries to join as a watcher " + player.getName());
+		if (players.contains(watcher)) {
+			LOGGER.log(Level.INFO, "Player is playing, tries to join as a watcher " + watcher.getName());
 			return false;
 		}
-		watchers.add(player);
+		watchers.add(watcher);
 		return true;
 	}
 

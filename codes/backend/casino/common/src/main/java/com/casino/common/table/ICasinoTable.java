@@ -34,7 +34,7 @@ public interface ICasinoTable {
 
 	public void onTableClose();
 
-	public boolean watch(ICasinoPlayer player);
+//	public <T extends ICasinoTable> boolean watch(T player);
 
 	public Language getLanguage();
 

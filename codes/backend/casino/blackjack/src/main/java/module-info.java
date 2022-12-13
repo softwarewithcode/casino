@@ -4,6 +4,6 @@ module casino.blackjack {
 	exports com.casino.blackjack.rules;
 	exports com.casino.blackjack.table.timing;
 
-	requires casino.common;
+	requires transitive casino.common;
 	requires java.logging;
 }

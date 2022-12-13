@@ -16,6 +16,7 @@ import com.casino.common.table.Status;
 import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
+import com.casino.common.user.Bridge;
 
 public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
@@ -28,8 +29,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 //
 	@Override
-	public boolean join(UUID playerId, String playerName, BigDecimal balance, int seatNumber) {
-		BlackjackPlayer player = new BlackjackPlayer(playerName, playerId, balance, this);
+	public boolean join(Bridge bridge, int seatNumber) {
+		BlackjackPlayer player = new BlackjackPlayer(bridge, this);
 		boolean gotSeat = super.trySeat(seatNumber, player);
 		if (gotSeat)
 			dealer.handleNewPlayer(player);
@@ -216,5 +217,11 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void prepareNewRound() {
 		dealer.prepareNewRound();
+	}
+
+	@Override
+	public boolean watch(Bridge user) {
+		BlackjackPlayer player = new BlackjackPlayer(user, this);
+		return super.joinAsWatcher(player);
 	}
 }

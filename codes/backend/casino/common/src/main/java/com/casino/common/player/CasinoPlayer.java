@@ -11,26 +11,22 @@ import java.util.logging.Logger;
 import com.casino.common.bet.BetUtil;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.table.ICasinoTable;
+import com.casino.common.user.Bridge;
 
-public abstract class CasinoPlayer<T> implements ICasinoPlayer {
+public abstract class CasinoPlayer implements ICasinoPlayer {
 	private static final Logger LOGGER = Logger.getLogger(CasinoPlayer.class.getName());
-	private T type;
-	private final String name;
-	private final UUID id;
-	private final BigDecimal initialBalance;
 	private final ICasinoTable table;
 	private final ReentrantLock playerLock;
 	private BigDecimal endBalance;
 	private volatile BigDecimal balance;
 	private volatile BigDecimal totalBet;
 	private volatile Status status;
+	private final Bridge bridge;
 
-	public CasinoPlayer(String name, UUID id, BigDecimal initialBalance, ICasinoTable table) {
+	public CasinoPlayer(Bridge bridge, ICasinoTable table) {
 		super();
-		this.name = name;
-		this.id = id;
-		this.initialBalance = initialBalance;
-		this.balance = initialBalance;
+		this.bridge = bridge;
+		this.balance = bridge.initialBalance();
 		this.balance = this.balance.setScale(2, RoundingMode.DOWN);
 		this.status = null;
 		this.table = table;
@@ -39,7 +35,7 @@ public abstract class CasinoPlayer<T> implements ICasinoPlayer {
 
 	@Override
 	public String getName() {
-		return name;
+		return bridge.name();
 	}
 
 	public ICasinoTable getTable() {
@@ -48,7 +44,7 @@ public abstract class CasinoPlayer<T> implements ICasinoPlayer {
 
 	@Override
 	public BigDecimal getInitialBalance() {
-		return initialBalance;
+		return bridge.initialBalance();
 	}
 
 	@Override
@@ -58,7 +54,7 @@ public abstract class CasinoPlayer<T> implements ICasinoPlayer {
 
 	@Override
 	public UUID getId() {
-		return id;
+		return bridge.playerId();
 	}
 
 	@Override
@@ -73,7 +69,7 @@ public abstract class CasinoPlayer<T> implements ICasinoPlayer {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id);
+		return Objects.hash(bridge.playerId());
 	}
 
 	@Override
@@ -85,7 +81,7 @@ public abstract class CasinoPlayer<T> implements ICasinoPlayer {
 		if (getClass() != obj.getClass())
 			return false;
 		CasinoPlayer other = (CasinoPlayer) obj;
-		return Objects.equals(id, other.id);
+		return Objects.equals(bridge.playerId(), other.bridge.playerId());
 	}
 
 	@Override
