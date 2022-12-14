@@ -285,6 +285,14 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	protected <T> void notifyTable(T t) {
 		getPlayers().entrySet().parallelStream().forEach(o -> o.getValue().sendMessage(t));
-		getWatchers().entrySet().parallelStream().forEach(o -> o.getValue().sendMessage(t));
+		Thread.ofVirtual().start(() -> {
+			getWatchers().entrySet().parallelStream().forEach(o -> o.getValue().sendMessage(t));
+		});
+	}
+
+	protected <T, P extends ICasinoPlayer> void notifyPlayer(T t, P p) {
+		ICasinoPlayer player = getPlayers().get(p.getId());
+		if (player != null)
+			player.sendMessage(t);
 	}
 }

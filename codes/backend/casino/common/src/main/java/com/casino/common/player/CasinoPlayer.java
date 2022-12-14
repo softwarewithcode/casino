@@ -105,8 +105,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@Override
 	public <T> void sendMessage(T t) {
 		if (bridge.session() == null || !bridge.session().isOpen()) {
+//			System.out.println("Session not found from bridge -> " + getName() + " will not receive message ->" + t + " " + System.nanoTime() + " conductor:" + Thread.currentThread());
 			return;
-//			throw new IllegalStateException("player bridge is broken." + bridge.session());
 		}
 		try {
 			bridge.session().getBasicRemote().sendText("Table " + getId() + " " + t);

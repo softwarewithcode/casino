@@ -35,7 +35,8 @@ public final class BlackjackTable extends SeatedTable implements BlackjackTableP
 		boolean gotSeat = super.trySeat(seat, player);
 		if (gotSeat)
 			dealer.handleNewPlayer(player);
-		notifyTable(Title.NEW_PLAYER);
+		System.out.println("new player joined:" + bridge.name());
+		notifyTable(Title.NEW_PLAYER + " " + bridge.name() + " joined:" + System.nanoTime() + " printedAt:");
 		return gotSeat;
 	}
 

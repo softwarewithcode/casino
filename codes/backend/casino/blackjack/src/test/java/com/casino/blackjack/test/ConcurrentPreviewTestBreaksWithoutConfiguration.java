@@ -172,7 +172,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		cards.add(Card.of(2, Suit.HEART));
 		cards.add(Card.of(5, Suit.SPADE));
 		CyclicBarrier casinoBarrier = new CyclicBarrier(29);
-		List<Thread> threads = sendSimultaneouslyMultipleInsuranceRequestsFromSelectedPlayer(28, casinoBarrier);
+		List<Thread> threads = sendSimultaneouslyMultipleInsuranceRequestsForSpecificPlayer(28, casinoBarrier);
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
 		sleep(BET_ROUND_TIME_SECONDS + INSURANCE_ROUND_TIME_SECONDS + 3, ChronoUnit.SECONDS);
@@ -189,6 +189,23 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		casinoBarrier.await();
 		sleep(1, ChronoUnit.SECONDS);
 		assertEquals(999, rejectedDoubles);
+	}
+
+	@Test
+	public void tableAcceptsWatchersSimultaneously() throws InterruptedException, BrokenBarrierException {
+		int betPhaseTimeSeconds = 6;
+		table = new BlackjackTable(Status.WAITING_PLAYERS,
+				new Thresholds(MIN_BET, MAX_BET, betPhaseTimeSeconds, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 49, 49, Type.PUBLIC), UUID.randomUUID());
+		CyclicBarrier casinoBarrier = new CyclicBarrier(10001);
+		table.join(bridge, "3");
+		assertEquals(0, table.getWatchers().size());
+		List<Thread> threads = addWatchersToTable(10000, casinoBarrier);
+		threads.forEach(Thread::start);
+		casinoBarrier.await();
+		sleep(1, ChronoUnit.SECONDS); // All watchers have had 1 second of time to join.
+		table.join(bridge2, "4");
+		assertEquals(10000, table.getWatchers().size());
+		sleep(table.getThresholds().betPhaseTime(), ChronoUnit.SECONDS);
 	}
 
 	@Test
@@ -300,7 +317,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		})).toList();
 	}
 
-	private List<Thread> sendSimultaneouslyMultipleInsuranceRequestsFromSelectedPlayer(int amount, CyclicBarrier casinoDoor) {
+	private List<Thread> sendSimultaneouslyMultipleInsuranceRequestsForSpecificPlayer(int amount, CyclicBarrier casinoDoor) {
 		UUID uuid = UUID.randomUUID();
 		Bridge insurerBridge = new Bridge("player:" + 0, table.getId(), uuid, null, new BigDecimal("10000000.0"));
 		return IntStream.rangeClosed(0, amount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
@@ -357,14 +374,24 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				}
 				casinoDoor.await();
 				if (!table.join(randomBridge, String.valueOf(seatNumber))) {
-//					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCount _before updating " + rejectedCount + " 	** " + System.nanoTime());
 					addRejected();
-//					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCounter _after update " + rejectedCount + " 	** " + System.nanoTime());
 				} else {
-//					System.out.println(b.getName() + " got seat " + seatNumber + " sees acceptedCount before_ updating " + acceptedCount + " 	** " + System.nanoTime());
 					addAccepted();
-//					System.out.println(b.getName() + " got seat " + seatNumber + "  sees acceptedCount after_ update " + acceptedCount + " ** " + System.nanoTime());
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (BrokenBarrierException e) {
+				e.printStackTrace();
+			}
+		})).toList();
+	}
+
+	private List<Thread> addWatchersToTable(int amount, CyclicBarrier casinoDoor) {
+		return IntStream.rangeClosed(0, amount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
+			Bridge randomBridge = new Bridge("watcher:" + index, table.getId(), UUID.randomUUID(), null, MAX_BET);
+			try {
+				casinoDoor.await();
+				table.watch(randomBridge);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (BrokenBarrierException e) {
