@@ -1,29 +1,24 @@
 package com.casino.common.table;
 
-import java.io.IOException;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.common.language.Language;
-import com.casino.common.player.CasinoPlayer;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePath;
 import com.casino.common.table.timing.Clock;
 import com.casino.common.table.timing.PlayerClockTask;
-import com.casino.common.user.Title;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.websocket.EncodeException;
 
 /**
  * Base class for all casino tables. Gather here common data and operations what
@@ -34,8 +29,8 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	private static final Logger LOGGER = Logger.getLogger(CasinoTable.class.getName());
 	private final PhasePath phasePath;
-	private Set<ICasinoPlayer> players;
-	private Set<ICasinoPlayer> watchers;
+	private ConcurrentHashMap<UUID, ICasinoPlayer> players;
+	private ConcurrentHashMap<UUID, ICasinoPlayer> watchers;
 	private volatile Status status;
 	private Type type;
 	private Language language;
@@ -48,8 +43,8 @@ public abstract class CasinoTable implements ICasinoTable {
 	private final Thresholds constants;
 
 	protected CasinoTable(Status initialStatus, Thresholds tableConstants, UUID id, PhasePath phases) {
-		this.players = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
-		this.watchers = Collections.synchronizedSet(new HashSet<ICasinoPlayer>());
+		this.players = new ConcurrentHashMap<>();
+		this.watchers = new ConcurrentHashMap<>();
 		this.status = initialStatus;
 		this.type = tableConstants.tableType();
 		this.id = id;
@@ -70,14 +65,14 @@ public abstract class CasinoTable implements ICasinoTable {
 			LOGGER.log(Level.INFO, "Player is playing, tries to join as a watcher " + watcher.getName());
 			return false;
 		}
-		watchers.add(watcher);
+		watchers.putIfAbsent(watcher.getId(), watcher);
 		return true;
 	}
 
 	protected boolean joinAsPlayer(ICasinoPlayer player) {
 		if (player == null)
 			return false;
-		players.add(player);
+		players.putIfAbsent(player.getId(), player);
 		return true;
 	}
 
@@ -139,17 +134,17 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public boolean addWatcher(ICasinoPlayer player) {
-		if (player == null)
+	public boolean addWatcher(ICasinoPlayer watcher) {
+		if (watcher == null)
 			return false;
-		return watchers.add(player);
+		return watchers.putIfAbsent(watcher.getId(), watcher) != null;
 	}
 
 	@Override
 	public boolean removePlayer(ICasinoPlayer p) {
 		if (p == null)
 			return false;
-		return players.remove(p);
+		return players.remove(p.getId()) != null;
 	}
 
 	public ReentrantLock getPlayerInTurnLock() {
@@ -169,39 +164,39 @@ public abstract class CasinoTable implements ICasinoTable {
 	public boolean removeWatcher(ICasinoPlayer p) {
 		if (p == null)
 			return false;
-		return watchers.remove(p);
+		return watchers.remove(p.getId()) != null;
 	}
 
 	protected void changeFromWatcherToPlayer(ICasinoPlayer player) {
-		watchers.remove(player);
-		players.add(player);
+		watchers.remove(player.getId());
+		players.putIfAbsent(player.getId(), player);
 	}
 
 	public void changeFromPlayerToWatcher(ICasinoPlayer player) {
-		players.remove(player);
-		watchers.add(player);
+		players.remove(player.getId());
+		watchers.putIfAbsent(player.getId(), player);
 	}
 
 	@Override
-	public Set<ICasinoPlayer> getPlayers() {
+	public ConcurrentMap<UUID, ICasinoPlayer> getPlayers() {
 		return players;
 	}
 
 	@Override
-	public Set<ICasinoPlayer> getWatchers() {
+	public ConcurrentMap<UUID, ICasinoPlayer> getWatchers() {
 		return watchers;
+	}
+
+	@Override
+	public Set<ICasinoPlayer> tempConcurTest() {
+		Set<ICasinoPlayer> m = new HashSet<>();
+		m.addAll(players.values());
+		m.addAll(watchers.values());
+		return m;
 	}
 
 	protected boolean isAcceptingPlayers() {
 		return getStatus() == Status.WAITING_PLAYERS || getStatus() == Status.RUNNING;
-	}
-
-	@Override
-	public Set<ICasinoPlayer> getPlayersAndWatchers() {
-		HashSet<ICasinoPlayer> set = new HashSet<ICasinoPlayer>();
-		set.addAll(players);
-		set.addAll(watchers);
-		return set;
 	}
 
 	@Override
@@ -288,22 +283,8 @@ public abstract class CasinoTable implements ICasinoTable {
 		return Objects.equals(id, other.id);
 	}
 
-	protected synchronized void notifyTable(Title title) {
-		getPlayersAndWatchers().forEach(iplayer -> {
-			CasinoPlayer player = (CasinoPlayer) iplayer;
-			if (player.getBridge().session() == null || !player.getBridge().session().isOpen()) {
-				LOGGER.severe("websocket not open for:" + player);
-				return;
-			}
-			System.out.println("Sending table to:" + player.getName());
-//			ObjectMapper objectMapper = new ObjectMapper();
-//			objectMapper.writ
-			try {
-				player.getBridge().session().getBasicRemote().sendText("Table " + getId() + " " + title);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		});
+	protected <T> void notifyTable(T t) {
+		getPlayers().entrySet().parallelStream().forEach(o -> o.getValue().sendMessage(t));
+		getWatchers().entrySet().parallelStream().forEach(o -> o.getValue().sendMessage(t));
 	}
 }

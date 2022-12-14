@@ -165,8 +165,9 @@ public class BlackjackDealer implements IDealer {
 
 	public synchronized void finalizeBetPhase() {
 		table.updateGamePhase(GamePhase.BETS_COMPLETED);
-		if (!shouldDealStartingHands())
+		if (!shouldDealStartingHands()) {
 			return;
+		}
 		updateActivePlayers();
 		dealStartingHands();
 		if (hasStartingAce()) {
@@ -214,11 +215,10 @@ public class BlackjackDealer implements IDealer {
 	public synchronized void prepareNewRound() {
 		if (table.getGamePhase() != GamePhase.ROUND_COMPLETED)
 			throw new IllegalArgumentException("not allowed");
-		table.getPlayers().forEach(ICasinoPlayer::prepareNextRound);
+		table.getPlayers().values().forEach(ICasinoPlayer::prepareNextRound);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		table.updateGamePhase(GamePhase.BET);
 		deck = Deck.combineDecks(8);
-		table.getPlayers().forEach(ICasinoPlayer::getBalance);
 	}
 
 	private boolean shouldRestartBetPhase() {
@@ -300,7 +300,8 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void payout() {
-		List<ICasinoPlayer> playersWithWinningChances = table.getPlayers().stream().filter(ICasinoPlayer::hasWinningChance).collect(Collectors.toList());
+		// Deal the case where player has disconnected before payout
+		List<ICasinoPlayer> playersWithWinningChances = table.getPlayers().values().stream().filter(ICasinoPlayer::hasWinningChance).collect(Collectors.toList());
 		playersWithWinningChances.stream().forEach(player -> player.getHands().forEach(playerHand -> {
 			int comparison = dealerHand.compareTo(playerHand);
 			if (player.isCompensable() && dealerHand.isBlackjack())

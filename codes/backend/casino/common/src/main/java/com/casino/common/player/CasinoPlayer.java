@@ -1,11 +1,13 @@
 package com.casino.common.player;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ConcurrentModificationException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.common.bet.BetUtil;
@@ -98,6 +100,21 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@Override
 	public BigDecimal getTotalBet() {
 		return this.totalBet != null ? this.totalBet.setScale(2, RoundingMode.DOWN) : null;
+	}
+
+	@Override
+	public <T> void sendMessage(T t) {
+		if (bridge.session() == null || !bridge.session().isOpen()) {
+			return;
+//			throw new IllegalStateException("player bridge is broken." + bridge.session());
+		}
+		try {
+			bridge.session().getBasicRemote().sendText("Table " + getId() + " " + t);
+		} catch (IOException e) {
+			UUID logIdentifier = UUID.randomUUID();
+			LOGGER.log(Level.SEVERE, "Could not reach player: logIdentifier: " + logIdentifier + " name;" + getName() + " id:" + getId(), e);
+			throw new RuntimeException("cannot be reached ->  LogId:" + logIdentifier);
+		}
 	}
 
 	@Override

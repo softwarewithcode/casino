@@ -56,4 +56,6 @@ public interface ICasinoPlayer {
 
 	public <T> T autoplay(T t);
 
+	public <T> void sendMessage(T message);
+
 }
