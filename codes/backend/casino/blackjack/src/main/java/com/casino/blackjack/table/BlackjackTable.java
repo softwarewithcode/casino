@@ -29,9 +29,10 @@ public final class BlackjackTable extends SeatedTable implements BlackjackTableP
 	}
 
 	@Override
-	public boolean join(Bridge bridge, Integer seatNumber) {
+	public boolean join(Bridge bridge, String seatNumber) {
+		int seat = Integer.parseInt(seatNumber);
 		BlackjackPlayer player = new BlackjackPlayer(bridge, this);
-		boolean gotSeat = super.trySeat(seatNumber, player);
+		boolean gotSeat = super.trySeat(seat, player);
 		if (gotSeat)
 			dealer.handleNewPlayer(player);
 		notifyTable(Title.NEW_PLAYER);

@@ -52,7 +52,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(5, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(1, table.getPlayer(bridge.playerId()).getHands().size());
@@ -68,7 +68,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(1, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(1, table.getPlayer(bridge.playerId()).getHands().size());
@@ -85,7 +85,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));
 		cards.add(Card.of(4, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.hit(bridge.playerId());
@@ -101,7 +101,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(7, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
@@ -115,7 +115,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(9, Suit.SPADE));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(9, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.split(bridge.playerId());
@@ -129,7 +129,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(12, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(12, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.split(bridge.playerId());
@@ -143,7 +143,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(12, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(12, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.split(bridge.playerId());
@@ -160,7 +160,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.split(bridge.playerId());
@@ -179,7 +179,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.split(bridge.playerId());
@@ -200,7 +200,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.split(bridge.playerId());
@@ -218,7 +218,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(11, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.HEART));
 		cards.add(Card.of(12, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.split(bridge.playerId());
@@ -234,7 +234,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(1, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.split(bridge.playerId());
@@ -256,7 +256,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge2, 5);
+		table.join(bridge2, "5");
 		table.bet(bridge2.playerId(), new BigDecimal("6.77"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.split(bridge2.playerId());
@@ -275,7 +275,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge2, 5);
+		table.join(bridge2, "5");
 		table.bet(bridge2.playerId(), new BigDecimal("50.1"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("49.90"), table.getPlayer(bridge2.playerId()).getBalance());
@@ -291,7 +291,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(1, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.hit(bridge.playerId());
@@ -309,7 +309,7 @@ public class StartingHandSplitTest extends BaseTest {
 		cards.add(Card.of(12, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
 		cards.add(Card.of(11, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("10.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.split(bridge.playerId());

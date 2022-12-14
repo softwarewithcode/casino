@@ -54,7 +54,7 @@ public class InsuranceTest extends BaseTest {
 
 	@Test
 	public void playerCanInsureHandWhenDealerHasStartingAce() {
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(bridge.playerId());
@@ -66,7 +66,7 @@ public class InsuranceTest extends BaseTest {
 	public void playerCannotInsureHandWhenDealerHasNotAce() {
 		dealer.getDecks().add(Card.of(2, Suit.HEART));
 		dealer.getDecks().add(Card.of(2, Suit.HEART));
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
@@ -77,8 +77,8 @@ public class InsuranceTest extends BaseTest {
 
 	@Test
 	public void playerWithoutBetCannotInsure() {
-		table.join(bridge, 5);
-		table.join(bridge2, 6);
+		table.join(bridge,"5");
+		table.join(bridge2, "6");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(bridge.playerId());
@@ -90,7 +90,7 @@ public class InsuranceTest extends BaseTest {
 
 	@Test
 	public void insuredHandCannotBeInsured() {
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(bridge.playerId());
@@ -101,7 +101,7 @@ public class InsuranceTest extends BaseTest {
 
 	@Test
 	public void standNotAllowedDuringInsurancePhase() {
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
@@ -111,7 +111,7 @@ public class InsuranceTest extends BaseTest {
 
 	@Test
 	public void doublingNotAllowedDuringInsurancePhase() {
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
@@ -127,7 +127,7 @@ public class InsuranceTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(1, Suit.HEART));
 		cards.add(Card.of(5, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
@@ -142,7 +142,7 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(5, Suit.SPADE));
 		dealer.getDecks().add(Card.of(1, Suit.DIAMOND));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
@@ -158,7 +158,7 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(4, Suit.DIAMOND));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(bridge.playerId());
@@ -182,7 +182,7 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(4, Suit.SPADE));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.CLUB));
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(bridge.playerId());
@@ -206,7 +206,7 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(4, Suit.CLUB));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(bridge.playerId());
@@ -231,7 +231,7 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(4, Suit.HEART));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(bridge.playerId());
@@ -256,7 +256,7 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(4, Suit.HEART));
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
-		table.join(bridge, 5);
+		table.join(bridge,"5");
 		table.bet(bridge.playerId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.insure(bridge.playerId());

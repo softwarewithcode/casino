@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.casino.common.user.Bridge;
 
 public interface BlackjackTableProxy {
-	public boolean join(Bridge user, Integer seatNumber);
+	public boolean join(Bridge user, String seatNumber);
 
 	public boolean watch(Bridge user);
 

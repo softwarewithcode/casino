@@ -62,7 +62,7 @@ public class DealerTest extends BaseTest {
 	@Test
 	public void gamePhaseChangesFromBetToPlayAfterBetPhaseEnd() {
 		assertEquals(GamePhase.BET, table.getGamePhase());
-		table.join(bridge, 1);
+		table.join(bridge, "1");
 		assertEquals(GamePhase.BET, table.getGamePhase());
 		table.bet(bridge.playerId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
@@ -72,13 +72,13 @@ public class DealerTest extends BaseTest {
 	@Test
 	public void tableStatusChangesFromWaitingToRunningAfterFirstPlayerTakesSeat() {
 		assertTrue(table.getStatus() == Status.WAITING_PLAYERS);
-		assertTrue(table.join(bridge, 1));
+		assertTrue(table.join(bridge, "1"));
 		assertTrue(table.getStatus() == Status.RUNNING);
 	}
 
 	@Test
 	public void twoCardsIsAddedToStartingHandAfterPlacingBet() {
-		table.join(bridge, 6);
+		table.join(bridge, "6");
 		table.bet(bridge.playerId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(2, table.getPlayer(bridge.playerId()).getHands().get(0).getCards().size());
@@ -86,8 +86,8 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void playersBalanceGetAdjustedAccordingToBet() {
-		table.join(bridge, 1);
-		table.join(bridge2, 2);
+		table.join(bridge, "1");
+		table.join(bridge2, "2");
 		table.bet(bridge.playerId(), new BigDecimal("54.0"));
 		table.bet(bridge2.playerId(), new BigDecimal("51.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
@@ -97,8 +97,8 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void onlyPlayerWithBetReceivesStartingHand() {
-		table.join(bridge, 1);
-		table.join(bridge2, 2);
+		table.join(bridge, "1");
+		table.join(bridge2, "2");
 		table.bet(bridge.playerId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS); // w for the dealer to complete. Just a number
 		assertEquals(2, table.getPlayer(bridge.playerId()).getHands().get(0).getCards().size());
@@ -115,8 +115,8 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void betChangeDoesNotMakeOnTimeAndLastReceivedBetIsUsed() {
-		table.join(bridge, 1);
-		table.join(bridge2, 2);
+		table.join(bridge, "1");
+		table.join(bridge2, "2");
 		table.bet(bridge.playerId(), new BigDecimal("11.11"));
 		table.bet(bridge2.playerId(), new BigDecimal("22.67"));
 		table.bet(bridge.playerId(), new BigDecimal("44.55"));
@@ -143,9 +143,9 @@ public class DealerTest extends BaseTest {
 		cards.add(Card.of(4, Suit.SPADE));
 		cards.add(Card.of(3, Suit.HEART));
 		cards.add(Card.of(2, Suit.SPADE));
-		table.join(bridge, 0);
-		table.join(bridge2, 3);
-		table.join(bridge3, 6);
+		table.join(bridge, "0");
+		table.join(bridge2, "3");
+		table.join(bridge3, "6");
 		table.bet(bridge.playerId(), new BigDecimal("11.11"));
 		table.bet(bridge2.playerId(), new BigDecimal("22.67"));
 		table.bet(bridge3.playerId(), new BigDecimal("44.55"));
@@ -171,9 +171,9 @@ public class DealerTest extends BaseTest {
 		cards.add(Card.of(3, Suit.HEART));
 		cards.add(Card.of(2, Suit.SPADE));
 		assertFalse(table.isDealerTurn());
-		table.join(bridge, 0);
-		table.join(bridge2, 3);
-		table.join(bridge3, 6);
+		table.join(bridge, "0");
+		table.join(bridge2, "3");
+		table.join(bridge3, "6");
 		assertFalse(table.isDealerTurn());
 		table.bet(bridge.playerId(), new BigDecimal("11.11"));
 		table.bet(bridge2.playerId(), new BigDecimal("22.67"));
@@ -208,9 +208,9 @@ public class DealerTest extends BaseTest {
 		cards.add(Card.of(10, Suit.HEART));
 		cards.add(Card.of(10, Suit.SPADE));
 		assertFalse(table.isDealerTurn());
-		table.join(bridge, 1);
-		table.join(bridge2, 3);
-		table.join(bridge3, 6);
+		table.join(bridge, "1");
+		table.join(bridge2, "3");
+		table.join(bridge3, "6");
 		assertFalse(table.isDealerTurn());
 		table.bet(bridge.playerId(), new BigDecimal("11.11"));
 		table.bet(bridge2.playerId(), new BigDecimal("22.67"));
@@ -245,9 +245,9 @@ public class DealerTest extends BaseTest {
 		cards.add(Card.of(10, Suit.HEART));
 		cards.add(Card.of(10, Suit.SPADE));
 		assertFalse(table.isDealerTurn());
-		table.join(bridge, 1);
-		table.join(bridge2, 4);
-		table.join(bridge3, 5);
+		table.join(bridge, "1");
+		table.join(bridge2, "4");
+		table.join(bridge3, "5");
 		assertFalse(table.isDealerTurn());
 		table.bet(bridge.playerId(), new BigDecimal("11.11"));
 		table.bet(bridge2.playerId(), new BigDecimal("22.67"));

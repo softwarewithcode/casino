@@ -47,15 +47,15 @@ public class SeatTest extends BaseTest {
 
 	@Test
 	public void takingSeatChangesWatcherToPlayer() {
-		table.join(bridge, 0);
+		table.join(bridge, "0");
 		Assertions.assertEquals(0, table.getWatchers().size());
 		Assertions.assertEquals(1, table.getPlayers().size());
 	}
 
 	@Test
 	public void reservedSeatCannotBeTaken() {
-		table.join(bridge, 0);
-		table.join(bridge2, 0);
+		table.join(bridge, "0");
+		table.join(bridge2, "0");
 		Assertions.assertEquals(bridge.playerId(), table.getSeats().stream().filter(seat -> seat.getPlayer() != null).findFirst().get().getPlayer().getId());
 	}
 
@@ -63,7 +63,7 @@ public class SeatTest extends BaseTest {
 	public void playerCannotTakeSeatIfMinimumBetIsNotCovered() {
 		Bridge b = bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("4.99"));
 		assertThrows(IllegalArgumentException.class, () -> {
-			table.join(b, 0);
+			table.join(b, "0");
 		});
 		Assertions.assertEquals(0, table.getPlayers().size());
 	}

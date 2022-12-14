@@ -20,7 +20,7 @@ public class TableHandlerTest {
 		UUID playerId = UUID.randomUUID();
 		BlackjackTableProxy table = handler.fetchTable(tableId);
 		Bridge bridge = new Bridge("JohnDoe", tableId, playerId, null, new BigDecimal("1000.0"));
-		boolean joined = table.join(bridge, 0);
+		boolean joined = table.join(bridge, "0");
 		table.bet(bridge.playerId(), new BigDecimal("1000.0"));
 		assertTrue(joined);
 	}

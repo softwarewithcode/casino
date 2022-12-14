@@ -52,7 +52,7 @@ public class BalanceTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
 		cards.add(Card.of(4, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("10.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("990.00"), table.getPlayer(bridge.playerId()).getBalance());
@@ -69,8 +69,8 @@ public class BalanceTest extends BaseTest {
 	public void dealerCalculatesBalancesBasedOnLastAcceptedBets() {
 		Bridge blackjackPlayer = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("100"));
 		Bridge blackjackPlayer2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("100"));
-		table.join(blackjackPlayer, 5);
-		table.join(blackjackPlayer2, 6);
+		table.join(blackjackPlayer, "5");
+		table.join(blackjackPlayer2, "6");
 		table.bet(blackjackPlayer.playerId(), new BigDecimal("11.11"));
 		table.bet(blackjackPlayer2.playerId(), new BigDecimal("22.67"));
 		table.bet(blackjackPlayer.playerId(), new BigDecimal("44.55"));
@@ -93,7 +93,7 @@ public class BalanceTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("50.1"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("949.90"), table.getPlayer(bridge.playerId()).getBalance());
@@ -110,7 +110,7 @@ public class BalanceTest extends BaseTest {
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(13, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("50.1"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("1075.15"), table.getPlayer(bridge.playerId()).getBalance());
@@ -125,8 +125,8 @@ public class BalanceTest extends BaseTest {
 		cards.add(Card.of(13, Suit.DIAMOND));
 		cards.add(Card.of(12, Suit.HEART));
 		cards.add(Card.of(11, Suit.SPADE));
-		table.join(bridge, 5);
-		table.join(bridge2, 6);
+		table.join(bridge, "5");
+		table.join(bridge2, "6");
 		table.bet(bridge.playerId(), new BigDecimal("50.1"));
 		table.bet(bridge2.playerId(), new BigDecimal("12.77"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);

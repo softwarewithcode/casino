@@ -60,7 +60,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(bridge.playerId());
@@ -74,7 +74,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(bridge.playerId());
@@ -98,7 +98,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(4, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(bridge.playerId());
@@ -115,7 +115,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(bridge.playerId());
@@ -128,7 +128,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(6, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(bridge.playerId());
@@ -145,7 +145,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(12, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
 		cards.add(Card.of(1, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("10.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
@@ -163,7 +163,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(10, Suit.SPADE));
 		cards.add(Card.of(2, Suit.SPADE));
 		bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("199.9"));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("100"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalArgumentException.class, () -> {
@@ -177,7 +177,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(6, Suit.SPADE));
-		table.join(bridge, 5);
+		table.join(bridge, "5");
 		table.bet(bridge.playerId(), new BigDecimal("0.01234"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("999.98"), table.getPlayer(bridge.playerId()).getBalance());

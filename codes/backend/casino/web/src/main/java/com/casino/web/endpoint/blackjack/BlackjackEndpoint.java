@@ -53,7 +53,7 @@ public class BlackjackEndpoint {
 		System.out.println("onMessage to table: " + tableId + "\n-> message:" + message);
 		if (isFirstMessage(session)) {
 			createBridge(session, message);
-			proxy.join(bridge, 0);
+			proxy.join(bridge, "0");
 			return;
 		}
 		switch (message.getAction()) {

@@ -260,7 +260,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
 		int waitSecondsForPlayersToFinish = 9;
-		sleep(BET_ROUND_TIME_SECONDS + waitSecondsForPlayersToFinish+3, ChronoUnit.SECONDS);
+		sleep(BET_ROUND_TIME_SECONDS + waitSecondsForPlayersToFinish + 3, ChronoUnit.SECONDS);
 		BlackjackPlayer b = (BlackjackPlayer) table.getPlayer(0);
 		assertEquals(15, b.getFirstHandFinalValue());
 		assertEquals(MAX_BET.multiply(BigDecimal.TWO).setScale(2), table.getPlayer(0).getTotalBet());
@@ -282,12 +282,12 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				int seatNumber = index;
 				casinoDoor.await();
 				if (index == 0) {
-					table.join(doublerBridge, 0);
+					table.join(doublerBridge, "0");
 					table.bet(doublerBridge.playerId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
 					table.doubleDown(doublerBridge.playerId());
 				} else {
-					table.join(b, seatNumber);
+					table.join(b, String.valueOf(seatNumber));
 					table.bet(b.playerId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
 					table.doubleDown(doublerBridge.playerId());//// All these players try to doubleDown for the first player
@@ -311,12 +311,12 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				int seatNumber = index;
 				casinoDoor.await();
 				if (index == 0) {
-					table.join(insurerBridge, seatNumber);
+					table.join(insurerBridge, String.valueOf(seatNumber));
 					table.bet(insurerBridge.playerId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 					table.insure(insurerBridge.playerId());
 				} else {
-					table.join(b, seatNumber);
+					table.join(b, String.valueOf(seatNumber));
 					table.bet(b.playerId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 					table.insure(insurerBridge.playerId());
@@ -356,7 +356,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 					seatNumber = ThreadLocalRandom.current().nextInt(0, table.getSeats().size() - 1);
 				}
 				casinoDoor.await();
-				if (!table.join(randomBridge, seatNumber)) {
+				if (!table.join(randomBridge, String.valueOf(seatNumber))) {
 //					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCount _before updating " + rejectedCount + " 	** " + System.nanoTime());
 					addRejected();
 //					System.out.println(b.getName() + " did not get seat " + seatNumber + " sees rejectedCounter _after update " + rejectedCount + " 	** " + System.nanoTime());
