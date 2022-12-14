@@ -184,8 +184,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		List<Integer> values = getFirstHand().calculateValues();
 		int val = values.get(0);
 		if (!(val >= 9 && val <= 11))
-			throw new IllegalPlayerActionException("hand value does not allow doubling; "
-					+ getFirstHand().getCards().get(0) + " " + getFirstHand().getCards().get(1), 10);
+			throw new IllegalPlayerActionException("hand value does not allow doubling; " + getFirstHand().getCards().get(0) + " " + getFirstHand().getCards().get(1), 10);
 	}
 
 	private void validateSplitPreConditions() {
@@ -204,8 +203,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		if (!hands.get(0).isActive())
 			throw new IllegalPlayerActionException("first hand is not active " + getName(), 2);
 		if (hands.get(0).getCards().size() != 2)
-			throw new IllegalPlayerActionException(
-					"starting hand does not contain exactly two cards:" + getName() + " " + hands.get(0).getCards(), 3);
+			throw new IllegalPlayerActionException("starting hand does not contain exactly two cards:" + getName() + " " + hands.get(0).getCards(), 3);
 	}
 
 	public IHand getActiveHand() {
@@ -313,5 +311,4 @@ public class BlackjackPlayer extends CasinoPlayer {
 			secondHand.complete();
 		return null;
 	}
-
 }
