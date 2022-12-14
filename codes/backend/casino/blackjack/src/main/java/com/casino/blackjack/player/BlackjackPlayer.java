@@ -49,9 +49,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 				return;
 			actions.add(Action.TAKE);
 			actions.add(Action.STAND);
-			if (!getFirstHand().isActive()) {
+			if (!getFirstHand().isActive())
 				return;
-			}
 			if (getFirstHand().getCards().size() != 2)
 				return;
 			Card first = getFirstHand().getCards().get(0);
@@ -89,7 +88,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	}
 
 	public boolean hasActiveHand() {
-		return hands.stream().filter(hand -> hand.isActive()).findAny().isPresent();
+		return hands.stream().filter(IHand::isActive).findAny().isPresent();
 	}
 
 	public boolean isInsuranceCompensable() {
@@ -185,7 +184,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 		List<Integer> values = getFirstHand().calculateValues();
 		int val = values.get(0);
 		if (!(val >= 9 && val <= 11))
-			throw new IllegalPlayerActionException("hand value does not allow doubling; " + getFirstHand().getCards().get(0) + " " + getFirstHand().getCards().get(1), 10);
+			throw new IllegalPlayerActionException("hand value does not allow doubling; "
+					+ getFirstHand().getCards().get(0) + " " + getFirstHand().getCards().get(1), 10);
 	}
 
 	private void validateSplitPreConditions() {
@@ -204,11 +204,12 @@ public class BlackjackPlayer extends CasinoPlayer {
 		if (!hands.get(0).isActive())
 			throw new IllegalPlayerActionException("first hand is not active " + getName(), 2);
 		if (hands.get(0).getCards().size() != 2)
-			throw new IllegalPlayerActionException("starting hand does not contain exactly two cards:" + getName() + " " + hands.get(0).getCards(), 3);
+			throw new IllegalPlayerActionException(
+					"starting hand does not contain exactly two cards:" + getName() + " " + hands.get(0).getCards(), 3);
 	}
 
 	public IHand getActiveHand() {
-		return hands.stream().filter(hand -> hand.isActive()).findFirst().orElse(null);
+		return hands.stream().filter(IHand::isActive).findFirst().orElse(null);
 	}
 
 	public void addCard(IHand hand, Card card) {
@@ -220,11 +221,6 @@ public class BlackjackPlayer extends CasinoPlayer {
 		} finally {
 			releasePlayerLock();
 		}
-	}
-
-	public void clearHands() {
-		tryTakingPlayerLock();
-		hands.clear();
 	}
 
 	@Override
@@ -256,7 +252,6 @@ public class BlackjackPlayer extends CasinoPlayer {
 		} finally {
 			releasePlayerLock();
 		}
-		// hands.add(createNewHand(true));
 	}
 
 	@Override

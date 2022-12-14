@@ -28,15 +28,13 @@ public final class BlackjackTable extends SeatedTable implements BlackjackTableP
 		this.dealer = new BlackjackDealer(this, thresholds);
 	}
 
-//
 	@Override
-	public boolean join(Bridge bridge, int seatNumber) {
+	public boolean join(Bridge bridge, Integer seatNumber) {
 		BlackjackPlayer player = new BlackjackPlayer(bridge, this);
 		boolean gotSeat = super.trySeat(seatNumber, player);
 		if (gotSeat)
 			dealer.handleNewPlayer(player);
-		System.out.println("New player joined " + bridge.name() + " with " + bridge.initialBalance());
-		notifyPlayers(Title.NEW_PLAYER);
+		notifyTable(Title.NEW_PLAYER);
 		return gotSeat;
 	}
 
@@ -64,7 +62,7 @@ public final class BlackjackTable extends SeatedTable implements BlackjackTableP
 				dealer.insure(player);
 			else {
 				LOGGER.severe("insuring is not accepted:phase " + getGamePhase() + " table:" + this + " player:" + player);
-				throw new IllegalPlayerActionException("insuring is not allowed:" + getGamePhase() + " table:" + this + " player:" + player, 44);// 44=number for JUnit test to catch
+				throw new IllegalPlayerActionException("insuring is not allowed:" + getGamePhase() + " table:" + this + " player:" + player, 44);
 			}
 		} finally {
 			LOGGER.exiting(getClass().getName(), "insure");

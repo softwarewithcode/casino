@@ -33,13 +33,13 @@ public class BlackjackDealer implements IDealer {
 	private final Thresholds thresholds;
 	private final BlackjackTable table;
 	private final ReentrantLock betPhaseLock;
-	private List<Card> decks;
+	private List<Card> deck;
 	private BlackjackDealerHand dealerHand;
 
 	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds tableConstants) {
 		this.table = blackjackTable;
 		this.thresholds = tableConstants;
-		this.decks = Deck.combineDecks(8);
+		this.deck = Deck.combineDecks(8);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		betPhaseLock = new ReentrantLock();
 	}
@@ -88,11 +88,11 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void createDecks() {
-		decks = Deck.combineDecks(6);
+		deck = Deck.combineDecks(6);
 	}
 
 	public List<Card> getDecks() {
-		return decks;
+		return deck;
 	}
 
 	public Thresholds getThresholds() {
@@ -148,11 +148,11 @@ public class BlackjackDealer implements IDealer {
 	private boolean isEnoughCardsForPlayersAndDealer() {
 		// Amount of decks used can vary. For example using 100 decks combined.
 		int dealer = 1;
-		return (table.getPlayers().size() + dealer) * getMaximumNumberOfCardsPlayerCanHold() < decks.size();
+		return (table.getPlayers().size() + dealer) * getMaximumNumberOfCardsPlayerCanHold() < deck.size();
 	}
 
 	private int getMaximumNumberOfCardsPlayerCanHold() {
-		return 12;
+		return 11; // 11 aces=21 (6 decks contains 24 aces)
 	}
 
 	private boolean somebodyHasBet() {
@@ -160,7 +160,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private List<ICasinoPlayer> getOrderedPlayersWithBet() {
-		return table.getSeats().stream().filter(seat -> seat.hasPlayerWithBet()).sorted(Comparator.comparing(Seat::getNumber)).map(seat -> seat.getPlayer()).collect(Collectors.toList());
+		return table.getSeats().stream().filter(Seat::hasPlayerWithBet).sorted(Comparator.comparing(Seat::getNumber)).map(seat -> seat.getPlayer()).collect(Collectors.toList());
 	}
 
 	public synchronized void finalizeBetPhase() {
@@ -178,7 +178,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void updateActivePlayers() {
-		table.getSeats().stream().filter(seat -> seat.hasPlayer()).map(seat -> seat.getPlayer()).forEach(player -> {
+		table.getSeats().stream().filter(Seat::hasPlayer).map(Seat::getPlayer).forEach(player -> {
 			player.setStatus(Status.SIT_OUT);
 			if (!player.hasBet())
 				table.changeFromPlayerToWatcher(player);
@@ -217,7 +217,7 @@ public class BlackjackDealer implements IDealer {
 		table.getPlayers().forEach(ICasinoPlayer::prepareNextRound);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		table.updateGamePhase(GamePhase.BET);
-		decks = Deck.combineDecks(8);
+		deck = Deck.combineDecks(8);
 		table.getPlayers().forEach(ICasinoPlayer::getBalance);
 	}
 
@@ -232,13 +232,13 @@ public class BlackjackDealer implements IDealer {
 
 	public void doubleDown(BlackjackPlayer player) {
 		verifyPlayerHasSeat(player);
-		Card cardReference = decks.get(decks.size() - 1);
+		Card cardReference = deck.get(deck.size() - 1);
 		player.doubleDown(cardReference);
 		removeCardFromDeck();
 	}
 
 	public Card getNextCard() {
-		return decks.get(decks.size() - 1);
+		return deck.get(deck.size() - 1);
 	}
 
 	private void verifyPlayerHasSeat(BlackjackPlayer player) {
@@ -264,7 +264,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private Card removeCardFromDeck() {
-		return decks.remove(decks.size() - 1);
+		return deck.remove(deck.size() - 1);
 	}
 
 	public boolean shouldChangeTurn() {
@@ -300,12 +300,11 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void payout() {
-		List<ICasinoPlayer> playersWithWinningChances = table.getPlayers().stream().filter(player -> player.hasWinningChance()).collect(Collectors.toList());
+		List<ICasinoPlayer> playersWithWinningChances = table.getPlayers().stream().filter(ICasinoPlayer::hasWinningChance).collect(Collectors.toList());
 		playersWithWinningChances.stream().forEach(player -> player.getHands().forEach(playerHand -> {
 			int comparison = dealerHand.compareTo(playerHand);
-			if (player.isCompensable() && dealerHand.isBlackjack()) {
+			if (player.isCompensable() && dealerHand.isBlackjack())
 				player.increaseBalance(player.getInsuranceAmount().multiply(BigDecimal.TWO));
-			}
 			if (evenResult(comparison))
 				player.increaseBalance(playerHand.getBet());
 			else if (playerWins(comparison)) {

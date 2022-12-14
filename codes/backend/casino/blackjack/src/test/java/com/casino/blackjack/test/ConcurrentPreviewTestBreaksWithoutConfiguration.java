@@ -131,7 +131,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		List<Thread> threads = createCasinoPlayers(100, casinoBarrier);
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
-		sleep(3, ChronoUnit.SECONDS);
+		sleep(4, ChronoUnit.SECONDS);
 		assertEquals(49, table.getReservedSeatCount());
 		assertEquals(49, playersWhoGotSeat);
 		assertEquals(51, playerWhoDidNotGetSeat);
@@ -175,7 +175,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		List<Thread> threads = sendSimultaneouslyMultipleInsuranceRequestsFromSelectedPlayer(28, casinoBarrier);
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
-		sleep(BET_ROUND_TIME_SECONDS + INSURANCE_ROUND_TIME_SECONDS + 1, ChronoUnit.SECONDS);
+		sleep(BET_ROUND_TIME_SECONDS + INSURANCE_ROUND_TIME_SECONDS + 3, ChronoUnit.SECONDS);
 		assertEquals(27, rejectedInsurances);
 	}
 
@@ -260,7 +260,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
 		int waitSecondsForPlayersToFinish = 9;
-		sleep(BET_ROUND_TIME_SECONDS + waitSecondsForPlayersToFinish, ChronoUnit.SECONDS);
+		sleep(BET_ROUND_TIME_SECONDS + waitSecondsForPlayersToFinish+3, ChronoUnit.SECONDS);
 		BlackjackPlayer b = (BlackjackPlayer) table.getPlayer(0);
 		assertEquals(15, b.getFirstHandFinalValue());
 		assertEquals(MAX_BET.multiply(BigDecimal.TWO).setScale(2), table.getPlayer(0).getTotalBet());

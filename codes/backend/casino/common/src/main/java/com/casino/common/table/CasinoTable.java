@@ -288,11 +288,13 @@ public abstract class CasinoTable implements ICasinoTable {
 		return Objects.equals(id, other.id);
 	}
 
-	protected synchronized void notifyPlayers(Title title) {
+	protected synchronized void notifyTable(Title title) {
 		getPlayersAndWatchers().forEach(iplayer -> {
 			CasinoPlayer player = (CasinoPlayer) iplayer;
-			if (!player.getBridge().session().isOpen())
+			if (player.getBridge().session() == null || !player.getBridge().session().isOpen()) {
 				LOGGER.severe("websocket not open for:" + player);
+				return;
+			}
 			System.out.println("Sending table to:" + player.getName());
 //			ObjectMapper objectMapper = new ObjectMapper();
 //			objectMapper.writ
