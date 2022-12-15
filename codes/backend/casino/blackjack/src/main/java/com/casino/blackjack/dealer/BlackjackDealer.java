@@ -1,4 +1,4 @@
-package com.casino.blackjack.rules;
+package com.casino.blackjack.dealer;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
@@ -18,14 +18,16 @@ import com.casino.blackjack.table.timing.InsurancePhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
+import com.casino.common.dealer.IDealer;
+import com.casino.common.dealer.CommunicationChannel;
 import com.casino.common.exception.PlayerNotFoundException;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.player.Status;
-import com.casino.common.table.IDealer;
 import com.casino.common.table.Seat;
 import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.timing.BetPhaseClockTask;
+import com.casino.common.user.Title;
 
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
@@ -33,15 +35,17 @@ public class BlackjackDealer implements IDealer {
 	private final Thresholds thresholds;
 	private final BlackjackTable table;
 	private final ReentrantLock betPhaseLock;
+	private final CommunicationChannel voice;
 	private List<Card> deck;
 	private BlackjackDealerHand dealerHand;
 
-	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds tableConstants) {
+	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds thresholds) {
 		this.table = blackjackTable;
-		this.thresholds = tableConstants;
+		this.thresholds = thresholds;
 		this.deck = Deck.combineDecks(8);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		betPhaseLock = new ReentrantLock();
+		voice = new CommunicationChannel(table);
 	}
 
 	private void startBetPhaseClock(long initialDelay) {
@@ -127,10 +131,14 @@ public class BlackjackDealer implements IDealer {
 
 	public void handleNewPlayer(ICasinoPlayer player) {
 		try {
-			if (betPhaseLock.tryLock() && shouldStartGame()) {
+			if (!betPhaseLock.tryLock())
+				return;
+			if (shouldStartGame()) {
 				table.setStatus(com.casino.common.table.Status.RUNNING);
 				startBetPhaseClock(0l);
 			}
+			voice.multicast(Title.NEW_PLAYER, player);
+			voice.unicast(Title.NEW_PLAYER, player);
 		} finally {
 			if (betPhaseLock.isHeldByCurrentThread())
 				betPhaseLock.unlock();

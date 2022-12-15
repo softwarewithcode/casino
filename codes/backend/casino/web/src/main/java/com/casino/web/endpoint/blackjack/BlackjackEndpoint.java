@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import com.casino.blackjack.ext.BlackjackTableProxy;
+import com.casino.blackjack.ext.BlackjackReverseProxy;
 import com.casino.blackjack.ext.BlackjackTableService;
 import com.casino.common.user.Bridge;
 import com.casino.common.validaton.Validator;
@@ -30,14 +30,14 @@ public class BlackjackEndpoint {
 	BlackjackTableService tableServiceTemp = new BlackjackTableService();
 
 	private UUID tableId;
-	private BlackjackTableProxy proxy;
+	private BlackjackReverseProxy proxy;
 	private Bridge bridge;
 
 	@OnOpen
 	public void onOpen(Session session, @PathParam("tableId") String tableId, EndpointConfig ec) {
 		System.out.println("onOpen called " + tableId);
 		UUID id = Validator.validateId(tableId);
-		BlackjackTableProxy proxy = tableServiceTemp.getTable(id);
+		BlackjackReverseProxy proxy = tableServiceTemp.getTable(id);
 		if (proxy == null) {
 			tableId = null;
 			bridge = null;

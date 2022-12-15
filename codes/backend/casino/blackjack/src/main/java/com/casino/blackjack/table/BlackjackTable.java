@@ -5,9 +5,9 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.casino.blackjack.ext.BlackjackTableProxy;
+import com.casino.blackjack.dealer.BlackjackDealer;
+import com.casino.blackjack.ext.BlackjackReverseProxy;
 import com.casino.blackjack.player.BlackjackPlayer;
-import com.casino.blackjack.rules.BlackjackDealer;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
@@ -19,7 +19,7 @@ import com.casino.common.table.phase.PhasePathFactory;
 import com.casino.common.user.Bridge;
 import com.casino.common.user.Title;
 
-public final class BlackjackTable extends SeatedTable implements BlackjackTableProxy {
+public final class BlackjackTable extends SeatedTable implements BlackjackReverseProxy {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
 	private final BlackjackDealer dealer;
 
@@ -31,12 +31,11 @@ public final class BlackjackTable extends SeatedTable implements BlackjackTableP
 	@Override
 	public boolean join(Bridge bridge, String seatNumber) {
 		int seat = Integer.parseInt(seatNumber);
-		BlackjackPlayer player = new BlackjackPlayer(bridge, this);
-		boolean gotSeat = super.trySeat(seat, player);
+		BlackjackPlayer joinedPlayer = new BlackjackPlayer(bridge, this);
+		boolean gotSeat = super.trySeat(seat, joinedPlayer);
 		if (gotSeat)
-			dealer.handleNewPlayer(player);
+			dealer.handleNewPlayer(joinedPlayer);
 		System.out.println("new player joined:" + bridge.name());
-		notifyTable(Title.NEW_PLAYER + " " + bridge.name() + " joined:" + System.nanoTime() + " printedAt:");
 		return gotSeat;
 	}
 

@@ -1,4 +1,4 @@
-package com.casino.blackjack.rules;
+package com.casino.blackjack.dealer;
 
 import java.util.List;
 import java.util.UUID;

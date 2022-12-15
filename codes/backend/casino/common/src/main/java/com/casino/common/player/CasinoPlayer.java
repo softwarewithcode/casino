@@ -103,13 +103,14 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	}
 
 	@Override
-	public <T> void sendMessage(T t) {
+	public <T> void sendMessage(T message) {
 		if (bridge.session() == null || !bridge.session().isOpen()) {
-//			System.out.println("Session not found from bridge -> " + getName() + " will not receive message ->" + t + " " + System.nanoTime() + " conductor:" + Thread.currentThread());
+			// block for tests. todo override sendMessage() in tests
+			LOGGER.log(Level.SEVERE, "Player cannot be reached. Remove from table");
 			return;
 		}
 		try {
-			bridge.session().getBasicRemote().sendText("Table " + getId() + " " + t);
+			bridge.session().getBasicRemote().sendText("Table " + getId() + " " + message);
 		} catch (IOException e) {
 			UUID logIdentifier = UUID.randomUUID();
 			LOGGER.log(Level.SEVERE, "Could not reach player: logIdentifier: " + logIdentifier + " name;" + getName() + " id:" + getId(), e);

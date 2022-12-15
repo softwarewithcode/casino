@@ -1,4 +1,4 @@
-package com.casino.common.table;
+package com.casino.common.dealer;
 
 import com.casino.common.player.ICasinoPlayer;
 

@@ -35,7 +35,7 @@ public class BlackjackTableService {
 		// create new tables as tables get full?
 	}
 
-	public BlackjackTableProxy getTable(UUID id) {
+	public BlackjackReverseProxy getTable(UUID id) {
 		if (id == null)
 			throw new IllegalArgumentException("no such table:" + id);
 		return tables.stream().filter(table -> table.getId().equals(id)&& table.isOpen()).findAny().orElse(null);

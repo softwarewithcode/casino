@@ -282,17 +282,4 @@ public abstract class CasinoTable implements ICasinoTable {
 		CasinoTable other = (CasinoTable) obj;
 		return Objects.equals(id, other.id);
 	}
-
-	protected <T> void notifyTable(T t) {
-		getPlayers().entrySet().parallelStream().forEach(o -> o.getValue().sendMessage(t));
-//		Thread.ofVirtual().start(() -> { commenting this part out as this is 'production code' and VirtualThreads are still a preview feature.
-			getWatchers().entrySet().parallelStream().forEach(o -> o.getValue().sendMessage(t));
-//		});
-	}
-
-	protected <T, P extends ICasinoPlayer> void notifyPlayer(T t, P p) {
-		ICasinoPlayer player = getPlayers().get(p.getId());
-		if (player != null)
-			player.sendMessage(t);
-	}
 }
