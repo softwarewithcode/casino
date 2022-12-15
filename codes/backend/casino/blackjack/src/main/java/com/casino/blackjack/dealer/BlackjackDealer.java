@@ -29,6 +29,7 @@ import com.casino.common.table.Seat;
 import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.timing.BetPhaseClockTask;
+import com.casino.common.user.Title;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -117,7 +118,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public boolean dealStartingHands() {
-
+		LOGGER.info("dealer deals starting hands");
 		List<ICasinoPlayer> orderedPlayers = getOrderedPlayersWithBet();
 		orderedPlayers.forEach(player -> dealCard(player.getHands().get(0))); // first the players
 		dealCard(dealerHand); // then dealer
@@ -141,11 +142,13 @@ public class BlackjackDealer implements IDealer {
 	@Override
 	public <T extends CasinoPlayer> void onPlayerArrival(T player) {
 		try {
-			notify((BlackjackPlayer) player);
+			notifyAboutNewPlayer((BlackjackPlayer) player);
 			if (!betPhaseLock.tryLock())
 				return;
-			if (shouldStartGame())
+			if (shouldStartGame()) {
 				startNewGame();
+				notifyAll(Title.BET_PHASE_STARTS, (BlackjackPlayer) player);
+			}
 		} finally {
 			if (betPhaseLock.isHeldByCurrentThread())
 				betPhaseLock.unlock();
@@ -157,10 +160,15 @@ public class BlackjackDealer implements IDealer {
 		startBetPhaseClock(0l);
 	}
 
-	private void notify(BlackjackPlayer player) {
-		String message = Mapper.createArrivalMessage(table, player);
+	private void notifyAboutNewPlayer(BlackjackPlayer player) {
+		String message = Mapper.createMessage(Title.NEW_PLAYER, table, player);
 		voice.multicast(message, player);
 		voice.unicast(message, player);
+	}
+
+	private void notifyAll(Title title, BlackjackPlayer player) {
+		String message = Mapper.createMessage(title, table, player);
+		voice.broadcast(message);
 	}
 
 	private boolean shouldStartGame() {
@@ -192,6 +200,7 @@ public class BlackjackDealer implements IDealer {
 	public synchronized void finalizeBetPhase() {
 		table.updateGamePhase(GamePhase.BETS_COMPLETED);
 		if (!shouldDealStartingHands()) {
+			LOGGER.info("dealer does not deal cards now");
 			return;
 		}
 		updateActivePlayers();
@@ -202,6 +211,7 @@ public class BlackjackDealer implements IDealer {
 		}
 		table.updateGamePhase(GamePhase.PLAY);
 		updateTableActor();
+		notifyAll(Title.PLAY_TURN, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
 	private void updateActivePlayers() {

@@ -13,7 +13,6 @@ public class PhasePath {
 	private final List<GamePhase> phases;
 	private final boolean around;
 	private volatile GamePhase currentPhase;
-//	private int index;
 
 	public PhasePath(List<GamePhase> phases, boolean around) {
 		if (phases == null || phases.size() < 2)
@@ -22,21 +21,6 @@ public class PhasePath {
 		this.around = around;
 		this.currentPhase = phases.get(0);
 	}
-
-//	public GamePhase next() {
-//		if (isLastPhase()) {
-//			if (!around)
-//				return null;
-//			index = 0;
-//		} else
-//			index++;
-//		currentPhase = phases.get(index);
-//		return currentPhase;
-//	}
-
-//	private boolean isLastPhase() {
-//		return index == phases.size() - 1;
-//	}
 
 	public GamePhase getPhase() {
 		return currentPhase;

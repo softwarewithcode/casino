@@ -5,11 +5,13 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 </head>
 <body>
-<script>
+	<script>
+	var timer=19
 	console.log("connecting")
 		let socket= new WebSocket('ws://localhost:8080/casino/blackjack/e021c3bf-ffd9-4f75-953f-61639222e50d');
 	 	if(socket){
 	 		console.log("got connection")
+	 	
 	 	}
 		// Connection opened
 		socket.addEventListener('open', (event) => {
@@ -22,7 +24,7 @@
 		    socket.send(jsonObj);
 		}
 		function placeBet(message){
-			const json = {amount:'55.75'}
+			const json = {amount:'55.00',action:'BET'}
 			const jsonObj = JSON.stringify(json);
 			console.log("obj:"+jsonObj)
 		    socket.send(jsonObj);
@@ -34,28 +36,74 @@
 		    socket.send(jsonObj);
 		}
 		socket.addEventListener('message', (event) => {
-			console.log("table sends:"+event)
-			document.getElementById('tableData').innerHTML +=event.data
-		    
+			const ret=JSON.parse(event.data)
+			console.log(ret)
+			console.log(ret.title)
+			document.getElementById('tableData').innerHTML +=ret.title +"<br>"+ret.table +"<br>"
+		    if(ret.title==="BET_PHASE_STARTS"){
+		    	console.log("bet phase starts")
+		     const interval=setInterval(() => {
+		    		  timer--
+		    		  document.getElementById('timer').innerHTML =+timer 
+		    		  document.getElementById('timer').innerHtml += "<br>"+timer;
+		    		  if(timer==0)
+		    			   clearInterval(interval)
+		    		}, 1000)
+
+		    	document.getElementById('betButton').style.visibility = 'visible';
+		    }
+			if(ret.title==="NEW_PLAYER"){
+		    	document.getElementById('joinedText').style.visibility = 'visible';
+		    }
+			if(ret.title==="PLAY_TURN"){
+				console.log("playTurn message:"+ret)
+		    	document.getElementById('turn').style.visibility = 'visible';
+		    	 document.getElementById('cardsText').innerHTML =+ret.player.activeHand.cards[0].rank +" "+ret.player.activeHand.cards[0].suit +"<br>"
+		    	 											+ret.player.activeHand.cards[1].rank +" "+ret.player.activeHand.cards[1].suit
+		    	const take=ret.player.actions.includes("TAKE");
+		    	const stand=ret.player.actions.includes("STAND");
+		    	const split=ret.player.actions.includes("SPLIT");
+		    	const doubl=ret.player.actions.includes("DOUBLE");
+		    	if(take)
+		    		document.getElementById('take').style.visibility = 'visible';
+		    	if(stand)
+		    		document.getElementById('stand').style.visibility = 'visible';
+		    	if(split)
+		    		document.getElementById('split').style.visibility = 'visible';
+		    	if(doubl)
+		    		document.getElementById('doubl').style.visibility = 'visible';
+		    	 										
+		    }
+			
 		});
 </script>
-	Casino
+	Casino <br> page refresh and load creates new table and timers.
 
-<br>
+	<br>
 
-<br>
-	<button  onclick="join()">Join table</button>
-<br>
-<div id="table">
-	<span>Joined in table</span>
-	<div id="tableData">
+	<br>
+	<button onclick="join()">Join table</button>
+	<br>
+	<div id="table">
+		<span id="joinedText" style="visibility: hidden">Joined in table</span>
+		<div id="tableData"></div>
+
+	</div>
+	<br>
+	<div id="timer"> </div>
+	<button style="visibility: hidden" id="betButton" onclick="placeBet()">Bet 55.0$</button>
+	<br>
+	<div style="visibility: hidden" id="turn">
+		<span id="cardsText" >You have </span>
+		<br>
+		<button style="visibility: hidden" id="take" onclick="take()">take</button>
+		<button style="visibility: hidden" id="stand" onclick="stand()">stand</button>
+		<button style="visibility: hidden" id="split" onclick="split()">bet</button>
+		<button style="visibility: hidden" id="double" onclick="double()">bet</button>
 	</div>
 	
-</div>
 	<br>
-<!--  	<button  onclick="placeBet()">Place bet</button>
-	<br><br>
-	<button  onclick="take()">Take</button>
+	<!-- 	<button  onclick="take()">Take</button>
 -->
 </body>
 </html>

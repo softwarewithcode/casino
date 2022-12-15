@@ -50,12 +50,14 @@ public class BlackjackEndpoint {
 
 	@OnMessage
 	public void onMessage(Session session, Message message) {
-		System.out.println("onMessage to table: " + tableId + "\n-> message:" + message);
+		LOGGER.info("endpoint got message: " + tableId + "\n-> message:" + message);
 		if (isFirstMessage(session)) {
 			createBridge(session, message);
 			proxy.join(bridge, "0");
 			return;
 		}
+		if (message.getAction() == null)
+			throw new IllegalArgumentException("action is missing");
 		switch (message.getAction()) {
 		// case null -> System.out.println("preview feature");
 		case BET -> proxy.bet(bridge.playerId(), message.getAmount());

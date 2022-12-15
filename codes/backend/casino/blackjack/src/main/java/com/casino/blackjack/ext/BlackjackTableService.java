@@ -11,15 +11,15 @@ import com.casino.common.table.Thresholds;
 import com.casino.common.table.Type;
 
 public class BlackjackTableService {
-	protected static final BigDecimal MIN_BET = new BigDecimal("5.0");
-	protected static final BigDecimal MAX_BET = new BigDecimal("100.0");
-	protected static final Integer BET_ROUND_TIME_SECONDS = 2;
-	protected static final Integer INSURANCE_ROUND_TIME_SECONDS = 3;
-	protected static final Integer PLAYER_TIME_SECONDS = 4;
-	protected static final long DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS = 2500l;
-	protected static final Integer MIN_PLAYERS = 0;
-	protected static final Integer MAX_PLAYERS = 7;
-	protected static final Integer DEFAULT_SEAT_COUNT = 7;
+	private static final BigDecimal MIN_BET = new BigDecimal("5.0");
+	private static final BigDecimal MAX_BET = new BigDecimal("100.0");
+	private static final Integer BET_ROUND_TIME_SECONDS = 20;
+	private static final Integer INSURANCE_ROUND_TIME_SECONDS = 3;
+	private static final Integer PLAYER_TIME_SECONDS = 30;
+	private static final long DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS = 5000l;
+	private static final Integer MIN_PLAYERS = 0;
+	private static final Integer MAX_PLAYERS = 7;
+	private static final Integer DEFAULT_SEAT_COUNT = 7;
 
 	private List<BlackjackTable> tables = new ArrayList<>();
 
@@ -38,6 +38,6 @@ public class BlackjackTableService {
 	public BlackjackReverseProxy getTable(UUID id) {
 		if (id == null)
 			throw new IllegalArgumentException("no such table:" + id);
-		return tables.stream().filter(table -> table.getId().equals(id)&& table.isOpen()).findAny().orElse(null);
+		return tables.stream().filter(table -> table.getId().equals(id) && table.isOpen()).findAny().orElse(null);
 	}
 }

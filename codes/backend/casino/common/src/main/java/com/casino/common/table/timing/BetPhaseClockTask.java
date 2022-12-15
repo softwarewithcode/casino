@@ -31,8 +31,8 @@ public class BetPhaseClockTask extends TimerTask {
 		}
 		secondsLeft--;
 		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine("BetPhaseClockTask, secondsLeft:" + secondsLeft);
-		System.out.println("BetPhaseClock running, left:" + secondsLeft);
+			LOGGER.fine("BetPhaseClockTask, secondsLeft:" + secondsLeft + " in table:" + table.getId());
+		LOGGER.info("BetPhaseClock running, left:" + secondsLeft);
 		if (secondsLeft == 0) {
 			table.stopClock();
 			table.onBetPhaseEnd();

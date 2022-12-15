@@ -32,6 +32,7 @@ public final class BlackjackTable extends SeatedTable implements BlackjackRevers
 	@Override
 	public boolean join(Bridge bridge, String seatNumber) {
 		LOGGER.entering(getClass().getName(), "join", getId());
+		LOGGER.info("table_join " + bridge);
 		boolean gotSeat = false;
 		try {
 			int seat = Integer.parseInt(seatNumber);
@@ -48,6 +49,7 @@ public final class BlackjackTable extends SeatedTable implements BlackjackRevers
 	@Override
 	public void bet(UUID playerId, BigDecimal bet) {
 		LOGGER.entering(getClass().getName(), "bet", bet + " player:" + playerId + " table:" + getId());
+		LOGGER.info("table_bet " + playerId + " bet:" + bet);
 		try {
 			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
 			System.out.println("player bet:" + bet);

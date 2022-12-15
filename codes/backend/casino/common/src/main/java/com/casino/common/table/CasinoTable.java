@@ -52,7 +52,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private ICasinoPlayer playerInTurn;
 	@JsonProperty
 	private boolean dealerTurn;
-	@JsonProperty
+	@JsonIgnore
 	private volatile Status status;
 
 	protected CasinoTable(Status initialStatus, Thresholds tableConstants, UUID id, PhasePath phases) {
