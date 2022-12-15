@@ -45,9 +45,7 @@ public interface ICasinoTable {
 
 	public boolean removePlayer(ICasinoPlayer p);
 
-	public Set<ICasinoPlayer> tempConcurTest();
-
-	public boolean removeWatcher(ICasinoPlayer p);
+ 	public boolean removeWatcher(ICasinoPlayer p);
 
 	public ConcurrentMap<UUID, ICasinoPlayer> getPlayers();
 

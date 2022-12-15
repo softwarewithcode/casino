@@ -2,9 +2,7 @@ package com.casino.common.table;
 
 import java.time.Instant;
 import java.util.ConcurrentModificationException;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,18 +27,18 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	private static final Logger LOGGER = Logger.getLogger(CasinoTable.class.getName());
 	private final PhasePath phasePath;
-	private ConcurrentHashMap<UUID, ICasinoPlayer> players;
-	private ConcurrentHashMap<UUID, ICasinoPlayer> watchers;
-	private volatile Status status;
-	private Type type;
-	private Language language;
+	private final Type type;
+	private final ConcurrentHashMap<UUID, ICasinoPlayer> players;
+	private final ConcurrentHashMap<UUID, ICasinoPlayer> watchers;
+	private final Thresholds constants;
+	private final ReentrantLock playerInTurnLock;
 	private final UUID id;
 	private final Instant created;
 	private final Clock clock;
+	private Language language;
 	private ICasinoPlayer playerInTurn;
-	private final ReentrantLock playerInTurnLock;
 	private boolean dealerTurn;
-	private final Thresholds constants;
+	private volatile Status status;
 
 	protected CasinoTable(Status initialStatus, Thresholds tableConstants, UUID id, PhasePath phases) {
 		this.players = new ConcurrentHashMap<>();
@@ -72,6 +70,10 @@ public abstract class CasinoTable implements ICasinoTable {
 	protected boolean joinAsPlayer(ICasinoPlayer player) {
 		if (player == null)
 			return false;
+		if (watchers.contains(player)) {
+			LOGGER.log(Level.INFO, "Player is playing, tries to join as a watcher " + player.getName());
+			return false;
+		}
 		players.putIfAbsent(player.getId(), player);
 		return true;
 	}
@@ -185,14 +187,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public ConcurrentMap<UUID, ICasinoPlayer> getWatchers() {
 		return watchers;
-	}
-
-	@Override
-	public Set<ICasinoPlayer> tempConcurTest() {
-		Set<ICasinoPlayer> m = new HashSet<>();
-		m.addAll(players.values());
-		m.addAll(watchers.values());
-		return m;
 	}
 
 	protected boolean isAcceptingPlayers() {
