@@ -18,8 +18,8 @@ import com.casino.blackjack.table.timing.InsurancePhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
-import com.casino.common.dealer.IDealer;
 import com.casino.common.dealer.CommunicationChannel;
+import com.casino.common.dealer.IDealer;
 import com.casino.common.exception.PlayerNotFoundException;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.player.Status;
@@ -129,20 +129,28 @@ public class BlackjackDealer implements IDealer {
 		activeHand.addCard(card);
 	}
 
-	public void handleNewPlayer(ICasinoPlayer player) {
+	@Override
+	public void onPlayerArrival(ICasinoPlayer player) {
 		try {
+			notify(player);
 			if (!betPhaseLock.tryLock())
 				return;
-			if (shouldStartGame()) {
-				table.setStatus(com.casino.common.table.Status.RUNNING);
-				startBetPhaseClock(0l);
-			}
-			voice.multicast(Title.NEW_PLAYER, player);
-			voice.unicast(Title.NEW_PLAYER, player);
+			if (shouldStartGame())
+				startNewGame();
 		} finally {
 			if (betPhaseLock.isHeldByCurrentThread())
 				betPhaseLock.unlock();
 		}
+	}
+
+	private void startNewGame() {
+		table.setStatus(com.casino.common.table.Status.RUNNING);
+		startBetPhaseClock(0l);
+	}
+
+	private void notify(ICasinoPlayer player) {
+		voice.multicast(Title.NEW_PLAYER, player);
+		voice.unicast(Title.NEW_PLAYER, player);
 	}
 
 	private boolean shouldStartGame() {

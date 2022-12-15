@@ -17,7 +17,6 @@ import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
 import com.casino.common.user.Bridge;
-import com.casino.common.user.Title;
 
 public final class BlackjackTable extends SeatedTable implements BlackjackReverseProxy {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
@@ -34,8 +33,7 @@ public final class BlackjackTable extends SeatedTable implements BlackjackRevers
 		BlackjackPlayer joinedPlayer = new BlackjackPlayer(bridge, this);
 		boolean gotSeat = super.trySeat(seat, joinedPlayer);
 		if (gotSeat)
-			dealer.handleNewPlayer(joinedPlayer);
-		System.out.println("new player joined:" + bridge.name());
+			dealer.onPlayerArrival(joinedPlayer);
 		return gotSeat;
 	}
 
