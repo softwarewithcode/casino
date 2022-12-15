@@ -169,7 +169,7 @@ public class InsuranceTest extends BaseTest {
 		assertEquals(20, table.getPlayer(bridge.playerId()).getActiveHand().calculateValues().get(1));
 		table.stand(bridge.playerId());
 		assertTrue(table.getPlayer(bridge.playerId()).getHands().get(0).isInsured());
-		assertEquals(21, dealer.getHand().getFinalValue());
+		assertEquals(21, dealer.getHand().calculateFinalValue());
 		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.playerId()).getTotalBet());
 		assertEquals(new BigDecimal("925.00"), table.getPlayer(bridge.playerId()).getBalance());
 	}
@@ -192,7 +192,7 @@ public class InsuranceTest extends BaseTest {
 		assertEquals(10, table.getPlayer(bridge.playerId()).getActiveHand().calculateValues().get(0));
 		assertEquals(20, table.getPlayer(bridge.playerId()).getActiveHand().calculateValues().get(1));
 		table.stand(bridge.playerId());
-		assertEquals(19, dealer.getHand().getFinalValue());
+		assertEquals(19, dealer.getHand().calculateFinalValue());
 		assertTrue(table.getPlayer(bridge.playerId()).getHands().get(0).isInsured());
 		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.playerId()).getTotalBet());
 		assertEquals(new BigDecimal("1025.00"), table.getPlayer(bridge.playerId()).getBalance());

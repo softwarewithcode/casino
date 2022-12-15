@@ -14,16 +14,25 @@ import com.casino.common.bet.BetUtil;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.table.ICasinoTable;
 import com.casino.common.user.Bridge;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public abstract class CasinoPlayer implements ICasinoPlayer {
 	private static final Logger LOGGER = Logger.getLogger(CasinoPlayer.class.getName());
+	@JsonIgnore
 	private final ICasinoTable table;
-	private final ReentrantLock playerLock;
+	@JsonIgnore
 	private BigDecimal endBalance;
-	private volatile BigDecimal balance;
-	private volatile BigDecimal totalBet;
-	private volatile Status status;
+	@JsonIgnore
+	private final ReentrantLock playerLock;
+	@JsonIgnore
 	private final Bridge bridge;
+	@JsonProperty
+	private volatile BigDecimal balance;
+	@JsonProperty
+	private volatile BigDecimal totalBet;
+	@JsonProperty
+	private volatile Status status;
 
 	public CasinoPlayer(Bridge bridge, ICasinoTable table) {
 		super();
@@ -106,11 +115,11 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	public <T> void sendMessage(T message) {
 		if (bridge.session() == null || !bridge.session().isOpen()) {
 			// block for tests. todo override sendMessage() in tests
-			LOGGER.log(Level.SEVERE, "Player cannot be reached. Remove from table");
+			LOGGER.log(Level.SEVERE, "Player cannot be reached. Remove from table " + getName());
 			return;
 		}
 		try {
-			bridge.session().getBasicRemote().sendText("Table " + getId() + " " + message);
+			bridge.session().getBasicRemote().sendText(message.toString());
 		} catch (IOException e) {
 			UUID logIdentifier = UUID.randomUUID();
 			LOGGER.log(Level.SEVERE, "Could not reach player: logIdentifier: " + logIdentifier + " name;" + getName() + " id:" + getId(), e);

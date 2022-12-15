@@ -12,7 +12,6 @@
 		<maven.compiler.release>19</maven.compiler.release>
 	</properties>
 
-
 	<dependencies>
 		<dependency>
 			<groupId>casino</groupId>

@@ -8,6 +8,6 @@ public record Thresholds(BigDecimal minimumBet, BigDecimal maximumBet, Integer b
 		if (BigDecimal.ZERO.compareTo(minimumBet) == 1)
 			throw new IllegalArgumentException("Minimum bet cannot be less than zero");
 		if (minimumBet.compareTo(maximumBet) == 1)
-			throw new IllegalArgumentException("minimum bet cannot be less than maximum bet");
+			throw new IllegalArgumentException("maximum bet cannot be less than minimum bet");
 	}
 }

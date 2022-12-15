@@ -60,7 +60,7 @@ public class BalanceTest extends BaseTest {
 		assertEquals(4, table.getPlayer(bridge.playerId()).getActiveHand().getCards().get(0).getRank());
 		assertEquals(5, table.getPlayer(bridge.playerId()).getActiveHand().getCards().get(1).getRank());
 		table.doubleDown(bridge.playerId());
-		assertEquals(20, table.getPlayer(bridge.playerId()).getHands().get(0).getFinalValue());
+		assertEquals(20, table.getPlayer(bridge.playerId()).getHands().get(0).calculateFinalValue());
 		assertEquals(new BigDecimal("20.00"), table.getPlayer(bridge.playerId()).getTotalBet());
 		assertEquals(new BigDecimal("1020.00"), table.getPlayer(bridge.playerId()).getBalance());
 	}

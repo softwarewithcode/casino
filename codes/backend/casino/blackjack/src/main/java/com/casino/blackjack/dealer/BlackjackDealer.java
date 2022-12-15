@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.casino.blackjack.message.Mapper;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.blackjack.table.BlackjackUtil;
@@ -21,22 +22,30 @@ import com.casino.common.cards.IHand;
 import com.casino.common.dealer.CommunicationChannel;
 import com.casino.common.dealer.IDealer;
 import com.casino.common.exception.PlayerNotFoundException;
+import com.casino.common.player.CasinoPlayer;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.player.Status;
 import com.casino.common.table.Seat;
 import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.timing.BetPhaseClockTask;
-import com.casino.common.user.Title;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
 	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
+	@JsonIgnore
 	private final Thresholds thresholds;
+	@JsonIgnore
 	private final BlackjackTable table;
+	@JsonIgnore
 	private final ReentrantLock betPhaseLock;
+	@JsonIgnore
 	private final CommunicationChannel voice;
+	@JsonIgnore
 	private List<Card> deck;
+	@JsonProperty
 	private BlackjackDealerHand dealerHand;
 
 	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds thresholds) {
@@ -130,9 +139,9 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	@Override
-	public void onPlayerArrival(ICasinoPlayer player) {
+	public <T extends CasinoPlayer> void onPlayerArrival(T player) {
 		try {
-			notify(player);
+			notify((BlackjackPlayer) player);
 			if (!betPhaseLock.tryLock())
 				return;
 			if (shouldStartGame())
@@ -148,9 +157,10 @@ public class BlackjackDealer implements IDealer {
 		startBetPhaseClock(0l);
 	}
 
-	private void notify(ICasinoPlayer player) {
-		voice.multicast(Title.NEW_PLAYER, player);
-		voice.unicast(Title.NEW_PLAYER, player);
+	private void notify(BlackjackPlayer player) {
+		String message = Mapper.createArrivalMessage(table, player);
+		voice.multicast(message, player);
+		voice.unicast(message, player);
 	}
 
 	private boolean shouldStartGame() {

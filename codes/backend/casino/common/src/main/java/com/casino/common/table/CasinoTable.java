@@ -17,6 +17,8 @@ import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePath;
 import com.casino.common.table.timing.Clock;
 import com.casino.common.table.timing.PlayerClockTask;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Base class for all casino tables. Gather here common data and operations what
@@ -26,18 +28,31 @@ import com.casino.common.table.timing.PlayerClockTask;
 public abstract class CasinoTable implements ICasinoTable {
 
 	private static final Logger LOGGER = Logger.getLogger(CasinoTable.class.getName());
+	@JsonIgnore
 	private final PhasePath phasePath;
+	@JsonProperty
 	private final Type type;
+	@JsonProperty
 	private final ConcurrentHashMap<UUID, ICasinoPlayer> players;
+	@JsonProperty
 	private final ConcurrentHashMap<UUID, ICasinoPlayer> watchers;
+	@JsonIgnore
 	private final Thresholds constants;
+	@JsonIgnore
 	private final ReentrantLock playerInTurnLock;
+	@JsonProperty
 	private final UUID id;
+	@JsonIgnore
 	private final Instant created;
+	@JsonIgnore
 	private final Clock clock;
+	@JsonProperty
 	private Language language;
+	@JsonProperty
 	private ICasinoPlayer playerInTurn;
+	@JsonProperty
 	private boolean dealerTurn;
+	@JsonProperty
 	private volatile Status status;
 
 	protected CasinoTable(Status initialStatus, Thresholds tableConstants, UUID id, PhasePath phases) {

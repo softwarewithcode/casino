@@ -24,8 +24,8 @@ public class BlackjackDealerHand extends BlackjackHand implements Comparable<IHa
 	public int compareTo(IHand playerHand) {
 		if (playerHand == null)
 			return -1;
-		int dealerVal = getFinalValue();
-		int playerVal = playerHand.getFinalValue();
+		int dealerVal = calculateFinalValue();
+		int playerVal = playerHand.calculateFinalValue();
 		boolean dealerBlackjack = this.isBlackjack();
 		boolean playerBlackjack = playerHand.isBlackjack();
 		if (dealerBlackjack && playerBlackjack)

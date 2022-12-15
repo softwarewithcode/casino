@@ -35,15 +35,23 @@
 		}
 		socket.addEventListener('message', (event) => {
 			console.log("table sends:"+event)
-		    alert('Message from table: '+ event.data);
+			document.getElementById('tableData').innerHTML +=event.data
+		    
 		});
 </script>
 	Casino
 
 <br>
+
 <br>
-	<button  onclick="join()">Join table first</button>
+	<button  onclick="join()">Join table</button>
 <br>
+<div id="table">
+	<span>Joined in table</span>
+	<div id="tableData">
+	</div>
+	
+</div>
 	<br>
 <!--  	<button  onclick="placeBet()">Place bet</button>
 	<br><br>

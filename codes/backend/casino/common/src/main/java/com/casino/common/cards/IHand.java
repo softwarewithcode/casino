@@ -42,7 +42,7 @@ public interface IHand {
 
 	public void stand();
 
-	public Integer getFinalValue();
+	public Integer calculateFinalValue();
 
 	public boolean hasWinningChance();
 

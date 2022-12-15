@@ -17,9 +17,11 @@ import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
 import com.casino.common.user.Bridge;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public final class BlackjackTable extends SeatedTable implements BlackjackReverseProxy {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
+	@JsonIgnore
 	private final BlackjackDealer dealer;
 
 	public BlackjackTable(Status initialStatus, Thresholds thresholds, UUID id) {

@@ -13,20 +13,31 @@ import java.util.stream.Collectors;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPlayerActionException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /*
  * Player(s) and internal timers are possible concurrent actors. BlackjackPlayer getHands() - hands out references to these hands.
  * 
  */
 public class BlackjackHand implements IHand {
+	@JsonIgnore
 	private final UUID id;
+	@JsonIgnore
 	private final Instant created;
+	@JsonProperty
 	private final List<Card> cards;
+	@JsonProperty
 	private volatile Instant completed;
+	@JsonProperty
 	private volatile boolean active;
+	@JsonProperty
 	private volatile boolean doubled;
+	@JsonProperty
 	private volatile BigDecimal bet;
+	@JsonProperty
 	private volatile BigDecimal insuranceBet;
+	@JsonIgnore
 	private ReentrantLock lock;
 
 	public BlackjackHand(UUID id, boolean active) {
@@ -197,7 +208,7 @@ public class BlackjackHand implements IHand {
 	}
 
 	@Override
-	public Integer getFinalValue() {
+	public Integer calculateFinalValue() {
 		if (!isCompleted() || getCards().size() < 2)
 			throw new IllegalArgumentException("hand has not enough cards " + getCards().size() + " or is not completed:" + completed);
 		List<Integer> values = calculateValues();
@@ -226,7 +237,7 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public boolean hasWinningChance() {
-		return getFinalValue() <= 21 || isInsured();
+		return calculateFinalValue() <= 21 || isInsured();
 	}
 
 	public BigDecimal getInsuranceBet() {
@@ -235,7 +246,7 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public boolean isInsuranceCompensable() {
-		return isInsured() && isCompleted() && getFinalValue() <= 21;
+		return isInsured() && isCompleted() && calculateFinalValue() <= 21;
 	}
 
 }

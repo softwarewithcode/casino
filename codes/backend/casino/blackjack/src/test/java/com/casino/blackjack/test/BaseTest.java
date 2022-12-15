@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
+import org.junit.jupiter.api.BeforeAll;
+
+import com.casino.blackjack.message.Mapper;
 import com.casino.common.table.Type;
 import com.casino.common.user.Bridge;
 
@@ -21,6 +24,12 @@ public class BaseTest {
 	protected Bridge bridge;
 	protected Bridge bridge2;
 	protected Bridge bridge3;
+
+	@BeforeAll
+	public static void setup() {
+		System.out.println("before all test -> setting skip serialization parameter ");
+		System.getProperties().setProperty(Mapper.JUNIT_RUNNER, "true");
+	}
 
 	protected void sleep(int i, ChronoUnit unit) {
 		try {

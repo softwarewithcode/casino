@@ -16,10 +16,13 @@ import com.casino.common.table.ICasinoTable;
 import com.casino.common.table.ISeatedTable;
 import com.casino.common.user.Action;
 import com.casino.common.user.Bridge;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BlackjackPlayer extends CasinoPlayer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackPlayer.class.getName());
+	@JsonProperty
 	private List<IHand> hands;
+	@JsonProperty
 	private List<Action> actions;
 
 	public BlackjackPlayer(Bridge bridge, ISeatedTable table) {
@@ -284,7 +287,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public Integer getFirstHandFinalValue() {
 		IHand hand = getFirstHand();
-		return hand.isCompleted() ? hand.getFinalValue() : null;
+		return hand.isCompleted() ? hand.calculateFinalValue() : null;
 	}
 
 	public BigDecimal getBet(int handNumber) {

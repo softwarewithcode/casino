@@ -10,14 +10,14 @@ import java.util.stream.IntStream;
 import com.casino.common.bet.BetUtil;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.PhasePath;
-import com.casino.common.user.Bridge;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /*
  * For example blackjack and red dog games are order based games. 
  * Roulette is not order based as people tend to add chips at the same time.
  */
 public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
-
+	@JsonIgnore
 	private Set<Seat> seats;
 
 	protected SeatedTable(Status initialStatus, Thresholds tableConstants, UUID tableId, PhasePath phasePath) {
@@ -46,7 +46,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().hasWinningChance()).findFirst().isPresent();
 	}
 
-	public Seat getNextPlayerWithActiveActiveHand() {
+	public Seat findNextPlayerWithActiveActiveHand() {
 		Optional<Seat> playerInTurnOptional = seats.stream().filter(seat -> !seat.isAvailable() && seat.getPlayer().equals(getPlayerInTurn())).findFirst();
 		if (playerInTurnOptional.isEmpty())
 			throw new IllegalStateException("No playerInTurn");

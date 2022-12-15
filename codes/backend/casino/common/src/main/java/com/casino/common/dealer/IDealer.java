@@ -1,9 +1,9 @@
 package com.casino.common.dealer;
 
-import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.player.CasinoPlayer;
 
 public interface IDealer {
-	public void onPlayerArrival(ICasinoPlayer player);
+	public <T extends CasinoPlayer> void onPlayerArrival(T player);
 
 	public boolean hasStartingAce();
 

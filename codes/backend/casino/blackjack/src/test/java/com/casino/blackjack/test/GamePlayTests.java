@@ -224,8 +224,8 @@ public class GamePlayTests extends BaseTest {
 		table.split(bridge.playerId());
 		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("20.00"), table.getPlayer(bridge.playerId()).getTotalBet());
-		assertEquals(16, table.getPlayer(bridge.playerId()).getHands().get(0).getFinalValue());
-		assertEquals(21, table.getPlayer(bridge.playerId()).getHands().get(1).getFinalValue());
+		assertEquals(16, table.getPlayer(bridge.playerId()).getHands().get(0).calculateFinalValue());
+		assertEquals(21, table.getPlayer(bridge.playerId()).getHands().get(1).calculateFinalValue());
 		assertEquals(new BigDecimal("1005.00"), table.getPlayer(bridge.playerId()).getBalance());
 	}
 
