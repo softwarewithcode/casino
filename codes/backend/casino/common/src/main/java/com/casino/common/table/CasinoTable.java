@@ -19,6 +19,7 @@ import com.casino.common.table.timing.Clock;
 import com.casino.common.table.timing.PlayerClockTask;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Base class for all casino tables. Gather here common data and operations what
@@ -32,12 +33,13 @@ public abstract class CasinoTable implements ICasinoTable {
 	private final PhasePath phasePath;
 	@JsonProperty
 	private final Type type;
+	@JsonSerialize(converter = CasinoPlayersConverter.class)
 	@JsonProperty
 	private final ConcurrentHashMap<UUID, ICasinoPlayer> players;
-	@JsonProperty
-	private final ConcurrentHashMap<UUID, ICasinoPlayer> watchers;
 	@JsonIgnore
-	private final Thresholds constants;
+	private final ConcurrentHashMap<UUID, ICasinoPlayer> watchers;
+	@JsonProperty
+	private final Thresholds thresholds;
 	@JsonIgnore
 	private final ReentrantLock playerInTurnLock;
 	@JsonProperty
@@ -62,7 +64,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.type = tableConstants.tableType();
 		this.id = id;
 		this.created = Instant.now();
-		this.constants = tableConstants;
+		this.thresholds = tableConstants;
 		this.clock = new Clock();
 		this.phasePath = phases;
 		this.playerInTurnLock = new ReentrantLock(true);
@@ -104,11 +106,12 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.clock.stopClock();
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isClockTicking() {
 		return this.clock.isTicking();
 	}
-
+	@JsonIgnore
 	@Override
 	public boolean isClosed() {
 		return status == Status.CLOSED;
@@ -116,19 +119,22 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public boolean isMultiplayer() {
-		return constants.maxPlayers() > 1;
+		return thresholds.maxPlayers() > 1;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isPublic() {
 		return type == Type.PUBLIC;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isPrivate() {
 		return type == Type.PRIVATE;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isReserved() {
 		return type == Type.RESERVED;
@@ -143,6 +149,11 @@ public abstract class CasinoTable implements ICasinoTable {
 	public void onClose() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@JsonProperty
+	public int getWatcherCount() {
+		return watchers.size();
 	}
 
 	@Override
@@ -277,7 +288,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	public Thresholds getThresholds() {
-		return constants;
+		return thresholds;
 	}
 
 	@Override

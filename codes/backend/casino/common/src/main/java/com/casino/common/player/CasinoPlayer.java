@@ -24,6 +24,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@JsonIgnore
 	private BigDecimal endBalance;
 	@JsonIgnore
+	private BigDecimal initialBalance;
+	@JsonIgnore
 	private final ReentrantLock playerLock;
 	@JsonIgnore
 	private final Bridge bridge;
@@ -32,14 +34,18 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@JsonProperty
 	private volatile BigDecimal totalBet;
 	@JsonProperty
+	private volatile BigDecimal payout;
+	@JsonProperty
 	private volatile Status status;
 
 	public CasinoPlayer(Bridge bridge, ICasinoTable table) {
 		super();
 		this.bridge = bridge;
 		this.balance = bridge.initialBalance();
+		this.initialBalance = bridge.initialBalance();
 		this.balance = this.balance.setScale(2, RoundingMode.DOWN);
 		this.status = null;
+		this.payout = BigDecimal.ZERO;
 		this.table = table;
 		this.playerLock = new ReentrantLock();
 	}
@@ -63,7 +69,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		return endBalance;
 	}
 
-	@Override
+	@JsonIgnore
+	@Override // never return this id to the players
 	public UUID getId() {
 		return bridge.playerId();
 	}
@@ -179,6 +186,21 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		} finally {
 			releasePlayerLock();
 		}
+	}
+
+	public void increaseBalanceAndPayout(BigDecimal amount) {
+		try {
+			tryTakingPlayerLock();
+			increaseBalance(amount);
+			this.payout = payout.add(amount);
+		} finally {
+			releasePlayerLock();
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "CasinoPlayer [name=" + bridge.name() + "balance=" + balance + ", totalBet=" + totalBet + ", status=" + status + "]";
 	}
 
 	@Override

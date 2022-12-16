@@ -2,109 +2,70 @@
 <html>
 <head>
 <title>Casino</title>
+<script type="text/javascript" src="actions.js" defer></script>
+<script type="text/javascript" src="websocket.js" defer></script>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 </head>
 <body>
 	<script>
-	var timer=19
-	console.log("connecting")
-		let socket= new WebSocket('ws://localhost:8080/casino/blackjack/e021c3bf-ffd9-4f75-953f-61639222e50d');
-	 	if(socket){
-	 		console.log("got connection")
-	 	
-	 	}
-		// Connection opened
-		socket.addEventListener('open', (event) => {
-			console.log("open")		
-		});
-		function join(message){
-			const json = {userId:'',action:'JOIN'}
-			const jsonObj = JSON.stringify(json);
-			console.log("obj:"+jsonObj)
-		    socket.send(jsonObj);
-		}
-		function placeBet(message){
-			const json = {amount:'55.00',action:'BET'}
-			const jsonObj = JSON.stringify(json);
-			console.log("obj:"+jsonObj)
-		    socket.send(jsonObj);
-		}
-		function take(message){
-			const json = {userId:''}
-			const jsonObj = JSON.stringify(json);
-			console.log("obj:"+jsonObj)
-		    socket.send(jsonObj);
-		}
-		socket.addEventListener('message', (event) => {
-			const ret=JSON.parse(event.data)
-			console.log(ret)
-			console.log(ret.title)
-			document.getElementById('tableData').innerHTML +=ret.title +"<br>"+ret.table +"<br>"
-		    if(ret.title==="BET_PHASE_STARTS"){
-		    	console.log("bet phase starts")
-		     const interval=setInterval(() => {
-		    		  timer--
-		    		  document.getElementById('timer').innerHTML =+timer 
-		    		  document.getElementById('timer').innerHtml += "<br>"+timer;
-		    		  if(timer==0)
-		    			   clearInterval(interval)
-		    		}, 1000)
-
-		    	document.getElementById('betButton').style.visibility = 'visible';
-		    }
-			if(ret.title==="NEW_PLAYER"){
-		    	document.getElementById('joinedText').style.visibility = 'visible';
-		    }
-			if(ret.title==="PLAY_TURN"){
-				console.log("playTurn message:"+ret)
-		    	document.getElementById('turn').style.visibility = 'visible';
-		    	 document.getElementById('cardsText').innerHTML =+ret.player.activeHand.cards[0].rank +" "+ret.player.activeHand.cards[0].suit +"<br>"
-		    	 											+ret.player.activeHand.cards[1].rank +" "+ret.player.activeHand.cards[1].suit
-		    	const take=ret.player.actions.includes("TAKE");
-		    	const stand=ret.player.actions.includes("STAND");
-		    	const split=ret.player.actions.includes("SPLIT");
-		    	const doubl=ret.player.actions.includes("DOUBLE");
-		    	if(take)
-		    		document.getElementById('take').style.visibility = 'visible';
-		    	if(stand)
-		    		document.getElementById('stand').style.visibility = 'visible';
-		    	if(split)
-		    		document.getElementById('split').style.visibility = 'visible';
-		    	if(doubl)
-		    		document.getElementById('doubl').style.visibility = 'visible';
-		    	 										
-		    }
-			
-		});
-</script>
+		var timer=19
+		var myName;
+		var myBalance=0;
+		var interval
+	</script>
 	Casino <br> page refresh and load creates new table and timers.
 
 	<br>
-
+	<div id="myProfile" style="visibility:hidden; color:green">
+		LOGGED IN 
+	</div>
 	<br>
-	<button onclick="join()">Join table</button>
+	<div id="joinContainer">
+		<button onclick="join()">Join table</button>
+	</div>
 	<br>
 	<div id="table">
 		<span id="joinedText" style="visibility: hidden">Joined in table</span>
 		<div id="tableData"></div>
-
 	</div>
 	<br>
 	<div id="timer"> </div>
-	<button style="visibility: hidden" id="betButton" onclick="placeBet()">Bet 55.0$</button>
+	<div id="betsContainer" style="visibility:hidden">
+		<div>
+			Round starts soon, place starting bet to play. Changing is possible as long as server starts next phase.
+		</div>
+		<button id="betButton" onclick="placeBet('55')">Place starting bet 55.0$</button>
+		<button id="betButton2" onclick="placeBet('99.0')">Place starting bet 99.0$</button>
+	</div>
 	<br>
-	<div style="visibility: hidden" id="turn">
-		<span id="cardsText" >You have </span>
+	
+	<div id="cardContainer">
+		<div style="font-size: 25px" id="dealerCardsContainer">
+		</div>
+		<div style="font-size: 25px" id="myCardsContainer">
+		</div>
+		<div id="otherPlayersCardsContainer">
+		</div>
+	</div>
+	<div style="visibility: hidden" id="actionContainer">
+		It's your turn. Actions:
 		<br>
 		<button style="visibility: hidden" id="take" onclick="take()">take</button>
 		<button style="visibility: hidden" id="stand" onclick="stand()">stand</button>
-		<button style="visibility: hidden" id="split" onclick="split()">bet</button>
-		<button style="visibility: hidden" id="double" onclick="double()">bet</button>
+		<button style="visibility: hidden" id="split" onclick="split()">split</button>
+		<button style="visibility: hidden" id="doubl" onclick="double()">doubleDown</button>
+	</div>
+	<div id="insureContainer" style="visibility:hidden">
+		Insure phase is on. Insuring not allowed if hand is blackjack or not enough balance. TODO<br>
+		<button id="insureButton" onclick="insure()">insure hand. </button>
 	</div>
 	
+	<div id="roundCompletedContainer" style="visibility:hidden">
+		Round is completed:.
+		<div id="payouts"></div>
+		<div id="handValue"
+	</div>
 	<br>
-	<!-- 	<button  onclick="take()">Take</button>
--->
 </body>
 </html>
 

@@ -17,6 +17,7 @@ public class BetPhaseClockTask extends TimerTask {
 		this.table = table;
 		Thresholds thresholds = table.getThresholds();
 		secondsLeft = thresholds.betPhaseTime();
+		System.out.println("BET PHASE CLOCK TASK NEW");
 	}
 
 	@Override

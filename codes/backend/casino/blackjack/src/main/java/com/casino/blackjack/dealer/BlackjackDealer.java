@@ -19,6 +19,7 @@ import com.casino.blackjack.table.timing.InsurancePhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
+import com.casino.common.cards.Suit;
 import com.casino.common.dealer.CommunicationChannel;
 import com.casino.common.dealer.IDealer;
 import com.casino.common.exception.PlayerNotFoundException;
@@ -31,7 +32,6 @@ import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.timing.BetPhaseClockTask;
 import com.casino.common.user.Title;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
@@ -46,7 +46,7 @@ public class BlackjackDealer implements IDealer {
 	private final CommunicationChannel voice;
 	@JsonIgnore
 	private List<Card> deck;
-	@JsonProperty
+	@JsonIgnore
 	private BlackjackDealerHand dealerHand;
 
 	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds thresholds) {
@@ -85,6 +85,7 @@ public class BlackjackDealer implements IDealer {
 		});
 	}
 
+	@JsonIgnore
 	public IHand getHand() {
 		return dealerHand;
 	}
@@ -105,6 +106,8 @@ public class BlackjackDealer implements IDealer {
 		deck = Deck.combineDecks(6);
 	}
 
+	// @JsonIgnore just in case of an upcoming getter error
+	@JsonIgnore
 	public List<Card> getDecks() {
 		return deck;
 	}
@@ -113,6 +116,7 @@ public class BlackjackDealer implements IDealer {
 		return thresholds;
 	}
 
+	@JsonIgnore
 	public BlackjackTable getTable() {
 		return table;
 	}
@@ -142,7 +146,7 @@ public class BlackjackDealer implements IDealer {
 	@Override
 	public <T extends CasinoPlayer> void onPlayerArrival(T player) {
 		try {
-			notifyAboutNewPlayer((BlackjackPlayer) player);
+			notifyPlayerArrival((BlackjackPlayer) player);
 			if (!betPhaseLock.tryLock())
 				return;
 			if (shouldStartGame()) {
@@ -160,13 +164,14 @@ public class BlackjackDealer implements IDealer {
 		startBetPhaseClock(0l);
 	}
 
-	private void notifyAboutNewPlayer(BlackjackPlayer player) {
-		String message = Mapper.createMessage(Title.NEW_PLAYER, table, player);
-		voice.multicast(message, player);
-		voice.unicast(message, player);
+	private void notifyPlayerArrival(BlackjackPlayer player) {
+		String commonMessage = Mapper.createMessage(Title.NEW_PLAYER, table, player);
+		String loginMessage = Mapper.createMessage(Title.LOGIN, table, player);
+		voice.unicast(loginMessage, player);
+		voice.multicast(commonMessage, player);
 	}
 
-	private void notifyAll(Title title, BlackjackPlayer player) {
+	public void notifyAll(Title title, BlackjackPlayer player) {
 		String message = Mapper.createMessage(title, table, player);
 		voice.broadcast(message);
 	}
@@ -190,7 +195,8 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private boolean somebodyHasBet() {
-		return getOrderedPlayersWithBet() != null && getOrderedPlayersWithBet().size() > 0;
+		List<ICasinoPlayer> c = getOrderedPlayersWithBet();
+		return c != null && c.size() > 0;
 	}
 
 	private List<ICasinoPlayer> getOrderedPlayersWithBet() {
@@ -206,6 +212,7 @@ public class BlackjackDealer implements IDealer {
 		updateActivePlayers();
 		dealStartingHands();
 		if (hasStartingAce()) {
+			notifyAll(Title.INSURANCE_PHASE_STARTS, (BlackjackPlayer) table.getPlayerInTurn());
 			startInsurancePhase();
 			return;
 		}
@@ -241,6 +248,10 @@ public class BlackjackDealer implements IDealer {
 		}
 	}
 
+	public void informTable() {
+		notifyAll(Title.PLAY_TURN, (BlackjackPlayer) table.getPlayerInTurn());
+	}
+
 	private void carryOutDealerTurn() {
 		completeRound();
 		if (shouldRestartBetPhase()) {
@@ -273,6 +284,7 @@ public class BlackjackDealer implements IDealer {
 		removeCardFromDeck();
 	}
 
+	@JsonIgnore
 	public Card getNextCard() {
 		return deck.get(deck.size() - 1);
 	}
@@ -341,14 +353,14 @@ public class BlackjackDealer implements IDealer {
 		playersWithWinningChances.stream().forEach(player -> player.getHands().forEach(playerHand -> {
 			int comparison = dealerHand.compareTo(playerHand);
 			if (player.isCompensable() && dealerHand.isBlackjack())
-				player.increaseBalance(player.getInsuranceAmount().multiply(BigDecimal.TWO));
+				player.increaseBalanceAndPayout(player.getInsuranceAmount().multiply(BigDecimal.TWO));
 			if (evenResult(comparison))
-				player.increaseBalance(playerHand.getBet());
+				player.increaseBalanceAndPayout(playerHand.getBet());
 			else if (playerWins(comparison)) {
 				if (playerHand.isBlackjack())
-					player.increaseBalance(playerHand.getBet().multiply(BLACKJACK_FACTOR));
+					player.increaseBalanceAndPayout(playerHand.getBet().multiply(BLACKJACK_FACTOR));
 				else
-					player.increaseBalance(playerHand.getBet().multiply(BigDecimal.TWO));
+					player.increaseBalanceAndPayout(playerHand.getBet().multiply(BigDecimal.TWO));
 			}
 		}));
 	}
@@ -371,5 +383,15 @@ public class BlackjackDealer implements IDealer {
 	public void finalizeInsurancePhase() {
 		table.updateGamePhase(GamePhase.PLAY);
 		updateTableActor();
+		Title title = table.getPlayerInTurn() != null ? Title.PLAY_TURN : Title.ROUND_COMPLETED;
+		notifyAll(title, (BlackjackPlayer) table.getPlayerInTurn());
+	}
+
+	public void finalizeAction(BlackjackPlayer player) {
+		updateTableActor();
+		if (table.getPlayerInTurn() != null)
+			notifyAll(Title.PLAY_TURN, (BlackjackPlayer) table.getPlayerInTurn());
+		else
+			notifyAll(Title.ROUND_COMPLETED, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 }

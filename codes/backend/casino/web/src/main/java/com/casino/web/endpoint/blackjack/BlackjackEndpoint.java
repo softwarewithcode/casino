@@ -2,6 +2,7 @@ package com.casino.web.endpoint.blackjack;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.blackjack.ext.BlackjackReverseProxy;
@@ -58,16 +59,20 @@ public class BlackjackEndpoint {
 		}
 		if (message.getAction() == null)
 			throw new IllegalArgumentException("action is missing");
-		switch (message.getAction()) {
-		// case null -> System.out.println("preview feature");
-		case BET -> proxy.bet(bridge.playerId(), message.getAmount());
-		case TAKE -> proxy.hit(bridge.playerId());
-		case SPLIT -> proxy.split(bridge.playerId());
-		case DOUBLE -> proxy.doubleDown(bridge.playerId());
-		case STAND -> proxy.stand(bridge.playerId());
-		case INSURE -> proxy.insure(bridge.playerId());
-		default -> LOGGER.severe("action is missing," + bridge);
+		try {
+			switch (message.getAction()) {
+			case BET -> proxy.bet(bridge.playerId(), message.getAmount());
+			case TAKE -> proxy.hit(bridge.playerId());
+			case SPLIT -> proxy.split(bridge.playerId());
+			case DOUBLE_DOWN -> proxy.doubleDown(bridge.playerId());
+			case STAND -> proxy.stand(bridge.playerId());
+			case INSURE -> proxy.insure(bridge.playerId());
+			default -> LOGGER.severe("action is missing," + bridge);
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Proxy error:" + bridge, e);
 		}
+		System.out.println("Command");
 	}
 
 	private void createBridge(Session session, Message message) {
@@ -81,6 +86,7 @@ public class BlackjackEndpoint {
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason) {
 		try {
+			LOGGER.info("Closing session:" + closeReason);
 			session.close(closeReason);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

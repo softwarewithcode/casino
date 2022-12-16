@@ -27,7 +27,7 @@ public class BlackjackHand implements IHand {
 	private final Instant created;
 	@JsonProperty
 	private final List<Card> cards;
-	@JsonProperty
+	@JsonIgnore
 	private volatile Instant completed;
 	@JsonProperty
 	private volatile boolean active;
@@ -63,6 +63,15 @@ public class BlackjackHand implements IHand {
 	public boolean isBlackjack() {
 		List<Integer> vals = calculateValues();
 		return cards.size() == 2 && vals.size() == 2 && vals.get(1) == 21;
+	}
+
+	@JsonProperty
+	public List<Integer> getValues() {
+		if (!isCompleted())
+			return calculateValues();
+		List<Integer> values = new ArrayList<>();
+		values.add(calculateFinalValue());
+		return values;
 	}
 
 	private boolean hasTwoPossibleValues(Integer smallestValue, Optional<Card> aceOptional) {

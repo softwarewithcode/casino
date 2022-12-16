@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import com.casino.blackjack.dealer.BlackjackDealer;
 import com.casino.blackjack.ext.BlackjackReverseProxy;
 import com.casino.blackjack.player.BlackjackPlayer;
+import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
@@ -18,10 +19,11 @@ import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
 import com.casino.common.user.Bridge;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class BlackjackTable extends SeatedTable implements BlackjackReverseProxy {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
-	@JsonIgnore
+	@JsonIgnore // Don't expose the dealer at all
 	private final BlackjackDealer dealer;
 
 	public BlackjackTable(Status initialStatus, Thresholds thresholds, UUID id) {
@@ -88,7 +90,7 @@ public final class BlackjackTable extends SeatedTable implements BlackjackRevers
 			lockPlayerInTurn();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "stand");
 			dealer.stand(player);
-			dealer.updateTableActor();
+			dealer.finalizeAction(player);
 		} finally {
 			unlockPlayerInTurn("stand");
 			LOGGER.exiting(getClass().getName(), "stand", " player:" + playerId + " table:" + getId());
@@ -107,7 +109,7 @@ public final class BlackjackTable extends SeatedTable implements BlackjackRevers
 			lockPlayerInTurn();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "hit");
 			dealer.addPlayerCard(player);
-			dealer.updateTableActor();
+			dealer.finalizeAction(player);
 		} finally {
 			unlockPlayerInTurn("hit");
 			LOGGER.exiting(getClass().getName(), "hit", " player:" + playerId + " table:" + getId());
@@ -122,6 +124,7 @@ public final class BlackjackTable extends SeatedTable implements BlackjackRevers
 			lockPlayerInTurn();
 			verifyActionClearance(player, "split");
 			dealer.handleSplit(player);
+			dealer.finalizeAction(player);
 		} finally {
 			unlockPlayerInTurn("split");
 			LOGGER.exiting(getClass().getName(), "split", " player:" + playerId + " table:" + getId());
@@ -215,6 +218,11 @@ public final class BlackjackTable extends SeatedTable implements BlackjackRevers
 			getPlayerInTurnLock().unlock();
 			LOGGER.exiting(getClass().getName(), "onInsurancePhaseEnd" + this.getId());
 		}
+	}
+
+	@JsonProperty
+	public IHand dealerHand() {
+		return dealer.getHand();
 	}
 
 	public Thresholds getThresholds() {

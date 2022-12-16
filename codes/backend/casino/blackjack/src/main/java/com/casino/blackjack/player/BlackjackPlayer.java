@@ -64,7 +64,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 				actions.add(Action.SPLIT);
 			int handValue = getFirstHand().calculateValues().get(0);
 			if (handValue >= 9 && handValue <= 11 && !hasSecondHand())
-				actions.add(Action.DOUBLE);
+				actions.add(Action.DOUBLE_DOWN);
 		} finally {
 			releasePlayerLock();
 		}
@@ -204,7 +204,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		if (this.hands.size() != 1)
 			throw new IllegalPlayerActionException("wrong hand count:" + getName() + " " + hands.size(), 1);
 		if (!hands.get(0).isActive())
-			throw new IllegalPlayerActionException("first hand is not active " + getName(), 2);
+			throw new IllegalPlayerActionException("first hand is not active " + getName()+ " "+getFirstHand() , 2);
 		if (hands.get(0).getCards().size() != 2)
 			throw new IllegalPlayerActionException("starting hand does not contain exactly two cards:" + getName() + " " + hands.get(0).getCards(), 3);
 	}

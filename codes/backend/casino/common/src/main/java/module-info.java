@@ -17,4 +17,5 @@ module casino.common {
 	requires jakarta.json.bind;
 	requires jakarta.websocket;
 	requires java.logging;
+	requires com.fasterxml.jackson.databind;
 }

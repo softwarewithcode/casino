@@ -16,6 +16,8 @@ public interface ICasinoPlayer {
 
 	public void increaseBalance(BigDecimal amount);
 
+	public void increaseBalanceAndPayout(BigDecimal amount);
+
 	public UUID getId();
 
 	public void onLeave();
