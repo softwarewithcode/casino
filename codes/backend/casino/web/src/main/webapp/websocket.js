@@ -76,6 +76,7 @@
 				timer=ret.table.thresholds.playerHandTime
 				clearInterval(interval)
 				document.getElementById('myCardsContainer').innerHTML =""
+				updateDealerCards(ret.table.dealerHand)
 		   		updateMyCards(ret.table.players[0])
 				document.getElementById('insureContainer').style.visibility = 'hidden';
 		    	document.getElementById('actionContainer').style.visibility = 'visible';
