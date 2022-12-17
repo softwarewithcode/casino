@@ -1,8 +1,7 @@
 function act(title, amount) {
-	document.getElementById('insureContainer').style.visibility = 'hidden'
 	const json = { amount: amount, action: title }
 	const jsonObj = JSON.stringify(json);
-	console.log("insuring:" + jsonObj)
+	console.log("calling :" +title+" with"+ jsonObj)
 	socket.send(jsonObj);
 }
 function placeBet(amount) {
