@@ -14,8 +14,8 @@ module casino.common {
 	exports com.casino.common.bet;
 
 	requires com.fasterxml.jackson.annotation;
+	requires com.fasterxml.jackson.databind;
 	requires jakarta.json.bind;
 	requires jakarta.websocket;
 	requires java.logging;
-	requires com.fasterxml.jackson.databind;
 }

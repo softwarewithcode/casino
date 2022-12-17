@@ -4,6 +4,7 @@ module casino.web {
 
 	requires casino.blackjack;
 	requires casino.common;
+	requires casino.service;
 	requires jakarta.cdi;
 	requires jakarta.inject;
 	requires jakarta.json.bind;

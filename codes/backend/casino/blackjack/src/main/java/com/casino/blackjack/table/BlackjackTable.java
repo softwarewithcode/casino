@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.blackjack.dealer.BlackjackDealer;
-import com.casino.blackjack.ext.BlackjackReverseProxy;
+import com.casino.blackjack.ext.IBlackjackTable;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPhaseException;
@@ -21,7 +21,7 @@ import com.casino.common.user.Bridge;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public final class BlackjackTable extends SeatedTable implements BlackjackReverseProxy {
+public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
 	@JsonIgnore // Don't expose the dealer at all
 	private final BlackjackDealer dealer;

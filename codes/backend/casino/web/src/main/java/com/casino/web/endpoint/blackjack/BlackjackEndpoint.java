@@ -1,15 +1,16 @@
 package com.casino.web.endpoint.blackjack;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.casino.blackjack.ext.BlackjackReverseProxy;
-import com.casino.blackjack.ext.BlackjackTableService;
+import com.casino.blackjack.ext.IBlackjackTable;
 import com.casino.common.user.Bridge;
 import com.casino.common.validaton.Validator;
 import com.casino.common.web.Message;
+import com.casino.service.BlackjackTableService;
 import com.casino.web.endpoint.handler.UserHandler;
 
 import jakarta.inject.Inject;
@@ -28,55 +29,63 @@ public class BlackjackEndpoint {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackEndpoint.class.getName());
 	@Inject
 	private UserHandler userHandler;
-	BlackjackTableService tableServiceTemp = new BlackjackTableService();
+	@Inject
+	private BlackjackTableService tableService = new BlackjackTableService();
 
-	private UUID tableId;
-	private BlackjackReverseProxy proxy;
+	private IBlackjackTable table;
 	private Bridge bridge;
+	private UUID tableId;
 
 	@OnOpen
 	public void onOpen(Session session, @PathParam("tableId") String tableId, EndpointConfig ec) {
 		System.out.println("onOpen called " + tableId);
-		UUID id = Validator.validateId(tableId);
-		BlackjackReverseProxy proxy = tableServiceTemp.getTable(id);
-		if (proxy == null) {
-			tableId = null;
-			bridge = null;
-			this.onClose(session, new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, " invalid table "));
-			return;
+		try {
+			UUID id = Validator.validateId(tableId);
+			Optional<IBlackjackTable> table = tableService.fetchTable(id);
+			if (table.isEmpty()) {
+				tableId = null;
+				bridge = null;
+				this.onClose(session, new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, " invalid table "));
+				return;
+			}
+			this.tableId = id;
+			this.table = table.get();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "onOpen error ", e);
 		}
-		this.tableId = id;
-		this.proxy = proxy;
 	}
 
 	@OnMessage
 	public void onMessage(Session session, Message message) {
-		LOGGER.info("endpoint got message: " + tableId + "\n-> message:" + message);
-		if (isFirstMessage(session)) {
-			createBridge(session, message);
-			proxy.join(bridge, "0");
-			return;
-		}
-		if (message.getAction() == null)
-			throw new IllegalArgumentException("action is missing");
+		LOGGER.info("endpoint got message: " + "\n-> message:" + message);
 		try {
+			if (isFirstMessage(session)) {
+				createBridge(session, message);
+				table.join(bridge, "3");
+				return;
+			}
+			if (message.getAction() == null)
+				throw new IllegalArgumentException("action is missing");
 			switch (message.getAction()) {
-			case BET -> proxy.bet(bridge.playerId(), message.getAmount());
-			case TAKE -> proxy.hit(bridge.playerId());
-			case SPLIT -> proxy.split(bridge.playerId());
-			case DOUBLE_DOWN -> proxy.doubleDown(bridge.playerId());
-			case STAND -> proxy.stand(bridge.playerId());
-			case INSURE -> proxy.insure(bridge.playerId());
+			case BET -> table.bet(bridge.playerId(), message.getAmount());
+			case TAKE -> table.hit(bridge.playerId());
+			case SPLIT -> table.split(bridge.playerId());
+			case DOUBLE_DOWN -> table.doubleDown(bridge.playerId());
+			case STAND -> table.stand(bridge.playerId());
+			case INSURE -> table.insure(bridge.playerId());
+			case REFRESH -> {
+//				bridge.session().getBasicRemote()
+			}
 			default -> LOGGER.severe("action is missing," + bridge);
 			}
+			System.out.println("Command ok");
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Proxy error:" + bridge, e);
 		}
-		System.out.println("Command");
 	}
 
 	private void createBridge(Session session, Message message) {
-		this.bridge = userHandler.createBridge(message.getUserId(), tableId, session);
+		this.bridge = userHandler.createBridge(message.getUserId(), this.tableId, session);
 	}
 
 	private boolean isFirstMessage(Session session) {

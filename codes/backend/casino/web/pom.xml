@@ -24,6 +24,11 @@
 			<version>0.0.1</version>
 		</dependency>
 		<dependency>
+			<groupId>casino</groupId>
+			<artifactId>service</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
 			<version>5.0.0</version>
@@ -56,6 +61,16 @@
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.enterprise</groupId>
+			<artifactId>jakarta.enterprise.cdi-api</artifactId>
+			<version>4.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.json</groupId>
