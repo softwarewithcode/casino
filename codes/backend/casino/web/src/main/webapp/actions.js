@@ -1,7 +1,8 @@
-function join() {
-	const json = { userId: '', action: 'JOIN' }
+function act(title, amount) {
+	document.getElementById('insureContainer').style.visibility = 'hidden'
+	const json = { amount: amount, action: title }
 	const jsonObj = JSON.stringify(json);
-	console.log("join:" + jsonObj)
+	console.log("insuring:" + jsonObj)
 	socket.send(jsonObj);
 }
 function placeBet(amount) {
@@ -10,45 +11,7 @@ function placeBet(amount) {
 	console.log("placing starting bet:" + jsonObj)
 	socket.send(jsonObj);
 }
-function take(message) {
-	document.getElementById('actionContainer').style.visibility = 'hidden'
-	const json = { userId: '', action: 'TAKE' }
-	const jsonObj = JSON.stringify(json);
-	console.log("taking card:" + jsonObj)
-	socket.send(jsonObj);
-}
 
-function split(message) {
-	document.getElementById('actionContainer').style.visibility = 'hidden'
-	const json = { userId: '', action: 'SPLIT' }
-	const jsonObj = JSON.stringify(json);
-	console.log("taking card:" + jsonObj)
-	socket.send(jsonObj);
-}
-
-
-function doubleDown(message) {
-	document.getElementById('actionContainer').style.visibility = 'hidden'
-	const json = { userId: '', action: 'DOUBLE_DOWN' }
-	const jsonObj = JSON.stringify(json);
-	console.log("taking card:" + jsonObj)
-	socket.send(jsonObj);
-}
-
-function stand(message) {
-	document.getElementById('actionContainer').style.visibility = 'hidden'
-	const json = { userId: '', action: 'STAND' }
-	const jsonObj = JSON.stringify(json);
-	console.log("taking card:" + jsonObj)
-	socket.send(jsonObj);
-}
-function insure(message) {
-	document.getElementById('insureContainer').style.visibility = 'hidden'
-	const json = { action: 'INSURE' }
-	const jsonObj = JSON.stringify(json);
-	console.log("insuring:" + jsonObj)
-	socket.send(jsonObj);
-}
 function updateAllPlayersBalances(players) {
 	const myResult = players.filter(player => player.name === myName)
 	if (myResult)
@@ -76,7 +39,7 @@ function updateMyCards(player) {
 }
 
 function getSuit(suit) {
-	if (suit == "SPADE")
+	if (suit == "SPADE") 
 		return '\u2664'
 	if (suit == "HEART")
 		return '\u2661'

@@ -76,13 +76,14 @@
 				timer=ret.table.thresholds.playerHandTime
 				clearInterval(interval)
 				document.getElementById('myCardsContainer').innerHTML =""
-				updateDealerCards(ret.table.dealerHand)
-		   		updateMyCards(ret.table.players[0])
+				
 				document.getElementById('insureContainer').style.visibility = 'hidden';
 		    	document.getElementById('actionContainer').style.visibility = 'visible';
 		    	updateAllPlayersBalances(ret.table.players)
 		    	const playerInTurnIsMe=ret.player.name===myName
 		    	if(playerInTurnIsMe){
+					updateDealerCards(ret.table.dealerHand)
+		   			updateMyCards(ret.table.players[0])
 				
 			    	const take=ret.player.actions.includes("TAKE");
 			    	const stand=ret.player.actions.includes("STAND");
