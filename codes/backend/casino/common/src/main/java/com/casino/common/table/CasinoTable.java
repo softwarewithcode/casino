@@ -111,6 +111,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	public boolean isClockTicking() {
 		return this.clock.isTicking();
 	}
+
 	@JsonIgnore
 	@Override
 	public boolean isClosed() {
@@ -232,6 +233,10 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public Instant getCreated() {
 		return created;
+	}
+
+	public Type getType() {
+		return type;
 	}
 
 	@Override

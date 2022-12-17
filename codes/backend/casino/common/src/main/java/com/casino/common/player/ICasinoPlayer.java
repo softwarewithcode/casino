@@ -2,6 +2,7 @@ package com.casino.common.player;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.casino.common.cards.IHand;
@@ -56,7 +57,7 @@ public interface ICasinoPlayer {
 
 	public BigDecimal getInsuranceAmount();
 
-	public <T> T autoplay(T t);
+	public <T> Optional<T> autoplay(T t);
 
 	public <T> void sendMessage(T message);
 

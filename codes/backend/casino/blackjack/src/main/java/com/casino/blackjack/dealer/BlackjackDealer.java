@@ -19,7 +19,6 @@ import com.casino.blackjack.table.timing.InsurancePhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
-import com.casino.common.cards.Suit;
 import com.casino.common.dealer.CommunicationChannel;
 import com.casino.common.dealer.IDealer;
 import com.casino.common.exception.PlayerNotFoundException;
@@ -133,12 +132,12 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void dealCard(IHand hand) {
-		Card card = removeCardFromDeck();
+		Card card = removeLastCardFromDeck();
 		hand.addCard(card);
 	}
 
 	public void addPlayerCard(ICasinoPlayer player) {
-		Card card = removeCardFromDeck();
+		Card card = removeLastCardFromDeck();
 		IHand activeHand = player.getActiveHand();
 		activeHand.addCard(card);
 	}
@@ -281,7 +280,7 @@ public class BlackjackDealer implements IDealer {
 		verifyPlayerHasSeat(player);
 		Card cardReference = deck.get(deck.size() - 1);
 		player.doubleDown(cardReference);
-		removeCardFromDeck();
+		removeLastCardFromDeck();
 	}
 
 	@JsonIgnore
@@ -298,21 +297,22 @@ public class BlackjackDealer implements IDealer {
 		verifyPlayerHasSeat(player);
 		player.splitStartingHand();
 		IHand firstHand = player.getActiveHand();
-		firstHand.addCard(removeCardFromDeck());
+		firstHand.addCard(removeLastCardFromDeck());
 		if (firstHand.isCompleted()) {
 			player.getHands().get(1).activate();
-			player.getHands().get(1).addCard(removeCardFromDeck());
+			player.getHands().get(1).addCard(removeLastCardFromDeck());
 		}
 	}
 
-	public void autoplay(ICasinoPlayer player) {
-		if (player.autoplay(getNextCard()) == null) {
-			removeCardFromDeck();
-		}
+	public void autoplayForPlayer(ICasinoPlayer player) {
+		Card nextCard = getNextCard();
+		if (player.autoplay(nextCard).isEmpty())
+			removeLastCardFromDeck();
 	}
 
-	private Card removeCardFromDeck() {
-		return deck.remove(deck.size() - 1);
+	private Card removeLastCardFromDeck() {
+		Card c = deck.remove(deck.size() - 1);
+		return c;
 	}
 
 	public boolean shouldChangeTurn() {
@@ -375,7 +375,7 @@ public class BlackjackDealer implements IDealer {
 
 	private void addDealerCards() {
 		while (!dealerHand.isCompleted()) {
-			Card card = removeCardFromDeck();
+			Card card = removeLastCardFromDeck();
 			addCard(card);
 		}
 	}

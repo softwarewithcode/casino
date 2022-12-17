@@ -120,9 +120,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public <T> void sendMessage(T message) {
-		if (bridge.session() == null || !bridge.session().isOpen()) {
-			// block for tests. todo override sendMessage() in tests
-			LOGGER.log(Level.SEVERE, "Player cannot be reached. Remove from table " + getName());
+		if (!canSendMessage(message)) {
+			LOGGER.log(Level.SEVERE, "Message cannot be delivered:" + message);
 			return;
 		}
 		try {
@@ -132,6 +131,10 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 			LOGGER.log(Level.SEVERE, "Could not reach player: logIdentifier: " + logIdentifier + " name;" + getName() + " id:" + getId(), e);
 			throw new RuntimeException("cannot be reached ->  LogId:" + logIdentifier);
 		}
+	}
+
+	private <T> boolean canSendMessage(T message) {
+		return bridge.isConnectable() && message != null;
 	}
 
 	@Override
@@ -223,6 +226,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		return balance.setScale(2, RoundingMode.DOWN);
 	}
 
+	@JsonIgnore
 	public Bridge getBridge() {
 		return bridge;
 	}

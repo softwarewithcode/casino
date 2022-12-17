@@ -54,7 +54,6 @@ public final class BlackjackTable extends SeatedTable implements BlackjackRevers
 		LOGGER.info("table_bet " + playerId + " bet:" + bet);
 		try {
 			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
-			System.out.println("player bet:" + bet);
 			if (isGamePhase(GamePhase.BET))
 				dealer.updatePlayerBet(player, bet);
 			else {
@@ -176,7 +175,7 @@ public final class BlackjackTable extends SeatedTable implements BlackjackRevers
 			if (!isPlayerInTurn(timedOutPlayer)) {
 				return;
 			}
-			dealer.autoplay(timedOutPlayer);
+			dealer.autoplayForPlayer(timedOutPlayer);
 			dealer.updateTableActor();
 		} finally {
 			getPlayerInTurnLock().unlock();
@@ -188,7 +187,6 @@ public final class BlackjackTable extends SeatedTable implements BlackjackRevers
 	public void onBetPhaseEnd() {
 		LOGGER.entering(getClass().getName(), "onBetPhaseEnd" + this.getId());
 		try {
-			System.out.println("betphase has ended");
 			lockPlayerInTurn();
 			if (!isGamePhase(GamePhase.BET))
 				throw new IllegalPhaseException("GamePhase is not what is expected on betPhaseEnd", getGamePhase(), GamePhase.BET);

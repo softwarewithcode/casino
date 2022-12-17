@@ -1,5 +1,8 @@
 package com.casino.blackjack.message;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.user.Title;
@@ -8,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 public class Mapper {
+	private static final Logger LOGGER = Logger.getLogger(Mapper.class.getName());
 	public static final String JUNIT_RUNNER = "JUNIT_RUNNER";
 	private static final boolean skipSerialization;
 
@@ -19,15 +23,14 @@ public class Mapper {
 			skipSerialization = false;
 	}
 
-	private static String convertToJSON(Message message) {
+	public static String convertToJSON(Message message) {
 		ObjectMapper mapper = JsonMapper.builder().build();
 		try {
 			return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(message);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Message could not be converted to json:" + message, e);
 		}
-		return null;
+		throw new RuntimeException("Message could not be converted to JSON:" + message);
 	}
 
 	public static String createMessage(Title title, BlackjackTable table, BlackjackPlayer operand) {

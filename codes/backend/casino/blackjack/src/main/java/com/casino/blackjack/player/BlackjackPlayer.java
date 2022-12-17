@@ -3,6 +3,7 @@ package com.casino.blackjack.player;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -204,7 +205,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		if (this.hands.size() != 1)
 			throw new IllegalPlayerActionException("wrong hand count:" + getName() + " " + hands.size(), 1);
 		if (!hands.get(0).isActive())
-			throw new IllegalPlayerActionException("first hand is not active " + getName()+ " "+getFirstHand() , 2);
+			throw new IllegalPlayerActionException("first hand is not active " + getName() + " " + getFirstHand(), 2);
 		if (hands.get(0).getCards().size() != 2)
 			throw new IllegalPlayerActionException("starting hand does not contain exactly two cards:" + getName() + " " + hands.get(0).getCards(), 3);
 	}
@@ -296,22 +297,26 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return getHands().get(handNumber).getBet();
 	}
 
-	// first or second hand can be active. second hand might need additional card to
-	// reach minimum of 2 cards
+	/**
+	 * Returns empty if Card is added to second hand <br>
+	 * Returns Optional<T> if card is not added to second hand
+	 */
 	@Override
-	public <T> T autoplay(T t) {
-		if (!hasActiveHand() || !(t instanceof Card card)) {
-			return t;
-		}
+	public <T> Optional<T> autoplay(T t) {
+		Optional<T> cardOptional = Optional.of(t);
+		if (!hasActiveHand() || !(t instanceof Card card))
+			return cardOptional;
 		if (getFirstHand().isActive())
 			getFirstHand().complete();
 		if (getHands().size() != 2)
-			return t;
+			return cardOptional;
 		IHand secondHand = getSecondHand();
-		if (secondHand.getCards().size() < 2)
-			secondHand.addCard(card);
+		if (secondHand.getCards().size() < 2) {
+			secondHand.addCard(card); // card is used
+			cardOptional = Optional.empty(); // return e
+		}
 		if (!secondHand.isCompleted())// Automatic blackjack can have completed the hand
 			secondHand.complete();
-		return null;
+		return cardOptional;
 	}
 }
