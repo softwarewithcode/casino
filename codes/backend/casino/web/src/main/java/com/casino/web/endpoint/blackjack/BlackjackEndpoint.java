@@ -80,7 +80,7 @@ public class BlackjackEndpoint {
 			}
 			System.out.println("Command ok");
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Proxy error:" + bridge, e);
+			LOGGER.log(Level.SEVERE, "onMessage error:" + bridge, e);
 		}
 	}
 
@@ -96,7 +96,9 @@ public class BlackjackEndpoint {
 	public void onClose(Session session, CloseReason closeReason) {
 		try {
 			LOGGER.info("Closing session:" + closeReason);
-			session.close(closeReason);
+			if (bridge != null && bridge.playerId() != null)
+				table.onPlayerLeave(bridge.playerId());
+			session.close(closeReason);// can close session here, table checks that this session is not open anymore
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

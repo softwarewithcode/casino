@@ -22,4 +22,6 @@ public interface IBlackjackTable {
 
 	public void insure(UUID playerId);
 
+	public void onPlayerLeave(UUID playerId);
+
 }

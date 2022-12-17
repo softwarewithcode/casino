@@ -94,7 +94,11 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	@Override
 	public void leaveSeats(ICasinoPlayer player) {
 		// in a private table user can take all the seats
-		seats.forEach(seat -> seat.removePlayerIfHolder(player));
+		seats.forEach(seat -> {
+			boolean seatSanitized = seat.removePlayerIfHolder(player);
+			if (seatSanitized)
+				super.removePlayer(player);
+		});
 	}
 
 	protected void sanitizeAllSeats() {

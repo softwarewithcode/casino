@@ -39,7 +39,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		try {
 			int seat = Integer.parseInt(seatNumber);
 			BlackjackPlayer joinedPlayer = new BlackjackPlayer(bridge, this);
+			joinedPlayer.setStatus(com.casino.common.player.Status.ACTIVE);
 			gotSeat = super.trySeat(seat, joinedPlayer);
+			super.joinAsPlayer(joinedPlayer);
 			if (gotSeat)
 				dealer.onPlayerArrival(joinedPlayer);
 			return gotSeat;
@@ -91,7 +93,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			dealer.stand(player);
 			dealer.finalizeAction(player);
 		} finally {
-			unlockPlayerInTurn("stand");
+			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "stand", " player:" + playerId + " table:" + getId());
 		}
 	}
@@ -110,7 +112,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			dealer.addPlayerCard(player);
 			dealer.finalizeAction(player);
 		} finally {
-			unlockPlayerInTurn("hit");
+			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "hit", " player:" + playerId + " table:" + getId());
 		}
 	}
@@ -125,7 +127,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			dealer.handleSplit(player);
 			dealer.finalizeAction(player);
 		} finally {
-			unlockPlayerInTurn("split");
+			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "split", " player:" + playerId + " table:" + getId());
 		}
 	}
@@ -140,12 +142,12 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			dealer.doubleDown(player);
 			dealer.updateTableActor();
 		} finally {
-			unlockPlayerInTurn("doubleDown");
+			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "doubleDown", " player:" + playerId + " table:" + getId());
 		}
 	}
 
-	private void unlockPlayerInTurn(String actionName) {
+	private void unlockPlayerInTurn() {
 		if (getPlayerInTurnLock().isHeldByCurrentThread())
 			getPlayerInTurnLock().unlock();
 	}
@@ -162,9 +164,19 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public synchronized void onPlayerLeave(ICasinoPlayer player) {
-		// TODO Auto-generated method stub
-
+	public synchronized void onPlayerLeave(UUID playerId) {
+		System.out.println("player disconnected from table " + getId() + " player:" + playerId);
+		BlackjackPlayer leavingPlayer = null;
+		try {
+			leavingPlayer = (BlackjackPlayer) getPlayer(playerId);
+			if (leavingPlayer == null)
+				return;
+			lockPlayerInTurn();
+			dealer.handleLeavingTable(leavingPlayer);
+		} finally {
+			unlockPlayerInTurn();
+			LOGGER.exiting(getClass().getName(), "onPlayerLeave", " leavingPlayer:" + leavingPlayer + " table:" + getId());
+		}
 	}
 
 	@Override

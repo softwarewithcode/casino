@@ -238,7 +238,7 @@ public class BlackjackDealer implements IDealer {
 		table.stopClock();
 		if (optionalPlayerActor.isEmpty()) {
 			changeTurnToDealer();
-			carryOutDealerTurn();
+			carryOutDealerDuties();
 		} else {
 			// Actor can be same as previous ->split hand
 			BlackjackPlayer player = (BlackjackPlayer) optionalPlayerActor.get().getPlayer();
@@ -251,11 +251,18 @@ public class BlackjackDealer implements IDealer {
 		notifyAll(Title.PLAY_TURN, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
-	private void carryOutDealerTurn() {
+	private void carryOutDealerDuties() {
 		completeRound();
+		removeInactivePlayers();
+		if (table.getActivePlayerCount() == 0)
+			table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
 		if (shouldRestartBetPhase()) {
 			startBetPhaseClock(table.getThresholds().phaseDelay());
 		}
+	}
+
+	private void removeInactivePlayers() {
+		table.getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != Status.ACTIVE).forEach(Seat::leave);
 	}
 
 	public synchronized void prepareNewRound() {
@@ -394,4 +401,19 @@ public class BlackjackDealer implements IDealer {
 		else
 			notifyAll(Title.ROUND_COMPLETED, (BlackjackPlayer) table.getPlayerInTurn());
 	}
+
+	public void handleLeavingTable(BlackjackPlayer player) {
+		if (player.equals(table.getPlayerInTurn())) {
+			autoplayForPlayer(player);
+			updateTableActor();
+		}
+		player.setStatus(Status.SIT_OUT);
+		// dealer removes inactive players after round if round is going on
+		if (!table.getGamePhase().isOnGoingRound() || table.getActivePlayerCount() < 1) {
+			removeInactivePlayers();
+		}
+
+		notifyAll(Title.PLAYER_LEFT, player);
+	}
+
 }

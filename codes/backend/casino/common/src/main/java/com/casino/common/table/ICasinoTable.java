@@ -27,15 +27,11 @@ public interface ICasinoTable {
 
 	public void onClose();
 
-	public void onPlayerLeave(ICasinoPlayer player);
-
 	public void onPlayerTimeout(ICasinoPlayer player);
 
 	public int getPlayerTurnTime();
 
 	public void onTableClose();
-
-//	public <T extends ICasinoTable> boolean watch(T player);
 
 	public Language getLanguage();
 
@@ -45,7 +41,7 @@ public interface ICasinoTable {
 
 	public boolean removePlayer(ICasinoPlayer p);
 
- 	public boolean removeWatcher(ICasinoPlayer p);
+	public boolean removeWatcher(ICasinoPlayer p);
 
 	public ConcurrentMap<UUID, ICasinoPlayer> getPlayers();
 

@@ -70,9 +70,6 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.playerInTurnLock = new ReentrantLock(true);
 	}
 
-	@Override
-	public abstract void onPlayerLeave(ICasinoPlayer player);
-
 	protected <T extends ICasinoPlayer> boolean joinAsWatcher(T watcher) {
 		if (watcher == null)
 			return false;
