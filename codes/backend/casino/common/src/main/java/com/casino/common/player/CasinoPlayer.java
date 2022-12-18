@@ -109,7 +109,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public void setStatus(Status status) {
-		// TODO Auto-generated method stub
+		this.status = status;
 
 	}
 

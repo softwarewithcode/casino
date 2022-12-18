@@ -39,10 +39,10 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		try {
 			int seat = Integer.parseInt(seatNumber);
 			BlackjackPlayer joinedPlayer = new BlackjackPlayer(bridge, this);
-			joinedPlayer.setStatus(com.casino.common.player.Status.ACTIVE);
 			gotSeat = super.trySeat(seat, joinedPlayer);
 			super.joinAsPlayer(joinedPlayer);
 			if (gotSeat)
+				joinedPlayer.setStatus(com.casino.common.player.Status.ACTIVE);
 				dealer.onPlayerArrival(joinedPlayer);
 			return gotSeat;
 		} finally {
