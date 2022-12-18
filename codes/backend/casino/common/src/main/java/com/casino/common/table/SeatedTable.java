@@ -65,20 +65,17 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return !seat.isAvailable() && seat.getPlayer().hasActiveHand() && seat.getNumber() > playerInTurnSeat.getNumber();
 	}
 
-	// public trySeat(..) vs. required join() first ?
 	@Override
-	public boolean trySeat(int seatNumber, ICasinoPlayer player) {
+	public Optional<Seat> trySeat(int seatNumber, ICasinoPlayer player) {
 		BetUtil.verifySufficentBalance(getThresholds().minimumBet(), player);
-		if (!isAcceptingPlayers())
-			return false;
 		if (seatNumber < 0 || seatNumber >= seats.size())
 			throw new IllegalArgumentException("seat number is incorrect " + seatNumber + " has:" + getSeats().size());
+		if (!isAcceptingPlayers())
+			return Optional.empty();
 		if (hasSeat(player))
-			return false;
-		Seat seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().orElse(null);
-		if (seat == null || !seat.take(player))
-			return false;
-		return true;
+			return Optional.empty();
+		Seat seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().get();
+		return seat.take(player);
 	}
 
 	@Override

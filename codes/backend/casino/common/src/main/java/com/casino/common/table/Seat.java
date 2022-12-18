@@ -1,6 +1,7 @@
 package com.casino.common.table;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import com.casino.common.player.ICasinoPlayer;
 
@@ -12,11 +13,11 @@ public class Seat {
 		this.number = number;
 	}
 
-	public synchronized boolean take(ICasinoPlayer p) {
+	public synchronized Optional<Seat> take(ICasinoPlayer newPlayer) {
 		if (player != null)
-			return false;
-		player = p;
-		return true;
+			return Optional.empty();
+		player = newPlayer;
+		return Optional.of(this);
 	}
 
 	public boolean hasPlayerWithBet() {

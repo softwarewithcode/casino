@@ -1,6 +1,7 @@
 package com.casino.blackjack.table;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,6 +13,7 @@ import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.table.Seat;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
 import com.casino.common.table.Thresholds;
@@ -35,17 +37,17 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public boolean join(Bridge bridge, String seatNumber) {
 		LOGGER.entering(getClass().getName(), "join", getId());
 		LOGGER.info("table_join " + bridge);
-		boolean gotSeat = false;
 		try {
 			int seat = Integer.parseInt(seatNumber);
-			BlackjackPlayer joinedPlayer = new BlackjackPlayer(bridge, this);
-			gotSeat = super.trySeat(seat, joinedPlayer);
-			if (gotSeat)
-				joinedPlayer.setStatus(com.casino.common.player.Status.ACTIVE);
-			dealer.onPlayerArrival(joinedPlayer);
-			return gotSeat;
+			BlackjackPlayer player = new BlackjackPlayer(bridge, this);
+			Optional<Seat> seatOptional = trySeat(seat, player);
+			if (seatOptional.isEmpty())
+				return false;
+			player.setStatus(com.casino.common.player.Status.ACTIVE);
+			dealer.onPlayerArrival(player);
+			return true;
 		} finally {
-			LOGGER.exiting(getClass().getName(), "join" + " gotSeat:" + gotSeat + " number:" + seatNumber + " bridge:" + bridge + " tableId:" + getId());
+			LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNumber + " bridge:" + bridge + " tableId:" + getId());
 		}
 	}
 
