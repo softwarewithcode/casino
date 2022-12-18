@@ -34,8 +34,8 @@ public abstract class CasinoTable implements ICasinoTable {
 	@JsonProperty
 	private final Type type;
 	@JsonSerialize(converter = CasinoPlayersConverter.class)
-	@JsonProperty
-	private final ConcurrentHashMap<UUID, ICasinoPlayer> players;
+//	@JsonProperty
+//	private final ConcurrentHashMap<UUID, ICasinoPlayer> players;
 	@JsonIgnore
 	private final ConcurrentHashMap<UUID, ICasinoPlayer> watchers;
 	@JsonProperty
@@ -58,7 +58,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	private volatile Status status;
 
 	protected CasinoTable(Status initialStatus, Thresholds tableConstants, UUID id, PhasePath phases) {
-		this.players = new ConcurrentHashMap<>();
 		this.watchers = new ConcurrentHashMap<>();
 		this.status = initialStatus;
 		this.type = tableConstants.tableType();
@@ -73,23 +72,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	protected <T extends ICasinoPlayer> boolean joinAsWatcher(T watcher) {
 		if (watcher == null)
 			return false;
-		if (players.contains(watcher)) {
-			LOGGER.log(Level.INFO, "Player is playing, tries to join as a watcher " + watcher.getName());
-			return false;
-		}
-		watchers.putIfAbsent(watcher.getId(), watcher);
-		return true;
-	}
-
-	protected boolean joinAsPlayer(ICasinoPlayer player) {
-		if (player == null)
-			return false;
-		if (watchers.contains(player)) {
-			LOGGER.log(Level.INFO, "Player is playing, tries to join as a watcher " + player.getName());
-			return false;
-		}
-		players.putIfAbsent(player.getId(), player);
-		return true;
+		return watchers.putIfAbsent(watcher.getId(), watcher) != null;
 	}
 
 	public synchronized void startClock(TimerTask task, long initialDelay) {
@@ -166,13 +149,6 @@ public abstract class CasinoTable implements ICasinoTable {
 		return watchers.putIfAbsent(watcher.getId(), watcher) != null;
 	}
 
-	@Override
-	public boolean removePlayer(ICasinoPlayer p) {
-		if (p == null)
-			return false;
-		return players.remove(p.getId()) != null;
-	}
-
 	public ReentrantLock getPlayerInTurnLock() {
 		return playerInTurnLock;
 	}
@@ -191,21 +167,6 @@ public abstract class CasinoTable implements ICasinoTable {
 		if (p == null)
 			return false;
 		return watchers.remove(p.getId()) != null;
-	}
-
-	protected void changeFromWatcherToPlayer(ICasinoPlayer player) {
-		watchers.remove(player.getId());
-		players.putIfAbsent(player.getId(), player);
-	}
-
-	public void changeFromPlayerToWatcher(ICasinoPlayer player) {
-		players.remove(player.getId());
-		watchers.putIfAbsent(player.getId(), player);
-	}
-
-	@Override
-	public ConcurrentMap<UUID, ICasinoPlayer> getPlayers() {
-		return players;
 	}
 
 	@Override

@@ -54,7 +54,8 @@
 			if(ret.title==="LOGIN"){
 				// user gets own data here and inits the page
 		    	myName = ret.player.name
-		    	myBalance = ret.player.initialBalance
+		    	myBalance = ret.player.balance
+		    	
 		    	document.getElementById('myProfile').style.visibility = 'visible';
 		    	console.log("myName:"+myName+ " myBalance:"+myBalance +" players:"+ret.table.players.length)
 		    	visualizeMyProfile()

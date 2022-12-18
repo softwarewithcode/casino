@@ -33,7 +33,7 @@ public class Seat {
 		this.player = player;
 	}
 
-	public void leave() {
+	public void sanitize() {
 		player = null;
 	}
 

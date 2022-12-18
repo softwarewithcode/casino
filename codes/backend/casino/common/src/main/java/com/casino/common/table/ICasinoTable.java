@@ -1,7 +1,7 @@
 package com.casino.common.table;
 
 import java.time.Instant;
-import java.util.Set;
+import java.util.List;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
@@ -39,11 +39,11 @@ public interface ICasinoTable {
 
 	public boolean addWatcher(ICasinoPlayer player);
 
-	public boolean removePlayer(ICasinoPlayer p);
+//	public boolean removePlayer(ICasinoPlayer p);
 
 	public boolean removeWatcher(ICasinoPlayer p);
 
-	public ConcurrentMap<UUID, ICasinoPlayer> getPlayers();
+	public List<ICasinoPlayer> getPlayers();
 
 	public ConcurrentMap<UUID, ICasinoPlayer> getWatchers();
 

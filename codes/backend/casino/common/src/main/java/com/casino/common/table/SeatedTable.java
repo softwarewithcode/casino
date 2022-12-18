@@ -1,6 +1,7 @@
 package com.casino.common.table;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -42,6 +43,11 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return (int) seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != com.casino.common.player.Status.SIT_OUT).count();
 	}
 
+	// User might have disconnected, so don't compare to active status
+	public List<ICasinoPlayer> getPlayersWithBet() {
+		return seats.stream().filter(seat -> seat.hasPlayerWithBet()).map(seat -> seat.getPlayer()).collect(Collectors.toList());
+	}
+
 	public boolean hasPlayersWithWinningChances() {
 		return seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().hasWinningChance()).findFirst().isPresent();
 	}
@@ -72,7 +78,6 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		Seat seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().orElse(null);
 		if (seat == null || !seat.take(player))
 			return false;
-		super.changeFromWatcherToPlayer(player);
 		return true;
 	}
 
@@ -93,18 +98,12 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	@Override
 	public void leaveSeats(ICasinoPlayer player) {
-		// in a private table user can take all the seats
-		seats.forEach(seat -> {
-			boolean seatSanitized = seat.removePlayerIfHolder(player);
-			if (seatSanitized)
-				super.removePlayer(player);
-		});
+		// in a private table user can reserve all the seats
+		seats.forEach(seat -> seat.removePlayerIfHolder(player));
 	}
 
 	protected void sanitizeAllSeats() {
-		seats.stream().map(seat -> seat.getPlayer()).forEach(player -> {
-			super.changeFromPlayerToWatcher(player);
-		});
+		seats.stream().forEach(seat -> seat.sanitize());
 	}
 
 	public Set<Seat> getSeats() {
@@ -113,6 +112,10 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	public boolean hasSeat(ICasinoPlayer p) {
 		return p == null ? false : seats.stream().anyMatch(seat -> p.equals(seat.getPlayer()));
+	}
+
+	public List<ICasinoPlayer> getPlayers() {
+		return seats.stream().filter(Seat::hasPlayer).map(seat -> seat.getPlayer()).collect(Collectors.toList());
 	}
 
 }

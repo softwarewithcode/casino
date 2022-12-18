@@ -68,8 +68,7 @@ public class BlackjackDealer implements IDealer {
 		getTable().startClock(task, 0);
 	}
 
-	@Override
-	public boolean hasStartingAce() {
+	public boolean dealerHasStartingAce() {
 		Card card = dealerHand.getCards().get(0);
 		return card != null & card.isAce();
 	}
@@ -120,15 +119,14 @@ public class BlackjackDealer implements IDealer {
 		return table;
 	}
 
-	public boolean dealStartingHands() {
+	public void dealStartingHands() {
 		LOGGER.info("dealer deals starting hands");
 		List<ICasinoPlayer> orderedPlayers = getOrderedPlayersWithBet();
 		orderedPlayers.forEach(player -> dealCard(player.getHands().get(0))); // first the players
-		dealCard(dealerHand); // then dealer
-		orderedPlayers.forEach(player -> { // then players again
+		dealCard(dealerHand); // then the dealer
+		orderedPlayers.forEach(player -> { // then the players again
 			dealCard(player.getHands().get(0));
 		});
-		return true;
 	}
 
 	private void dealCard(IHand hand) {
@@ -176,7 +174,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private boolean shouldStartGame() {
-		return table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS && table.getActivePlayerCount() > 0;
+		return table.getStatus() == com.casino.common.table.Status.WAITING_PLAYERS || table.getActivePlayerCount() == 1;
 	}
 
 	private boolean shouldDealStartingHands() {
@@ -204,14 +202,15 @@ public class BlackjackDealer implements IDealer {
 
 	public synchronized void finalizeBetPhase() {
 		table.updateGamePhase(GamePhase.BETS_COMPLETED);
+		updatePlayerStatuses();
 		if (!shouldDealStartingHands()) {
 			LOGGER.info("dealer does not deal cards now");
 			return;
 		}
-		updateActivePlayers();
+		subtractBetFromBalance();
 		dealStartingHands();
-		if (hasStartingAce()) {
-			notifyAll(Title.INSURANCE_PHASE_STARTS, (BlackjackPlayer) table.getPlayerInTurn());
+		if (dealerHasStartingAce()) {
+			notifyAll(Title.INSURANCE_PHASE_STARTS, null);
 			startInsurancePhase();
 			return;
 		}
@@ -220,16 +219,18 @@ public class BlackjackDealer implements IDealer {
 		notifyAll(Title.PLAY_TURN, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
-	private void updateActivePlayers() {
+	private void subtractBetFromBalance() {
+		table.getPlayersWithBet().forEach(player -> {
+			player.subtractTotalBetFromBalance();
+			player.getHands().get(0).updateBet(player.getTotalBet());
+		});
+	}
+
+	private void updatePlayerStatuses() {
 		table.getSeats().stream().filter(Seat::hasPlayer).map(Seat::getPlayer).forEach(player -> {
 			player.setStatus(Status.SIT_OUT);
-			if (!player.hasBet())
-				table.changeFromPlayerToWatcher(player);
-			else {
-				player.subtractTotalBetFromBalance();
+			if (player.hasBet())
 				player.setStatus(Status.ACTIVE);
-				player.getHands().get(0).updateBet(player.getTotalBet());
-			}
 		});
 	}
 
@@ -262,13 +263,13 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void removeInactivePlayers() {
-		table.getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != Status.ACTIVE).forEach(Seat::leave);
+		table.getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != Status.ACTIVE).forEach(Seat::sanitize);
 	}
 
 	public synchronized void prepareNewRound() {
 		if (table.getGamePhase() != GamePhase.ROUND_COMPLETED)
 			throw new IllegalArgumentException("not allowed");
-		table.getPlayers().values().forEach(ICasinoPlayer::prepareNextRound);
+		table.getPlayers().forEach(ICasinoPlayer::prepareNextRound);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		table.updateGamePhase(GamePhase.BET);
 		deck = Deck.combineDecks(8);
@@ -356,7 +357,7 @@ public class BlackjackDealer implements IDealer {
 
 	private void payout() {
 		// Deal the case where player has disconnected before payout
-		List<ICasinoPlayer> playersWithWinningChances = table.getPlayers().values().stream().filter(ICasinoPlayer::hasWinningChance).collect(Collectors.toList());
+		List<ICasinoPlayer> playersWithWinningChances = table.getPlayers().stream().filter(ICasinoPlayer::hasWinningChance).collect(Collectors.toList());
 		playersWithWinningChances.stream().forEach(player -> player.getHands().forEach(playerHand -> {
 			int comparison = dealerHand.compareTo(playerHand);
 			if (player.isCompensable() && dealerHand.isBlackjack())
@@ -402,18 +403,20 @@ public class BlackjackDealer implements IDealer {
 			notifyAll(Title.ROUND_COMPLETED, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
-	public void handleLeavingTable(BlackjackPlayer player) {
-		if (player.equals(table.getPlayerInTurn())) {
-			autoplayForPlayer(player);
+	public void handleLeavingTable(BlackjackPlayer leavingPlayer) {
+		if (leavingPlayer.hasBet() && leavingPlayer.equals(table.getPlayerInTurn())) {
+			autoplayForPlayer(leavingPlayer);
 			updateTableActor();
 		}
-		player.setStatus(Status.SIT_OUT);
+		leavingPlayer.setStatus(Status.SIT_OUT);
 		// dealer removes inactive players after round if round is going on
 		if (!table.getGamePhase().isOnGoingRound() || table.getActivePlayerCount() < 1) {
 			removeInactivePlayers();
 		}
-
-		notifyAll(Title.PLAYER_LEFT, player);
+		if (table.getPlayers().size() == 0) {
+			table.stopClock();
+			table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
+		}
+		notifyAll(Title.PLAYER_LEFT, leavingPlayer);
 	}
-
 }

@@ -12,20 +12,19 @@ public class CommunicationChannel {
 	}
 
 	public <T, P extends ICasinoPlayer> void unicast(T message, P player) {
-		ICasinoPlayer p = table.getPlayers().get(player.getId());
-		if (p != null)
-			p.sendMessage(message);
+		if (player != null)
+			player.sendMessage(message);
 	}
 
 	public <T> void broadcast(T message) {
-		table.getPlayers().entrySet().parallelStream().forEach(entry -> entry.getValue().sendMessage(message));
+		table.getPlayers().parallelStream().forEach(player -> player.sendMessage(message));
 //		Thread.ofVirtual().start(() -> {
 		table.getWatchers().entrySet().parallelStream().forEach(o -> o.getValue().sendMessage(message));
 //		});
 	}
 
-	public <T> void multicast(T message, ICasinoPlayer excludeEndpoint) {
-		table.getPlayers().entrySet().parallelStream().filter(entry -> !entry.getKey().equals(excludeEndpoint.getId())).forEach(player -> player.getValue().sendMessage(message));
+	public <T> void multicast(T message, ICasinoPlayer excludedPlayer) {
+		table.getPlayers().parallelStream().filter(player -> !player.getId().equals(excludedPlayer.getId())).forEach(player -> player.sendMessage(message));
 //		Thread.ofVirtual().start(() -> {
 		table.getWatchers().entrySet().parallelStream().forEach(entry -> entry.getValue().sendMessage(message));
 //		});
