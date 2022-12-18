@@ -56,7 +56,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		LOGGER.entering(getClass().getName(), "bet", bet + " player:" + playerId + " table:" + getId());
 		LOGGER.info("table_bet " + playerId + " bet:" + bet);
 		try {
-			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
+			BlackjackPlayer player = getPlayer(playerId);
 			if (isGamePhase(GamePhase.BET))
 				dealer.updatePlayerBet(player, bet);
 			else {
@@ -72,7 +72,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void insure(UUID playerId) {
 		LOGGER.entering(getClass().getName(), "insure", " player:" + playerId + " table:" + getId());
 		try {
-			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
+			BlackjackPlayer player = getPlayer(playerId);
 			if (isGamePhase(GamePhase.INSURE))
 				dealer.insure(player);
 			else {
@@ -88,7 +88,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void stand(UUID playerId) {
 		LOGGER.entering(getClass().getName(), "stand", " player:" + playerId + " table:" + getId());
 		try {
-			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
+			BlackjackPlayer player = getPlayer(playerId);
 			lockPlayerInTurn();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "stand");
 			dealer.stand(player);
@@ -107,7 +107,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void hit(UUID playerId) {
 		LOGGER.entering(getClass().getName(), "hit ", " player:" + playerId + " table:" + getId());
 		try {
-			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
+			BlackjackPlayer player = getPlayer(playerId);
 			lockPlayerInTurn();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "hit");
 			dealer.addPlayerCard(player);
@@ -122,7 +122,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void split(UUID playerId) {
 		LOGGER.entering(getClass().getName(), "split", " player:" + playerId + " table:" + getId());
 		try {
-			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
+			BlackjackPlayer player = getPlayer(playerId);
 			lockPlayerInTurn();
 			verifyActionClearance(player, "split");
 			dealer.handleSplit(player);
@@ -137,7 +137,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public void doubleDown(UUID playerId) {
 		LOGGER.entering(getClass().getName(), "doubleDown", " player:" + playerId + " table:" + getId());
 		try {
-			BlackjackPlayer player = (BlackjackPlayer) getPlayer(playerId);
+			BlackjackPlayer player = getPlayer(playerId);
 			lockPlayerInTurn();
 			verifyActionClearance(player, "doubleDown");
 			dealer.doubleDown(player);
@@ -169,7 +169,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		System.out.println("player disconnected from table " + getId() + " player:" + playerId);
 		BlackjackPlayer leavingPlayer = null;
 		try {
-			leavingPlayer = (BlackjackPlayer) getPlayer(playerId);
+			leavingPlayer = getPlayer(playerId);
 			if (leavingPlayer == null)
 				return;
 			lockPlayerInTurn();
