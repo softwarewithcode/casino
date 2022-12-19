@@ -25,6 +25,12 @@ function placeBet(amount) {
 	socket.send(jsonObj);
 }
 
+function clearCardsContainer(){
+	document.getElementById('playerCardsContainer').innerHTML = ""
+	document.getElementById('dealerCardsContainer').innerHTML = ""
+	document.getElementById('otherPlayersCardsContainer').innerHTML = ""
+	
+}
 function updateAllPlayersBalances(players) {
 	const myResult = players.filter(player => player.name === myName)
 	if (myResult && myResult.length > 0)
@@ -87,7 +93,7 @@ function updateDealerCards(dealerHand) {
 
 function updateWinnings(player) {
 	if (player.payout > 0)
-		document.getElementById('payouts').innerHTML += "Dealer gives you back " + player.payout + " checkBalance"
+		document.getElementById('roundCompletedContainer').innerHTML += "Dealer gives you back " + player.payout + " checkBalance"
 	else
-		document.getElementById('payouts').innerHTML += "You lost"
+		document.getElementById('roundCompletedContainer').innerHTML += "You lost"
 }

@@ -20,9 +20,14 @@
 		    	updateAllPlayersBalances(ret.table.players)
 		    	document.getElementById('betsContainer').style.visibility = 'visible'
 		    	document.getElementById('joinContainer').style.visibility = 'hidden' 
+		    	document.getElementById('playerCardsContainer').innerHTML =""
+		    	document.getElementById('roundCompletedContainer').innerHTML =""
+		    	clearCardsContainer()
 		    	startBetPhase(ret.table.thresholds.betPhaseTime)
 		    }
 			if(ret.title==="INSURANCE_PHASE_STARTS"){
+				
+				//If blackjack then should not show insurance container
 		    	document.getElementById('insureContainer').style.visibility = 'visible';
 		    	console.log(JSON.stringify(ret.table.thresholds))
 		    	timer=ret.table.thresholds.secondPhaseTime
@@ -63,34 +68,38 @@
 		    }
 		    if(ret.title==="ROUND_COMPLETED"){
 				document.getElementById('insureContainer').style.visibility = 'hidden';
+				document.getElementById('actionContainer').style.display = 'none';
+		    	document.getElementById('roundCompletedContainer').style.visibility = 'visible';
+		    	document.getElementById('roundCompletedContainer').style.display = 'block';
 				clearInterval(interval)
 		    	updateAllPlayersBalances(ret.table.players)
 		    	updatePlayerCards(ret.table.players[0])
 		    	updateDealerCards(ret.table.dealerHand)
-		    	document.getElementById('roundCompletedContainer').style.visibility = 'visible';
 		    	console.log("myName:"+myName+ " myBalance:"+myBalance +" players:"+ret.table.players.length)
 		    	updateWinnings(ret.table.players.find(player=>player.name===myName))
 		    	visualizeMyProfile()
 		    }
 		  
-			if(ret.title==="GAME_ACTION"){
+			if(ret.title==="SERVER_WAITS_PLAYER_ACTION"){
 				console.log("playTurn message:"+ret)
 				timer=ret.table.thresholds.playerHandTime
 				clearInterval(interval)
-				document.getElementById('playerCardsContainer').innerHTML =""
-				
+				document.getElementById('actionContainer').style.color='green'
 				document.getElementById('insureContainer').style.visibility = 'hidden';
-		    	document.getElementById('actionContainer').style.visibility = 'visible';
+		    	document.getElementById('actionContainer').style.display = 'none';
 		    	updateAllPlayersBalances(ret.table.players)
-		    	const playerInTurnIsMe=ret.player.name===myName
+		    	const playerInTurnIsMe =ret.table.playerInTurn.name === myName?true:false
 		    	updateDealerCards(ret.table.dealerHand)
 		   		updatePlayerCards(ret.player)
+		   		document.getElementById('actionContainer').style.display = 'none';
+		    	console.log("myTurn:"+playerInTurnIsMe)
 		    	if(playerInTurnIsMe){					
-				
+					document.getElementById('actionContainer').style.color = 'green';
+					document.getElementById('actionContainer').style.display = 'block';
 			    	const take=ret.player.actions.includes("TAKE");
 			    	const stand=ret.player.actions.includes("STAND");
 			    	const split=ret.player.actions.includes("SPLIT");
-			    	const doubl=ret.player.actions.includes("DOUBLE");
+			    	const doubl=ret.player.actions.includes("DOUBLE_DOWN");
 			    	if(take)
 			    		document.getElementById('take').style.visibility = 'visible';
 			    	if(stand)

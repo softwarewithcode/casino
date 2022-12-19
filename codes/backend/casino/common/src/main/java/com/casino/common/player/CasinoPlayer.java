@@ -122,7 +122,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	public <T> void sendMessage(T message) {
 		if (!canSendMessage(message)) {
 			System.out.println("cannot send message " + getName());
-			LOGGER.log(Level.SEVERE, "Message cannot be delivered:" + message);
+			LOGGER.log(Level.FINE, "Message cannot be delivered:"+message);
+			LOGGER.log(Level.SEVERE, "Message cannot be delivered:");
 			return;
 		}
 		try {

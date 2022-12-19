@@ -232,6 +232,30 @@ public class DealerTest extends BaseTest {
 	}
 
 	@Test
+	public void dealerCreatesNewHandIfPlayerTimesOutAndRejoins() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(10, Suit.HEART));
+		cards.add(Card.of(10, Suit.CLUB));
+		assertFalse(table.isDealerTurn());
+		table.join(bridge, "1");
+		assertFalse(table.isDealerTurn());
+		table.bet(bridge.userId(), new BigDecimal("11.11"));
+		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
+		UUID firstHandId = dealer.getHand().getId();
+		sleep(BET_ROUND_TIME_SECONDS + 1, ChronoUnit.SECONDS);
+		table.join(bridge, "1");
+		assertFalse(dealer.getHand().getId().equals(firstHandId));
+	}
+
+	@Test
 	public void dealerChangesAfterPlayerDoublesDown() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(10, Suit.SPADE));

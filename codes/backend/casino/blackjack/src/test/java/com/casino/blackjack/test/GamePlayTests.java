@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.dealer.BlackjackDealer;
@@ -179,6 +180,7 @@ public class GamePlayTests extends BaseTest {
 		assertFalse(p.canTake());
 	}
 
+	@Disabled // Players are removed after timing out
 	@Test
 	public void playersDoNotReactOnTimeButWinBecauseDealerGetsOver21() {
 		List<Card> cards = dealer.getDecks();
@@ -205,6 +207,7 @@ public class GamePlayTests extends BaseTest {
 		assertEquals(new BigDecimal("1025.00"), table.getPlayer(bridge3.userId()).getBalance());
 	}
 
+	@Disabled // Player is removed if timed out
 	@Test
 	public void splitHandGetsAdditionalCardAndCompletedWhenFirstHandIsActiveWhileTimingOut() {
 		List<Card> cards = dealer.getDecks();

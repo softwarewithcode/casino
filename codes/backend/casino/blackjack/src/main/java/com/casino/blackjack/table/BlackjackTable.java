@@ -95,7 +95,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "stand");
 			dealer.stand(player);
-			dealer.finalizeAction(player);
+			dealer.calculateNextTurnAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "stand", " player:" + playerId + " table:" + getId());
@@ -114,7 +114,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "hit");
 			dealer.addPlayerCard(player);
-			dealer.finalizeAction(player);
+			dealer.calculateNextTurnAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "hit", " player:" + playerId + " table:" + getId());
@@ -129,7 +129,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();
 			verifyActionClearance(player, "split");
 			dealer.handleSplit(player);
-			dealer.finalizeAction(player);
+			dealer.calculateNextTurnAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "split", " player:" + playerId + " table:" + getId());
@@ -144,7 +144,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();
 			verifyActionClearance(player, "doubleDown");
 			dealer.doubleDown(player);
-			dealer.updateTableActor();
+			dealer.calculateNextTurnAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "doubleDown", " player:" + playerId + " table:" + getId());
@@ -176,7 +176,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			if (leavingPlayer == null)
 				return;
 			lockPlayerInTurn();
-			dealer.handleLeavingTable(leavingPlayer);
+			dealer.handleLeavingPlayer(leavingPlayer);
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "onPlayerLeave", " leavingPlayer:" + leavingPlayer + " table:" + getId());
@@ -191,8 +191,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			if (!isPlayerInTurn(timedOutPlayer)) {
 				return;
 			}
-			dealer.autoplayForPlayer(timedOutPlayer);
-			dealer.updateTableActor();
+			dealer.handleTimedoutPlayer((BlackjackPlayer) timedOutPlayer);
 		} finally {
 			getPlayerInTurnLock().unlock();
 			LOGGER.exiting(getClass().getName(), "onPlayerTimeout", " timedOutPlayer:" + timedOutPlayer + " table:" + getId());

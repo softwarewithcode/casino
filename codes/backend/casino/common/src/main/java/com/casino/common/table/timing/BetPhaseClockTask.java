@@ -20,6 +20,7 @@ public class BetPhaseClockTask extends TimerTask {
 
 	@Override
 	public void run() {
+		System.out.println("BetPhaseTask runs");
 		if (!table.isClockTicking()) {
 			LOGGER.fine("BetPhaseClockTask, clock not ticking:");
 			return;

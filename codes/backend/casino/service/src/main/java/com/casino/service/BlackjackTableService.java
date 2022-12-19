@@ -23,7 +23,7 @@ public class BlackjackTableService {
 	private static final Integer BET_PHASE_TIME_SECONDS_DEFAULT = 15;
 	private static final Integer INSURANCE_PHASE_TIME_SECONDS_DEFAULT = 11;
 	private static final Integer PLAYER_TIME_SECONDS_DEFAULT = 30;
-	private static final long DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS_DEFAULT = 10000l;
+	private static final long DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS_DEFAULT = 14000l;
 	private static final Integer MIN_PLAYER_DEFAULT = 0;
 	private static final Integer MAX_PLAYERS_DEFAULT = 7;
 	private static final Integer SEAT_DCOUNT_DEFAULT = 7;

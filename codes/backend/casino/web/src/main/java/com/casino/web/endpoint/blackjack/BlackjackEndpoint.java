@@ -1,6 +1,5 @@
 package com.casino.web.endpoint.blackjack;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,14 +76,14 @@ public class BlackjackEndpoint {
 			if (isFirstMessage(session)) {
 				createBridge(session, message);
 			}
-			validateMessage(message);
+			validateMessageAndBridge(message);
 			switch (message.getAction()) {
 			case JOIN -> {
 				if (watcher) {
 					if (!table.watch(bridge))
-						session.getBasicRemote().sendText("{title:'NOT_ALLOWED'}");
+						session.getBasicRemote().sendText("{\"title\":\"FORBIDDEN\"}");
 				} else if (!table.join(bridge, message.getSeat()))
-					session.getBasicRemote().sendText("{title:'NO_SEAT'}");
+					session.getBasicRemote().sendText("{\"title\":\"FORBIDDEN\"}");
 			}
 			case BET -> table.bet(bridge.userId(), message.getAmount());
 			case TAKE -> table.hit(bridge.userId());
@@ -97,14 +96,17 @@ public class BlackjackEndpoint {
 			System.out.println("Command ok " + message.getAction());
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onMessage error:" + bridge, e);
+//			this.onClose(session, CloseReason.CloseCodes.UNEXPECTED_CONDITION);
 		}
 	}
 
-	private void validateMessage(Message message) {
+	private void validateMessageAndBridge(Message message) {
 		if (!containsMessage(message))
 			throw new IllegalArgumentException("BlackjackEndpoint: action is missing");
 		if (watcher && message.getAction() != Action.JOIN)
 			throw new IllegalArgumentException("Watcher cannot play " + bridge);
+		if (bridge == null || bridge.userId() == null)
+			throw new IllegalArgumentException("Bridge detached");
 	}
 
 	private boolean containsMessage(Message message) {

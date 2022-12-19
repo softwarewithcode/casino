@@ -115,6 +115,21 @@ public class BalanceTest extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("1075.15"), table.getPlayer(bridge.userId()).getBalance());
 	}
+	
+	@Test
+	public void totalBetIsUpdated() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.HEART));
+		cards.add(Card.of(13, Suit.SPADE));
+		table.join(bridge, "5");
+		table.bet(bridge.userId(), new BigDecimal("50.1"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("1075.15"), table.getPlayer(bridge.userId()).getBalance());
+	}
 
 	@Test
 	public void secondPlayerWinsWithBlackjackAndTurnIsChangedToDealer() {

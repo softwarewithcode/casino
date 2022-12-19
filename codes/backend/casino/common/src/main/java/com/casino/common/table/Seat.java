@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.player.Status;
 
 public class Seat {
 	private final int number;
@@ -22,6 +23,10 @@ public class Seat {
 
 	public boolean hasPlayerWithBet() {
 		return hasPlayer() && this.player.hasBet();
+	}
+
+	public boolean hasPlayerWhoCanAct() {
+		return hasPlayerWithBet() && this.player.getStatus() == Status.ACTIVE && player.hasActiveHand();
 	}
 
 	public boolean hasPlayer() {

@@ -161,6 +161,7 @@ public class BlackjackDealer implements IDealer {
 	private void startNewGame() {
 		table.setStatus(com.casino.common.table.Status.RUNNING);
 		table.updateGamePhase(GamePhase.BET);
+		dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		startBetPhaseClock(0l);
 	}
 
@@ -214,6 +215,7 @@ public class BlackjackDealer implements IDealer {
 		updatePlayerStatuses();
 		if (!shouldDealStartingHands()) {
 			LOGGER.info("dealer does not deal cards now");
+			removeInactivePlayers();
 			return;
 		}
 		subtractBetFromBalance();
@@ -225,7 +227,7 @@ public class BlackjackDealer implements IDealer {
 		}
 		table.updateGamePhase(GamePhase.PLAY);
 		updateTableActor();
-		notifyAll(Title.GAME_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
+		notifyAll(Title.SERVER_WAITS_PLAYER_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
 	private void subtractBetFromBalance() {
@@ -237,38 +239,43 @@ public class BlackjackDealer implements IDealer {
 
 	private void updatePlayerStatuses() {
 		table.getSeats().stream().filter(Seat::hasPlayer).map(Seat::getPlayer).forEach(player -> {
-			player.setStatus(Status.SIT_OUT);
+			if (player.getStatus() == Status.LEFT)
+				return;
 			if (player.hasBet())
 				player.setStatus(Status.ACTIVE);
+			else
+				player.setStatus(Status.SIT_OUT);
 		});
 	}
 
 	public void updateTableActor() {
-		Optional<Seat> optionalPlayerActor = table.getSeats().stream().filter(seat -> seat.hasPlayerWithBet() && seat.getPlayer().hasActiveHand()).min(Comparator.comparing(Seat::getNumber));
 		table.stopClock();
+		Optional<Seat> optionalPlayerActor = table.getSeats().stream().filter(seat -> seat.hasPlayerWhoCanAct()).min(Comparator.comparing(Seat::getNumber));
 		if (optionalPlayerActor.isEmpty()) {
+			System.out.println("Dealer turn starts");
 			changeTurnToDealer();
-			carryOutDealerDuties();
+			carryOutDealerDutiesAndNotify();
 		} else {
 			// Actor can be same as previous ->split hand
 			BlackjackPlayer player = (BlackjackPlayer) optionalPlayerActor.get().getPlayer();
+			System.out.println("player turn starts" + player);
 			table.changePlayer(player);
 			player.updateActions();
 		}
 	}
 
 	public void informTable() {
-		notifyAll(Title.GAME_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
+		notifyAll(Title.SERVER_WAITS_PLAYER_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
-	private void carryOutDealerDuties() {
+	private void carryOutDealerDutiesAndNotify() {
 		completeRound();
+		notifyAll(Title.ROUND_COMPLETED, null);
 		removeInactivePlayers();
 		if (table.getActivePlayerCount() == 0)
 			table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
 		if (shouldRestartBetPhase()) {
 			startBetPhaseClock(table.getThresholds().phaseDelay());
-			notifyAll(Title.BET_PHASE_STARTS, null);
 		}
 	}
 
@@ -279,9 +286,11 @@ public class BlackjackDealer implements IDealer {
 	public synchronized void prepareNewRound() {
 		if (table.getGamePhase() != GamePhase.ROUND_COMPLETED)
 			throw new IllegalArgumentException("not allowed");
+		notifyAll(Title.BET_PHASE_STARTS, null);
 		table.getPlayers().forEach(ICasinoPlayer::prepareNextRound);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		table.updateGamePhase(GamePhase.BET);
+		table.updateCounterTime(table.getThresholds().betPhaseTime());
 		deck = Deck.combineDecks(8);
 	}
 
@@ -354,6 +363,7 @@ public class BlackjackDealer implements IDealer {
 			return;
 		}
 		try {
+			completeHandsOfThePlayersWhoLeftImmediatelyAfterPlacingABet();
 			if (table.hasPlayersWithWinningChances()) {
 				addDealerCards();
 				payout();
@@ -364,6 +374,10 @@ public class BlackjackDealer implements IDealer {
 			BlackjackUtil.dumpTable(table, "dealer player turn:" + e);
 			throw new IllegalStateException("what to do");
 		}
+	}
+
+	private void completeHandsOfThePlayersWhoLeftImmediatelyAfterPlacingABet() {
+		table.getPlayersWithBet().stream().filter(player -> player.hasActiveHand()).forEach(player -> player.getActiveHand().complete());
 	}
 
 	private void payout() {
@@ -404,26 +418,21 @@ public class BlackjackDealer implements IDealer {
 	public void finalizeInsurancePhase() {
 		table.updateGamePhase(GamePhase.PLAY);
 		updateTableActor();
-		Title title = table.getPlayerInTurn() != null ? Title.GAME_ACTION : Title.ROUND_COMPLETED;
+		Title title = table.getPlayerInTurn() != null ? Title.SERVER_WAITS_PLAYER_ACTION : Title.ROUND_COMPLETED;
 		notifyAll(title, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
-	public void finalizeAction(BlackjackPlayer player) {
+	public void calculateNextTurnAndNotify() {
 		updateTableActor();
 		if (table.getPlayerInTurn() != null)
-			notifyAll(Title.GAME_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
-		else
-			notifyAll(Title.ROUND_COMPLETED, (BlackjackPlayer) table.getPlayerInTurn());
+			notifyAll(Title.SERVER_WAITS_PLAYER_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
+
 	}
 
-	public void handleLeavingTable(BlackjackPlayer leavingPlayer) {
-		if (leavingPlayer.hasBet() && leavingPlayer.equals(table.getPlayerInTurn())) {
-			autoplayForPlayer(leavingPlayer);
-			updateTableActor();
-		}
-		leavingPlayer.setStatus(Status.SIT_OUT);
-		// dealer removes inactive players after round if round is going on
-		if (!table.getGamePhase().isOnGoingRound() || table.getActivePlayerCount() < 1) {
+	public void handleLeavingPlayer(BlackjackPlayer leavingPlayer) {
+		leavingPlayer.setStatus(Status.LEFT);
+		finishInactivePlayerTurn(leavingPlayer);
+		if (!table.getGamePhase().isOnGoingRound()) {
 			removeInactivePlayers();
 		}
 		if (table.getPlayers().size() == 0) {
@@ -431,6 +440,19 @@ public class BlackjackDealer implements IDealer {
 			table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
 		}
 		notifyAll(Title.PLAYER_LEFT, leavingPlayer);
+	}
+
+	private void finishInactivePlayerTurn(BlackjackPlayer player) {
+		if (player.hasBet() && player.equals(table.getPlayerInTurn())) {
+			autoplayForPlayer(player);
+			calculateNextTurnAndNotify();
+		}
+	}
+
+	public void handleTimedoutPlayer(BlackjackPlayer timedOutPlayer) {
+		finishInactivePlayerTurn(timedOutPlayer);
+		notifyAll(Title.TIMED_OUT, timedOutPlayer);
+		calculateNextTurnAndNotify();
 	}
 
 	public void sendStatusUpdate(CasinoPlayer player) {

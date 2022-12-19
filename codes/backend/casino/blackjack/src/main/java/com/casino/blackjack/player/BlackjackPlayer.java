@@ -307,10 +307,6 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return getHands().get(handNumber).getBet();
 	}
 
-	/**
-	 * Returns empty if Card is added to second hand <br>
-	 * Returns Optional<T> if card is not added to second hand
-	 */
 	@Override
 	public <T> Optional<T> autoplay(T t) {
 		Optional<T> cardOptional = Optional.of(t);
@@ -322,8 +318,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 			return cardOptional;
 		IHand secondHand = getSecondHand();
 		if (secondHand.getCards().size() < 2) {
-			secondHand.addCard(card); // card is used
-			cardOptional = Optional.empty(); // return e
+			secondHand.addCard(card); // card is used here
+			cardOptional = Optional.empty();
 		}
 		if (!secondHand.isCompleted())// Automatic blackjack can have completed the hand
 			secondHand.complete();
