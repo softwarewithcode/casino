@@ -300,14 +300,14 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				casinoDoor.await();
 				if (index == 0) {
 					table.join(doublerBridge, "0");
-					table.bet(doublerBridge.playerId(), MAX_BET);
+					table.bet(doublerBridge.userId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
-					table.doubleDown(doublerBridge.playerId());
+					table.doubleDown(doublerBridge.userId());
 				} else {
 					table.join(b, String.valueOf(seatNumber));
-					table.bet(b.playerId(), MAX_BET);
+					table.bet(b.userId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
-					table.doubleDown(doublerBridge.playerId());//// All these players try to doubleDown for the first player
+					table.doubleDown(doublerBridge.userId());//// All these players try to doubleDown for the first player
 				}
 
 			} catch (Exception e) {
@@ -329,14 +329,14 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 				casinoDoor.await();
 				if (index == 0) {
 					table.join(insurerBridge, String.valueOf(seatNumber));
-					table.bet(insurerBridge.playerId(), MAX_BET);
+					table.bet(insurerBridge.userId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-					table.insure(insurerBridge.playerId());
+					table.insure(insurerBridge.userId());
 				} else {
 					table.join(b, String.valueOf(seatNumber));
-					table.bet(b.playerId(), MAX_BET);
+					table.bet(b.userId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-					table.insure(insurerBridge.playerId());
+					table.insure(insurerBridge.userId());
 				}
 
 			} catch (Exception e) {

@@ -86,13 +86,13 @@ public class BlackjackEndpoint {
 				} else if (!table.join(bridge, message.getSeat()))
 					session.getBasicRemote().sendText("{title:'NO_SEAT'}");
 			}
-			case BET -> table.bet(bridge.playerId(), message.getAmount());
-			case TAKE -> table.hit(bridge.playerId());
-			case SPLIT -> table.split(bridge.playerId());
-			case DOUBLE_DOWN -> table.doubleDown(bridge.playerId());
-			case STAND -> table.stand(bridge.playerId());
-			case INSURE -> table.insure(bridge.playerId());
-			case REFRESH -> table.refresh(bridge.playerId());
+			case BET -> table.bet(bridge.userId(), message.getAmount());
+			case TAKE -> table.hit(bridge.userId());
+			case SPLIT -> table.split(bridge.userId());
+			case DOUBLE_DOWN -> table.doubleDown(bridge.userId());
+			case STAND -> table.stand(bridge.userId());
+			case INSURE -> table.insure(bridge.userId());
+			case REFRESH -> table.refresh(bridge.userId());
 			}
 			System.out.println("Command ok " + message.getAction());
 		} catch (Exception e) {
@@ -126,17 +126,25 @@ public class BlackjackEndpoint {
 	public void onClose(Session session, CloseReason closeReason) {
 		try {
 			LOGGER.info("Closing session:" + closeReason);
-			if (bridge != null && bridge.playerId() != null)
-				table.onPlayerLeave(bridge.playerId());
-			session.close(closeReason);// can close session here, table checks that this session is not open anymore
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if (isPlayerSessionClosing())
+				table.onPlayerLeave(bridge.userId());
+			if (isWatcherSessionClosing())
+				tableService.removeWatcher(bridge);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onClose error,", e);
 		}
+	}
+
+	private boolean isWatcherSessionClosing() {
+		return bridge != null && bridge.userId() != null && this.watcher == true;
+	}
+
+	private boolean isPlayerSessionClosing() {
+		return bridge != null && bridge.userId() != null && this.watcher == false;
 	}
 
 	@OnError
 	public void onError(Session session, Throwable throwable) {
-
+		LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onError ", throwable);
 	}
 }

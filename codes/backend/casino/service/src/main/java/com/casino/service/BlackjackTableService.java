@@ -11,6 +11,7 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.table.Status;
 import com.casino.common.table.Thresholds;
 import com.casino.common.table.Type;
+import com.casino.common.user.Bridge;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -51,5 +52,12 @@ public class BlackjackTableService {
 		if (id == null)
 			throw new IllegalArgumentException("table id is required:" + id);
 		return Optional.ofNullable(tables.get(id));
+	}
+
+	public void removeWatcher(Bridge bridge) {
+		BlackjackTable table = tables.get(bridge.tableId());
+
+		table.removeWatcher(bridge.userId());
+
 	}
 }

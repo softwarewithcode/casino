@@ -72,7 +72,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@JsonIgnore
 	@Override // never return this id to the players
 	public UUID getId() {
-		return bridge.playerId();
+		return bridge.userId();
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(bridge.playerId());
+		return Objects.hash(bridge.userId());
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		if (getClass() != obj.getClass())
 			return false;
 		CasinoPlayer other = (CasinoPlayer) obj;
-		return Objects.equals(bridge.playerId(), other.bridge.playerId());
+		return Objects.equals(bridge.userId(), other.bridge.userId());
 	}
 
 	@Override

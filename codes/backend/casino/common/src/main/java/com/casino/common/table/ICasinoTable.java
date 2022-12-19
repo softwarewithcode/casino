@@ -41,7 +41,7 @@ public interface ICasinoTable {
 
 //	public boolean removePlayer(ICasinoPlayer p);
 
-	public boolean removeWatcher(ICasinoPlayer p);
+	public void removeWatcher(UUID id);
 
 	public List<ICasinoPlayer> getPlayers();
 

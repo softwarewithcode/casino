@@ -56,7 +56,7 @@ public class SeatTest extends BaseTest {
 	public void reservedSeatCannotBeTaken() {
 		table.join(bridge, "0");
 		table.join(bridge2, "0");
-		Assertions.assertEquals(bridge.playerId(), table.getSeats().stream().filter(seat -> seat.getPlayer() != null).findFirst().get().getPlayer().getId());
+		Assertions.assertEquals(bridge.userId(), table.getSeats().stream().filter(seat -> seat.getPlayer() != null).findFirst().get().getPlayer().getId());
 	}
 
 	@Test

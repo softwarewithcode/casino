@@ -83,7 +83,7 @@ public class BetTest extends BaseTest {
 		table.join(bridge, "0");
 		;
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
-			table.bet(bridge.playerId(), null);
+			table.bet(bridge.userId(), null);
 		});
 		assertEquals(2, exception.getCode());
 	}
@@ -93,7 +93,7 @@ public class BetTest extends BaseTest {
 		table.join(bridge, "0");
 		;
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
-			table.bet(bridge.playerId(), new BigDecimal("1000.001"));
+			table.bet(bridge.userId(), new BigDecimal("1000.001"));
 		});
 		assertEquals(3, exception.getCode());
 	}
@@ -103,7 +103,7 @@ public class BetTest extends BaseTest {
 		table.join(bridge, "0");
 		;
 		PlayerNotFoundException exception = assertThrows(PlayerNotFoundException.class, () -> {
-			table.bet(bridge2.playerId(), new BigDecimal("7.0"));
+			table.bet(bridge2.userId(), new BigDecimal("7.0"));
 		});
 		assertEquals(1, exception.getCode());
 	}
@@ -113,7 +113,7 @@ public class BetTest extends BaseTest {
 		table.join(bridge, "0");
 		;
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
-			table.bet(bridge.playerId(), new BigDecimal("4.99"));
+			table.bet(bridge.userId(), new BigDecimal("4.99"));
 		});
 		assertEquals(4, exception.getCode());
 	}
@@ -123,7 +123,7 @@ public class BetTest extends BaseTest {
 		table.join(bridge, "0");
 		;
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
-			table.bet(bridge.playerId(), new BigDecimal("100.1"));
+			table.bet(bridge.userId(), new BigDecimal("100.1"));
 		});
 		assertEquals(5, exception.getCode());
 	}
@@ -132,18 +132,18 @@ public class BetTest extends BaseTest {
 	public void placingAllowedBetSetsTheBetForPlayer() {
 		table.join(bridge, "0");
 		;
-		table.bet(bridge.playerId(), new BigDecimal("49.9"));
-		assertEquals("49.90", table.getPlayer(bridge.playerId()).getTotalBet().toString());
+		table.bet(bridge.userId(), new BigDecimal("49.9"));
+		assertEquals("49.90", table.getPlayer(bridge.userId()).getTotalBet().toString());
 	}
 
 	@Test
 	public void playersBetsAreAccepted() {
 		assertTrue(table.join(bridge, "1"));
 		assertTrue(table.join(bridge2, "2"));
-		table.bet(bridge.playerId(), new BigDecimal("50.0"));
-		table.bet(bridge2.playerId(), new BigDecimal("99.7"));
-		assertEquals("50.00", table.getPlayer(bridge.playerId()).getTotalBet().toString());
-		assertEquals("99.70", table.getPlayer(bridge2.playerId()).getTotalBet().toString());
+		table.bet(bridge.userId(), new BigDecimal("50.0"));
+		table.bet(bridge2.userId(), new BigDecimal("99.7"));
+		assertEquals("50.00", table.getPlayer(bridge.userId()).getTotalBet().toString());
+		assertEquals("99.70", table.getPlayer(bridge2.userId()).getTotalBet().toString());
 	}
 
 	@Test
@@ -171,7 +171,7 @@ public class BetTest extends BaseTest {
 		bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 		table.join(bridge, "1");
 		assertThrows(IllegalBetException.class, () -> {
-			table.bet(bridge.playerId(), new BigDecimal("-10.1"));
+			table.bet(bridge.userId(), new BigDecimal("-10.1"));
 		});
 	}
 }

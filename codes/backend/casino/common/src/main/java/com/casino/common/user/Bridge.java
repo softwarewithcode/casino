@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import jakarta.websocket.Session;
 
-public record Bridge(String name, UUID tableId, UUID playerId, Session session, BigDecimal initialBalance) {
+public record Bridge(String name, UUID tableId, UUID userId, Session session, BigDecimal initialBalance) {
 
 	public boolean isConnectable() {
 		return session != null && session.isOpen();

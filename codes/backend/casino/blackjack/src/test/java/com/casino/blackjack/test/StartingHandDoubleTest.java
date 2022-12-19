@@ -61,11 +61,11 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.SPADE));
 		table.join(bridge, "5");
-		table.bet(bridge.playerId(), initialBet);
+		table.bet(bridge.userId(), initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.doubleDown(bridge.playerId());
-		assertEquals(new BigDecimal("51.56"), table.getPlayer(bridge.playerId()).getTotalBet());
-		assertEquals(new BigDecimal("51.56"), table.getPlayer(bridge.playerId()).getHands().get(0).getBet());
+		table.doubleDown(bridge.userId());
+		assertEquals(new BigDecimal("51.56"), table.getPlayer(bridge.userId()).getTotalBet());
+		assertEquals(new BigDecimal("51.56"), table.getPlayer(bridge.userId()).getHands().get(0).getBet());
 	}
 
 	@Test
@@ -75,19 +75,19 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.SPADE));
 		table.join(bridge, "5");
-		table.bet(bridge.playerId(), initialBet);
+		table.bet(bridge.userId(), initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.doubleDown(bridge.playerId());
-		assertTrue(table.getPlayer(bridge.playerId()).getHands().get(0).isCompleted());
-		assertNull(table.getPlayer(bridge.playerId()).getActiveHand());
+		table.doubleDown(bridge.userId());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isCompleted());
+		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.hit(bridge.playerId());
+			table.hit(bridge.userId());
 		});
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.stand(bridge.playerId());
+			table.stand(bridge.userId());
 		});
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.doubleDown(bridge.playerId());
+			table.doubleDown(bridge.userId());
 		});
 	}
 
@@ -99,14 +99,14 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(4, Suit.SPADE));
 		table.join(bridge, "5");
-		table.bet(bridge.playerId(), initialBet);
+		table.bet(bridge.userId(), initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.doubleDown(bridge.playerId());
-		assertTrue(table.getPlayer(bridge.playerId()).getHands().get(0).isCompleted());
-		assertEquals(10, table.getPlayer(bridge.playerId()).getHands().get(0).calculateValues().get(0));
-		assertEquals(20, table.getPlayer(bridge.playerId()).getHands().get(0).calculateValues().get(1));
-		assertEquals(3, table.getPlayer(bridge.playerId()).getHands().get(0).getCards().size());
-		assertNull(table.getPlayer(bridge.playerId()).getActiveHand());
+		table.doubleDown(bridge.userId());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isCompleted());
+		assertEquals(10, table.getPlayer(bridge.userId()).getHands().get(0).calculateValues().get(0));
+		assertEquals(20, table.getPlayer(bridge.userId()).getHands().get(0).calculateValues().get(1));
+		assertEquals(3, table.getPlayer(bridge.userId()).getHands().get(0).getCards().size());
+		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
 	}
 
 	@Test
@@ -116,10 +116,10 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.SPADE));
 		table.join(bridge, "5");
-		table.bet(bridge.playerId(), initialBet);
+		table.bet(bridge.userId(), initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.doubleDown(bridge.playerId());
-		assertEquals(new BigDecimal("51.56"), table.getPlayer(bridge.playerId()).getTotalBet());
+		table.doubleDown(bridge.userId());
+		assertEquals(new BigDecimal("51.56"), table.getPlayer(bridge.userId()).getTotalBet());
 	}
 
 	@Test
@@ -129,11 +129,11 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(6, Suit.SPADE));
 		table.join(bridge, "5");
-		table.bet(bridge.playerId(), initialBet);
+		table.bet(bridge.userId(), initialBet);
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.doubleDown(bridge.playerId());
-		assertEquals(new BigDecimal("51.56"), table.getPlayer(bridge.playerId()).getTotalBet());
-		assertEquals(new BigDecimal("51.56"), table.getPlayer(bridge.playerId()).getHands().get(0).getBet());
+		table.doubleDown(bridge.userId());
+		assertEquals(new BigDecimal("51.56"), table.getPlayer(bridge.userId()).getTotalBet());
+		assertEquals(new BigDecimal("51.56"), table.getPlayer(bridge.userId()).getHands().get(0).getBet());
 	}
 
 	@Test
@@ -146,10 +146,10 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(10, Suit.SPADE));
 		cards.add(Card.of(1, Suit.SPADE));
 		table.join(bridge, "5");
-		table.bet(bridge.playerId(), new BigDecimal("10.0"));
+		table.bet(bridge.userId(), new BigDecimal("10.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.doubleDown(bridge.playerId());
+			table.doubleDown(bridge.userId());
 		});
 	}
 
@@ -164,10 +164,10 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(2, Suit.SPADE));
 		bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("199.9"));
 		table.join(bridge, "5");
-		table.bet(bridge.playerId(), new BigDecimal("100"));
+		table.bet(bridge.userId(), new BigDecimal("100"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalArgumentException.class, () -> {
-			table.doubleDown(bridge.playerId());
+			table.doubleDown(bridge.userId());
 		});
 	}
 
@@ -178,13 +178,13 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(6, Suit.SPADE));
 		table.join(bridge, "5");
-		table.bet(bridge.playerId(), new BigDecimal("0.01234"));
+		table.bet(bridge.userId(), new BigDecimal("0.01234"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("999.98"), table.getPlayer(bridge.playerId()).getBalance());
-		table.doubleDown(bridge.playerId());
-		assertEquals(new BigDecimal("0.02"), table.getPlayer(bridge.playerId()).getTotalBet());
+		assertEquals(new BigDecimal("999.98"), table.getPlayer(bridge.userId()).getBalance());
+		table.doubleDown(bridge.userId());
+		assertEquals(new BigDecimal("0.02"), table.getPlayer(bridge.userId()).getTotalBet());
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.doubleDown(bridge.playerId());
+			table.doubleDown(bridge.userId());
 		});
 	}
 }

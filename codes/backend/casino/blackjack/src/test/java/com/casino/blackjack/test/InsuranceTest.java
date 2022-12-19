@@ -55,11 +55,11 @@ public class InsuranceTest extends BaseTest {
 	@Test
 	public void playerCanInsureHandWhenDealerHasStartingAce() {
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("99.0"));
+		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.insure(bridge.playerId());
+		table.insure(bridge.userId());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertTrue(table.getPlayer(bridge.playerId()).getActiveHand().isInsured());
+		assertTrue(table.getPlayer(bridge.userId()).getActiveHand().isInsured());
 	}
 
 	@Test
@@ -67,10 +67,10 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(2, Suit.HEART));
 		dealer.getDecks().add(Card.of(2, Suit.HEART));
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("99.0"));
+		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.insure(bridge.playerId());
+			table.insure(bridge.userId());
 		});
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 	}
@@ -79,11 +79,11 @@ public class InsuranceTest extends BaseTest {
 	public void playerWithoutBetCannotInsure() {
 		table.join(bridge,"5");
 		table.join(bridge2, "6");
-		table.bet(bridge.playerId(), new BigDecimal("99.0"));
+		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.insure(bridge.playerId());
+		table.insure(bridge.userId());
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.insure(bridge2.playerId());
+			table.insure(bridge2.userId());
 		});
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 	}
@@ -91,31 +91,31 @@ public class InsuranceTest extends BaseTest {
 	@Test
 	public void insuredHandCannotBeInsured() {
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("99.0"));
+		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.insure(bridge.playerId());
+		table.insure(bridge.userId());
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.insure(bridge.playerId());
+			table.insure(bridge.userId());
 		});
 	}
 
 	@Test
 	public void standNotAllowedDuringInsurancePhase() {
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("99.0"));
+		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.stand(bridge.playerId());
+			table.stand(bridge.userId());
 		});
 	}
 
 	@Test
 	public void doublingNotAllowedDuringInsurancePhase() {
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("99.0"));
+		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.doubleDown(bridge.playerId());
+			table.doubleDown(bridge.userId());
 		});
 	}
 
@@ -128,11 +128,11 @@ public class InsuranceTest extends BaseTest {
 		cards.add(Card.of(1, Suit.HEART));
 		cards.add(Card.of(5, Suit.SPADE));
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("99.0"));
+		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.doubleDown(bridge.playerId());
-		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(bridge.playerId());
+		table.doubleDown(bridge.userId());
+		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(bridge.userId());
 		assertTrue(p.hasDoubled());
 	}
 
@@ -143,10 +143,10 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(1, Suit.DIAMOND));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("99.0"));
+		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.split(bridge.playerId());
+			table.split(bridge.userId());
 		});
 	}
 
@@ -159,19 +159,19 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("50.0"));
+		table.bet(bridge.userId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.insure(bridge.playerId());
-		assertTrue(table.getPlayer(bridge.playerId()).getHands().get(0).isInsured());
+		table.insure(bridge.userId());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isInsured());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.hit(bridge.playerId());
-		assertEquals(10, table.getPlayer(bridge.playerId()).getActiveHand().calculateValues().get(0));
-		assertEquals(20, table.getPlayer(bridge.playerId()).getActiveHand().calculateValues().get(1));
-		table.stand(bridge.playerId());
-		assertTrue(table.getPlayer(bridge.playerId()).getHands().get(0).isInsured());
+		table.hit(bridge.userId());
+		assertEquals(10, table.getPlayer(bridge.userId()).getActiveHand().calculateValues().get(0));
+		assertEquals(20, table.getPlayer(bridge.userId()).getActiveHand().calculateValues().get(1));
+		table.stand(bridge.userId());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isInsured());
 		assertEquals(21, dealer.getHand().calculateFinalValue());
-		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.playerId()).getTotalBet());
-		assertEquals(new BigDecimal("925.00"), table.getPlayer(bridge.playerId()).getBalance());
+		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.userId()).getTotalBet());
+		assertEquals(new BigDecimal("925.00"), table.getPlayer(bridge.userId()).getBalance());
 	}
 
 	@Test
@@ -183,19 +183,19 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.CLUB));
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("50.0"));
+		table.bet(bridge.userId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.insure(bridge.playerId());
+		table.insure(bridge.userId());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertTrue(table.getPlayer(bridge.playerId()).getHands().get(0).isInsured());
-		table.hit(bridge.playerId());
-		assertEquals(10, table.getPlayer(bridge.playerId()).getActiveHand().calculateValues().get(0));
-		assertEquals(20, table.getPlayer(bridge.playerId()).getActiveHand().calculateValues().get(1));
-		table.stand(bridge.playerId());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isInsured());
+		table.hit(bridge.userId());
+		assertEquals(10, table.getPlayer(bridge.userId()).getActiveHand().calculateValues().get(0));
+		assertEquals(20, table.getPlayer(bridge.userId()).getActiveHand().calculateValues().get(1));
+		table.stand(bridge.userId());
 		assertEquals(19, dealer.getHand().calculateFinalValue());
-		assertTrue(table.getPlayer(bridge.playerId()).getHands().get(0).isInsured());
-		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.playerId()).getTotalBet());
-		assertEquals(new BigDecimal("1025.00"), table.getPlayer(bridge.playerId()).getBalance());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isInsured());
+		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.userId()).getTotalBet());
+		assertEquals(new BigDecimal("1025.00"), table.getPlayer(bridge.userId()).getBalance());
 	}
 
 	@Test
@@ -207,16 +207,16 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("50.0"));
+		table.bet(bridge.userId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.insure(bridge.playerId());
+		table.insure(bridge.userId());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertTrue(table.getPlayer(bridge.playerId()).getHands().get(0).isInsured());
-		table.hit(bridge.playerId());
-		assertEquals(18, table.getPlayer(bridge.playerId()).getActiveHand().calculateValues().get(0));
-		table.stand(bridge.playerId());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isInsured());
+		table.hit(bridge.userId());
+		assertEquals(18, table.getPlayer(bridge.userId()).getActiveHand().calculateValues().get(0));
+		table.stand(bridge.userId());
 		assertTrue(dealer.getHand().isBlackjack());
-		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(bridge.playerId());
+		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(bridge.userId());
 		assertTrue(p.hasInsured());
 		assertTrue(p.hasCompletedFirstHand());
 		assertEquals(new BigDecimal("75.00"), p.getTotalBet());
@@ -232,20 +232,20 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("50.0"));
+		table.bet(bridge.userId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.insure(bridge.playerId());
+		table.insure(bridge.userId());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertTrue(table.getPlayer(bridge.playerId()).getHands().get(0).isInsured());
-		table.hit(bridge.playerId());
-		assertEquals(18, table.getPlayer(bridge.playerId()).getActiveHand().calculateValues().get(0));
-		table.hit(bridge.playerId());
-		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(bridge.playerId());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isInsured());
+		table.hit(bridge.userId());
+		assertEquals(18, table.getPlayer(bridge.userId()).getActiveHand().calculateValues().get(0));
+		table.hit(bridge.userId());
+		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(bridge.userId());
 		assertEquals(28, p.getFirstHandFinalValue());
 		assertTrue(dealer.getHand().isBlackjack());
-		assertTrue(table.getPlayer(bridge.playerId()).getHands().get(0).isInsured());
-		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.playerId()).getTotalBet());
-		assertEquals(new BigDecimal("925.00"), table.getPlayer(bridge.playerId()).getBalance());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isInsured());
+		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.userId()).getTotalBet());
+		assertEquals(new BigDecimal("925.00"), table.getPlayer(bridge.userId()).getBalance());
 	}
 
 	@Test
@@ -257,12 +257,12 @@ public class InsuranceTest extends BaseTest {
 		dealer.getDecks().add(Card.of(1, Suit.HEART));
 		dealer.getDecks().add(Card.of(5, Suit.HEART));
 		table.join(bridge,"5");
-		table.bet(bridge.playerId(), new BigDecimal("50.0"));
+		table.bet(bridge.userId(), new BigDecimal("50.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.insure(bridge.playerId());
+		table.insure(bridge.userId());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.split(bridge.playerId());
+			table.split(bridge.userId());
 		});
 	}
 }
