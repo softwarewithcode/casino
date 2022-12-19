@@ -25,6 +25,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 	private List<IHand> hands;
 	@JsonProperty
 	private List<Action> actions;
+	@JsonProperty
+	private Integer seatNumber;
 
 	public BlackjackPlayer(Bridge bridge, ISeatedTable table) {
 		super(bridge, table);
@@ -43,6 +45,14 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	private BlackjackHand createNewHand(boolean active) {
 		return new BlackjackHand(UUID.randomUUID(), active);
+	}
+
+	public Integer getSeatNumber() {
+		return seatNumber;
+	}
+
+	public void setSeatNumber(Integer seatNumber) {
+		this.seatNumber = seatNumber;
 	}
 
 	public void updateActions() {

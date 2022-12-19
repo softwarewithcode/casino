@@ -8,7 +8,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.common.language.Language;
@@ -34,8 +33,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	@JsonProperty
 	private final Type type;
 	@JsonSerialize(converter = CasinoPlayersConverter.class)
-//	@JsonProperty
-//	private final ConcurrentHashMap<UUID, ICasinoPlayer> players;
 	@JsonIgnore
 	private final ConcurrentHashMap<UUID, ICasinoPlayer> watchers;
 	@JsonProperty
@@ -72,7 +69,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	protected <T extends ICasinoPlayer> boolean joinAsWatcher(T watcher) {
 		if (watcher == null)
 			return false;
-		return watchers.putIfAbsent(watcher.getId(), watcher) != null;
+		return watchers.putIfAbsent(watcher.getId(), watcher) == null;
 	}
 
 	public synchronized void startClock(TimerTask task, long initialDelay) {
@@ -220,6 +217,14 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public ICasinoPlayer getPlayerInTurn() {
 		return playerInTurn;
+	}
+
+	public void updateCounterTime(int counter) {
+		this.clock.updateTime(counter);
+	}
+
+	public int getCounterTime() {
+		return this.clock.getTime();
 	}
 
 	protected boolean isPlayerInTurn(ICasinoPlayer player) {

@@ -8,6 +8,7 @@ public class Clock {
 
 	private Timer timer;
 	private boolean ticking;
+	private int timeLeft;
 
 	public void startClock(TimerTask task, long initialDelay, int millis) {
 		stopClock();
@@ -25,6 +26,14 @@ public class Clock {
 
 	public boolean isTicking() {
 		return ticking;
+	}
+
+	public void updateTime(int time) {
+		this.timeLeft = time;
+	}
+
+	public int getTime() {
+		return timeLeft;
 	}
 
 }

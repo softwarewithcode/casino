@@ -8,8 +8,7 @@ public class Validator {
 		if (id == null) {
 			throw new IllegalArgumentException("id missing");
 		}
-		UUID validId;
-		validId = UUID.fromString(id);
+		UUID validId = UUID.fromString(id);
 		if (validId.toString().equals(id))
 			return validId;
 		else

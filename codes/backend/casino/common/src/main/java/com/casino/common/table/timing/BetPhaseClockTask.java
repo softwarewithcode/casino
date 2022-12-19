@@ -11,36 +11,37 @@ import com.casino.common.table.phase.GamePhase;
 public class BetPhaseClockTask extends TimerTask {
 	private static final Logger LOGGER = Logger.getLogger(BetPhaseClockTask.class.getName());
 	private ICasinoTable table;
-	private int secondsLeft;
 
 	public BetPhaseClockTask(ICasinoTable table) {
 		this.table = table;
 		Thresholds thresholds = table.getThresholds();
-		secondsLeft = thresholds.betPhaseTime();
+		table.updateCounterTime(thresholds.betPhaseTime());
 	}
 
 	@Override
 	public void run() {
 		if (!table.isClockTicking()) {
-			LOGGER.fine("BetPhaseClockTask, clock not ticking:" + secondsLeft);
+			LOGGER.fine("BetPhaseClockTask, clock not ticking:");
 			return;
 		}
 		if (shouldPrepareNewRound()) {
 			LOGGER.fine("BetPhaseClockTask, clear previous round" + table);
 			table.prepareNewRound();
 		}
-		secondsLeft--;
+		int curTime = table.getCounterTime();
+		curTime--;
+		table.updateCounterTime(curTime);
 		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine("BetPhaseClockTask, secondsLeft:" + secondsLeft + " in table:" + table.getId());
-		LOGGER.info("BetPhaseClock running, left:" + secondsLeft);
-		if (secondsLeft == 0) {
+			LOGGER.fine("BetPhaseClockTask, secondsLeft:" + curTime + " in table:" + table.getId());
+		LOGGER.info("BetPhaseClock running, left:" + curTime);
+		if (curTime == 0) {
 			table.stopClock();
 			table.onBetPhaseEnd();
 		}
 	}
 
 	private boolean shouldPrepareNewRound() {
-		return secondsLeft == table.getThresholds().betPhaseTime() && table.getGamePhase() == GamePhase.ROUND_COMPLETED;
+		return table.getCounterTime() == table.getThresholds().betPhaseTime() && table.getGamePhase() == GamePhase.ROUND_COMPLETED;
 	}
 
 }

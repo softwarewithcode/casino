@@ -34,20 +34,23 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public boolean join(Bridge bridge, String seatNumber) {
+	public boolean join(Bridge bridge, String seatNmbr) {
 		LOGGER.entering(getClass().getName(), "join", getId());
-		LOGGER.info("table_join " + bridge);
+		System.out.println("table_join " + bridge + " seatNumber:" + seatNmbr);
 		try {
-			int seat = Integer.parseInt(seatNumber);
+			Integer seatNumber = seatNmbr != null ? Integer.parseInt(seatNmbr) : null;
 			BlackjackPlayer player = new BlackjackPlayer(bridge, this);
-			Optional<Seat> seatOptional = trySeat(seat, player);
-			if (seatOptional.isEmpty())
+			Optional<Seat> seatOptional = trySeat(seatNumber, player);
+			if (seatOptional.isEmpty()) {
+				System.out.println("no seat:!");
 				return false;
+			}
 			player.setStatus(com.casino.common.player.Status.ACTIVE);
+			player.setSeatNumber(seatOptional.get().getNumber());
 			dealer.onPlayerArrival(player);
 			return true;
 		} finally {
-			LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNumber + " bridge:" + bridge + " tableId:" + getId());
+			LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNmbr + " bridge:" + bridge + " tableId:" + getId());
 		}
 	}
 
@@ -257,7 +260,25 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	@Override
 	public boolean watch(Bridge user) {
-		BlackjackPlayer player = new BlackjackPlayer(user, this);
-		return super.joinAsWatcher(player);
+		BlackjackPlayer player = new BlackjackPlayer(user, null);
+		boolean joined = super.joinAsWatcher(player);
+		if (joined)
+			dealer.onWatcherArrival(player);
+		return joined;
+	}
+
+	@Override
+	public void refresh(UUID playerId) {
+		LOGGER.entering(getClass().getName(), "refresh table:" + getId() + " player:" + playerId);
+		LOGGER.info("table_refresh ");
+		if (playerId == null)
+			return;
+		try {
+//			Thread.ofVirtual().start(() -> {
+			dealer.sendStatusUpdate(getPlayer(playerId));
+//			});
+		} finally {
+			LOGGER.exiting(getClass().getName(), playerId.toString());
+		}
 	}
 }

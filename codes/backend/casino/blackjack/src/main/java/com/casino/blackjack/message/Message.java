@@ -2,22 +2,22 @@ package com.casino.blackjack.message;
 
 import java.io.Serializable;
 
-import com.casino.blackjack.player.BlackjackPlayer;
-import com.casino.blackjack.table.BlackjackTable;
+import com.casino.common.player.CasinoPlayer;
+import com.casino.common.table.CasinoTable;
 import com.casino.common.user.Title;
 
 public class Message implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	public BlackjackTable table;
+	public CasinoTable table;
 	public Title title;
-	public BlackjackPlayer player;
+	public CasinoPlayer player;
 
-	public BlackjackTable getTable() {
+	public CasinoTable getTable() {
 		return table;
 	}
 
-	public void setTable(BlackjackTable table) {
+	public void setTable(CasinoTable table) {
 		this.table = table;
 	}
 
@@ -29,11 +29,11 @@ public class Message implements Serializable {
 		this.title = title;
 	}
 
-	public BlackjackPlayer getPlayer() {
+	public CasinoPlayer getPlayer() {
 		return player;
 	}
 
-	public void setPlayer(BlackjackPlayer player) {
+	public void setPlayer(CasinoPlayer player) {
 		this.player = player;
 	}
 

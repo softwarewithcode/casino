@@ -24,4 +24,6 @@ public interface IBlackjackTable {
 
 	public void onPlayerLeave(UUID playerId);
 
+	public void refresh(UUID id);
+
 }

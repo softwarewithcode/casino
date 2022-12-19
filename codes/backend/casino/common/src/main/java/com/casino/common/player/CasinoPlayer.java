@@ -121,10 +121,12 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@Override
 	public <T> void sendMessage(T message) {
 		if (!canSendMessage(message)) {
+			System.out.println("cannot send message " + getName());
 			LOGGER.log(Level.SEVERE, "Message cannot be delivered:" + message);
 			return;
 		}
 		try {
+			System.out.println("sendingMessage to " + getName());
 			bridge.session().getBasicRemote().sendText(message.toString());
 		} catch (IOException e) {
 			UUID logIdentifier = UUID.randomUUID();

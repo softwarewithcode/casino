@@ -143,9 +143,11 @@ public class BlackjackDealer implements IDealer {
 	@Override
 	public <T extends CasinoPlayer> void onPlayerArrival(T player) {
 		try {
-			notifyPlayerArrival((BlackjackPlayer) player);
-			if (!betPhaseLock.tryLock())
+			notifyPlayerArrival(player);
+			if (!betPhaseLock.tryLock()) {
+				notifyTableStatus(player);
 				return;
+			}
 			if (shouldStartGame()) {
 				startNewGame();
 				notifyAll(Title.BET_PHASE_STARTS, (BlackjackPlayer) player);
@@ -158,11 +160,18 @@ public class BlackjackDealer implements IDealer {
 
 	private void startNewGame() {
 		table.setStatus(com.casino.common.table.Status.RUNNING);
+		table.updateGamePhase(GamePhase.BET);
 		startBetPhaseClock(0l);
 	}
 
-	private void notifyPlayerArrival(BlackjackPlayer player) {
+	private void notifyTableStatus(CasinoPlayer player) {
+		String message = Mapper.createMessage(Title.STATUS_UPDATE, table, player);
+		voice.unicast(message, player);
+	}
+
+	private void notifyPlayerArrival(CasinoPlayer player) {
 		String commonMessage = Mapper.createMessage(Title.NEW_PLAYER, table, player);
+		// no need to serialize again, -> string manipulation
 		String loginMessage = Mapper.createMessage(Title.LOGIN, table, player);
 		voice.unicast(loginMessage, player);
 		voice.multicast(commonMessage, player);
@@ -216,7 +225,7 @@ public class BlackjackDealer implements IDealer {
 		}
 		table.updateGamePhase(GamePhase.PLAY);
 		updateTableActor();
-		notifyAll(Title.PLAY_TURN, (BlackjackPlayer) table.getPlayerInTurn());
+		notifyAll(Title.GAME_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
 	private void subtractBetFromBalance() {
@@ -249,7 +258,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void informTable() {
-		notifyAll(Title.PLAY_TURN, (BlackjackPlayer) table.getPlayerInTurn());
+		notifyAll(Title.GAME_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
 	private void carryOutDealerDuties() {
@@ -259,6 +268,7 @@ public class BlackjackDealer implements IDealer {
 			table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
 		if (shouldRestartBetPhase()) {
 			startBetPhaseClock(table.getThresholds().phaseDelay());
+			notifyAll(Title.BET_PHASE_STARTS, null);
 		}
 	}
 
@@ -338,6 +348,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void completeRound() {
+		LOGGER.info("Dealer starts completeRound");
 		if (table.getGamePhase() == GamePhase.ROUND_COMPLETED) {
 			LOGGER.severe("complete round called on completed round");
 			return;
@@ -356,8 +367,9 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void payout() {
+		LOGGER.info("Dealer starts payout");
 		// Deal the case where player has disconnected before payout
-		List<ICasinoPlayer> playersWithWinningChances = table.getPlayers().stream().filter(ICasinoPlayer::hasWinningChance).collect(Collectors.toList());
+		List<ICasinoPlayer> playersWithWinningChances = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasWinningChance).collect(Collectors.toList());
 		playersWithWinningChances.stream().forEach(player -> player.getHands().forEach(playerHand -> {
 			int comparison = dealerHand.compareTo(playerHand);
 			if (player.isCompensable() && dealerHand.isBlackjack())
@@ -383,6 +395,7 @@ public class BlackjackDealer implements IDealer {
 
 	private void addDealerCards() {
 		while (!dealerHand.isCompleted()) {
+			LOGGER.info("Dealer takes cards:");
 			Card card = removeLastCardFromDeck();
 			addCard(card);
 		}
@@ -391,14 +404,14 @@ public class BlackjackDealer implements IDealer {
 	public void finalizeInsurancePhase() {
 		table.updateGamePhase(GamePhase.PLAY);
 		updateTableActor();
-		Title title = table.getPlayerInTurn() != null ? Title.PLAY_TURN : Title.ROUND_COMPLETED;
+		Title title = table.getPlayerInTurn() != null ? Title.GAME_ACTION : Title.ROUND_COMPLETED;
 		notifyAll(title, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
 	public void finalizeAction(BlackjackPlayer player) {
 		updateTableActor();
 		if (table.getPlayerInTurn() != null)
-			notifyAll(Title.PLAY_TURN, (BlackjackPlayer) table.getPlayerInTurn());
+			notifyAll(Title.GAME_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
 		else
 			notifyAll(Title.ROUND_COMPLETED, (BlackjackPlayer) table.getPlayerInTurn());
 	}
@@ -418,5 +431,16 @@ public class BlackjackDealer implements IDealer {
 			table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
 		}
 		notifyAll(Title.PLAYER_LEFT, leavingPlayer);
+	}
+
+	public void sendStatusUpdate(CasinoPlayer player) {
+		String statusMessage = Mapper.createMessage(Title.STATUS_UPDATE, table, player);
+		voice.unicast(statusMessage, player);
+	}
+
+	@Override
+	public <T extends CasinoPlayer> void onWatcherArrival(T watcher) {
+		String message = Mapper.createMessage(Title.WATCHER_JOIN, table, null);
+		voice.unicast(message, watcher);
 	}
 }

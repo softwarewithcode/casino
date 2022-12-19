@@ -73,4 +73,8 @@ public interface ICasinoTable {
 
 	public void prepareNewRound();
 
+	public void updateCounterTime(int currentTime);
+
+	public int getCounterTime();
+
 }

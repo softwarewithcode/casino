@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
+import com.casino.common.player.CasinoPlayer;
 import com.casino.common.user.Title;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +34,7 @@ public class Mapper {
 		throw new RuntimeException("Message could not be converted to JSON:" + message);
 	}
 
-	public static String createMessage(Title title, BlackjackTable table, BlackjackPlayer operand) {
+	public static String createMessage(Title title, BlackjackTable table, CasinoPlayer operand) {
 		if (skipSerialization)
 			return "serialization switched off";
 		Message message = new Message();

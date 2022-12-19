@@ -12,11 +12,18 @@ import jakarta.websocket.Session;
 @Dependent
 public class UserHandler {
 
-	public Bridge createBridge(String userId, UUID tableId, Session session) {
+	public Bridge createPlayerBridge(String userId, UUID tableId, Session session) {
 		if (userId == null || userId.isBlank())
-			return createTempUser(tableId, session);
+			return createDefaultGuestPlayerBridge(tableId, session);
 		UUID validUserId = Validator.validateId(userId);
 		return fetchUserDataLikeBalanceFromDB(validUserId, tableId, session);
+	}
+
+	public Bridge createWatcherBridge(String userId, UUID tableId, Session session) {
+		if (userId == null || userId.isBlank())
+			return createDefaultWatcherBridge(tableId, session);
+//		UUID validUserId = Validator.validateId(userId);
+		return createDefaultWatcherBridge(tableId, session);
 	}
 
 	private Bridge fetchUserDataLikeBalanceFromDB(UUID userId, UUID tableId, Session session) {
@@ -25,9 +32,15 @@ public class UserHandler {
 
 	}
 
-	private Bridge createTempUser(UUID tableId, Session session) {
+	private Bridge createDefaultGuestPlayerBridge(UUID tableId, Session session) {
 		// TODO Auto-generated method stub
-		return new Bridge("guest", tableId, UUID.randomUUID(), session, new BigDecimal("1000.0"));
+		UUID id = UUID.randomUUID();
+		return new Bridge("guestPlayer" + id, tableId, id, session, new BigDecimal("1000.0"));
 	}
 
+	private Bridge createDefaultWatcherBridge(UUID tableId, Session session) {
+		// TODO Auto-generated method stub
+		UUID id = UUID.randomUUID();
+		return new Bridge("watcherGuest" + id, tableId, id, session, BigDecimal.ZERO);
+	}
 }

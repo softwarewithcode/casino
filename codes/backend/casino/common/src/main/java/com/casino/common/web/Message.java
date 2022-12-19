@@ -12,6 +12,9 @@ public class Message {
 	@JsonbProperty("userId")
 	private String userId;
 
+	@JsonbProperty("seat")
+	private String seat;
+
 	@JsonbProperty("amount")
 	private BigDecimal amount;
 
@@ -25,6 +28,14 @@ public class Message {
 
 	public String getUserId() {
 		return userId;
+	}
+
+	public String getSeat() {
+		return seat;
+	}
+
+	public void setSeat(String seat) {
+		this.seat = seat;
 	}
 
 	public void setUserId(String userId) {
