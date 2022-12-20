@@ -238,7 +238,8 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void updatePlayerStatuses() {
-		table.getSeats().stream().filter(Seat::hasPlayer).map(Seat::getPlayer).forEach(player -> {
+		List<ICasinoPlayer> players = table.getSeats().stream().filter(Seat::hasPlayer).map(Seat::getPlayer).collect(Collectors.toList());
+		players.forEach(player -> {
 			if (player.getStatus() == Status.LEFT)
 				return;
 			if (player.hasBet())
@@ -278,7 +279,8 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void removeInactivePlayers() {
-		table.getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != Status.ACTIVE).forEach(Seat::sanitize);
+		List<Seat> casinoPlayers = table.getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != Status.ACTIVE).collect(Collectors.toList());
+		casinoPlayers.forEach(Seat::sanitize);
 	}
 
 	public synchronized void prepareNewRound() {
@@ -361,7 +363,7 @@ public class BlackjackDealer implements IDealer {
 			return;
 		}
 		try {
-			completeHandsOfThePlayersWhoLeftImmediatelyAfterPlacingABet();
+			completeActiveHands();
 			if (table.hasPlayersWithWinningChances()) {
 				addDealerCards();
 				payout();
@@ -374,8 +376,8 @@ public class BlackjackDealer implements IDealer {
 		}
 	}
 
-	private void completeHandsOfThePlayersWhoLeftImmediatelyAfterPlacingABet() {
-		List<ICasinoPlayer> players = table.getPlayersWithBet().stream().filter(player -> player.hasActiveHand()).collect(Collectors.toList());
+	private void completeActiveHands() {
+		List<ICasinoPlayer> players = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasActiveHand).collect(Collectors.toList());
 		players.forEach(player -> player.getActiveHand().complete());
 	}
 
