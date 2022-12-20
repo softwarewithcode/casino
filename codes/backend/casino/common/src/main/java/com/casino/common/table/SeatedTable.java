@@ -13,19 +13,24 @@ import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.PhasePath;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * 
+ * @author softwarewithcode from GitHub
+ *
+ */
 /*
- * For example blackjack and red dog games are order based games. 
- * Roulette is not order based as people tend to add chips at the same time.
+ * For example blackjack and red dog games are order based games. Roulette is
+ * not order based as people tend to add chips at the same time.
  */
 public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	@JsonIgnore
 	private Set<Seat> seats;
 
-	protected SeatedTable(Status initialStatus, Thresholds tableConstants, UUID tableId, PhasePath phasePath) {
-		super(initialStatus, tableConstants, tableId, phasePath);
-		if (tableConstants.maxPlayers() > tableConstants.seatCount())
+	protected SeatedTable(Status initialStatus, TableInitData tableDescription, PhasePath phasePath) {
+		super(initialStatus, tableDescription, phasePath);
+		if (tableDescription.thresholds().maxPlayers() > tableDescription.thresholds().seatCount())
 			throw new IllegalArgumentException("not enough seats for the players");
-		createSeats(tableConstants.seatCount());
+		createSeats(tableDescription.thresholds().seatCount());
 	}
 
 	private void createSeats(int seatCount) {

@@ -32,6 +32,10 @@ import com.casino.common.table.timing.BetPhaseClockTask;
 import com.casino.common.user.Title;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * @author softwarewithcode from GitHub
+ * 
+ */
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
 	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");

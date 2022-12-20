@@ -4,6 +4,7 @@ module casino.service {
 	requires casino.blackjack;
 	requires jakarta.cdi;
 	requires jakarta.inject;
-	requires casino.common;
+	requires transitive casino.common;
 	requires java.logging;
+
 }

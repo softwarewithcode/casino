@@ -77,4 +77,6 @@ public interface ICasinoTable {
 
 	public int getCounterTime();
 
+	public TableDescription getTableDescription();
+
 }

@@ -31,7 +31,7 @@ public class BlackjackEndpoint {
 	@Inject
 	private UserHandler userHandler;
 	@Inject
-	private BlackjackTableService tableService = new BlackjackTableService();
+	private BlackjackTableService tableService;
 
 	private IBlackjackTable table;
 	private Bridge bridge;
@@ -107,6 +107,8 @@ public class BlackjackEndpoint {
 			throw new IllegalArgumentException("Watcher cannot play " + bridge);
 		if (bridge == null || bridge.userId() == null)
 			throw new IllegalArgumentException("Bridge detached");
+		if (table == null)
+			throw new IllegalArgumentException("Not related to real table");
 	}
 
 	private boolean containsMessage(Message message) {
@@ -128,6 +130,8 @@ public class BlackjackEndpoint {
 	public void onClose(Session session, CloseReason closeReason) {
 		try {
 			LOGGER.info("Closing session:" + closeReason);
+			if (shouldCloseImmediately(session))
+				session.close();
 			if (isPlayerSessionClosing())
 				table.onPlayerLeave(bridge.userId());
 			if (isWatcherSessionClosing())
@@ -135,6 +139,10 @@ public class BlackjackEndpoint {
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onClose error,", e);
 		}
+	}
+
+	private boolean shouldCloseImmediately(Session session) {
+		return this.table == null && session != null && session.isOpen();
 	}
 
 	private boolean isWatcherSessionClosing() {

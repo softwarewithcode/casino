@@ -1,10 +1,12 @@
 package com.casino.blackjack.table;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.casino.blackjack.dealer.BlackjackDealer;
 import com.casino.blackjack.ext.IBlackjackTable;
@@ -16,6 +18,8 @@ import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.Seat;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
+import com.casino.common.table.TableDescription;
+import com.casino.common.table.TableInitData;
 import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
@@ -23,14 +27,18 @@ import com.casino.common.user.Bridge;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * @author softwarewithcode from GitHub
+ * 
+ */
 public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
 	@JsonIgnore // Don't expose the dealer at all
 	private final BlackjackDealer dealer;
 
-	public BlackjackTable(Status initialStatus, Thresholds thresholds, UUID id) {
-		super(initialStatus, thresholds, id, PhasePathFactory.buildBlackjackPath());
-		this.dealer = new BlackjackDealer(this, thresholds);
+	public BlackjackTable(Status initialStatus, TableInitData tableDescription) {
+		super(initialStatus, tableDescription, PhasePathFactory.buildBlackjackPath());
+		this.dealer = new BlackjackDealer(this, tableDescription.thresholds());
 	}
 
 	@Override
@@ -279,4 +287,13 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			LOGGER.exiting(getClass().getName(), playerId.toString());
 		}
 	}
+
+	@Override
+	public TableDescription getTableDescription() {
+		TableDescription description = super.getTableDescription();
+		List<Integer> seats = getSeats().stream().filter(seat -> !seat.hasPlayer()).map(seat -> seat.getNumber()).collect(Collectors.toList());
+		description.setAvailablePositions(seats);
+		return description;
+	}
+
 }

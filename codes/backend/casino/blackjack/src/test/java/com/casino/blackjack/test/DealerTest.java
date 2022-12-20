@@ -22,7 +22,9 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalPlayerActionException;
+import com.casino.common.language.Language;
 import com.casino.common.table.Status;
+import com.casino.common.table.TableInitData;
 import com.casino.common.table.Thresholds;
 import com.casino.common.table.Type;
 import com.casino.common.table.phase.GamePhase;
@@ -38,9 +40,9 @@ public class DealerTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS,
-					new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
-					UUID.randomUUID());
+			Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
+			TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
+			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
@@ -107,9 +109,7 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void dealerCreatesEightDecks() {
-		Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT,
-				Type.PUBLIC);
-		BlackjackDealer d = new BlackjackDealer(null, thresholds);
+		BlackjackDealer d = new BlackjackDealer(null, table.getThresholds());
 		Assertions.assertEquals(416, d.getDecks().size());
 	}
 

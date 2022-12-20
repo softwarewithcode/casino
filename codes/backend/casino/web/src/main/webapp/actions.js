@@ -1,13 +1,36 @@
+//Tester code
+fetchTables()
+async function fetchTables(){
+	const tablesAPI = "http://localhost:8080/casino/blackjack/tables";
+	const acceptHeader = new Headers({ Accept: "application/json" });
+	const requestInit = {
+ 		method: "GET",
+  		headers: acceptHeader,
+  		body: null
+	}
+	let tables=null
+    const resp = await fetch(tablesAPI, requestInit);
+	 if(resp.status < 400)
+    	tables = await resp.json();
+    this.tables =tables;
+    //return { tables: tables, statusCode: resp.status };
+    console.log("tables"+ this.tables)
+	showTables(tables)
+}
+
 function act(title, amount) {
 	const json = { amount: amount, action: title }
 	const jsonObj = JSON.stringify(json);
 	console.log("calling :" + title + " with" + jsonObj)
 	socket.send(jsonObj);
 }
-function trySeat(seat) {
+const w = m => new Promise(r => setTimeout(r, m)) // artificial wait
+async function trySeat(seat) {
 	const json = { seat: seat, action: 'JOIN' }
 	const jsonObj = JSON.stringify(json);
 	console.log("reserving seat :" + seat + " with" + jsonObj)
+	await openTable(tables[0].id)
+	await w(1000) // waiting for WS initialization in this tester.
 	socket.send(jsonObj);
 }
 function joinAsWatcher() {
@@ -80,6 +103,17 @@ function getSuit(suit) {
 		return '\u2662'
 	if (suit == "CLUB")
 		return '\u2667'
+}
+
+
+function showTables(tables) {
+	console.log("TABLES:"+JSON.stringify(tables))
+		tables.forEach( table => {
+			document.getElementById('tablesContainer').innerHTML += "Table:ID= "+table.id 
+	
+			+"<br><br>"
+		}
+	)
 }
 
 function updateDealerCards(dealerHand) {

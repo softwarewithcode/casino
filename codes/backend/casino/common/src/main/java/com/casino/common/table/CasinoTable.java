@@ -21,10 +21,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
- * Base class for all casino tables. Gather here common data and operations what
- * could be related to all tables.
  * 
+ * @author softwarewithcode from GitHub
+ *
  */
+
 public abstract class CasinoTable implements ICasinoTable {
 
 	private static final Logger LOGGER = Logger.getLogger(CasinoTable.class.getName());
@@ -39,7 +40,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private final Thresholds thresholds;
 	@JsonIgnore
 	private final ReentrantLock playerInTurnLock;
-	@JsonProperty
+	@JsonIgnore
 	private final UUID id;
 	@JsonIgnore
 	private final Instant created;
@@ -53,17 +54,23 @@ public abstract class CasinoTable implements ICasinoTable {
 	private boolean dealerTurn;
 	@JsonIgnore
 	private volatile Status status;
+	@JsonIgnore
+	private TableInitData tableInitData;
+	@JsonIgnore
+	private final TableDescription tableDescription;
 
-	protected CasinoTable(Status initialStatus, Thresholds tableConstants, UUID id, PhasePath phases) {
+	protected CasinoTable(Status initialStatus, TableInitData initData, PhasePath phases) {
 		this.watchers = new ConcurrentHashMap<>();
 		this.status = initialStatus;
-		this.type = tableConstants.tableType();
-		this.id = id;
+		this.type = initData.tableType();
+		this.id = initData.id();
 		this.created = Instant.now();
-		this.thresholds = tableConstants;
+		this.thresholds = initData.thresholds();
 		this.clock = new Clock();
 		this.phasePath = phases;
 		this.playerInTurnLock = new ReentrantLock(true);
+		this.tableInitData = initData;
+		tableDescription = new TableDescription(initData.thresholds(), initData.id(), initData.language());
 	}
 
 	protected <T extends ICasinoPlayer> boolean joinAsWatcher(T watcher) {
@@ -195,23 +202,13 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-
-	@Override
 	public UUID getId() {
-		return id;
+		return tableInitData.id();
 	}
 
 	public GamePhase updateGamePhase(GamePhase phase) {
 		phasePath.setCurrentPhase(phase);
 		return phasePath.getPhase();
-	}
-
-	@Override
-	public String toString() {
-		return "CasinoTable [status=" + status + ", type=" + type + ", id=" + id + ", playerInTurn=" + playerInTurn + "]";
 	}
 
 	@Override
@@ -265,6 +262,15 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	public TableDescription getTableDescription() {
+		return tableDescription;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -275,4 +281,10 @@ public abstract class CasinoTable implements ICasinoTable {
 		CasinoTable other = (CasinoTable) obj;
 		return Objects.equals(id, other.id);
 	}
+
+	@Override
+	public String toString() {
+		return "CasinoTable [type=" + type + ", id=" + id + ", created=" + created + ", playerInTurn=" + playerInTurn + ", tableInitData=" + tableInitData + "]";
+	}
+
 }

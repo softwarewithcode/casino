@@ -22,7 +22,9 @@ import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.exception.PlayerNotFoundException;
+import com.casino.common.language.Language;
 import com.casino.common.table.Status;
+import com.casino.common.table.TableInitData;
 import com.casino.common.table.Thresholds;
 import com.casino.common.table.Type;
 import com.casino.common.table.phase.GamePhase;
@@ -37,9 +39,9 @@ public class BetTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS,
-					new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
-					UUID.randomUUID());
+			Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
+			TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
+			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			Field f = table.getClass().getDeclaredField("dealer");
@@ -101,7 +103,6 @@ public class BetTest extends BaseTest {
 	@Test
 	public void placingBetToPlayerNotInTableResultsInException() {
 		table.join(bridge, "0");
-		;
 		PlayerNotFoundException exception = assertThrows(PlayerNotFoundException.class, () -> {
 			table.bet(bridge2.userId(), new BigDecimal("7.0"));
 		});
@@ -149,25 +150,29 @@ public class BetTest extends BaseTest {
 	@Test
 	public void creatingATableWithNegativeBetAmountIsNotAllowed() { // In error case where minimum bet is negative
 		assertThrows(IllegalArgumentException.class, () -> {
-			new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(new BigDecimal("-1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS,
-					MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC), UUID.randomUUID());
+			Thresholds thresholds = new Thresholds(new BigDecimal("-1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS,
+					DEFAULT_SEAT_COUNT);
+			TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
+			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 		});
 	}
 
 	@Test
 	public void tableCannotBeCreatedIfMaximumBetIsLessThanMinimumBet() { // In error case where minimum bet is negative
 		assertThrows(IllegalArgumentException.class, () -> {
-			new BlackjackTable(Status.WAITING_PLAYERS, new Thresholds(new BigDecimal("1000.0"), new BigDecimal("100.0"), BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS,
-					MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC), UUID.randomUUID());
+			Thresholds thresholds = new Thresholds(new BigDecimal("1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS,
+					DEFAULT_SEAT_COUNT);
+			TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
+			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 
 		});
 	}
 
 	@Test
 	public void negativeStartingBetIsPrevented() { // In error case where minimum bet is negative
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS,
-				new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT, Type.PUBLIC),
-				UUID.randomUUID());
+		Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
+		TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
+		table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 		bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 		table.join(bridge, "1");
 		assertThrows(IllegalBetException.class, () -> {
