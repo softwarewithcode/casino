@@ -42,7 +42,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			BlackjackPlayer player = new BlackjackPlayer(bridge, this);
 			Optional<Seat> seatOptional = trySeat(seatNumber, player);
 			if (seatOptional.isEmpty()) {
-				System.out.println("no seat:!");
 				return false;
 			}
 			player.setStatus(com.casino.common.player.Status.ACTIVE);

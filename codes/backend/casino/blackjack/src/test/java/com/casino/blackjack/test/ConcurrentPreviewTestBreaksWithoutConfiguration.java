@@ -132,9 +132,9 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
 		sleep(4, ChronoUnit.SECONDS);
-		assertEquals(49, table.getReservedSeatCount());
 		assertEquals(49, playersWhoGotSeat);
 		assertEquals(51, playerWhoDidNotGetSeat);
+		assertEquals(49, table.getReservedSeatCount());
 	}
 
 	@Test
@@ -366,17 +366,18 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 
 	private List<Thread> createCasinoPlayers(int amount, CyclicBarrier casinoDoor) {
 		return IntStream.rangeClosed(0, amount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
-			Bridge randomBridge = new Bridge("player:" + index, table.getId(), UUID.randomUUID(), null, MAX_BET);
+			Bridge indexedBridge = new Bridge("player:" + index, table.getId(), UUID.randomUUID(), null, MAX_BET);
 			try {
 				int seatNumber = index;
 				if (index >= table.getSeats().size()) {
 					seatNumber = ThreadLocalRandom.current().nextInt(0, table.getSeats().size() - 1);
 				}
 				casinoDoor.await();
-				if (!table.join(randomBridge, String.valueOf(seatNumber))) {
+				if (!table.join(indexedBridge, String.valueOf(seatNumber))) {
 					addRejected();
 				} else {
 					addAccepted();
+					table.bet(indexedBridge.userId(), MAX_BET);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();

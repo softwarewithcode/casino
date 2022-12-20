@@ -237,26 +237,26 @@ public class GamePlayTests extends BaseTest {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(7, Suit.DIAMOND));
-		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(8, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
 		cards.add(Card.of(11, Suit.DIAMOND));
 		cards.add(Card.of(6, Suit.DIAMOND));// dealer
-		cards.add(Card.of(1, Suit.HEART));
-		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(6, Suit.HEART));
+		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.SPADE));
 		table.join(bridge, "0");
-		table.join(bridge2, "5");
+		table.join(bridge2, "2");
 		table.join(bridge3, "6");
 		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		table.bet(bridge2.userId(), new BigDecimal("10.0"));
 		table.bet(bridge3.userId(), new BigDecimal("25.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.hit(bridge.userId());
-		sleep(PLAYER_TIME_SECONDS * 3 + 1, ChronoUnit.SECONDS);
+		sleep(PLAYER_TIME_SECONDS * 3, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("1099.00"), table.getPlayer(bridge.userId()).getBalance());
-		assertEquals(new BigDecimal("1015.00"), table.getPlayer(bridge2.userId()).getBalance());
-		assertEquals(new BigDecimal("1037.50"), table.getPlayer(bridge3.userId()).getBalance());
+		assertEquals(new BigDecimal("1010.00"), table.getPlayer(bridge2.userId()).getBalance());
+		assertEquals(new BigDecimal("1025.00"), table.getPlayer(bridge3.userId()).getBalance());
 	}
 
 }

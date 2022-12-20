@@ -14,6 +14,7 @@ public class Clock {
 		stopClock();
 		this.ticking = true;
 		timer = new Timer(UUID.randomUUID().toString());
+		System.out.println("StartClock with delay:" + initialDelay);
 		timer.schedule(task, initialDelay, millis);
 	}
 

@@ -252,13 +252,11 @@ public class BlackjackDealer implements IDealer {
 		table.stopClock();
 		Optional<Seat> optionalPlayerActor = table.getSeats().stream().filter(seat -> seat.hasPlayerWhoCanAct()).min(Comparator.comparing(Seat::getNumber));
 		if (optionalPlayerActor.isEmpty()) {
-			System.out.println("Dealer turn starts");
 			changeTurnToDealer();
 			carryOutDealerDutiesAndNotify();
 		} else {
 			// Actor can be same as previous ->split hand
 			BlackjackPlayer player = (BlackjackPlayer) optionalPlayerActor.get().getPlayer();
-			System.out.println("player turn starts" + player);
 			table.changePlayer(player);
 			player.updateActions();
 		}
@@ -300,7 +298,7 @@ public class BlackjackDealer implements IDealer {
 
 	private void changeTurnToDealer() {
 		table.updateDealerTurn(true);
-		table.changePlayer(null);
+		table.clearPlayerInTurn();
 	}
 
 	public void doubleDown(BlackjackPlayer player) {
@@ -377,14 +375,15 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void completeHandsOfThePlayersWhoLeftImmediatelyAfterPlacingABet() {
-		table.getPlayersWithBet().stream().filter(player -> player.hasActiveHand()).forEach(player -> player.getActiveHand().complete());
+		List<ICasinoPlayer> players = table.getPlayersWithBet().stream().filter(player -> player.hasActiveHand()).collect(Collectors.toList());
+		players.forEach(player -> player.getActiveHand().complete());
 	}
 
 	private void payout() {
 		LOGGER.info("Dealer starts payout");
 		// Deal the case where player has disconnected before payout
 		List<ICasinoPlayer> playersWithWinningChances = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasWinningChance).collect(Collectors.toList());
-		playersWithWinningChances.stream().forEach(player -> player.getHands().forEach(playerHand -> {
+		playersWithWinningChances.forEach(player -> player.getHands().forEach(playerHand -> {
 			int comparison = dealerHand.compareTo(playerHand);
 			if (player.isCompensable() && dealerHand.isBlackjack())
 				player.increaseBalanceAndPayout(player.getInsuranceAmount().multiply(BigDecimal.TWO));

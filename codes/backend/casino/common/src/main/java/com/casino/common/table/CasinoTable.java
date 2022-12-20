@@ -234,6 +234,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	public void changePlayer(ICasinoPlayer player) {
+		System.out.println("ChangePlayer to:" + player.getName() + " stat " + player.getStatus());
 		if (playerInTurnLock.isHeldByCurrentThread()) {
 			playerInTurn = player;
 			if (playerInTurn != null) {
@@ -243,6 +244,10 @@ public abstract class CasinoTable implements ICasinoTable {
 			}
 		} else
 			throw new ConcurrentModificationException("Cannot update playerInTurn, lock is missing");
+	}
+
+	public void clearPlayerInTurn() {
+		this.playerInTurn = null;
 	}
 
 	@Override

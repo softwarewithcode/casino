@@ -20,13 +20,12 @@ public class BetPhaseClockTask extends TimerTask {
 
 	@Override
 	public void run() {
-		System.out.println("BetPhaseTask runs");
 		if (!table.isClockTicking()) {
 			LOGGER.fine("BetPhaseClockTask, clock not ticking:");
 			return;
 		}
 		if (shouldPrepareNewRound()) {
-			LOGGER.fine("BetPhaseClockTask, clear previous round" + table);
+			LOGGER.info("BetPhaseClockTask, clear previous round" + table);
 			table.prepareNewRound();
 		}
 		int curTime = table.getCounterTime();
