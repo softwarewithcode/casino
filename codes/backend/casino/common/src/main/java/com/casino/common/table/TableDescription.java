@@ -13,6 +13,7 @@ public class TableDescription implements Serializable {
 	private final UUID id;
 	private final Language language;
 	private List<Integer> availablePositions;
+	private GameType game;
 
 	public TableDescription(Thresholds thresholds, UUID id, Language language) {
 		super();
@@ -27,6 +28,14 @@ public class TableDescription implements Serializable {
 
 	public UUID getId() {
 		return id;
+	}
+
+	public GameType getGame() {
+		return game;
+	}
+
+	public void setGame(GameType game) {
+		this.game = game;
 	}
 
 	public Language getLanguage() {

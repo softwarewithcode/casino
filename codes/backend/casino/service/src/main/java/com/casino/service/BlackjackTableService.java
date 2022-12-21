@@ -37,17 +37,17 @@ public class BlackjackTableService {
 
 	public BlackjackTableService() {
 		super();
-		TableInitData tableInitData = createDefaultInitData();
+		TableInitData tableInitData = createDefaultInitData(new BigDecimal("5"), new BigDecimal("10"));
 		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 		tables.putIfAbsent(table.getId(), table);
-		TableInitData tableInitData2 = createDefaultInitData();
+		TableInitData tableInitData2 = createDefaultInitData(new BigDecimal("15"), new BigDecimal("100"));
 		BlackjackTable table2 = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData2);
 		tables.putIfAbsent(table2.getId(), table2);
 	}
 
-	private TableInitData createDefaultInitData() {
-		Thresholds thresholds = new Thresholds(MIN_BET_DEFAULT, MAX_BET_DEFAULT, BET_PHASE_TIME_SECONDS_DEFAULT, INSURANCE_PHASE_TIME_SECONDS_DEFAULT, PLAYER_TIME_SECONDS_DEFAULT, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS_DEFAULT,
-				MIN_PLAYER_DEFAULT, MAX_PLAYERS_DEFAULT, SEAT_COUNT_DEFAULT);
+	private TableInitData createDefaultInitData(BigDecimal min, BigDecimal max) {
+		Thresholds thresholds = new Thresholds(min, max, BET_PHASE_TIME_SECONDS_DEFAULT, INSURANCE_PHASE_TIME_SECONDS_DEFAULT, PLAYER_TIME_SECONDS_DEFAULT, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS_DEFAULT, MIN_PLAYER_DEFAULT,
+				MAX_PLAYERS_DEFAULT, SEAT_COUNT_DEFAULT);
 		TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
 		return tableInitData;
 	}

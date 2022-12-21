@@ -15,6 +15,7 @@ import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.table.GameType;
 import com.casino.common.table.Seat;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
@@ -293,6 +294,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		TableDescription description = super.getTableDescription();
 		List<Integer> seats = getSeats().stream().filter(seat -> !seat.hasPlayer()).map(seat -> seat.getNumber()).collect(Collectors.toList());
 		description.setAvailablePositions(seats);
+		description.setGame(GameType.BLACKJACK);
 		return description;
 	}
 

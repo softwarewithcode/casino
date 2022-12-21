@@ -28,11 +28,6 @@
 			<artifactId>service</artifactId>
 			<version>0.0.1</version>
 		</dependency>
-		<dependency>
-			<groupId>jakarta.servlet</groupId>
-			<artifactId>jakarta.servlet-api</artifactId>
-			<version>5.0.0</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/jakarta.ejb/jakarta.ejb-api -->
 		<dependency>
 			<groupId>jakarta.ws.rs</groupId>
@@ -94,11 +89,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>jakarta.ws.rs</groupId>
-			<artifactId>jakarta.ws.rs-api</artifactId>
-			<version>3.1.0</version>
-		</dependency>
-		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId> <!-- either Jackson or json.bind-->
 			<artifactId>jackson-core</artifactId>
 			<version>2.14.1</version>
@@ -113,6 +103,12 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.14.1</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>6.0.0</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
