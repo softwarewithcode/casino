@@ -4,13 +4,13 @@ import { defineComponent } from "vue"
 import { createSocket,send } from "@/components/composables/communication/socket/websocket"
 import { useRouter, useRoute } from 'vue-router'
 const props = defineProps<{
-  description:TableDescription
+  description:any
 }>()
 const router = useRouter()
 const openTable = (tableId:string) => {
     createSocket(tableId)
  
-    router.push({ name: 'blackjack', params: { id: tableId} })
+    router.push({ name: 'blackjack', params: { desc:props.description} })
 }
 </script>
 <template>

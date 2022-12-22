@@ -10,7 +10,7 @@ const router = createRouter({
       component: () => import("../views/Casino.vue"),
     },
     {
-        path: "/:id",
+        path: "/blackjack/:desc",
         name: "blackjack",
         props: true,
         component: () => import("../views/BlackjackTable.vue"),

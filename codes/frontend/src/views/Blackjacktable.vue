@@ -3,7 +3,7 @@ import type { TableDescription } from "@/types/casino"
 import { defineComponent } from "vue"
 import { createSocket,send } from "@/components/composables/communication/socket/websocket"
 const props = defineProps<{
-  description:TableDescription
+  desc:TableDescription
 }>()
 
 const takeSeat = (seat:string) =>{
@@ -12,5 +12,12 @@ const takeSeat = (seat:string) =>{
 </script>
 
 <template>
-TABLE
+    TABLE {{  desc.availablePositions }}
+
+    <div style="border-style: dashed solid">
+        <div v-for="position in desc.availablePositions">
+            <button>Take seat {{position}}</button>
+        </div>
+    
+    </div>
 </template>

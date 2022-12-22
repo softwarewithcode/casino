@@ -57,7 +57,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	@JsonIgnore
 	private TableInitData tableInitData;
 	@JsonIgnore
-	private final TableDescription tableDescription;
+	private final TableCard tableCard;
 
 	protected CasinoTable(Status initialStatus, TableInitData initData, PhasePath phases) {
 		this.watchers = new ConcurrentHashMap<>();
@@ -70,7 +70,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.phasePath = phases;
 		this.playerInTurnLock = new ReentrantLock(true);
 		this.tableInitData = initData;
-		tableDescription = new TableDescription(initData);
+		tableCard = new TableCard(initData);
 	}
 
 	protected <T extends ICasinoPlayer> boolean joinAsWatcher(T watcher) {
@@ -266,8 +266,8 @@ public abstract class CasinoTable implements ICasinoTable {
 		return Objects.hash(id);
 	}
 
-	public TableDescription getTableDescription() {
-		return tableDescription;
+	public TableCard getTableCard() {
+		return tableCard;
 	}
 
 	@Override

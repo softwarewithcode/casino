@@ -13,7 +13,7 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.language.Language;
 import com.casino.common.table.Game;
 import com.casino.common.table.Status;
-import com.casino.common.table.TableDescription;
+import com.casino.common.table.TableCard;
 import com.casino.common.table.TableInitData;
 import com.casino.common.table.Thresholds;
 import com.casino.common.table.Type;
@@ -72,7 +72,7 @@ public class BlackjackTableService {
 		table.removeWatcher(bridge.userId());
 	}
 
-	public List<TableDescription> fetchTableDescriptions() {
-		return tables.values().stream().filter(table -> table.getStatus().isVisible()).map(BlackjackTable::getTableDescription).collect(Collectors.toList());
+	public List<TableCard> fetchTableCards() {
+		return tables.values().stream().filter(table -> table.getStatus().isVisible()).map(BlackjackTable::getTableCard).collect(Collectors.toList());
 	}
 }

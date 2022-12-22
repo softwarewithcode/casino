@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.casino.common.table.TableDescription;
+import com.casino.common.table.TableCard;
 import com.casino.service.BlackjackTableService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,10 +24,10 @@ public class TableResource {
 	@GET
 	@Path("/tables")
 	@Produces("application/json")
-	public Response fetchTableDescriptions() {
+	public Response fetchTableCards() {
 		try {
-			List<TableDescription> descriptions = tableService.fetchTableDescriptions();
-			var json = MAPPER.writeValueAsString(descriptions);
+			List<TableCard> cards = tableService.fetchTableCards();
+			var json = MAPPER.writeValueAsString(cards);
 			return Response.ok(json).build();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "FeedBackResource error ", e);

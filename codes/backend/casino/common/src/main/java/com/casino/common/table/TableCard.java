@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import com.casino.common.language.Language;
 
-public class TableDescription implements Serializable {
+public class TableCard implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private final Thresholds thresholds;
@@ -15,7 +15,7 @@ public class TableDescription implements Serializable {
 	private final Game game;
 	private List<Integer> availablePositions;
 
-	public TableDescription(TableInitData initData) {
+	public TableCard(TableInitData initData) {
 		super();
 		this.thresholds = initData.thresholds();
 		this.id = initData.id();

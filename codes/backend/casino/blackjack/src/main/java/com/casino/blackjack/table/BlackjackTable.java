@@ -19,7 +19,7 @@ import com.casino.common.table.Game;
 import com.casino.common.table.Seat;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
-import com.casino.common.table.TableDescription;
+import com.casino.common.table.TableCard;
 import com.casino.common.table.TableInitData;
 import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
@@ -290,11 +290,11 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public TableDescription getTableDescription() {
-		TableDescription description = super.getTableDescription();
+	public TableCard getTableCard() {
+		TableCard card = super.getTableCard();
 		List<Integer> seats = getSeats().stream().filter(seat -> !seat.hasPlayer()).map(seat -> seat.getNumber()).collect(Collectors.toList());
-		description.setAvailablePositions(seats);
-		return description;
+		card.setAvailablePositions(seats);
+		return card;
 	}
 
 }
