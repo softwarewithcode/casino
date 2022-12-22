@@ -2,10 +2,10 @@ import { onMounted, computed } from "vue"
 import { defineStore } from "pinia"
 
 import { fetchTables } from "../components/composables/communication/http"
-import type { TableDescription } from "@/types/casino"
+import type { TableCard } from "@/types/casino"
 export const tableStore = defineStore("tableStore", {
   state: () => ({
-    tables: Array<TableDescription>,
+    tables: Array<TableCard>,
   }),
   getters: {
     getTables(state) {

@@ -1,5 +1,5 @@
 export interface CasinoTable {
-  description: TableDescription;
+  tableCard: TableCard;
 }
 export interface CasinoPlayer {
   name: string;
@@ -13,9 +13,9 @@ export interface CasinoHand {
   bet: number;
 }
 
-export interface TableDescription {
+export interface TableCard {
   thresholds: Thresholds;
-  availablePositions: Array<Number;
+  availablePositions: Array<Number>;
   totalPositions: number;
   name: string;
   id: string;

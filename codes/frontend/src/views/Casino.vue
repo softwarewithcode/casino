@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, onBeforeMount } from "vue"
 import { fetchTables } from "../components/composables/communication/http"
-import type { CasinoTable, TableDescription } from "../types/casino"
+import type { CasinoTable, TableCard } from "../types/casino"
 import {tableStore} from "../stores/tableStore"
 import TableDescriptionView from "../views/TableDescriptionView.vue";
 import Blackjack from "./TableDescriptionView.vue";

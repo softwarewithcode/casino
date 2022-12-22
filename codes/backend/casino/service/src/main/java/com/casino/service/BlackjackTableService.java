@@ -36,11 +36,17 @@ public class BlackjackTableService {
 
 	public BlackjackTableService() {
 		TableInitData tableInitData = createDefaultInitData(new BigDecimal("5"), new BigDecimal("10"));
-		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
-		tables.putIfAbsent(table.getId(), table);
+		BlackjackTable temp1 = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
+		tables.putIfAbsent(temp1.getId(), temp1);
 		TableInitData tableInitData2 = createDefaultInitData(new BigDecimal("15"), new BigDecimal("100"));
-		BlackjackTable table2 = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData2);
-		tables.putIfAbsent(table2.getId(), table2);
+		BlackjackTable temp2 = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData2);
+		tables.putIfAbsent(temp2.getId(), temp2);
+		TableInitData temp3 = createDefaultInitData(new BigDecimal("0.5"), new BigDecimal("1.0"));
+		BlackjackTable table3 = new BlackjackTable(Status.WAITING_PLAYERS, temp3);
+		tables.putIfAbsent(table3.getId(), table3);
+		TableInitData temp4 = createDefaultInitData(new BigDecimal("1.0"), new BigDecimal("2.0"));
+		BlackjackTable table4 = new BlackjackTable(Status.CLOSED, temp4);
+		tables.putIfAbsent(table4.getId(), table4);
 	}
 
 	private TableInitData createDefaultInitData(BigDecimal min, BigDecimal max) {
