@@ -53,6 +53,7 @@ public class BlackjackEndpoint {
 			}
 			this.tableId = id;
 			this.table = table.get();
+//			this.table.watch(bridge);
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "onOpen error ", e);
 		}
@@ -65,7 +66,7 @@ public class BlackjackEndpoint {
 			Integer watching = Integer.parseInt(watchParam);
 			if (watching != 1)
 				throw new IllegalArgumentException("watch param exist but is not what is expected");
-			this.watcher = true;
+//			this.watcher = true;
 		}
 	}
 
@@ -78,11 +79,17 @@ public class BlackjackEndpoint {
 			}
 			validateMessageAndBridge(message);
 			switch (message.getAction()) {
+			case OPEN_TABLE -> {
+				watcher = true;
+				if (!table.watch(bridge)) {
+					session.getBasicRemote().sendText("{\"title\":\"FORBIDDEN\"}");
+				}
+			}
 			case JOIN -> {
-				if (watcher) {
-					if (!table.watch(bridge))
-						session.getBasicRemote().sendText("{\"title\":\"FORBIDDEN\"}");
-				} else if (!table.join(bridge, message.getSeat()))
+				boolean player = table.join(bridge, message.getSeat());
+				if (player)
+					watcher = false;
+				else
 					session.getBasicRemote().sendText("{\"title\":\"FORBIDDEN\"}");
 			}
 			case BET -> table.bet(bridge.userId(), message.getAmount());
@@ -103,8 +110,8 @@ public class BlackjackEndpoint {
 	private void validateMessageAndBridge(Message message) {
 		if (!containsMessage(message))
 			throw new IllegalArgumentException("BlackjackEndpoint: action is missing");
-		if (watcher && message.getAction() != Action.JOIN)
-			throw new IllegalArgumentException("Watcher cannot play " + bridge);
+//		if (watcher && message.getAction() != Action.JOIN)
+//			throw new IllegalArgumentException("Watcher cannot play " + bridge);
 		if (bridge == null || bridge.userId() == null)
 			throw new IllegalArgumentException("Bridge detached");
 		if (table == null)
@@ -116,10 +123,10 @@ public class BlackjackEndpoint {
 	}
 
 	private void createBridge(Session session, Message message) {
-		if (watcher)
-			this.bridge = userHandler.createWatcherBridge(message.getUserId(), this.tableId, session);
-		else
-			this.bridge = userHandler.createPlayerBridge(message.getUserId(), this.tableId, session);
+//		if (watcher)
+		this.bridge = userHandler.createGuestPlayerBridge(message.getUserId(), this.tableId, session);
+//		else
+//			this.bridge = userHandler.createPlayerBridge(message.getUserId(), this.tableId, session);
 	}
 
 	private boolean isFirstMessage(Session session) {
@@ -134,7 +141,7 @@ public class BlackjackEndpoint {
 				session.close();
 			if (isPlayerSessionClosing())
 				table.onPlayerLeave(bridge.userId());
-			if (isWatcherSessionClosing())
+			else if (isWatcherSessionClosing())
 				tableService.removeWatcher(bridge);
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onClose error,", e);

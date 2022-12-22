@@ -15,13 +15,11 @@ import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
-import com.casino.common.table.Game;
 import com.casino.common.table.Seat;
 import com.casino.common.table.SeatedTable;
 import com.casino.common.table.Status;
 import com.casino.common.table.TableCard;
 import com.casino.common.table.TableInitData;
-import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
 import com.casino.common.user.Bridge;
@@ -55,6 +53,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			}
 			player.setStatus(com.casino.common.player.Status.ACTIVE);
 			player.setSeatNumber(seatOptional.get().getNumber());
+			super.removeWatcher(player.getId());
 			dealer.onPlayerArrival(player);
 			return true;
 		} finally {
@@ -246,10 +245,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		return dealer.getHand();
 	}
 
-	public Thresholds getThresholds() {
-		return super.getThresholds();
-	}
-
 	@Override
 	public synchronized void onTableClose() {
 		// TODO Auto-generated method stub
@@ -257,7 +252,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	@Override
 	public int getPlayerTurnTime() {
-		return getThresholds().playerHandTime();
+		return getThresholds().playerTime();
 	}
 
 	@Override

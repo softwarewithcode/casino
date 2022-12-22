@@ -65,8 +65,6 @@ public interface ICasinoTable {
 
 	public boolean isClockTicking();
 
-	public Thresholds getThresholds();
-
 	public GamePhase updateGamePhase(GamePhase phase);
 
 	boolean isGamePhase(GamePhase phase);

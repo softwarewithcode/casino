@@ -36,11 +36,9 @@ public abstract class CasinoTable implements ICasinoTable {
 	@JsonSerialize(converter = CasinoPlayersConverter.class)
 	@JsonIgnore
 	private final ConcurrentHashMap<UUID, ICasinoPlayer> watchers;
-	@JsonProperty
-	private final Thresholds thresholds;
 	@JsonIgnore
 	private final ReentrantLock playerInTurnLock;
-	@JsonIgnore
+	@JsonProperty
 	private final UUID id;
 	@JsonIgnore
 	private final Instant created;
@@ -56,7 +54,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private volatile Status status;
 	@JsonIgnore
 	private TableInitData tableInitData;
-	@JsonIgnore
+	@JsonProperty
 	private final TableCard tableCard;
 
 	protected CasinoTable(Status initialStatus, TableInitData initData, PhasePath phases) {
@@ -65,7 +63,6 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.type = initData.tableType();
 		this.id = initData.id();
 		this.created = Instant.now();
-		this.thresholds = initData.thresholds();
 		this.clock = new Clock();
 		this.phasePath = phases;
 		this.playerInTurnLock = new ReentrantLock(true);
@@ -104,7 +101,7 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public boolean isMultiplayer() {
-		return thresholds.maxPlayers() > 1;
+		return tableCard.getThresholds().maxPlayers() > 1;
 	}
 
 	@JsonIgnore
@@ -123,6 +120,11 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public boolean isReserved() {
 		return type == Type.RESERVED;
+	}
+
+	@JsonIgnore
+	public Thresholds getThresholds() {
+		return getTableCard().getThresholds();
 	}
 
 	@Override
@@ -224,6 +226,11 @@ public abstract class CasinoTable implements ICasinoTable {
 		return this.clock.getTime();
 	}
 
+	@JsonProperty
+	public GamePhase getPhase() {
+		return phasePath.getPhase();
+	}
+
 	protected boolean isPlayerInTurn(ICasinoPlayer player) {
 		if (player == null)
 			return false;
@@ -255,10 +262,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public GamePhase getGamePhase() {
 		return phasePath.getPhase();
-	}
-
-	public Thresholds getThresholds() {
-		return thresholds;
 	}
 
 	@Override

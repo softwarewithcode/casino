@@ -16,7 +16,7 @@ export interface CasinoHand {
 export interface TableCard {
   thresholds: Thresholds;
   availablePositions: Array<Number>;
-  totalPositions: number;
+
   name: string;
   id: string;
   language: string;
@@ -26,6 +26,8 @@ export interface TableCard {
 export interface Thresholds {
   minimumBet: number;
   maximumBet: number;
+  maxPlayers: number;
+  seatCount: number;
 }
 
 export interface Card {

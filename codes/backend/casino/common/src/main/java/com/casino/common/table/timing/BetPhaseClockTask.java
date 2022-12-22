@@ -14,7 +14,7 @@ public class BetPhaseClockTask extends TimerTask {
 
 	public BetPhaseClockTask(ICasinoTable table) {
 		this.table = table;
-		Thresholds thresholds = table.getThresholds();
+		Thresholds thresholds = table.getTableCard().getThresholds();
 		table.updateCounterTime(thresholds.betPhaseTime());
 	}
 
@@ -41,7 +41,7 @@ public class BetPhaseClockTask extends TimerTask {
 	}
 
 	private boolean shouldPrepareNewRound() {
-		return table.getCounterTime() == table.getThresholds().betPhaseTime() && table.getGamePhase() == GamePhase.ROUND_COMPLETED;
+		return table.getCounterTime() == table.getTableCard().getThresholds().betPhaseTime() && table.getGamePhase() == GamePhase.ROUND_COMPLETED;
 	}
 
 }

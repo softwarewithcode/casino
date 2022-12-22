@@ -40,6 +40,7 @@ public class Seat {
 	}
 
 	public void sanitize() {
+		System.out.println("Cleaning seat:"+this.number +" player:"+player);
 		player = null;
 	}
 

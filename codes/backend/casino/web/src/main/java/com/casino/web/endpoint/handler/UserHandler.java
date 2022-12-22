@@ -19,11 +19,11 @@ public class UserHandler {
 		return fetchUserDataLikeBalanceFromDB(validUserId, tableId, session);
 	}
 
-	public Bridge createWatcherBridge(String userId, UUID tableId, Session session) {
-		if (userId == null || userId.isBlank())
-			return createDefaultWatcherBridge(tableId, session);
-//		UUID validUserId = Validator.validateId(userId);
-		return createDefaultWatcherBridge(tableId, session);
+	private static int tempNotThreadSafe = 0;
+
+	public Bridge createGuestPlayerBridge(String userId, UUID tableId, Session session) {
+		tempNotThreadSafe++;
+		return createDefaultGuestPlayerBridge(tableId, session);
 	}
 
 	private Bridge fetchUserDataLikeBalanceFromDB(UUID userId, UUID tableId, Session session) {
@@ -35,12 +35,12 @@ public class UserHandler {
 	private Bridge createDefaultGuestPlayerBridge(UUID tableId, Session session) {
 		// TODO Auto-generated method stub
 		UUID id = UUID.randomUUID();
-		return new Bridge("guestPlayer" + id, tableId, id, session, new BigDecimal("1000.0"));
+		return new Bridge("guestP" + tempNotThreadSafe, tableId, id, session, new BigDecimal("1000.0"));
 	}
 
-	private Bridge createDefaultWatcherBridge(UUID tableId, Session session) {
-		// TODO Auto-generated method stub
-		UUID id = UUID.randomUUID();
-		return new Bridge("watcherGuest" + id, tableId, id, session, BigDecimal.ZERO);
-	}
+//	private Bridge createDefaultWatcherBridge(UUID tableId, Session session) {
+//		// TODO Auto-generated method stub
+//		UUID id = UUID.randomUUID();
+//		return new Bridge("watcherGuest" + id, tableId, id, session, new BigDecimal("1000.0"));
+//	}
 }
