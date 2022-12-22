@@ -1,5 +1,5 @@
 package com.casino.common.table;
 
-public enum GameType {
+public enum Game {
 	BLACKJACK
 }

@@ -17,6 +17,7 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.language.Language;
+import com.casino.common.table.Game;
 import com.casino.common.table.Status;
 import com.casino.common.table.TableInitData;
 import com.casino.common.table.Thresholds;
@@ -33,7 +34,7 @@ public class BalanceTest extends BaseTest {
 	public void initTest() {
 		try {
 			Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
-			TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
+			TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC, Game.BLACKJACK);
 			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
@@ -117,7 +118,7 @@ public class BalanceTest extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("1075.15"), table.getPlayer(bridge.userId()).getBalance());
 	}
-	
+
 	@Test
 	public void totalBetIsUpdated() {
 		List<Card> cards = dealer.getDecks();

@@ -3,10 +3,16 @@ package com.casino.blackjack.test;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
 
 import com.casino.blackjack.message.Mapper;
+import com.casino.blackjack.table.BlackjackTable;
+import com.casino.common.language.Language;
+import com.casino.common.table.Game;
+import com.casino.common.table.TableInitData;
+import com.casino.common.table.Thresholds;
 import com.casino.common.table.Type;
 import com.casino.common.user.Bridge;
 
@@ -29,6 +35,36 @@ public class BaseTest {
 	public static void setup() {
 		System.out.println("before all test -> setting skip serialization parameter ");
 		System.getProperties().setProperty(Mapper.JUNIT_RUNNER, "true");
+	}
+
+	private BlackjackTable defaultTable;
+
+	protected Thresholds getDefaultThresholds() {
+		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
+	}
+
+	protected Thresholds getThresholdsWithMinBets(BigDecimal minbet, BigDecimal maxBet) {
+		return new Thresholds(minbet, maxBet, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
+	}
+
+	protected Thresholds getThresholdsWithPlayersMinAndMax(Integer minPlayers, Integer maxPlayers) {
+		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, minPlayers, maxPlayers, maxPlayers);
+	}
+
+	protected TableInitData getDefaultTableInitData() {
+		return new TableInitData(getDefaultThresholds(), UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC, Game.BLACKJACK);
+	}
+
+	protected TableInitData getDefaultTableInitDataWithThresholds(Thresholds thresholds) {
+		return new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC, Game.BLACKJACK);
+	}
+
+	protected TableInitData getDefaultTableInitDataWithBets(BigDecimal minBet, BigDecimal maxBet) {
+		return new TableInitData(getThresholdsWithMinBets(minBet, maxBet), UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC, Game.BLACKJACK);
+	}
+
+	protected TableInitData getDefaultTableInitDataWithPlayersMinAndMax(Integer minPlayers, Integer maxPlayers) {
+		return new TableInitData(getThresholdsWithPlayersMinAndMax(minPlayers, maxPlayers), UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC, Game.BLACKJACK);
 	}
 
 	protected void sleep(int i, ChronoUnit unit) {

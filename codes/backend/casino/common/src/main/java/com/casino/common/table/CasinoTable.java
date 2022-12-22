@@ -70,7 +70,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.phasePath = phases;
 		this.playerInTurnLock = new ReentrantLock(true);
 		this.tableInitData = initData;
-		tableDescription = new TableDescription(initData.thresholds(), initData.id(), initData.language());
+		tableDescription = new TableDescription(initData);
 	}
 
 	protected <T extends ICasinoPlayer> boolean joinAsWatcher(T watcher) {

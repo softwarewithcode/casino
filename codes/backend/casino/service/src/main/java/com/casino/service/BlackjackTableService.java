@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.casino.blackjack.ext.IBlackjackTable;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.language.Language;
+import com.casino.common.table.Game;
 import com.casino.common.table.Status;
 import com.casino.common.table.TableDescription;
 import com.casino.common.table.TableInitData;
@@ -23,8 +24,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class BlackjackTableService {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTableService.class.getName());
-	private static final BigDecimal MIN_BET_DEFAULT = new BigDecimal("5.0");
-	private static final BigDecimal MAX_BET_DEFAULT = new BigDecimal("100.0");
 	private static final Integer BET_PHASE_TIME_SECONDS_DEFAULT = 15;
 	private static final Integer INSURANCE_PHASE_TIME_SECONDS_DEFAULT = 11;
 	private static final Integer PLAYER_TIME_SECONDS_DEFAULT = 30;
@@ -36,7 +35,6 @@ public class BlackjackTableService {
 	private final ConcurrentHashMap<UUID, BlackjackTable> tables = new ConcurrentHashMap<>();
 
 	public BlackjackTableService() {
-		super();
 		TableInitData tableInitData = createDefaultInitData(new BigDecimal("5"), new BigDecimal("10"));
 		BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 		tables.putIfAbsent(table.getId(), table);
@@ -48,7 +46,7 @@ public class BlackjackTableService {
 	private TableInitData createDefaultInitData(BigDecimal min, BigDecimal max) {
 		Thresholds thresholds = new Thresholds(min, max, BET_PHASE_TIME_SECONDS_DEFAULT, INSURANCE_PHASE_TIME_SECONDS_DEFAULT, PLAYER_TIME_SECONDS_DEFAULT, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS_DEFAULT, MIN_PLAYER_DEFAULT,
 				MAX_PLAYERS_DEFAULT, SEAT_COUNT_DEFAULT);
-		TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
+		TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC, Game.BLACKJACK);
 		return tableInitData;
 	}
 

@@ -22,11 +22,8 @@ import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.exception.PlayerNotFoundException;
-import com.casino.common.language.Language;
 import com.casino.common.table.Status;
 import com.casino.common.table.TableInitData;
-import com.casino.common.table.Thresholds;
-import com.casino.common.table.Type;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.user.Bridge;
 
@@ -34,18 +31,13 @@ public class BetTest extends BaseTest {
 	private BlackjackTable table;
 	private BlackjackDealer dealer;
 
-//	private BlackjackPlayer blackjackPlayer;
-
 	@BeforeEach
 	public void initTest() {
 		try {
-			Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
-			TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
-			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
+			table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			Field f = table.getClass().getDeclaredField("dealer");
-//			blackjackPlayer = new BlackjackPlayer(bridge, table);
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
 			List<Card> cards = dealer.getDecks();
@@ -150,30 +142,22 @@ public class BetTest extends BaseTest {
 	@Test
 	public void creatingATableWithNegativeBetAmountIsNotAllowed() { // In error case where minimum bet is negative
 		assertThrows(IllegalArgumentException.class, () -> {
-			Thresholds thresholds = new Thresholds(new BigDecimal("-1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS,
-					DEFAULT_SEAT_COUNT);
-			TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
+			TableInitData tableInitData = getDefaultTableInitDataWithBets(new BigDecimal("-1000.0"), MAX_BET);
 			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 		});
 	}
 
 	@Test
-	public void tableCannotBeCreatedIfMaximumBetIsLessThanMinimumBet() { // In error case where minimum bet is negative
+	public void tableCannotBeCreatedIfMaximumBetIsLessThanMinimumBet() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			Thresholds thresholds = new Thresholds(new BigDecimal("1000.0"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS,
-					DEFAULT_SEAT_COUNT);
-			TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
+			TableInitData tableInitData = getDefaultTableInitDataWithBets(new BigDecimal("1000.0"), MAX_BET);
 			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
-
 		});
 	}
 
 	@Test
-	public void negativeStartingBetIsPrevented() { // In error case where minimum bet is negative
-		Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
-		TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
-		table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
-		bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
+	public void negativeStartingBetIsPrevented() {
+		table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
 		table.join(bridge, "1");
 		assertThrows(IllegalBetException.class, () -> {
 			table.bet(bridge.userId(), new BigDecimal("-10.1"));

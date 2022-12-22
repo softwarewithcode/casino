@@ -20,24 +20,17 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalPlayerActionException;
-import com.casino.common.language.Language;
 import com.casino.common.table.Status;
-import com.casino.common.table.TableInitData;
-import com.casino.common.table.Thresholds;
-import com.casino.common.table.Type;
 import com.casino.common.user.Bridge;
 
 public class StartingHandSplitTest extends BaseTest {
 	private BlackjackTable table;
-//	private BlackjackPlayer blackjackPlayer;
 	private BlackjackDealer dealer;
 
 	@BeforeEach
 	public void initTest() {
 		try {
-			Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
-			TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC);
-			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
+			table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge2 = new Bridge("JohnDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("100.0"));
 			Field f = table.getClass().getDeclaredField("dealer");
