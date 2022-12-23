@@ -1,10 +1,8 @@
 # casino
 
-## web module with tester page 13/12/2022
-Web module and tester html page can run on different servers that supports Jakarta EE 9.1 and WebSockets. 
-<br>For example TomEE Plume 9.0.0.RC1 <br> https://tomee.apache.org/download.html <br>
-http://localhost:8080/casino/ -> context-root and port from the logs or by custom configuration <br>
-Browser tries to contact ws://localhost:8080/casino/blackjack/.. -> if app is running http://localhost:8080/casino.web/ -> change tester.html accordingly
+## User interface 23/12/2022
+Frontend folder contains UI which is required to build and run separately during development phase. Original tester.html is updated no longer. Intention is to bring some test versions of the UI at some point into web-module.
+<br> Clicking "open table" initiates a socket session, browser tries to connect ws://localhost:8080/casino/blackjack/{tableId} 
 ## initial idea and goals 25/11/2022
 * Build a casino where play money is used 
 * Start with a blackjack game 
