@@ -7,6 +7,7 @@ export interface CasinoPlayer {
   balance: number;
   totalBet: number;
 }
+
 export interface CasinoHand {
   cards: Card[];
   values: [];
@@ -16,7 +17,6 @@ export interface CasinoHand {
 export interface TableCard {
   thresholds: Thresholds;
   availablePositions: Array<Number>;
-
   name: string;
   id: string;
   language: string;

@@ -1,5 +1,6 @@
 package com.casino.common.table;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import com.casino.common.bet.BetUtil;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.PhasePath;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 
@@ -115,6 +117,11 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	public Set<Seat> getSeats() {
 		return seats;
+	}
+
+	@JsonProperty("seats")
+	public List<Seat> getSeatsAsList() {
+		return new ArrayList<>(seats);
 	}
 
 	public boolean hasSeat(ICasinoPlayer p) {

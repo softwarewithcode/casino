@@ -1,53 +1,46 @@
 <script setup lang="ts">
 import type { BlackjackPlayer, BlackjackTable } from "@/types/blackjack";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useTableStore } from "../stores/tableStore";
 import { storeToRefs } from "pinia";
 
 const props = defineProps<{ tableId: string }>();
 const store = useTableStore();
-const { table } = storeToRefs(store);
-const tbl = ref<BlackjackTable>();
+const { table, command, commandPlayerId, me } = storeToRefs(store);
 
+onMounted(() => {});
 const takeSeat = (seat: string) => {
   useSend({ action: "JOIN", seat: seat });
 };
 
 let player: BlackjackPlayer | undefined;
-const getPlayerFromSeat = (seatNumber: number) => {
-  player = table.value.players.find((player) => player.seatNumber === seatNumber
-  );
-  return player;
-};
+
+const iHaveSeat = computed<boolean>(() => {
+    console.log("seat:"+me.value?.seatNumber)
+  return me.value?.seatNumber >= 0;
+})
+
 const isPhase = (phase: String) => {
   console.log("phase:" + table.value.title);
   return table.value.title === phase;
-};
+}
 </script>
 
 <template>
   Table {{ table.tableCard.id }}
-  <div
-    style="
-      border-style: dashed solid;
-      height: 200px;
-      width: 700px;
-      display: flex;
-    "
-  >
+  <div style=" border-style: dashed solid; height: 200px;  width: 700px;  display: flex; "  >
     <div id="players" style="align-self: flex-end">
-      <span v-for="index in table.tableCard.thresholds.seatCount" :key="index">
-        <span v-if="!getPlayerFromSeat(index)">
+      <span v-for="(seat, index) in table.seats" :key="index">
+        <span v-if="!iHaveSeat && seat.available">
           <button @click="takeSeat(index.toString())">
             Take seat {{ index }}
           </button>
         </span>
-        <span v-else>
-          Player {{ player?.name }} balance: {{ player?.balance }}
-          <span v-if="isPhase('BET_PHASE_STARTS')">
-            BetPhase. Show coins, slider or <input type="text" id="q" />
-          </span>
+        <span v-else-if="!seat.available">
+            {{seat.player.name}} <br>
+            Money:{{seat.player.balance}} <br>
+            Bet: {{seat.player.totalBet}} <br>
         </span>
       </span>
     </div>

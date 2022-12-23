@@ -2,6 +2,7 @@ package com.casino.common.table;
 
 import java.time.Instant;
 import java.util.ConcurrentModificationException;
+import java.util.List;
 import java.util.Objects;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -9,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
@@ -56,7 +58,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private TableInitData tableInitData;
 	@JsonProperty
 	private final TableCard tableCard;
-
+	
 	protected CasinoTable(Status initialStatus, TableInitData initData, PhasePath phases) {
 		this.watchers = new ConcurrentHashMap<>();
 		this.status = initialStatus;

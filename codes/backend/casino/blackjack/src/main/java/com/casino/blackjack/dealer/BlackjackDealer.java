@@ -219,7 +219,7 @@ public class BlackjackDealer implements IDealer {
 		updatePlayerStatuses();
 		if (!shouldDealStartingHands()) {
 			LOGGER.info("dealer does not deal cards now");
-			removeInactivePlayers();
+			//removeInactivePlayers(); commented for testing 
 			return;
 		}
 		subtractBetFromBalance();
@@ -439,12 +439,13 @@ public class BlackjackDealer implements IDealer {
 		finishInactivePlayerTurn(leavingPlayer);
 		if (!table.getGamePhase().isOnGoingRound()) {
 			removeInactivePlayers();
-		}
+			notifyAll(Title.PLAYER_LEFT, leavingPlayer);
+		} else
+			notifyAll(Title.SIT_OUT, leavingPlayer);
 		if (table.getPlayers().size() == 0) {
 			table.stopClock();
 			table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
 		}
-		notifyAll(Title.PLAYER_LEFT, leavingPlayer);
 	}
 
 	private void finishInactivePlayerTurn(BlackjackPlayer player) {
@@ -467,7 +468,7 @@ public class BlackjackDealer implements IDealer {
 
 	@Override
 	public <T extends CasinoPlayer> void onWatcherArrival(T watcher) {
-		String message = Mapper.createMessage(Title.WATCHER_JOIN, table, null);
+		String message = Mapper.createMessage(Title.OPEN_TABLE, table, null);
 		voice.unicast(message, watcher);
 	}
 }
