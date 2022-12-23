@@ -1,7 +1,6 @@
-import type { SocketMessageHandler } from "@/types/sockethander";
+
 import { handle } from "./handler";
 let websocket: WebSocket;
-let handler: SocketMessageHandler;
 const base = "ws://localhost:8080/casino/blackjack/";
 const watch = "?watch=1";
 const openTableJSON = '{ "action": "OPEN_TABLE"}';
