@@ -13,7 +13,7 @@ const router = createRouter({
         path: "/blackjack/:tableId",
         name: "blackjack",
         props: true,
-        component: () => import("../views/BlackjackTable.vue"),
+        component: () => import("../views/BlackjackTableView.vue"),
       },
   ],
 });
