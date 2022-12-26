@@ -14,29 +14,35 @@ export function handle(data: any) {
     case Command.LOGIN:
       console.log("login");
       store.$patch({
-        me: data.player,
+        player: data.player,
       });
+      break;
     case Command.OPEN_TABLE:
       handleTableOpen(data);
+      break;
     case Command.NEW_PLAYER:
       updateTable(data);
+      break;
     case Command.PLAYER_LEFT: //Server keeps the player in list until round is finished
       updateTable(data);
+      break;
   }
 }
+const w = m => new Promise(r => setTimeout(r, m))
 
 const handleTableOpen = async (data: any) => {
-  console.log("PATCH:" + JSON.stringify(data));
+  console.log("handleTableOpen");
   let table = data.table;
+  router.push({ name: "blackjack", params: { tableId: table.id } });
   store.$patch({
     table: table,
   });
-  router.push({ name: "blackjack", params: { tableId: table.id } });
 };
 
 const updateTable = async (data: any) => {
-  console.log("updatePlayer:" + JSON.stringify(data));
+  console.log("updateTable:");
   store.$patch({
-    table: data.table, // updates whole table instead of players.. TODO
+    table: data.table,
+    command: data.title,
   });
 };

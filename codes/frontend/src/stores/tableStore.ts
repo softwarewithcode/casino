@@ -10,7 +10,7 @@ export const useTableStore = defineStore("tableStore", {
     table: {} as BlackjackTable, //{} as any //{} as CasinoTable,
     command: {} as String,
     commandPlayerId: String,
-    me: {} as BlackjackPlayer,
+    player: {} as BlackjackPlayer,
   }),
   getters: {
     getTables(state) {
@@ -30,7 +30,8 @@ export const useTableStore = defineStore("tableStore", {
       }
     },
     async login(player: BlackjackPlayer) {
-      this.me = player;
+      this.player = player;
+      console.log("store Login:"+this.player)
     },
   },
 });

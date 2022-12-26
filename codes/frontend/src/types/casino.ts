@@ -35,6 +35,14 @@ export interface Card {
   suit: SUIT;
 }
 
+export interface Vector {
+  x: number;
+  y: number;
+}
+export interface CasinoFont {
+  faceAndSize: string;
+  color: string;
+}
 export enum SUIT {
   CLUB,
   DIAMOND,
