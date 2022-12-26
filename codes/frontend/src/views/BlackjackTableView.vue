@@ -9,7 +9,7 @@ import { storeToRefs } from "pinia";
 const props = defineProps<{ tableId: string }>();
 const canvasReady = ref<boolean>(false);
 const store = useTableStore();
-const { table, command, commandPlayerId, player } = storeToRefs(store);
+const { table, command, commandPlayerId, player, counter } = storeToRefs(store);
 
 store.$subscribe((mutation, state) => {
   if (mutation.type === "patch object") {
@@ -75,9 +75,10 @@ const seatStyle = (seatNumber:number) => {
             </button>
         </div>
     </div>
-    <div v-if="canvasReady" id="actionRow">        
-        <button v-if="command === 'BET_PHASE_STARTS' " @click="bet(50)" >
-            Bet 50
+    <div v-if="canvasReady" id="actionRow"> 
+        {{ counter }}       
+        <button v-if="command === 'BET_PHASE_STARTS' " @click="bet(10)" >
+            Bet 50 
         </button>
     </div>
   </div>

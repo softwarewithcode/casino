@@ -8,9 +8,10 @@ export const useTableStore = defineStore("tableStore", {
   state: () => ({
     tables: [] as TableCard[],
     table: {} as BlackjackTable, //{} as any //{} as CasinoTable,
-    command: {} as String,
-    commandPlayerId: String,
+    command: {} as string,
+    commandPlayerId: {} as string,
     player: {} as BlackjackPlayer,
+    counter: {} as number
   }),
   getters: {
     getTables(state) {
@@ -18,6 +19,9 @@ export const useTableStore = defineStore("tableStore", {
     },
     getTable(state) {
       return state.table;
+    },
+    getCounter(state) {
+      return state.counter;
     },
   },
   actions: {
@@ -31,7 +35,13 @@ export const useTableStore = defineStore("tableStore", {
     },
     async login(player: BlackjackPlayer) {
       this.player = player;
-      console.log("store Login:"+this.player)
+      console.log("store Login:" + this.player);
+    },
+    reduceCounter() {
+      console.log("reduceCounter" +JSON.stringify( this.counter));
+      let counterCurrent = this.counter
+      counterCurrent--
+      this.counter = counterCurrent
     },
   },
 });

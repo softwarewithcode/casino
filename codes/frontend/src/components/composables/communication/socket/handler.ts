@@ -2,6 +2,7 @@ import { useTableStore } from "../../../../stores/tableStore";
 import { useRouter, useRoute } from "vue-router";
 import router from "../../../../router/router";
 import { Command } from "@/types/blackjack";
+import { useCounter } from "../../timing/clock";
 const store = useTableStore();
 //const router = useRouter()
 
@@ -49,9 +50,10 @@ const updateTable = async (data: any) => {
   });
 };
 const startBetPhase = async (data: any) => {
-    console.log("startBetPhase:");
-    store.$patch({
-      command: data.title,
-    });
-  };
-
+  console.log("startBetPhase:" + JSON.stringify(data));
+  await store.$patch({
+    command: data.title,
+    counter: data.table.counterTime,
+  });
+  useCounter();
+};
