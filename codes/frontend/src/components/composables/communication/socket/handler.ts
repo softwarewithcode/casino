@@ -26,9 +26,11 @@ export function handle(data: any) {
     case Command.PLAYER_LEFT: //Server keeps the player in list until round is finished
       updateTable(data);
       break;
+    case Command.BET_PHASE_STARTS:
+      startBetPhase(data);
+      break;
   }
 }
-const w = m => new Promise(r => setTimeout(r, m))
 
 const handleTableOpen = async (data: any) => {
   console.log("handleTableOpen");
@@ -46,3 +48,10 @@ const updateTable = async (data: any) => {
     command: data.title,
   });
 };
+const startBetPhase = async (data: any) => {
+    console.log("startBetPhase:");
+    store.$patch({
+      command: data.title,
+    });
+  };
+

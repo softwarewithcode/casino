@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { BlackjackPlayer, BlackjackTable, Seat } from "@/types/blackjack";
 import { useActorsPainter, useCanvasInitializer} from "../components/composables/rendering/canvasUtils";
+import { useCounter} from "../components/composables/timing/clock";
 import { onMounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useTableStore } from "../stores/tableStore";
@@ -26,6 +27,9 @@ const takeSeat = (seat: string) => {
   useSend({ action: "JOIN", seat: seat });
 };
 
+const bet = (amount: number) => {
+  useSend({ action: "BET", amount:amount });
+};
 
 const orderedSeatsByNumber = computed<Array<Seat>>(() => {
   return table.value.seats.sort((a, b) => a.number - b.number);
@@ -64,12 +68,17 @@ const seatStyle = (seatNumber:number) => {
   <div style="position: relative">
     Table {{ table?.tableCard?.id }} {{ player }} ready:{{ canvasReady }}
     <canvas id="canvas" width="1800" height="600" style="border-style: dashed solid"></canvas>
-    <div id="buttonRow" >
+    <div id="buttonRow">
         <div v-if="canvasReady" v-for="(seat, index) in orderedSeatsByNumber" :key="seat.number" :id="seat.number.toString()" :style =" seatStyle(seat.number)">
             <button v-if="seat.available && !player.seatNumber" @click="takeSeat(seat.number.toString())" >
                 Take {{ seat.number + 1 }}
             </button>
         </div>
+    </div>
+    <div v-if="canvasReady" id="actionRow">        
+        <button v-if="command === 'BET_PHASE_STARTS' " @click="bet(50)" >
+            Bet 50
+        </button>
     </div>
   </div>
 </template>
