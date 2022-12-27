@@ -192,7 +192,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private boolean shouldDealStartingHands() {
-		System.out.println("ShouldStartDealing?:"+table.isGamePhase(GamePhase.BETS_COMPLETED)+ "  bet:"+ somebodyHasBet());
+		System.out.println("ShouldStartDealing?:" + table.isGamePhase(GamePhase.BETS_COMPLETED) + "  bet:" + somebodyHasBet());
 		return table.isGamePhase(GamePhase.BETS_COMPLETED) && somebodyHasBet() && isEnoughCardsForPlayersAndDealer();
 	}
 
@@ -220,7 +220,7 @@ public class BlackjackDealer implements IDealer {
 		updatePlayerStatuses();
 		if (!shouldDealStartingHands()) {
 			LOGGER.info("dealer does not deal cards now");
-			//removeInactivePlayers(); commented for testing 
+			// removeInactivePlayers(); commented for testing
 			return;
 		}
 		subtractBetFromBalance();
@@ -389,20 +389,22 @@ public class BlackjackDealer implements IDealer {
 	private void payout() {
 		LOGGER.info("Dealer starts payout");
 		// Deal the case where player has disconnected before payout
-		List<ICasinoPlayer> playersWithWinningChances = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasWinningChance).collect(Collectors.toList());
+		List<ICasinoPlayer> playersWithWinningChances = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasWinningChance).toList();
 		playersWithWinningChances.forEach(player -> player.getHands().forEach(playerHand -> {
 			int comparison = dealerHand.compareTo(playerHand);
-			if (player.isCompensable() && dealerHand.isBlackjack())
+			if (shouldPayInsuranceBet(player))
 				player.increaseBalanceAndPayout(player.getInsuranceAmount().multiply(BigDecimal.TWO));
 			if (evenResult(comparison))
 				player.increaseBalanceAndPayout(playerHand.getBet());
 			else if (playerWins(comparison)) {
-				if (playerHand.isBlackjack())
-					player.increaseBalanceAndPayout(playerHand.getBet().multiply(BLACKJACK_FACTOR));
-				else
-					player.increaseBalanceAndPayout(playerHand.getBet().multiply(BigDecimal.TWO));
+				BigDecimal multiplier = playerHand.isBlackjack() ? BLACKJACK_FACTOR : BigDecimal.TWO;
+				player.increaseBalanceAndPayout(playerHand.getBet().multiply(multiplier));
 			}
 		}));
+	}
+
+	private boolean shouldPayInsuranceBet(ICasinoPlayer player) {
+		return player.isCompensable() && dealerHand.isBlackjack();
 	}
 
 	private boolean evenResult(int comparison) {
