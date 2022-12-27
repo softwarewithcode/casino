@@ -6,11 +6,12 @@ export interface CasinoPlayer {
   id: string;
   balance: number;
   totalBet: number;
+  actions: [] string
 }
 
 export interface CasinoHand {
-  cards: Card[];
-  values: [];
+    values: [];
+    cards: Card[];
   bet: number;
 }
 
