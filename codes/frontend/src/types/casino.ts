@@ -34,6 +34,7 @@ export interface Thresholds {
 export interface Card {
   rank: number;
   suit: SUIT;
+  visible: boolean
 }
 
 export interface Vector {

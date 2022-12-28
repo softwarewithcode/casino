@@ -89,7 +89,6 @@ const seatStyle = (seatNumber:number) => {
                 </button>
             </div>
         </div>
-        {{ player }}
         <div v-if="canvasReady && player.seatNumber>=0 && table.gamePhase === 'BET' " id="actionRow">
             {{ counter }}
             <button @click="bet(1)">
