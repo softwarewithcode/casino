@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { BlackjackPlayer, BlackjackTable, Seat } from "@/types/blackjack";
-import { useActorsPainter, useCanvasInitializer, useInitialDealPainter} from "../components/composables/rendering/canvasUtils";
+import { PlayerAction, type BlackjackPlayer, type Seat } from "@/types/blackjack";
+import { useActorsPainter, useCanvasInitializer, useInitialDealPainter,useCardsAndHandValuesPainter} from "../components/composables/rendering/canvasUtils";
 import { useCounterStart} from "../components/composables/timing/clock";
 import { onMounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
@@ -12,33 +12,38 @@ const store = useTableStore();
 const { table, command, commandPlayerId, player, counter } = storeToRefs(store);
 
         store.$subscribe((mutation, state) => {
-        if (mutation.type === "patch object") {
-            console.log("mutate:" + mutation.payload);
-                drawTable();
+        if (mutation.type === "patch object" ) {
+            console.log("mutate:" + JSON.stringify(mutation.payload));
+            drawTable(false);
         } 
         });
 
-        store.$onAction(
-        ({ name, store, args, after, onError,  }) => {
-            console.log(`OnAction name `+name +" mapActions "+mapActions.name )
-            if(name ==="showInitialDeal"){
-                useInitialDealPainter(table.value,getCenterPlayer(), getCanvas())
+        store.$onAction(({ name, store, args, after, onError,  }) => {
+                console.log(`OnAction name `+name +" mapActions "+mapActions.name )
+                if(name ==="showInitialDeal"){
+                    console.log("SHOW_INITIAL_DEAL")
+                    drawTable(true)
+                }
             }
-        }
         )
         onMounted(() => {
-        console.log("onMounted");
-        canvasReady.value = true;
-        useCanvasInitializer(getCanvas());
-        drawTable();
+            console.log("onMounted");
+            canvasReady.value = true;
+            useCanvasInitializer(getCanvas());
+            drawTable(false);
         });
         const takeSeat = (seat: string) => {
-        useSend({ action: "JOIN", seat: seat });
+            useSend({ action: "JOIN", seat: seat });
         };
 
         const bet = (amount: number) => {
-  useSend({ action: "BET", amount:amount });
-};
+            useSend({ action: "BET", amount:amount });
+        };
+        const sendAction = (action: string) => {
+            useSend({ action: action});
+        };
+   
+        
 
 const showInitialDeal = () => {
 
@@ -58,9 +63,16 @@ const clearCanvas = (): HTMLCanvasElement =>{
     ctx?.clearRect(0, 0, canvas.width, canvas.height)
     return canvas
 }
-const drawTable = () => {
+const drawTable = async (initialDeal:boolean)  => {
     console.log("drawTable");
-    useActorsPainter(table.value, clearCanvas(), getCenterPlayer());
+    const canvas:HTMLCanvasElement = clearCanvas()
+    useActorsPainter(table.value, getCenterPlayer(),canvas, );
+    if(initialDeal){
+        useInitialDealPainter(table.value, getCenterPlayer(), canvas)
+    }else{
+        useCardsAndHandValuesPainter(table.value, getCenterPlayer(),canvas)
+    }
+   
 }
 
 const getCenterPlayer = (): BlackjackPlayer => {
@@ -77,19 +89,21 @@ const seatStyle = (seatNumber:number) => {
 
 </script>
 
-<template>
+<template v-if="canvasReady">
+
     <div style="position: relative">
-        Table {{ table?.tableCard?.id }} {{ player }} ready:{{ canvasReady }}
+        Table {{ table?.tableCard?.id }} {{ table.gamePhase }}{{ table.playerInTurn?.name }}
         <canvas id="canvas" width="1800" height="600" style="border-style: dashed solid"></canvas>
         <div id="buttonRow">
-            <div v-if="canvasReady" v-for="(seat, index) in orderedSeatsByNumber" :key="seat.number"
-                :id="seat.number.toString()" :style=" seatStyle(seat.number)">
-                <button v-if="seat.available && !player.seatNumber" @click="takeSeat(seat.number.toString())">
+            <div v-for="(seat, index) in orderedSeatsByNumber" :key="seat.number" :id="seat.number.toString()"
+                :style=" seatStyle(seat.number)">
+                <button v-if="seat.available && !Number.isInteger(player.seatNumber)"
+                    @click="takeSeat(seat.number.toString())">
                     Take {{ seat.number + 1 }}
                 </button>
             </div>
         </div>
-        <div v-if="canvasReady && player.seatNumber>=0 && table.gamePhase === 'BET' " id="actionRow">
+        <div v-if=" player.seatNumber>=0 && table.gamePhase === 'BET' " id="betRow">
             {{ counter }}
             <button @click="bet(1)">
                 Bet 1
@@ -99,6 +113,25 @@ const seatStyle = (seatNumber:number) => {
             </button>
             <button @click="bet(15)">
                 Bet 15
+            </button>
+        </div>
+        <div style="position:relative; bottom:25px: left:50px"
+            v-if="table.gamePhase === 'PLAY' && table.playerInTurn.name === player.name " id="actionRow">
+            <button v-if="table.playerInTurn.actions.includes(PlayerAction.TAKE.toString())"
+                @click="sendAction(PlayerAction.TAKE.toString())">
+                Take
+            </button>
+            <button v-if="table.playerInTurn.actions.includes(PlayerAction.SPLIT.toString())"
+                @click="sendAction(PlayerAction.SPLIT.toString())">
+                Split
+            </button>
+            <button v-if="table.playerInTurn.actions.includes(PlayerAction.DOUBLE_DOWN.toString())"
+                @click="sendAction(PlayerAction.DOUBLE_DOWN.toString())">
+                Double down
+            </button>
+            <button v-if="table.playerInTurn.actions.includes(PlayerAction.STAND.toString())"
+                @click="sendAction(PlayerAction.STAND.toString())">
+                Stand
             </button>
         </div>
     </div>
