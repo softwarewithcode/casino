@@ -80,7 +80,7 @@ const seatStyle = (seatNumber:number) => {
 
 const insuranceClicked = ref<boolean>(false)
 const insuranceAvailable = computed<boolean>(() => {
-  return player.value.seatNumber>=0 && table.value.gamePhase === 'INSURE' 
+  return player.value.seatNumber>=0 && table.value.gamePhase === GamePhase.INSURE 
   && player.value.balance>= player.value.totalBet && !Number.isInteger(player.value.insuranceAmount) && insuranceClicked.value === false
 });
 </script>
