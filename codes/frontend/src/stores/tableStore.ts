@@ -32,21 +32,15 @@ export const useTableStore = defineStore("tableStore", {
 				this.tables = await fetchTables()
 			} catch (error) {
 				alert(error)
-				console.log(error)
 			}
 		},
 		async login(player: BlackjackPlayer) {
 			this.player = player
-			console.log("store Login:" + this.player)
 		},
 		reduceCounter() {
 			let counterCurrent = this.counter
 			counterCurrent--
 			this.counter = counterCurrent
-		},
-		showInitialDeal() {
-			console.log("STORE INITIAL DEAL")
-			// useCounterStart();
 		}
 	}
 })

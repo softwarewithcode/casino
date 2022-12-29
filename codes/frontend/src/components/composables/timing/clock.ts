@@ -1,18 +1,17 @@
-import { useTableStore } from "../../../stores/tableStore";
+import { useTableStore } from "../../../stores/tableStore"
 
-let counterId: number;
-let store;
+let counterId: number
+let store
 export function useCounterStart() {
-  if (!store) store = useTableStore();
-  startCounter();
+	if (!store) store = useTableStore()
+	startCounter()
 }
 
 function startCounter() {
-  console.log("startCounter");
-  if (counterId) clearInterval(counterId);
-  counterId = setInterval(() => {
-    store.reduceCounter();
-    let left = store.getCounter;
-    if (left <= 0) clearInterval(counterId);
-  }, 1000);
+	if (counterId) clearInterval(counterId)
+	counterId = setInterval(() => {
+		store.reduceCounter()
+		let left = store.getCounter
+		if (left <= 0) clearInterval(counterId)
+	}, 1000)
 }

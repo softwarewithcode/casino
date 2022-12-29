@@ -1,4 +1,5 @@
 //Tester code
+/*
 fetchTables()
 async function fetchTables(){
 	const tablesAPI = "http://localhost:8080/casino/blackjack/tables";
@@ -131,3 +132,4 @@ function updateWinnings(player) {
 	else
 		document.getElementById('roundCompletedContainer').innerHTML += "You lost"
 }
+*/

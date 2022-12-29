@@ -6,6 +6,7 @@ import { onMounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useTableStore } from "../stores/tableStore";
 import { mapActions, storeToRefs } from "pinia";
+import { Command } from "@/types/sockethander";
 const props = defineProps<{ tableId: string }>();
 const canvasReady = ref<boolean>(false);
 const store = useTableStore();
@@ -13,21 +14,12 @@ const { table, command, commandPlayerId, player, counter } = storeToRefs(store);
 
         store.$subscribe((mutation, state) => {
         if (mutation.type === "patch object" ) {
-            console.log("mutate:" + JSON.stringify(mutation.payload));
-            drawTable(false);
+            
+            drawTable(table.value.gamePhase === "PLAY" && command.value=== Command.INITIAL_DEAL_DONE.toString());
         } 
         });
-
-        store.$onAction(({ name, store, args, after, onError,  }) => {
-                console.log(`OnAction name `+name +" mapActions "+mapActions.name )
-                if(name ==="showInitialDeal"){
-                    console.log("SHOW_INITIAL_DEAL")
-                    drawTable(true)
-                }
-            }
-        )
         onMounted(() => {
-            console.log("onMounted");
+            
             canvasReady.value = true;
             useCanvasInitializer(getCanvas());
             drawTable(false);
@@ -64,13 +56,13 @@ const clearCanvas = (): HTMLCanvasElement =>{
     return canvas
 }
 const drawTable = async (initialDeal:boolean)  => {
-    console.log("drawTable");
+    
     const canvas:HTMLCanvasElement = clearCanvas()
-    useActorsPainter(table.value, getCenterPlayer(),canvas, );
+    useActorsPainter(table.value, getCenterPlayer(), canvas);
     if(initialDeal){
         useInitialDealPainter(table.value, getCenterPlayer(), canvas)
     }else{
-        useCardsAndHandValuesPainter(table.value, getCenterPlayer(),canvas)
+        useCardsAndHandValuesPainter(table.value, getCenterPlayer(), canvas)
     }
    
 }
