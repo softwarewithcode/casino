@@ -4,7 +4,7 @@ import type { CasinoTable } from "../types/casino"
 import type { BlackjackTable, BlackjackPlayer } from "../types/blackjack"
 import { fetchTables } from "../components/composables/communication/http"
 import type { TableCard } from "@/types/casino"
-import { useCounterStart } from "../components/composables/timing/clock"
+import { useStartCounter } from "../components/composables/timing/clock"
 
 export const useTableStore = defineStore("tableStore", {
 	state: () => ({

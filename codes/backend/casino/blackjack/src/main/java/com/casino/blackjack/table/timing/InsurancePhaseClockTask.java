@@ -1,16 +1,19 @@
 package com.casino.blackjack.table.timing;
 
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 import com.casino.blackjack.table.BlackjackTable;
+import com.casino.common.table.Thresholds;
 
 public class InsurancePhaseClockTask extends TimerTask {
 	private BlackjackTable table;
-	private int secondsLeft;
+	private static final Logger LOGGER = Logger.getLogger(InsurancePhaseClockTask.class.getName());
 
 	public InsurancePhaseClockTask(BlackjackTable table) {
 		this.table = table;
-		secondsLeft = table.getThresholds().secondPhaseTime();
+		Thresholds thresholds = table.getTableCard().getThresholds();
+		table.updateCounterTime(thresholds.secondPhaseTime());
 	}
 
 	@Override
@@ -18,8 +21,11 @@ public class InsurancePhaseClockTask extends TimerTask {
 		if (!table.isClockTicking()) {
 			return;
 		}
-		secondsLeft--;
-		if (secondsLeft == 0) {
+		int curTime = table.getCounterTime();
+		curTime--;
+		table.updateCounterTime(curTime);
+		LOGGER.info("InsurancePhase running, left:" + curTime);
+		if (curTime == 0) {
 			table.stopClock();
 			table.onInsurancePhaseEnd();
 		}

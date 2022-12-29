@@ -10,6 +10,7 @@ export interface BlackjackTable extends CasinoTable {
 export interface BlackjackPlayer extends CasinoPlayer {
 	hands: BlackjackHand[]
 	seatNumber: number
+	insuranceAmount: number
 }
 export interface Seat {
 	number: number
@@ -31,5 +32,12 @@ export enum PlayerAction {
 	TAKE = "TAKE",
 	DOUBLE_DOWN = "DOUBLE_DOWN",
 	STAND = "STAND",
-	SPLIT = "SPLIT"
+	SPLIT = "SPLIT",
+	INSURE = "INSURE",
+	BET = "BET"
+}
+
+export enum GamePhase {
+	INSURE = "INSURE",
+	BET = "BET"
 }

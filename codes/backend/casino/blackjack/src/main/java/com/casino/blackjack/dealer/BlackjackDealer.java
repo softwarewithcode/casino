@@ -19,6 +19,7 @@ import com.casino.blackjack.table.timing.InsurancePhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
+import com.casino.common.cards.Suit;
 import com.casino.common.dealer.CommunicationChannel;
 import com.casino.common.dealer.IDealer;
 import com.casino.common.exception.PlayerNotFoundException;
@@ -70,6 +71,7 @@ public class BlackjackDealer implements IDealer {
 		table.updateGamePhase(GamePhase.INSURE);
 		InsurancePhaseClockTask task = new InsurancePhaseClockTask(table);
 		getTable().startClock(task, 0);
+		notifyAll(Title.INSURANCE_PHASE_STARTS, null);
 	}
 
 	public boolean dealerHasStartingAce() {
@@ -226,7 +228,6 @@ public class BlackjackDealer implements IDealer {
 		subtractBetFromBalance();
 		dealStartingHands();
 		if (dealerHasStartingAce()) {
-			notifyAll(Title.INSURANCE_PHASE_STARTS, null);
 			startInsurancePhase();
 			return;
 		}

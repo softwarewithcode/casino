@@ -26,7 +26,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public abstract class CasinoTable implements ICasinoTable {
 
-	//private static final Logger LOGGER = Logger.getLogger(CasinoTable.class.getName());
+	// private static final Logger LOGGER =
+	// Logger.getLogger(CasinoTable.class.getName());
 	@JsonIgnore
 	private final PhasePath phasePath;
 	@JsonProperty
@@ -53,7 +54,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private TableInitData tableInitData;
 	@JsonProperty
 	private final TableCard tableCard;
-	
+
 	protected CasinoTable(Status initialStatus, TableInitData initData, PhasePath phases) {
 		this.watchers = new ConcurrentHashMap<>();
 		this.status = initialStatus;

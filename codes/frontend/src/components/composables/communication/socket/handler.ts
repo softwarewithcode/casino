@@ -2,7 +2,7 @@ import { useTableStore } from "../../../../stores/tableStore"
 import { useRouter, useRoute } from "vue-router"
 import router from "../../../../router/router"
 import { Command } from "@/types/sockethander"
-import { useCounterStart } from "../../timing/clock"
+import { useStartCounter } from "../../timing/clock"
 const store = useTableStore()
 //const router = useRouter()
 
@@ -20,7 +20,11 @@ export function handle(data: any) {
 			handleTableOpen(data)
 			break
 		case Command.BET_PHASE_STARTS:
-			startBetPhase(data)
+			patchTableAndCommandAndStartTimer(data)
+			break
+		case Command.INSURANCE_PHASE_STARTS:
+			console.log("insurance phaseTimer")
+			patchTableAndCommandAndStartTimer(data)
 			break
 		default:
 			patchTableAndCommand(data)
@@ -41,10 +45,11 @@ const patchTableAndCommand = async (data: any) => {
 		command: data.title
 	})
 }
-const startBetPhase = async (data: any) => {
+const patchTableAndCommandAndStartTimer = async (data: any) => {
 	await store.$patch({
+		table: data.table,
 		command: data.title,
 		counter: data.table.counterTime
 	})
-	useCounterStart()
+	useStartCounter()
 }

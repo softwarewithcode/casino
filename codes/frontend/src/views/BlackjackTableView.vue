@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { PlayerAction, type BlackjackPlayer, type Seat } from "@/types/blackjack";
+import { PlayerAction,GamePhase, type BlackjackPlayer, type Seat } from "@/types/blackjack";
 import { useActorsPainter, useCanvasInitializer, useInitialDealPainter,useCardsAndHandValuesPainter} from "../components/composables/rendering/canvasUtils";
-import { useCounterStart} from "../components/composables/timing/clock";
+import { useStartCounter} from "../components/composables/timing/clock";
 import { onMounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useTableStore } from "../stores/tableStore";
@@ -29,18 +29,17 @@ const { table, command, commandPlayerId, player, counter } = storeToRefs(store);
         };
 
         const bet = (amount: number) => {
-            useSend({ action: "BET", amount:amount });
+            useSend({ action: PlayerAction.BET, amount:amount });
         };
+        const insure = () =>{
+            insuranceClicked.value = true
+            useSend({ action: PlayerAction.INSURE})
+        }
         const sendAction = (action: string) => {
             useSend({ action: action});
         };
    
         
-
-const showInitialDeal = () => {
-
-}
-
 const orderedSeatsByNumber = computed<Array<Seat>>(() => {
   return table.value.seats.sort((a, b) => a.number - b.number);
 });
@@ -79,6 +78,11 @@ const seatStyle = (seatNumber:number) => {
     return { 'display': "inline" }
 }
 
+const insuranceClicked = ref<boolean>(false)
+const insuranceAvailable = computed<boolean>(() => {
+  return player.value.seatNumber>=0 && table.value.gamePhase === 'INSURE' 
+  && player.value.balance>= player.value.totalBet && !Number.isInteger(player.value.insuranceAmount) && insuranceClicked.value === false
+});
 </script>
 
 <template v-if="canvasReady">
@@ -95,20 +99,26 @@ const seatStyle = (seatNumber:number) => {
                 </button>
             </div>
         </div>
-        <div v-if=" player.seatNumber>=0 && table.gamePhase === 'BET' " id="betRow">
-            {{ counter }}
-            <button @click="bet(1)">
+        <div v-if="table.gamePhase === GamePhase.BET " id="betRow">
+            Bet time left {{ counter }}
+            <button v-if="player.seatNumber>=0 " @click="bet(1)">
                 Bet 1
             </button>
-            <button @click="bet(5)">
+            <button v-if="player.seatNumber>=0 " @click="bet(5)">
                 Bet 5
             </button>
-            <button @click="bet(15)">
+            <button v-if="player.seatNumber>=0 " @click="bet(15)">
                 Bet 15
             </button>
         </div>
+        <div v-if="table.gamePhase === GamePhase.INSURE" id="insureRow">
+            Insurance time left {{ counter }}
+            <button v-if="insuranceAvailable" @click="insure()">
+                Insure
+            </button>
+        </div>
         <div style="position:relative; bottom:25px: left:50px"
-            v-if="table.gamePhase === 'PLAY' && table.playerInTurn.name === player.name " id="actionRow">
+            v-if="table.gamePhase === 'PLAY' && table.playerInTurn.name === player.name" id="actionRow">
             <button v-if="table.playerInTurn.actions.includes(PlayerAction.TAKE.toString())"
                 @click="sendAction(PlayerAction.TAKE.toString())">
                 Take
