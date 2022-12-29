@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import com.casino.blackjack.table.BlackjackUtil;
 import com.casino.common.bet.BetUtil;
@@ -20,7 +19,7 @@ import com.casino.common.user.Bridge;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BlackjackPlayer extends CasinoPlayer {
-	private static final Logger LOGGER = Logger.getLogger(BlackjackPlayer.class.getName());
+	//private static final Logger LOGGER = Logger.getLogger(BlackjackPlayer.class.getName());
 	@JsonProperty
 	private List<IHand> hands;
 	@JsonProperty

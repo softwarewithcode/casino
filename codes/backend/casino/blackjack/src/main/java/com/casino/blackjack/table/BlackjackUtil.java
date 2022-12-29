@@ -1,11 +1,8 @@
 package com.casino.blackjack.table;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import com.casino.common.cards.Card;
-import com.casino.common.cards.IHand;
-import com.casino.common.exception.IllegalPlayerActionException;
 
 public class BlackjackUtil {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackUtil.class.getName());

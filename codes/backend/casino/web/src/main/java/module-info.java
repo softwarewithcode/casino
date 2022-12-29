@@ -8,7 +8,7 @@ module casino.web {
 	requires jakarta.cdi;
 	requires jakarta.inject;
 	requires jakarta.json.bind;
-	requires jakarta.websocket;
+	requires transitive jakarta.websocket;
 	requires jakarta.ws.rs;
 	requires java.logging;
 	requires com.fasterxml.jackson.annotation;

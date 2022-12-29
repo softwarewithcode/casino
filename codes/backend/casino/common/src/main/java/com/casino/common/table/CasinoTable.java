@@ -2,15 +2,12 @@ package com.casino.common.table;
 
 import java.time.Instant;
 import java.util.ConcurrentModificationException;
-import java.util.List;
 import java.util.Objects;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
@@ -20,7 +17,6 @@ import com.casino.common.table.timing.Clock;
 import com.casino.common.table.timing.PlayerClockTask;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * 
@@ -30,12 +26,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public abstract class CasinoTable implements ICasinoTable {
 
-	private static final Logger LOGGER = Logger.getLogger(CasinoTable.class.getName());
+	//private static final Logger LOGGER = Logger.getLogger(CasinoTable.class.getName());
 	@JsonIgnore
 	private final PhasePath phasePath;
 	@JsonProperty
 	private final Type type;
-	@JsonSerialize(converter = CasinoPlayersConverter.class)
 	@JsonIgnore
 	private final ConcurrentHashMap<UUID, ICasinoPlayer> watchers;
 	@JsonIgnore

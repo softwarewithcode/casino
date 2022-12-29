@@ -19,10 +19,14 @@ public class UserHandler {
 		return fetchUserDataLikeBalanceFromDB(validUserId, tableId, session);
 	}
 
-	private static int tempNotThreadSafe = 0;
+	private static int guestCount = 0;
+
+	private static synchronized int getNextGuestNumber() {
+		guestCount++;
+		return guestCount;
+	}
 
 	public Bridge createGuestPlayerBridge(String userId, UUID tableId, Session session) {
-		tempNotThreadSafe++;
 		return createDefaultGuestPlayerBridge(tableId, session);
 	}
 
@@ -33,9 +37,8 @@ public class UserHandler {
 	}
 
 	private Bridge createDefaultGuestPlayerBridge(UUID tableId, Session session) {
-		// TODO Auto-generated method stub
 		UUID id = UUID.randomUUID();
-		return new Bridge("guestP" + tempNotThreadSafe, tableId, id, session, new BigDecimal("1000.0"));
+		return new Bridge("guest" + getNextGuestNumber(), tableId, id, session, new BigDecimal("1000.0"));
 	}
 
 //	private Bridge createDefaultWatcherBridge(UUID tableId, Session session) {

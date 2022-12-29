@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.blackjack.ext.IBlackjackTable;
-import com.casino.common.user.Action;
 import com.casino.common.user.Bridge;
 import com.casino.common.validaton.Validator;
 import com.casino.common.web.Message;

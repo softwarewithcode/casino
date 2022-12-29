@@ -382,7 +382,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void completeActiveHands() {
-		List<ICasinoPlayer> players = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasActiveHand).collect(Collectors.toList());
+		List<ICasinoPlayer> players = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasActiveHand).toList();
 		players.forEach(player -> player.getActiveHand().complete());
 	}
 

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import com.casino.blackjack.ext.IBlackjackTable;
@@ -23,7 +22,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class BlackjackTableService {
-	private static final Logger LOGGER = Logger.getLogger(BlackjackTableService.class.getName());
+	//private static final Logger LOGGER = Logger.getLogger(BlackjackTableService.class.getName());
 	private static final Integer BET_PHASE_TIME_SECONDS_DEFAULT = 15;
 	private static final Integer INSURANCE_PHASE_TIME_SECONDS_DEFAULT = 11;
 	private static final Integer PLAYER_TIME_SECONDS_DEFAULT = 30;

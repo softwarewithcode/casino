@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 
 import com.casino.blackjack.message.Mapper;
-import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.language.Language;
 import com.casino.common.table.Game;
 import com.casino.common.table.TableInitData;
@@ -36,8 +35,6 @@ public class BaseTest {
 		System.out.println("before all test -> setting skip serialization parameter ");
 		System.getProperties().setProperty(Mapper.JUNIT_RUNNER, "true");
 	}
-
-	private BlackjackTable defaultTable;
 
 	protected Thresholds getDefaultThresholds() {
 		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);

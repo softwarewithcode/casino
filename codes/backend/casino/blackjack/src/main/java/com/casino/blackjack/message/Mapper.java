@@ -3,7 +3,6 @@ package com.casino.blackjack.message;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.player.CasinoPlayer;
 import com.casino.common.user.Title;

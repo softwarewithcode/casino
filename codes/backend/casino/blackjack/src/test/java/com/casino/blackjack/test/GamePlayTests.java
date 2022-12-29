@@ -19,11 +19,7 @@ import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
-import com.casino.common.language.Language;
 import com.casino.common.table.Status;
-import com.casino.common.table.TableInitData;
-import com.casino.common.table.Thresholds;
-import com.casino.common.table.Type;
 import com.casino.common.user.Bridge;
 
 public class GamePlayTests extends BaseTest {

@@ -16,6 +16,6 @@ module casino.common {
 	requires transitive com.fasterxml.jackson.annotation;
 	requires transitive com.fasterxml.jackson.databind;
 	requires transitive jakarta.json.bind;
-	requires jakarta.websocket;
+	requires transitive jakarta.websocket;
 	requires java.logging;
 }
