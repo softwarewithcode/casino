@@ -1,5 +1,5 @@
 import type { BlackjackHand, BlackjackPlayer, BlackjackTable, Seat } from "@/types/blackjack"
-import type { Vector, CasinoFont, Card } from "@/types/casino"
+import type { Vector, CasinoFont, Card, ImageProps } from "@/types/casino"
 const availableSeatFont: CasinoFont = {
 	color: "#006400",
 	faceAndSize: "25px Arial"
@@ -130,16 +130,42 @@ const paintCardWithDelay = async (delayMillis: number, startingCorner: Vector, c
 	paintCard(startingCorner, card, canvas)
 	await wait(delayMillis)
 }
+const cardsImage: HtmlImageElement = document.getElementById("cardsImage")
 const paintCard = (startingCorner: Vector, card: Card, canvas: HTMLCanvasElement) => {
 	if (!card) {
 		console.log("no card")
 		return
 	}
-
-	//paintImage
-	paintText(card.rank + " " + card.suit, { x: startingCorner.x, y: startingCorner.y }, canvas, reservedSeatFont)
+	const ctx = canvas.getContext("2d")
+	if (!ctx) return
+	const coords = findImageCoordinates(startingCorner, card)
+	ctx.drawImage(cardsImage, coords.clipFromX, coords.clipFromY, coords.sourceWidth, coords.sourceHeight, coords.destinationWidth, coords.destinationHeight, coords.toX, coords.toY)
+	//paintText(card.rank + " " + card.suit, { x: startingCorner.x, y: startingCorner.y }, canvas, reservedSeatFont)
 }
 
+const cardsWidth = 100
+const cardsHeight = 100
+const findImageCoordinates = (startingCorner: Vector, card: Card): ImageProps => {
+	const fromX = card.rank * 100
+	const fromy = card.rank * 100
+	return {
+		clipFromX: 0,
+		clipFromY: 0,
+		sourceWidth: suitToNumber(card.suit) * cardsWidth,
+		sourceHeight: card.rank * cardsHeight,
+		destinationWidth: startingCorner.x,
+		destinationHeight: startingCorner.y,
+		toX: 100,
+		toY: 100
+	}
+}
+const suitToNumber = (suit: Suit) => {
+	return 2
+	// (suit === Suit.CLUB) return 3
+	//if (suit === Suit.HEART) return 1
+	//if (suit === Suit.SPADE) return 4
+	//if (suit === Suit.DIAMOND) return 2
+}
 const getNextSeatNumber = (featuredSeatNumber: number, table: BlackjackTable): number => {
 	if (featuredSeatNumber === table.seats.length - 1) return 0
 	let next = featuredSeatNumber

@@ -51,3 +51,14 @@ export enum SUIT {
 	HEART,
 	SPADE
 }
+
+export interface ImageProps {
+	clipFromX: number
+	clipFromY: number
+	sourceWidth: number
+	sourceHeight: number
+	destinationWidth: number
+	destinationHeight: number
+	toX: number
+	toY: number
+}
