@@ -10,7 +10,7 @@ import { Command } from "@/types/sockethander";
 const props = defineProps<{ tableId: string }>();
 const canvasReady = ref<boolean>(false);
 const store = useTableStore();
-const { table, command, commandPlayerId, player, counter } = storeToRefs(store);
+const { table, command, player, counter } = storeToRefs(store);
 
         store.$subscribe((mutation, state) => {
         if (mutation.type === "patch object" ) {

@@ -10,7 +10,7 @@ export interface CasinoPlayer {
 }
 
 export interface CasinoHand {
-	values: []
+	values: number[]
 	cards: Card[]
 	bet: number
 }
@@ -33,7 +33,7 @@ export interface Thresholds {
 
 export interface Card {
 	rank: number
-	suit: SUIT
+	suit: Suit
 	visible: boolean
 }
 
@@ -45,20 +45,15 @@ export interface CasinoFont {
 	faceAndSize: string
 	color: string
 }
-export enum SUIT {
-	CLUB,
-	DIAMOND,
-	HEART,
-	SPADE
+
+export enum Suit {
+	CLUB = "CLUB",
+	DIAMOND = "DIAMOND",
+	HEART = "HEART",
+	SPADE = "SPADE"
 }
 
-export interface ImageProps {
-	clipFromX: number
-	clipFromY: number
-	sourceWidth: number
-	sourceHeight: number
-	destinationWidth: number
-	destinationHeight: number
-	toX: number
-	toY: number
+export interface SpriteImageMetadata {
+	position: Vector
+	size: Vector
 }

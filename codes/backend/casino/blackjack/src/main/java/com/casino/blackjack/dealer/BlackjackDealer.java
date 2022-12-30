@@ -19,7 +19,6 @@ import com.casino.blackjack.table.timing.InsurancePhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
-import com.casino.common.cards.Suit;
 import com.casino.common.dealer.CommunicationChannel;
 import com.casino.common.dealer.IDealer;
 import com.casino.common.exception.PlayerNotFoundException;
@@ -209,6 +208,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private boolean somebodyHasBet() {
+		// table.getSeats().stream().filter(Seat::hasPlayerWithBet).findAny
 		List<ICasinoPlayer> c = getOrderedPlayersWithBet();
 		return c != null && c.size() > 0;
 	}
