@@ -292,12 +292,12 @@ public class BlackjackDealer implements IDealer {
 	public synchronized void prepareNewRound() {
 		if (table.getGamePhase() != GamePhase.ROUND_COMPLETED)
 			throw new IllegalArgumentException("not allowed");
-		notifyAll(Title.BET_PHASE_STARTS, null);
 		table.getPlayers().forEach(ICasinoPlayer::prepareNextRound);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		table.updateGamePhase(GamePhase.BET);
 		table.updateCounterTime(table.getThresholds().betPhaseTime());
 		deck = Deck.combineDecks(8);
+		notifyAll(Title.BET_PHASE_STARTS, null);
 	}
 
 	private boolean shouldRestartBetPhase() {
