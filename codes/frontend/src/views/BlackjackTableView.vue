@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { PlayerAction,GamePhase, type BlackjackPlayer, type Seat } from "@/types/blackjack";
-import { useActorsPainter, useCanvasInitializer, useInitialDealPainter,useCardsAndHandValuesPainter} from "../components/composables/rendering/canvasUtils";
-import { useStartCounter} from "../components/composables/timing/clock";
+import { PlayerAction, GamePhase, type BlackjackPlayer, type Seat } from "@/types/blackjack";
+import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCardsAndHandValuesPainter } from "../components/composables/rendering/canvasUtils";
+import { useStartCounter } from "../components/composables/timing/clock";
 import { onMounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useTableStore } from "../stores/tableStore";
@@ -12,76 +12,72 @@ const canvasReady = ref<boolean>(false);
 const store = useTableStore();
 const { table, command, player, counter } = storeToRefs(store);
 
-        store.$subscribe((mutation, state) => {
-        if (mutation.type === "patch object" ) {
-            
-            drawTable(table.value.gamePhase === "PLAY" && command.value=== Command.INITIAL_DEAL_DONE.toString());
-        } 
-        });
-        onMounted(() => {
-            
-            canvasReady.value = true;
-            useCanvasInitializer(getCanvas());
-            drawTable(false);
-        });
-        const takeSeat = (seat: string) => {
-            useSend({ action: "JOIN", seat: seat });
-        };
+store.$subscribe((mutation, state) => {
+    if (mutation.type === "patch object") {
+        console.log("Table:" + JSON.stringify(table, null, 2))
+        drawTable(table.value.gamePhase === "PLAY" && command.value === Command.INITIAL_DEAL_DONE.toString());
+    }
+});
+onMounted(() => {
+    canvasReady.value = true;
+    useCanvasInitializer(getCanvas());
+    drawTable(false);
+});
+const takeSeat = (seat: string) => {
+    useSend({ action: "JOIN", seat: seat });
+};
+const bet = (amount: number) => {
+    useSend({ action: PlayerAction.BET, amount: amount });
+};
+const insure = () => {
+    insuranceClicked.value = true
+    useSend({ action: PlayerAction.INSURE })
+}
+const sendAction = (action: string) => {
+    useSend({ action: action });
+};
 
-        const bet = (amount: number) => {
-            useSend({ action: PlayerAction.BET, amount:amount });
-        };
-        const insure = () =>{
-            insuranceClicked.value = true
-            useSend({ action: PlayerAction.INSURE})
-        }
-        const sendAction = (action: string) => {
-            useSend({ action: action});
-        };
-   
-        
 const orderedSeatsByNumber = computed<Array<Seat>>(() => {
-  return table.value.seats.sort((a, b) => a.number - b.number);
+    return table.value.seats.sort((a, b) => a.number - b.number);
 });
 
 const getCanvas = (): HTMLCanvasElement => {
-  return document.getElementById("canvas") as HTMLCanvasElement;
+    return document.getElementById("canvas") as HTMLCanvasElement;
 };
 
-const clearCanvas = (): HTMLCanvasElement =>{
+const clearCanvas = (): HTMLCanvasElement => {
     const canvas = getCanvas()
     const ctx = canvas.getContext("2d")
     ctx?.clearRect(0, 0, canvas.width, canvas.height)
     return canvas
 }
-const drawTable = async (initialDeal:boolean)  => {
-    
-    const canvas:HTMLCanvasElement = clearCanvas()
+const drawTable = async (initialDeal: boolean) => {
+
+    const canvas: HTMLCanvasElement = clearCanvas()
     useActorsPainter(table.value, getCenterPlayer(), canvas);
-    if(initialDeal){
+    if (initialDeal) {
         useInitialDealPainter(table.value, getCenterPlayer(), canvas)
-    }else{
+    } else {
         useCardsAndHandValuesPainter(table.value, getCenterPlayer(), canvas)
     }
-   
 }
 
 const getCenterPlayer = (): BlackjackPlayer => {
-  if (player.value?.name) {
-    return player.value;
-  }
-  const centerPlayer= table.value.seats.find((seat) => seat.player?.balance > 0)?.player as BlackjackPlayer;
-  return centerPlayer
+    if (player.value?.name) {
+        return player.value;
+    }
+    const centerPlayer = table.value.seats.find((seat) => seat.player?.balance > 0)?.player as BlackjackPlayer;
+    return centerPlayer
 }
 
-const seatStyle = (seatNumber:number) => {
+const seatStyle = (seatNumber: number) => {
     return { 'display': "inline" }
 }
 
 const insuranceClicked = ref<boolean>(false)
 const insuranceAvailable = computed<boolean>(() => {
-  return player.value.seatNumber>=0 && table.value.gamePhase === GamePhase.INSURE 
-  && player.value.balance>= player.value.totalBet /2 && !Number.isInteger(player.value.insuranceAmount) && insuranceClicked.value === false
+    return player.value.seatNumber >= 0 && table.value.gamePhase === GamePhase.INSURE
+        && player.value.balance >= player.value.totalBet / 2 && !Number.isInteger(player.value.insuranceAmount) && insuranceClicked.value === false
 });
 </script>
 
@@ -92,22 +88,22 @@ const insuranceAvailable = computed<boolean>(() => {
         <canvas id="canvas" width="1800" height="600" style="border-style: dashed solid"></canvas>
         <div id="buttonRow">
             <div v-for="(seat, index) in orderedSeatsByNumber" :key="seat.number" :id="seat.number.toString()"
-                :style=" seatStyle(seat.number)">
+                :style="seatStyle(seat.number)">
                 <button v-if="seat.available && !Number.isInteger(player.seatNumber)"
                     @click="takeSeat(seat.number.toString())">
                     Take {{ seat.number + 1 }}
                 </button>
             </div>
         </div>
-        <div v-if="table.gamePhase === GamePhase.BET " id="betRow">
+        <div v-if="table.gamePhase === GamePhase.BET" id="betRow">
             Bet time left {{ counter }}
-            <button v-if="player.seatNumber>=0 " @click="bet(1)">
+            <button v-if="player.seatNumber >= 0" @click="bet(1)">
                 Bet 1
             </button>
-            <button v-if="player.seatNumber>=0 " @click="bet(5)">
+            <button v-if="player.seatNumber >= 0" @click="bet(5)">
                 Bet 5
             </button>
-            <button v-if="player.seatNumber>=0 " @click="bet(15)">
+            <button v-if="player.seatNumber >= 0" @click="bet(15)">
                 Bet 15
             </button>
         </div>
