@@ -24,6 +24,9 @@ export const useTableStore = defineStore("tableStore", {
 		},
 		getCounter(state) {
 			return state.counter
+		},
+		getPlayer(state) {
+			return state.player
 		}
 	},
 	actions: {

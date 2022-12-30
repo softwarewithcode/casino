@@ -20,14 +20,14 @@ export function handle(data: any) {
 			handleTableOpen(data)
 			break
 		case Command.BET_PHASE_STARTS:
-			patchTableAndCommandAndStartTimer(data)
+			patchStoreAndStartTimer(data)
 			break
 		case Command.INSURANCE_PHASE_STARTS:
 			console.log("insurance phaseTimer")
-			patchTableAndCommandAndStartTimer(data)
+			patchStoreAndStartTimer(data)
 			break
 		default:
-			patchTableAndCommand(data)
+			patchStore(data)
 	}
 }
 
@@ -39,17 +39,17 @@ const handleTableOpen = async (data: any) => {
 	})
 }
 
-const patchTableAndCommand = async (data: any) => {
+const patchStore = async (data: any) => {
+	const storePlayer = store.getPlayer
+	const player = data.table.players.find(player => player.name === storePlayer.name)
 	store.$patch({
 		table: data.table,
-		command: data.title
-	})
-}
-const patchTableAndCommandAndStartTimer = async (data: any) => {
-	await store.$patch({
-		table: data.table,
 		command: data.title,
+		player: player,
 		counter: data.table.counterTime
 	})
+}
+const patchStoreAndStartTimer = async (data: any) => {
+	patchStore(data)
 	useStartCounter()
 }
