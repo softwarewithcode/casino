@@ -146,7 +146,6 @@ const paintCard = (cardPosition: Vector, card: Card, canvas: HTMLCanvasElement) 
 	const ctx = canvas.getContext("2d")
 	if (!ctx) return
 	const cardData = useCardLocator(card)
-	console.log("cardData:" + JSON.stringify(cardData) + " card:" + JSON.stringify(card))
 	ctx.drawImage(cardsImage, cardData.position.x, cardData.position.y, cardData.size.x, cardData.size.y, cardPosition.x, cardPosition.y, defaultCardWidthPixel, defaultCarHeighthPixel)
 }
 

@@ -4,7 +4,6 @@ import router from "../../../../router/router"
 import { Command } from "@/types/sockethander"
 import { useStartCounter } from "../../timing/clock"
 const store = useTableStore()
-//const router = useRouter()
 
 export function handle(data: any) {
 	store.$patch({
@@ -23,7 +22,6 @@ export function handle(data: any) {
 			patchStoreAndStartTimer(data)
 			break
 		case Command.INSURANCE_PHASE_STARTS:
-			console.log("insurance phaseTimer")
 			patchStoreAndStartTimer(data)
 			break
 		default:
@@ -40,14 +38,12 @@ const handleTableOpen = async (data: any) => {
 }
 
 const patchStore = async (data: any) => {
-	const storePlayer = store.getPlayer
-	const player = data.table.players.find(player => player.name === storePlayer.name)
-	store.$patch({
-		table: data.table,
-		command: data.title,
-		player: player,
-		counter: data.table.counterTime
-	})
+	let patchObject = { table: data.table, command: data.title, counter: data.table.counterTime }
+	const patchPlayer = data.table.players.find(player => player.name === store.getPlayer?.name)
+	if (patchPlayer) {
+		patchObject["player"] = patchPlayer
+	}
+	store.$patch(patchObject)
 }
 const patchStoreAndStartTimer = async (data: any) => {
 	patchStore(data)

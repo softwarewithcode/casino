@@ -14,7 +14,6 @@ const { table, command, player, counter } = storeToRefs(store);
 
 store.$subscribe((mutation, state) => {
     if (mutation.type === "patch object") {
-        console.log("Table:" + JSON.stringify(table, null, 2))
         drawTable(table.value.gamePhase === "PLAY" && command.value === Command.INITIAL_DEAL_DONE.toString());
     }
 });
