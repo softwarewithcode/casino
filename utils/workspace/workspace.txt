@@ -1,0 +1,31 @@
+31.12.2022<br>
+
+Default workspace and setup contains:
+1) Latest Eclipse IDE for backend development
+2) Visual Studio Code for frontend development 
+
+Development and running the files:
+1) Backend: Maven, OpenJDK 19 compiler level 19, application server which supports JakartaEE 9.1 <br>
+ Default workspace uses Apache TomEE 9.0.0.RC1 as backend application server <br>
+1.1. Import projects in Eclipse as Maven projects. Mouse right click on projects and Maven -> update <br>
+	This loads the dependencies. <br>
+1.2 In Eclipse create new Server with Apache Tomcat v10.0 server adapter. <br> Select JRE as OpenJDK19.<br>
+1.3 Ship the projects into the server and check startup logs for errors. <br>
+
+2. Frontend: Vue3 with Reactive Pinia store. Npm v9.1.1, Node v16.15.0, with Volar takeover mode and .prettierc combination. <br>
+2.1 Open frontend folder where package.json exists, <br>
+run "npm install" -> should load the dependencies defined in package.json<br>
+run "npm run dev" -> should start the UI development server at port 5000. Package.json has predefined port 5000.<br>
+
+open http://localhost:5000 <br>
+It should show 3 blackjack tables with different bet ranges. <br>
+Opening one table connects to the backend server using websocket. ws://localhost:8080/casino/blackjack/{tableID} <br>
+Take a seat and game should start, it is possible to connect using another browsers at the same time. <br>
+
+Restart backend server when tables run out or create more default tables. Restart should take only few seconds.
+<br>
+Now this is only how it works in theory. There are many different things with your environment, starting from the operating system and versions. <br>
+So it is expected that at least some problem solving is ahead, already starting from the commited codes which might contain errors. <br>
+There is no CI/CD tool configured at the moment.<br>
+
+JUnit tests contains timings for different phases and wait times. <br> There might be some issues with different machines and processor usages.
