@@ -137,7 +137,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	}
 
 	private <T> boolean canSendMessage(T message) {
-		return bridge.isConnectable() && message != null;
+		return bridge.isConnected() && message != null;
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import jakarta.websocket.Session;
 
 public record Bridge(String name, UUID tableId, UUID userId, Session session, BigDecimal initialBalance) {
 
-	public boolean isConnectable() {
+	public boolean isConnected() {
 		return session != null && session.isOpen();
 	}
 }

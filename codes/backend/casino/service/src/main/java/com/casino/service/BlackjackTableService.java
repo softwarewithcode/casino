@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import com.casino.blackjack.ext.IBlackjackTable;
 import com.casino.blackjack.table.BlackjackTable;
@@ -78,6 +77,6 @@ public class BlackjackTableService {
 	}
 
 	public List<TableCard> fetchTableCards() {
-		return tables.values().stream().filter(table -> table.getStatus().isVisible()).map(BlackjackTable::getTableCard).collect(Collectors.toList());
+		return tables.values().stream().filter(table -> table.getStatus().isVisible()).map(BlackjackTable::getTableCard).toList();
 	}
 }

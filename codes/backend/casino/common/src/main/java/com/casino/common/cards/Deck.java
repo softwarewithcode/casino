@@ -5,10 +5,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Deck implements IDeck {
+public class Deck {
 	private Set<Card> cards;
 
 	public Deck() {
@@ -33,13 +32,8 @@ public class Deck implements IDeck {
 		return cards;
 	}
 
-	public Set<Card> take(int count) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public static List<Card> combineDecks(int count) {
-		List<Deck> decks = IntStream.range(0, count).mapToObj(i -> new Deck()).collect(Collectors.toList());
+		List<Deck> decks = IntStream.range(0, count).mapToObj(i -> new Deck()).toList();
 		List<Card> cards = new ArrayList<Card>();
 		decks.forEach(deck -> {
 			cards.addAll(deck.getCards());
