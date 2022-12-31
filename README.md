@@ -1,5 +1,8 @@
 # casino
 
+## Workspace instructions 31/12/2022 <br>
+/utils/workspace folder contains now more info about creating the workspace
+
 ## User interface 23/12/2022
 Default UI tries to <br>
 1)fetch tables from http://localhost:8080/casino/blackjack/tables based on http.ts hardcoded URL.<br>
