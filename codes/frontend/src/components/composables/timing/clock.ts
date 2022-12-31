@@ -8,12 +8,10 @@ export function useStartCounter() {
 }
 
 function startCounter() {
-	console.log("startCounter")
 	if (counterId) {
 		clearInterval(counterId)
 	}
 	counterId = setInterval(() => {
-		console.log("storeLeft:")
 		store.reduceCounter()
 		let left = store.getCounter
 		if (left <= 0) {

@@ -14,7 +14,7 @@ const { table, command, player, counter } = storeToRefs(store);
 
 store.$subscribe((mutation, state) => {
     if (mutation.type === "patch object") {
-        drawTable(table.value.gamePhase === "PLAY" && command.value === Command.INITIAL_DEAL_DONE.toString());
+        drawTable(table.value.gamePhase === "PLAY" && command.value === Command.INITIAL_DEAL_DONE);
     }
 });
 onMounted(() => {
@@ -36,7 +36,7 @@ const sendAction = (action: string) => {
     useSend({ action: action });
 };
 
-const orderedSeatsByNumber = computed<Array<Seat>>(() => {
+const getSeatsDescending = computed<Array<Seat>>(() => {
     return table.value.seats.sort((a, b) => a.number - b.number);
 });
 
@@ -86,7 +86,7 @@ const insuranceAvailable = computed<boolean>(() => {
         Table {{ table?.tableCard?.id }} {{ table.gamePhase }}{{ table.playerInTurn?.name }}
         <canvas id="canvas" width="1800" height="600" style="border-style: dashed solid"></canvas>
         <div id="buttonRow">
-            <div v-for="(seat, index) in orderedSeatsByNumber" :key="seat.number" :id="seat.number.toString()"
+            <div v-for="(seat, index) in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
                 :style="seatStyle(seat.number)">
                 <button v-if="seat.available && !Number.isInteger(player.seatNumber)"
                     @click="takeSeat(seat.number.toString())">
@@ -95,7 +95,9 @@ const insuranceAvailable = computed<boolean>(() => {
             </div>
         </div>
         <div v-if="table.gamePhase === GamePhase.BET" id="betRow">
-            Bet time left {{ counter }}
+            <template v-if="counter >= 0">
+                Bet time left {{ counter }}
+            </template>
             <button v-if="player.seatNumber >= 0" @click="bet(1)">
                 Bet 1
             </button>
