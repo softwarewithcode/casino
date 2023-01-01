@@ -129,9 +129,7 @@ public class BlackjackDealer implements IDealer {
 		List<ICasinoPlayer> orderedPlayers = getOrderedPlayersWithBet();
 		orderedPlayers.forEach(player -> dealCard(player.getHands().get(0))); // first the players
 		dealCard(dealerHand); // then the dealer
-		orderedPlayers.forEach(player -> { // then the players again
-			dealCard(player.getHands().get(0));
-		});
+		orderedPlayers.forEach(player -> dealCard(player.getHands().get(0))); // then the players again
 	}
 
 	private void dealCard(IHand hand) {
@@ -140,9 +138,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void addPlayerCard(ICasinoPlayer player) {
-		Card card = removeLastCardFromDeck();
-		IHand activeHand = player.getActiveHand();
-		activeHand.addCard(card);
+		dealCard(player.getActiveHand());
 	}
 
 	@Override
