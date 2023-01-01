@@ -132,4 +132,8 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return seats.stream().filter(Seat::hasPlayer).map(seat -> seat.getPlayer()).collect(Collectors.toList());
 	}
 
+	public boolean hasPlayers() {
+		return getReservedSeatCount() != 0;
+	}
+
 }

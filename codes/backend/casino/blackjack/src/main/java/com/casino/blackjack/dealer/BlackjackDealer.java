@@ -237,7 +237,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void updatePlayerStatuses() {
-		List<ICasinoPlayer> players = table.getSeats().stream().filter(Seat::hasPlayer).map(Seat::getPlayer).collect(Collectors.toList());
+		List<ICasinoPlayer> players = table.getSeats().stream().filter(Seat::hasPlayer).map(Seat::getPlayer).toList();
 		players.forEach(player -> {
 			if (player.getStatus() == Status.LEFT)
 				return;
@@ -278,7 +278,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void removeInactivePlayers() {
-		List<Seat> casinoPlayers = table.getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != Status.ACTIVE).collect(Collectors.toList());
+		List<Seat> casinoPlayers = table.getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != Status.ACTIVE).toList();
 		casinoPlayers.forEach(Seat::sanitize);
 	}
 
@@ -439,15 +439,15 @@ public class BlackjackDealer implements IDealer {
 			notifyAll(Title.SERVER_WAITS_PLAYER_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
-	public void handleLeavingPlayer(BlackjackPlayer leavingPlayer) {
+	public void onPlayerLeave(BlackjackPlayer leavingPlayer) {
 		leavingPlayer.setStatus(Status.LEFT);
 		finishInactivePlayerTurn(leavingPlayer);
-		if (!table.getGamePhase().isOnGoingRound()) {
+		if (!table.isRoundRunning()) {
 			removeInactivePlayers();
 			notifyAll(Title.PLAYER_LEFT, leavingPlayer);
 		} else
 			notifyAll(Title.SIT_OUT, leavingPlayer);
-		if (table.getPlayers().size() == 0) {
+		if (!table.hasPlayers()) {
 			table.stopClock();
 			table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
 		}

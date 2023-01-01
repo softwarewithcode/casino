@@ -183,7 +183,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			if (leavingPlayer == null)
 				return;
 			lockPlayerInTurn();
-			dealer.handleLeavingPlayer(leavingPlayer);
+			dealer.onPlayerLeave(leavingPlayer);
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "onPlayerLeave", " leavingPlayer:" + leavingPlayer + " table:" + getId());

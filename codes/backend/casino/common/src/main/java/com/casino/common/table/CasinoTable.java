@@ -262,6 +262,10 @@ public abstract class CasinoTable implements ICasinoTable {
 		return phasePath.getPhase();
 	}
 
+	public boolean isRoundRunning() {
+		return phasePath.getPhase().isOnGoingRound();
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
