@@ -54,7 +54,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		this.seatNumber = seatNumber;
 	}
 
-	public void updateActions() {
+	public void updateAvailableActions() {
 		try {
 			tryTakingPlayerLock();
 			actions = new ArrayList<>();
@@ -93,7 +93,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 			tryTakingPlayerLock();
 			hands = new ArrayList<IHand>();
 			hands.add(createNewHand(true));
-			updateActions();
+			updateAvailableActions();
 			this.removeTotalBet();
 		} finally {
 			releasePlayerLock();

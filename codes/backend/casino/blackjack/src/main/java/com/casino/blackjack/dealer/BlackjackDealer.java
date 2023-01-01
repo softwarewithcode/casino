@@ -250,16 +250,8 @@ public class BlackjackDealer implements IDealer {
 
 	public void updateTableActor() {
 		table.stopClock();
-		Optional<Seat> optionalPlayerActor = table.getSeats().stream().filter(seat -> seat.hasPlayerWhoCanAct()).min(Comparator.comparing(Seat::getNumber));
-		if (optionalPlayerActor.isEmpty()) {
-			changeTurnToDealer();
-			carryOutDealerDutiesAndNotify();
-		} else {
-			// Actor can be same as previous ->split hand
-			BlackjackPlayer player = (BlackjackPlayer) optionalPlayerActor.get().getPlayer();
-			table.changePlayer(player);
-			player.updateActions();
-		}
+		Optional<Seat> optionalPlayerSeat = table.getSeats().stream().filter(seat -> seat.hasPlayerWhoCanAct()).min(Comparator.comparing(Seat::getNumber));
+		optionalPlayerSeat.ifPresentOrElse(seat -> table.onPlayerInTurnUpdate(seat.getPlayer()), () -> changeTurnToDealer());
 	}
 
 	public void informTable() {
@@ -300,6 +292,7 @@ public class BlackjackDealer implements IDealer {
 	private void changeTurnToDealer() {
 		table.updateDealerTurn(true);
 		table.clearPlayerInTurn();
+		carryOutDealerDutiesAndNotify();
 	}
 
 	public void doubleDown(BlackjackPlayer player) {
@@ -433,7 +426,7 @@ public class BlackjackDealer implements IDealer {
 		notifyAll(title, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
-	public void calculateNextActorTurnAndNotify() {
+	public void calculateNextActorAndNotify() {
 		updateTableActor();
 		if (table.getPlayerInTurn() != null)
 			notifyAll(Title.SERVER_WAITS_PLAYER_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
@@ -441,7 +434,7 @@ public class BlackjackDealer implements IDealer {
 
 	public void onPlayerLeave(BlackjackPlayer leavingPlayer) {
 		leavingPlayer.setStatus(Status.LEFT);
-		finishInactivePlayerTurn(leavingPlayer);
+		finalizeInactivePlayerTurn(leavingPlayer);
 		if (!table.isRoundRunning()) {
 			removeInactivePlayers();
 			notifyAll(Title.PLAYER_LEFT, leavingPlayer);
@@ -453,17 +446,17 @@ public class BlackjackDealer implements IDealer {
 		}
 	}
 
-	private void finishInactivePlayerTurn(BlackjackPlayer player) {
+	private void finalizeInactivePlayerTurn(BlackjackPlayer player) {
 		if (player.hasBet() && player.equals(table.getPlayerInTurn())) {
 			autoplayForPlayer(player);
-			calculateNextActorTurnAndNotify();
+			calculateNextActorAndNotify();
 		}
 	}
 
 	public void handleTimedoutPlayer(BlackjackPlayer timedOutPlayer) {
-		finishInactivePlayerTurn(timedOutPlayer);
+		finalizeInactivePlayerTurn(timedOutPlayer);
 		notifyAll(Title.TIMED_OUT, timedOutPlayer);
-		calculateNextActorTurnAndNotify();
+		calculateNextActorAndNotify();
 	}
 
 	public void sendStatusUpdate(CasinoPlayer player) {

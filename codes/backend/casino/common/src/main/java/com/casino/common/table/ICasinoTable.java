@@ -77,4 +77,6 @@ public interface ICasinoTable {
 
 	public TableCard getTableCard();
 
+	public void onPlayerInTurnUpdate(ICasinoPlayer player);
+
 }

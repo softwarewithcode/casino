@@ -61,4 +61,6 @@ public interface ICasinoPlayer {
 
 	public <T> void sendMessage(T message);
 
+	public void updateAvailableActions();
+
 }

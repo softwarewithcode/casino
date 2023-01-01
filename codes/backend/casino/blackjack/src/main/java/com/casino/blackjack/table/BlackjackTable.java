@@ -102,7 +102,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "stand");
 			dealer.stand(player);
-			dealer.calculateNextActorTurnAndNotify();
+			dealer.calculateNextActorAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "stand", " player:" + playerId + " table:" + getId());
@@ -121,7 +121,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "hit");
 			dealer.addPlayerCard(player);
-			dealer.calculateNextActorTurnAndNotify();
+			dealer.calculateNextActorAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "hit", " player:" + playerId + " table:" + getId());
@@ -136,7 +136,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();
 			verifyActionClearance(player, "split");
 			dealer.handleSplit(player);
-			dealer.calculateNextActorTurnAndNotify();
+			dealer.calculateNextActorAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "split", " player:" + playerId + " table:" + getId());
@@ -151,7 +151,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();
 			verifyActionClearance(player, "doubleDown");
 			dealer.doubleDown(player);
-			dealer.calculateNextActorTurnAndNotify();
+			dealer.calculateNextActorAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "doubleDown", " player:" + playerId + " table:" + getId());

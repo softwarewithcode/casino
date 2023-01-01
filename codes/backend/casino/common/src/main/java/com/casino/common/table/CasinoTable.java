@@ -91,6 +91,12 @@ public abstract class CasinoTable implements ICasinoTable {
 		return this.clock.isTicking();
 	}
 
+	private void startPlayerClock(ICasinoPlayer player) {
+		stopClock();
+		PlayerClockTask playerTimer = new PlayerClockTask(this, player);
+		startClock(playerTimer, 0);
+	}
+
 	@JsonIgnore
 	@Override
 	public boolean isClosed() {
@@ -235,17 +241,17 @@ public abstract class CasinoTable implements ICasinoTable {
 		return getPlayerInTurn() != null && getPlayerInTurn().equals(player);
 	}
 
-	public void changePlayer(ICasinoPlayer player) {
-		System.out.println("ChangePlayer to:" + player.getName() + " stat " + player.getStatus());
-		if (playerInTurnLock.isHeldByCurrentThread()) {
-			playerInTurn = player;
-			if (playerInTurn != null) {
-				stopClock();
-				PlayerClockTask playerTimer = new PlayerClockTask(this, player);
-				startClock(playerTimer, 0);
-			}
-		} else
-			throw new ConcurrentModificationException("Cannot update playerInTurn, lock is missing");
+	@Override
+	public void onPlayerInTurnUpdate(ICasinoPlayer player) {
+		System.out.println("Current table Actor:" + player.getName() + " stat " + player.getStatus());
+		if (!playerInTurnLock.isHeldByCurrentThread()) {
+			throw new ConcurrentModificationException("playerInTurnLock is missing");
+		}
+		playerInTurn = player;
+		if (playerInTurn != null) {
+			player.updateAvailableActions();
+			startPlayerClock(player);
+		}
 	}
 
 	public void clearPlayerInTurn() {
