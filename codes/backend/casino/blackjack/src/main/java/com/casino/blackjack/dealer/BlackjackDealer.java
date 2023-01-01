@@ -80,12 +80,9 @@ public class BlackjackDealer implements IDealer {
 
 	public void updatePlayerBet(ICasinoPlayer tablePlayer, BigDecimal bet) {
 		Stream<Seat> seatStream = table.getSeats().stream();
-		Optional<Seat> playerOptional = seatStream.filter(seat -> seat.hasPlayer() && seat.getPlayer().equals(tablePlayer)).findFirst();
-		playerOptional.ifPresentOrElse(seat -> {
-			seat.getPlayer().updateStartingBet(bet, table);
-		}, () -> {
-			throw new PlayerNotFoundException("Player not found in table:" + table + " player:" + tablePlayer, 1);
-		});
+		Optional<Seat> seatOptional = seatStream.filter(seat -> seat.hasPlayer() && seat.getPlayer().equals(tablePlayer)).findFirst();
+		Seat seat = seatOptional.orElseThrow(PlayerNotFoundException::new);
+		seat.getPlayer().updateStartingBet(bet, table);
 	}
 
 	@JsonIgnore

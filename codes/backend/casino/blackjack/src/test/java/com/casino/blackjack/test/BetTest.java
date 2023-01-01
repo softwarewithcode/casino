@@ -95,10 +95,9 @@ public class BetTest extends BaseTest {
 	@Test
 	public void placingBetToPlayerNotInTableResultsInException() {
 		table.join(bridge, "0");
-		PlayerNotFoundException exception = assertThrows(PlayerNotFoundException.class, () -> {
+		assertThrows(PlayerNotFoundException.class, () -> {
 			table.bet(bridge2.userId(), new BigDecimal("7.0"));
 		});
-		assertEquals(1, exception.getCode());
 	}
 
 	@Test
