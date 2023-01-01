@@ -387,25 +387,30 @@ public class BlackjackDealer implements IDealer {
 		LOGGER.info("Dealer starts payout");
 		// Deal the case where player has disconnected before payout
 		List<ICasinoPlayer> playersWithWinningChances = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasWinningChance).toList();
-		playersWithWinningChances.forEach(player -> payoutWinnings(dealerHand, player));
+		playersWithWinningChances.forEach(player -> payoutWinnings(player));
 	}
 
-	private void payoutWinnings(BlackjackDealerHand dealerHand, ICasinoPlayer player) {
+	private void payoutWinnings(ICasinoPlayer player) {
 		player.getHands().forEach(playerHand -> {
 			if (shouldPayInsuranceBet(playerHand))
 				player.increaseBalanceAndPayout(playerHand.getInsuranceBet().multiply(BigDecimal.TWO));
-			int handComparison = dealerHand.compareTo(playerHand);
-			if (evenResult(handComparison))
-				player.increaseBalanceAndPayout(playerHand.getBet());
-			else if (playerWins(handComparison)) {
-				BigDecimal multiplier = playerHand.isBlackjack() ? BLACKJACK_FACTOR : BigDecimal.TWO;
-				player.increaseBalanceAndPayout(playerHand.getBet().multiply(multiplier));
-			}
+			BigDecimal betMultiplier = determineBetMultiplier(playerHand);
+			BigDecimal handPayout = playerHand.getBet().multiply(betMultiplier);
+			player.increaseBalanceAndPayout(handPayout);
 		});
 	}
 
-	private boolean shouldPayInsuranceBet(IHand hand) {
-		return hand.isInsuranceCompensable() && dealerHand.isBlackjack();
+	private boolean shouldPayInsuranceBet(IHand playerHand) {
+		return playerHand.isInsuranceCompensable() && dealerHand.isBlackjack();
+	}
+
+	private BigDecimal determineBetMultiplier(IHand playerHand) {
+		int handComparison = dealerHand.compareTo(playerHand);
+		if (evenResult(handComparison))
+			return BigDecimal.ONE;
+		if (playerWins(handComparison))
+			return playerHand.isBlackjack() ? BLACKJACK_FACTOR : BigDecimal.TWO;
+		return BigDecimal.ZERO;
 	}
 
 	private boolean evenResult(int comparison) {

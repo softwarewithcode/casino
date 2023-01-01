@@ -220,7 +220,7 @@ public class InsuranceTest extends BaseTest {
 	}
 
 	@Test
-	public void insuredHandProducesNothingIfHandGoesOver21AndDealerGetsBlackjack() {
+	public void insuredHandPayoutsNothingIfHandGoesOver21AndDealerGetsBlackjack() {
 		dealer.getDecks().add(Card.of(12, Suit.HEART));
 		dealer.getDecks().add(Card.of(13, Suit.HEART));
 		dealer.getDecks().add(Card.of(9, Suit.HEART));
