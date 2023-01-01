@@ -220,7 +220,7 @@ public class InsuranceTest extends BaseTest {
 	}
 
 	@Test
-	public void insuredHandPayoutsNothingIfHandGoesOver21AndDealerGetsBlackjack() {
+	public void insuredHandPaysInsuranceBetEvenIfHandGoesOver21AndDealerGetsBlackjack() {
 		dealer.getDecks().add(Card.of(12, Suit.HEART));
 		dealer.getDecks().add(Card.of(13, Suit.HEART));
 		dealer.getDecks().add(Card.of(9, Suit.HEART));
@@ -241,7 +241,7 @@ public class InsuranceTest extends BaseTest {
 		assertTrue(dealer.getHand().isBlackjack());
 		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isInsured());
 		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.userId()).getTotalBet());
-		assertEquals(new BigDecimal("925.00"), table.getPlayer(bridge.userId()).getBalance());
+		assertEquals(new BigDecimal("975.00"), table.getPlayer(bridge.userId()).getBalance());
 	}
 
 	@Test

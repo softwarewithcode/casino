@@ -255,7 +255,7 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public boolean isInsuranceCompensable() {
-		return isInsured() && isCompleted() && calculateFinalValue() <= 21;
+		return isInsured() && isCompleted();
 	}
 
 }
