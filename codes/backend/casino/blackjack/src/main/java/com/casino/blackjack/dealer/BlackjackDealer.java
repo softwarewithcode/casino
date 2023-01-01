@@ -127,9 +127,9 @@ public class BlackjackDealer implements IDealer {
 	public void dealStartingHands() {
 		LOGGER.info("dealer deals starting hands");
 		List<ICasinoPlayer> orderedPlayers = getOrderedPlayersWithBet();
-		orderedPlayers.forEach(player -> dealCard(player.getHands().get(0))); // first the players
+		orderedPlayers.forEach(player -> dealCard(player.getActiveHand())); // first the players
 		dealCard(dealerHand); // then the dealer
-		orderedPlayers.forEach(player -> dealCard(player.getHands().get(0))); // then the players again
+		orderedPlayers.forEach(player -> dealCard(player.getActiveHand())); // then the players again
 	}
 
 	private void dealCard(IHand hand) {
@@ -368,7 +368,7 @@ public class BlackjackDealer implements IDealer {
 			completeActiveHands();
 			if (table.hasPlayersWithWinningChances()) {
 				addDealerCards();
-				payout();
+				handlePayouts();
 			}
 			table.updateGamePhase(GamePhase.ROUND_COMPLETED);
 		} catch (Exception e) {
@@ -383,25 +383,29 @@ public class BlackjackDealer implements IDealer {
 		players.forEach(player -> player.getActiveHand().complete());
 	}
 
-	private void payout() {
+	private void handlePayouts() {
 		LOGGER.info("Dealer starts payout");
 		// Deal the case where player has disconnected before payout
 		List<ICasinoPlayer> playersWithWinningChances = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasWinningChance).toList();
-		playersWithWinningChances.forEach(player -> player.getHands().forEach(playerHand -> {
-			int comparison = dealerHand.compareTo(playerHand);
-			if (shouldPayInsuranceBet(player))
-				player.increaseBalanceAndPayout(player.getInsuranceAmount().multiply(BigDecimal.TWO));
-			if (evenResult(comparison))
+		playersWithWinningChances.forEach(player -> payoutWinnings(dealerHand, player));
+	}
+
+	private void payoutWinnings(BlackjackDealerHand dealerHand, ICasinoPlayer player) {
+		player.getHands().forEach(playerHand -> {
+			if (shouldPayInsuranceBet(playerHand))
+				player.increaseBalanceAndPayout(playerHand.getInsuranceBet().multiply(BigDecimal.TWO));
+			int handComparison = dealerHand.compareTo(playerHand);
+			if (evenResult(handComparison))
 				player.increaseBalanceAndPayout(playerHand.getBet());
-			else if (playerWins(comparison)) {
+			else if (playerWins(handComparison)) {
 				BigDecimal multiplier = playerHand.isBlackjack() ? BLACKJACK_FACTOR : BigDecimal.TWO;
 				player.increaseBalanceAndPayout(playerHand.getBet().multiply(multiplier));
 			}
-		}));
+		});
 	}
 
-	private boolean shouldPayInsuranceBet(ICasinoPlayer player) {
-		return player.isCompensable() && dealerHand.isBlackjack();
+	private boolean shouldPayInsuranceBet(IHand hand) {
+		return hand.isInsuranceCompensable() && dealerHand.isBlackjack();
 	}
 
 	private boolean evenResult(int comparison) {
@@ -427,11 +431,10 @@ public class BlackjackDealer implements IDealer {
 		notifyAll(title, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
-	public void calculateNextTurnAndNotify() {
+	public void calculateNextActorTurnAndNotify() {
 		updateTableActor();
 		if (table.getPlayerInTurn() != null)
 			notifyAll(Title.SERVER_WAITS_PLAYER_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
-
 	}
 
 	public void handleLeavingPlayer(BlackjackPlayer leavingPlayer) {
@@ -451,14 +454,14 @@ public class BlackjackDealer implements IDealer {
 	private void finishInactivePlayerTurn(BlackjackPlayer player) {
 		if (player.hasBet() && player.equals(table.getPlayerInTurn())) {
 			autoplayForPlayer(player);
-			calculateNextTurnAndNotify();
+			calculateNextActorTurnAndNotify();
 		}
 	}
 
 	public void handleTimedoutPlayer(BlackjackPlayer timedOutPlayer) {
 		finishInactivePlayerTurn(timedOutPlayer);
 		notifyAll(Title.TIMED_OUT, timedOutPlayer);
-		calculateNextTurnAndNotify();
+		calculateNextActorTurnAndNotify();
 	}
 
 	public void sendStatusUpdate(CasinoPlayer player) {
