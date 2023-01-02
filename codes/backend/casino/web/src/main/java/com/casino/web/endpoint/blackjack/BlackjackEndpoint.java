@@ -1,6 +1,5 @@
 package com.casino.web.endpoint.blackjack;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -42,7 +41,6 @@ public class BlackjackEndpoint {
 		System.out.println("onOpen called " + tableId);
 		try {
 			UUID id = Validator.validateId(tableId);
-			handlePossibleWatcherParam(session);
 			Optional<IBlackjackTable> table = tableService.fetchTable(id);
 			if (table.isEmpty()) {
 				tableId = null;
@@ -55,17 +53,6 @@ public class BlackjackEndpoint {
 //			this.table.watch(bridge);
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "onOpen error ", e);
-		}
-	}
-
-	private void handlePossibleWatcherParam(Session session) {
-		List<String> watch = session.getRequestParameterMap().get("watch");
-		if (watch != null) {
-			String watchParam = watch.get(0);
-			Integer watching = Integer.parseInt(watchParam);
-			if (watching != 1)
-				throw new IllegalArgumentException("watch param exist but is not what is expected");
-//			this.watcher = true;
 		}
 	}
 
