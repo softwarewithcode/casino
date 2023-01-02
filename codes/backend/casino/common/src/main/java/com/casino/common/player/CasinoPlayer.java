@@ -36,7 +36,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@JsonProperty
 	private volatile BigDecimal payout;
 	@JsonProperty
-	private volatile Status status;
+	private volatile PlayerStatus status;
 
 	public CasinoPlayer(Bridge bridge, ICasinoTable table) {
 		super();
@@ -103,12 +103,12 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	}
 
 	@Override
-	public Status getStatus() {
+	public PlayerStatus getStatus() {
 		return status;
 	}
 
 	@Override
-	public void setStatus(Status status) {
+	public void setStatus(PlayerStatus status) {
 		this.status = status;
 
 	}
@@ -147,7 +147,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		this.totalBet = bet;
 	}
 
-	protected void updateBalanceAndBet(BigDecimal increaseAmount) {
+	protected void updateBalanceAndTotalBet(BigDecimal increaseAmount) {
 		verifyCallersLock();
 		BetUtil.verifySufficentBalance(increaseAmount, this);
 		if (this.totalBet == null)

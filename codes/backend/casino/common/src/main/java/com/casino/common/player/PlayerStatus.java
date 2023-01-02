@@ -1,6 +1,6 @@
 package com.casino.common.player;
 
-public enum Status {
+public enum PlayerStatus {
 	SIT_OUT, ACTIVE, LEFT
 
 }

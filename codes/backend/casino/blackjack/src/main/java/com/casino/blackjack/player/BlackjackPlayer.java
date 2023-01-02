@@ -117,7 +117,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 			Card cardFromStartingHand = hands.get(0).getCards().remove(1);
 			splitHand.addCard(cardFromStartingHand);
 			splitHand.updateBet(hands.get(0).getBet());// immutable BigDecimal
-			updateBalanceAndBet(splitHand.getBet());
+			updateBalanceAndTotalBet(splitHand.getBet());
 			hands.add(splitHand);
 		} finally {
 			releasePlayerLock();
@@ -148,7 +148,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		try {
 			tryTakingPlayerLock();
 			validateDoubleDownPreConditions();
-			updateBalanceAndBet(getTotalBet());
+			updateBalanceAndTotalBet(getTotalBet());
 			getFirstHand().doubleDown(ref);
 		} finally {
 			releasePlayerLock();
@@ -171,7 +171,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 			tryTakingPlayerLock();
 			validateInsuringConditions();
 			getFirstHand().insure();
-			updateBalanceAndBet(getFirstHand().getBet().divide(BigDecimal.TWO));
+			updateBalanceAndTotalBet(getFirstHand().getBet().divide(BigDecimal.TWO));
 		} finally {
 			if (getPlayerLock().isHeldByCurrentThread())
 				getPlayerLock().unlock();

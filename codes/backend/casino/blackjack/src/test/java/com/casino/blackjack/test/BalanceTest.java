@@ -72,6 +72,19 @@ public class BalanceTest extends BaseTest {
 	public void dealerCalculatesBalancesBasedOnLastAcceptedBets() {
 		Bridge blackjackPlayer = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("100"));
 		Bridge blackjackPlayer2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("100"));
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(13, Suit.HEART));
+		cards.add(Card.of(11, Suit.SPADE));
+		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(6, Suit.DIAMOND));
+		cards.add(Card.of(13, Suit.HEART));
+		cards.add(Card.of(12, Suit.SPADE));
 		table.join(blackjackPlayer, "5");
 		table.join(blackjackPlayer2, "6");
 		table.bet(blackjackPlayer.userId(), new BigDecimal("11.11"));
@@ -79,12 +92,14 @@ public class BalanceTest extends BaseTest {
 		table.bet(blackjackPlayer.userId(), new BigDecimal("44.55"));
 		table.bet(blackjackPlayer2.userId(), new BigDecimal("51.00"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.stand(blackjackPlayer.userId());
+		table.stand(blackjackPlayer2.userId());
 		assertEquals(new BigDecimal("44.55"), table.getPlayer(blackjackPlayer.userId()).getHands().get(0).getBet());
 		assertEquals(new BigDecimal("44.55"), table.getPlayer(blackjackPlayer.userId()).getTotalBet());
-		assertEquals(new BigDecimal("55.45"), table.getPlayer(blackjackPlayer.userId()).getBalance());
+		assertEquals(new BigDecimal("144.55"), table.getPlayer(blackjackPlayer.userId()).getBalance());
 		assertEquals(new BigDecimal("51.00"), table.getPlayer(blackjackPlayer2.userId()).getHands().get(0).getBet());
 		assertEquals(new BigDecimal("51.00"), table.getPlayer(blackjackPlayer2.userId()).getTotalBet());
-		assertEquals(new BigDecimal("49.00"), table.getPlayer(blackjackPlayer2.userId()).getBalance());
+		assertEquals(new BigDecimal("151.00"), table.getPlayer(blackjackPlayer2.userId()).getBalance());
 	}
 
 	@Test

@@ -51,7 +51,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			if (seatOptional.isEmpty()) {
 				return false;
 			}
-			player.setStatus(com.casino.common.player.Status.ACTIVE);
+			player.setStatus(com.casino.common.player.PlayerStatus.ACTIVE);
 			player.setSeatNumber(seatOptional.get().getNumber());
 			super.removeWatcher(player.getId());
 			dealer.onPlayerArrival(player);

@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 
 import com.casino.common.bet.BetUtil;
 import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.player.PlayerStatus;
 import com.casino.common.table.phase.PhasePath;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -47,7 +48,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	@Override
 	public Integer getActivePlayerCount() {
-		return (int) seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != com.casino.common.player.Status.SIT_OUT).count();
+		return (int) seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != com.casino.common.player.PlayerStatus.SIT_OUT).count();
 	}
 
 	// User might have disconnected, so don't compare to active status
@@ -57,19 +58,6 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	public boolean hasPlayersWithWinningChances() {
 		return seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().hasWinningChance()).findFirst().isPresent();
-	}
-
-	public Seat findNextPlayerWithActiveActiveHand() {
-		Optional<Seat> playerInTurnOptional = seats.stream().filter(seat -> !seat.isAvailable() && seat.getPlayer().equals(getPlayerInTurn())).findFirst();
-		if (playerInTurnOptional.isEmpty())
-			throw new IllegalStateException("No playerInTurn");
-		Seat playerInTurnSeat = playerInTurnOptional.get();
-		Optional<Seat> nextPlayer = seats.stream().filter(seat -> isNextSeatWithBet(playerInTurnSeat, seat)).findFirst();
-		return nextPlayer.orElse(null);
-	}
-
-	private boolean isNextSeatWithBet(Seat playerInTurnSeat, Seat seat) {
-		return !seat.isAvailable() && seat.getPlayer().hasActiveHand() && seat.getNumber() > playerInTurnSeat.getNumber();
 	}
 
 	@Override
@@ -134,6 +122,10 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	public boolean hasPlayers() {
 		return getReservedSeatCount() != 0;
+	}
+
+	public List<Seat> findInActivePlayerSeats() {
+		return getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != PlayerStatus.ACTIVE).toList();
 	}
 
 }

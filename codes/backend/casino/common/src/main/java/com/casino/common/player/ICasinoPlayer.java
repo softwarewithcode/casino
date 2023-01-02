@@ -25,9 +25,9 @@ public interface ICasinoPlayer {
 
 	public boolean canAct();
 
-	public Status getStatus();
+	public PlayerStatus getStatus();
 
-	public void setStatus(Status status);
+	public void setStatus(PlayerStatus status);
 
 	public BigDecimal getTotalBet();
 

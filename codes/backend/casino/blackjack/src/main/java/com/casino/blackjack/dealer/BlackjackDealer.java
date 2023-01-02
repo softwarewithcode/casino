@@ -24,7 +24,7 @@ import com.casino.common.dealer.IDealer;
 import com.casino.common.exception.PlayerNotFoundException;
 import com.casino.common.player.CasinoPlayer;
 import com.casino.common.player.ICasinoPlayer;
-import com.casino.common.player.Status;
+import com.casino.common.player.PlayerStatus;
 import com.casino.common.table.Seat;
 import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
@@ -239,12 +239,12 @@ public class BlackjackDealer implements IDealer {
 	private void updatePlayerStatuses() {
 		List<ICasinoPlayer> players = table.getSeats().stream().filter(Seat::hasPlayer).map(Seat::getPlayer).toList();
 		players.forEach(player -> {
-			if (player.getStatus() == Status.LEFT)
+			if (player.getStatus() == PlayerStatus.LEFT)
 				return;
 			if (player.hasBet())
-				player.setStatus(Status.ACTIVE);
+				player.setStatus(PlayerStatus.ACTIVE);
 			else
-				player.setStatus(Status.SIT_OUT);
+				player.setStatus(PlayerStatus.SIT_OUT);
 		});
 	}
 
@@ -270,8 +270,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void removeInactivePlayers() {
-		List<Seat> casinoPlayers = table.getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != Status.ACTIVE).toList();
-		casinoPlayers.forEach(Seat::sanitize);
+		table.findInActivePlayerSeats().forEach(Seat::sanitize);
 	}
 
 	public synchronized void prepareNewRound() {
@@ -433,7 +432,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void onPlayerLeave(BlackjackPlayer leavingPlayer) {
-		leavingPlayer.setStatus(Status.LEFT);
+		leavingPlayer.setStatus(PlayerStatus.LEFT);
 		finalizeInactivePlayerTurn(leavingPlayer);
 		if (!table.isRoundRunning()) {
 			removeInactivePlayers();
