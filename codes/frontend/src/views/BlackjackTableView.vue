@@ -69,8 +69,9 @@ const getCenterPlayer = (): BlackjackPlayer => {
     return centerPlayer
 }
 
+
 const seatStyle = (seatNumber: number) => {
-    return { 'display': "inline" }
+    return { 'display': "inline", 'bottom': "200px", "margin-right": "45px", "left": "50px" }
 }
 
 const insuranceClicked = ref<boolean>(false)
@@ -81,7 +82,6 @@ const insuranceAvailable = computed<boolean>(() => {
 </script>
 
 <template v-if="canvasReady">
-
     <div style="position: relative">
         Table {{ table?.tableCard?.id }} {{ table.gamePhase }}{{ table.playerInTurn?.name }}
         <canvas id="canvas" width="1800" height="600" style="border-style: dashed solid"></canvas>
