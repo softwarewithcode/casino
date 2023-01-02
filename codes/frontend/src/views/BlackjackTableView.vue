@@ -54,11 +54,11 @@ const drawTable = async (initialDeal: boolean) => {
 
     const canvas: HTMLCanvasElement = clearCanvas()
     useActorsPainter(table.value, getCenterPlayer(), canvas);
-    if (initialDeal) {
+    if (initialDeal)
         useInitialDealPainter(table.value, getCenterPlayer(), canvas)
-    } else {
+    else
         useCardsAndHandValuesPainter(table.value, getCenterPlayer(), canvas)
-    }
+
 }
 
 const getCenterPlayer = (): BlackjackPlayer => {

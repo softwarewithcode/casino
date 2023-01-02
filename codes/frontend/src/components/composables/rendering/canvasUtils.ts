@@ -1,20 +1,26 @@
 import type { BlackjackHand, BlackjackPlayer, BlackjackTable, Seat } from "@/types/blackjack"
 import type { Vector, CasinoFont, Card, SpriteImageMetadata } from "@/types/casino"
 import { useCardLocator } from "./cardSpriteUtils"
-const availableSeatFont: CasinoFont = {
-	color: "#006400",
-	faceAndSize: "25px Arial"
+const infoFont: CasinoFont = {
+	color: "blue",
+	faceAndSize: "20px Arial"
+}
+const dealerFont: CasinoFont = {
+	color: "E97451",
+	faceAndSize: "22px Arial"
 }
 const reservedSeatFont: CasinoFont = {
 	color: "#E97451",
 	faceAndSize: "16px Arial"
 }
+
+const dealerName = "-"
 const INITIAL_DEAL_CARD_DELAY = 1500
 let playerBoxHeight
 let playerBoxWidth
-let dealerFirstCardPosition: Vector
-const defaultCardWidthPixel = 77
-const defaultCarHeighthPixel = 107
+const cardWidthHeightRatio: number = 0.72
+let mainBoxPlayer: BlackjackPlayer
+let table: BlackjackTable
 const largeBoxIndex = 6
 export function useCanvasInitializer(canvas: HTMLCanvasElement) {
 	const documentWidth = document.documentElement.clientWidth
@@ -23,7 +29,7 @@ export function useCanvasInitializer(canvas: HTMLCanvasElement) {
 }
 
 export function useActorsPainter(table: BlackjackTable, mainBoxPlayer: BlackjackPlayer, canvas: HTMLCanvasElement) {
-	initPainterData(canvas)
+	initPainterData(canvas, mainBoxPlayer, table)
 	const ctx = canvas.getContext("2d")
 	if (!ctx) return
 	if (!mainBoxPlayer || Object.keys(mainBoxPlayer).length === 0) return
@@ -32,7 +38,7 @@ export function useActorsPainter(table: BlackjackTable, mainBoxPlayer: Blackjack
 	paintDealerBox(canvas)
 }
 export function useCardsAndHandValuesPainter(table: BlackjackTable, mainBoxPlayer: BlackjackPlayer, canvas: HTMLCanvasElement) {
-	initPainterData(canvas)
+	initPainterData(canvas, mainBoxPlayer, table)
 	const playersWithCards: BlackjackPlayer[] = getPlayersWithCards(table)
 	if (playersWithCards.length === 0) return
 	paintPlayersCards(playersWithCards, mainBoxPlayer, canvas)
@@ -41,10 +47,8 @@ export function useCardsAndHandValuesPainter(table: BlackjackTable, mainBoxPlaye
 	paintPlayersHandValues(playersWithCards, mainBoxPlayer, canvas)
 }
 const paintDealerCards = (table: BlackjackTable, canvas: HTMLCanvasElement) => {
-	table.dealerHand.cards.forEach((dealerCard, index) => {
-		let x = dealerFirstCardPosition.x
-		x = dealerFirstCardPosition.x + index * defaultCardWidthPixel
-		paintCard({ x: x, y: dealerFirstCardPosition.y }, dealerCard, canvas)
+	table.dealerHand.cards.forEach((dealerCard, cardIndex) => {
+		paintCard(dealerName, dealerCard, cardIndex, 0, canvas)
 	})
 }
 
@@ -52,8 +56,8 @@ const paintPlayersCards = (playersWithCards: BlackjackPlayer[], mainBoxPlayer: B
 	playersWithCards.forEach(player => {
 		player.hands.forEach((hand, handIndex) => {
 			hand.cards.forEach((card, cardIndex) => {
-				const cardPosition: Vector = calculateCardPositionInPlayerBox(player, mainBoxPlayer, cardIndex, handIndex, canvas)
-				paintCard(cardPosition, card, canvas)
+				//const cardPosition: Vector = calculateCardPositionInPlayerBox(player, mainBoxPlayer, cardIndex, handIndex, canvas)
+				paintCard(player.name, card, cardIndex, handIndex, canvas)
 			})
 		})
 	})
@@ -61,46 +65,38 @@ const paintPlayersCards = (playersWithCards: BlackjackPlayer[], mainBoxPlayer: B
 export async function useInitialDealPainter(table: BlackjackTable, mainBoxPlayer: BlackjackPlayer, canvas: HTMLCanvasElement) {
 	const ctx = canvas.getContext("2d")
 	if (!ctx) return
-	initPainterData(canvas)
+	initPainterData(canvas, mainBoxPlayer, table)
 	const playersWithCards: BlackjackPlayer[] = getPlayersWithCards(table)
-	showOneCardFromFirstHandWithDelay(playersWithCards, mainBoxPlayer, canvas)
+	showOneCardFromFirstHandWithDelay(playersWithCards, canvas)
 	const dealerCard: Card = table.dealerHand.cards[0]
-	await paintCardWithDelay(INITIAL_DEAL_CARD_DELAY, dealerFirstCardPosition, dealerCard, canvas)
+	await paintCardWithDelay(INITIAL_DEAL_CARD_DELAY, dealerName, dealerCard, 0, 0, canvas)
 	paintDealerHandValue(table.dealerHand.values[0], canvas)
-	showOneCardFromFirstHandWithDelay(playersWithCards, mainBoxPlayer, canvas)
+	showOneCardFromFirstHandWithDelay(playersWithCards, canvas)
 	paintPlayersHandValues(playersWithCards, mainBoxPlayer, canvas)
 }
 
 const paintDealerHandValue = (value: number, canvas: HTMLCanvasElement) => {
-	paintText("Value:" + value, { x: 2 * playerBoxWidth, y: playerBoxHeight + 20 }, canvas, reservedSeatFont)
+	paintText("Value:" + value, { x: 2 * playerBoxWidth, y: playerBoxHeight + 20 }, canvas, dealerFont)
 }
 const getPlayersWithCards = (table: BlackjackTable) => {
 	return table.seats.map(seat => seat.player).filter(player => player?.hands && player.hands[0]?.cards.length > 0)
 }
-const showOneCardFromFirstHandWithDelay = async (players: BlackjackPlayer[], mainBoxPlayer: BlackjackPlayer, canvas: HTMLCanvasElement) => {
+const showOneCardFromFirstHandWithDelay = async (players: BlackjackPlayer[], canvas: HTMLCanvasElement) => {
 	for (let i = 0; i < players.length; i++) {
 		const player = players[i]
-
 		const cardIndex = player.hands[0].cards.findIndex(card => !card.hasOwnProperty("visible"))
 		const card = player.hands[0].cards[cardIndex]
-		const cardPosition = calculateCardPositionInPlayerBox(player, mainBoxPlayer, cardIndex, 0, canvas)
-
-		await paintCardWithDelay(INITIAL_DEAL_CARD_DELAY, cardPosition, card, canvas)
+		const handIndex = 0
+		await paintCardWithDelay(INITIAL_DEAL_CARD_DELAY, player.name, card, cardIndex, handIndex, canvas)
 		card.visible = true
 	}
-}
-const calculateCardPositionInPlayerBox = (player: BlackjackPlayer, mainBoxPlayer: BlackjackPlayer, cardIndex: number, handIndex: number, canvas: HTMLCanvasElement): Vector => {
-	const playerIndex = getPlayerBoxIndexRelativeToMainBoxPlayer(mainBoxPlayer, player)
-	let boxStartingCorner = getPlayerBoxStartingCorner(playerIndex, playerBoxWidth, playerBoxHeight)
-	const cardXCoordinateInPlayerBox = playerIndex === largeBoxIndex ? canvas.width / 3 + cardIndex * defaultCardWidthPixel : boxStartingCorner.x + cardIndex * defaultCardWidthPixel
-	const cardYCoordinateInPlayerBox = boxStartingCorner.y + 20
-	return { x: cardXCoordinateInPlayerBox, y: cardYCoordinateInPlayerBox }
 }
 
 const paintPlayersHandValues = (playersWithCards: BlackjackPlayer[], mainBoxPlayer: BlackjackPlayer, canvas: HTMLCanvasElement) => {
 	playersWithCards.forEach(player => {
-		const playerIndex = getPlayerBoxIndexRelativeToMainBoxPlayer(mainBoxPlayer, player)
+		const playerIndex = getPlayerBoxIndexRelativeToMainBoxPlayer(player.name)
 		const boxStartingCorner = getPlayerBoxStartingCorner(playerIndex, playerBoxWidth, playerBoxHeight)
+		console.log("boxStartingCorner:" + JSON.stringify(boxStartingCorner) + " index:" + playerIndex)
 		const halfOfPlayerBoxLength = playerIndex === largeBoxIndex ? canvas.width / 2 : playerBoxWidth / 2
 		getHands(player).forEach(hand => {
 			getHandValues(hand).forEach((value, index) => {
@@ -123,29 +119,79 @@ const getHands = (player: BlackjackPlayer) => {
 }
 
 const wait = time => new Promise(r => setTimeout(r, time)) // artificial wait
-const initPainterData = (canvas: HTMLCanvasElement) => {
+const initPainterData = (canvas: HTMLCanvasElement, mainPlayer: BlackjackPlayer, tbl: BlackjackTable) => {
+	mainBoxPlayer = mainPlayer
+	table = tbl
 	playerBoxHeight = canvas.height / 4
 	playerBoxWidth = canvas.width / 4
-	dealerFirstCardPosition = {
-		x: playerBoxWidth + 10,
-		y: playerBoxHeight + playerBoxHeight / 3
-	}
 }
 
-const paintCardWithDelay = async (delayMillis: number, startingCorner: Vector, card: Card, canvas: HTMLCanvasElement) => {
+const paintCardWithDelay = async (delayMillis: number, actorName: string, card: Card, nth: number, handNth: number, canvas: HTMLCanvasElement) => {
 	await wait(delayMillis)
-	paintCard(startingCorner, card, canvas)
+	paintCard(actorName, card, nth, handNth, canvas)
 }
-const cardsImage: HTMLImageElement = document.getElementById("cardsImage") as HTMLImageElement
-const paintCard = (cardPosition: Vector, card: Card, canvas: HTMLCanvasElement) => {
-	if (!card) {
-		console.log("no card")
+const cardsSprite: HTMLImageElement = document.getElementById("cardsSprite") as HTMLImageElement
+
+const paintCard = (actorName: string, card: Card, nth: number, handNth: number, canvas: HTMLCanvasElement) => {
+	const ctx = canvas.getContext("2d")
+	if (!card || !ctx) {
+		console.error("cannot draw")
 		return
 	}
-	const ctx = canvas.getContext("2d")
-	if (!ctx) return
 	const cardData = useCardLocator(card)
-	ctx.drawImage(cardsImage, cardData.position.x, cardData.position.y, cardData.size.x, cardData.size.y, cardPosition.x, cardPosition.y, defaultCardWidthPixel, defaultCarHeighthPixel)
+	const cardSize = calculateCardSize(actorName)
+	const cardPosition = calculateCardPosition(actorName, nth, handNth)
+	ctx.drawImage(cardsSprite, cardData.position.x, cardData.position.y, cardData.size.x, cardData.size.y, cardPosition.x, cardPosition.y, cardSize.x, cardSize.y)
+}
+let dealerCardSize: Vector
+let playerCardSize: Vector
+let mainPlayerCardSize: Vector
+
+const calculateCardPosition = (actorName: string, nthCard: number, nthHand: number): Vector => {
+	if (actorName === dealerName) {
+		const cardPositionX = playerBoxWidth + nthCard * dealerCardSize.x + 20
+		const cardPositionY = playerBoxHeight + playerBoxHeight
+		return { x: cardPositionX, y: cardPositionY }
+	}
+	if (actorName === mainBoxPlayer.name) {
+		const cardPositionX = playerBoxWidth + nthCard * mainPlayerCardSize.x + 20
+		const cardPositionY = 3 * playerBoxHeight + nthHand * mainPlayerCardSize.y
+		return { x: cardPositionX, y: cardPositionY }
+	}
+	const playerIndex = getPlayerBoxIndexRelativeToMainBoxPlayer(actorName)
+	let boxStartingCorner = getPlayerBoxStartingCorner(playerIndex, playerBoxWidth, playerBoxHeight)
+	console.log(JSON.stringify("index:" + playerIndex + " crener" + boxStartingCorner))
+	let cardPositionX = boxStartingCorner.x + playerCardSize.x * nthCard + 2
+	let cardPositionY = boxStartingCorner.y + boxStartingCorner.y / 3 + nthHand * playerCardSize.y
+	return { x: cardPositionX, y: cardPositionY }
+}
+
+const calculateCardSize = (actorName: string): Vector => {
+	console.log("calculateCardSize MainBoxPlayer:" + playerBoxHeight)
+	if (actorName === dealerName) {
+		if (!dealerCardSize) {
+			const dealerBoxWidth = playerBoxWidth * 2
+			const cardWidth = dealerBoxWidth / 5
+			const cardHeight = cardWidth / cardWidthHeightRatio
+			dealerCardSize = { x: cardWidth, y: cardHeight }
+		}
+		return dealerCardSize
+	}
+	if (actorName === mainBoxPlayer.name) {
+		if (!mainPlayerCardSize) {
+			const mainBoxWidth = playerBoxWidth * 4
+			const cardWidth = mainBoxWidth / 10
+			const cardHeight = cardWidth / cardWidthHeightRatio
+			mainPlayerCardSize = { x: cardWidth, y: cardHeight }
+		}
+		return mainPlayerCardSize
+	}
+	if (!playerCardSize) {
+		const cardWidth = playerBoxWidth / 4
+		const cardHeight = cardWidth / cardWidthHeightRatio
+		playerCardSize = { x: cardWidth, y: cardHeight }
+	}
+	return playerCardSize
 }
 
 const getNextSeatNumber = (featuredSeatNumber: number, table: BlackjackTable): number => {
@@ -173,12 +219,14 @@ const isPlayerInTurn = (table: BlackjackTable, player: BlackjackPlayer): boolean
 	return player.name === table.playerInTurn?.name
 }
 
-const getPlayerBoxIndexRelativeToMainBoxPlayer = (mainBoxPlayer: BlackjackPlayer, iterationPlayer: BlackjackPlayer) => {
-	if (mainBoxPlayer.name === iterationPlayer.name) return largeBoxIndex
-	if (mainBoxPlayer.seatNumber > iterationPlayer.seatNumber) {
-		return largeBoxIndex - (mainBoxPlayer.seatNumber - iterationPlayer.seatNumber)
+const getPlayerBoxIndexRelativeToMainBoxPlayer = (actorName: string) => {
+	if (mainBoxPlayer.name === actorName) return largeBoxIndex
+	const seat = table.seats.find(seat => seat.player?.name === actorName)
+	if (!seat) throw new Error("player not found " + actorName)
+	if (mainBoxPlayer.seatNumber > seat.number) {
+		return largeBoxIndex - (mainBoxPlayer.seatNumber - seat.number)
 	}
-	return iterationPlayer.seatNumber - mainBoxPlayer.seatNumber - 1
+	return seat.number - mainBoxPlayer.seatNumber - 1
 }
 
 const getPlayerBoxStartingCorner = (index: number, boxWidth: number, boxHeight: number) => {
@@ -206,13 +254,17 @@ const paintDealerBox = (canvas: HTMLCanvasElement) => {
 	if (!ctx) return
 	//ctx.strokeRect(playerBoxWidth, playerBoxHeight, 2 * playerBoxWidth, 2 * playerBoxHeight)
 	paintRectangle({ x: playerBoxWidth, y: playerBoxHeight }, { x: 2 * playerBoxWidth, y: 2 * playerBoxHeight }, canvas, false)
-	paintText("Dealer:", { x: playerBoxWidth + 10, y: playerBoxHeight + 20 }, canvas, reservedSeatFont)
+	paintText("Dealer:", { x: playerBoxWidth + 10, y: playerBoxHeight + 20 }, canvas, dealerFont)
 }
 
 const paintPlayerBox = (boxStartingCorner: Vector, seat: Seat, canvas: HTMLCanvasElement, isInTurn: boolean) => {
 	paintRectangle(boxStartingCorner, { x: playerBoxWidth, y: playerBoxHeight }, canvas, isInTurn)
-	paintText(seat.player?.name + " " + seat.number, { x: boxStartingCorner.x + 10, y: boxStartingCorner.y + 20 }, canvas, reservedSeatFont)
-	paintText("Balance " + seat.player?.balance, { x: boxStartingCorner.x + 10, y: boxStartingCorner.y + 50 }, canvas, reservedSeatFont)
+	if (!seat.player) {
+		paintText("Seat " + (seat.number + 1), { x: boxStartingCorner.x + 10, y: boxStartingCorner.y + 50 }, canvas, infoFont)
+		return
+	}
+	paintText(seat.player.name, { x: boxStartingCorner.x + 10, y: boxStartingCorner.y + 20 }, canvas, reservedSeatFont)
+	paintText(seat.player.balance + "$", { x: boxStartingCorner.x + playerBoxWidth - 60, y: boxStartingCorner.y + 20 }, canvas, reservedSeatFont)
 }
 
 const paintRectangle = (startPosition: Vector, endPosition: Vector, canvas: HTMLCanvasElement, highlight: boolean) => {
