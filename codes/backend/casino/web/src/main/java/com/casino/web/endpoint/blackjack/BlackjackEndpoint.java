@@ -67,13 +67,10 @@ public class BlackjackEndpoint {
 			switch (message.getAction()) {
 			case OPEN_TABLE -> {
 				watcher = true;
-				if (!table.watch(bridge)) {
-					session.getBasicRemote().sendText("{\"title\":\"FORBIDDEN\"}");
-				}
+				table.watch(bridge);
 			}
 			case JOIN -> {
-				boolean player = table.join(bridge, message.getSeat());
-				if (player)
+				if (table.join(bridge, message.getSeat()))
 					watcher = false;
 				else
 					session.getBasicRemote().sendText("{\"title\":\"FORBIDDEN\"}");
@@ -89,7 +86,6 @@ public class BlackjackEndpoint {
 			System.out.println("Command ok " + message.getAction());
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onMessage error:" + bridge, e);
-//			this.onClose(session, CloseReason.CloseCodes.UNEXPECTED_CONDITION);
 		}
 	}
 
