@@ -120,7 +120,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	}
 
 	@Test
-	public void fiftyOneOutHundredPlayersGetsRejectedAnd49GetsAcceptedIn49SeatedTable() throws InterruptedException, BrokenBarrierException {
+	public void fiftyOneOutOfHundredPlayersGetsRejectedAnd49GetsAcceptedIn49SeatedTable() throws InterruptedException, BrokenBarrierException {
 		TableInitData tableInitData = getDefaultTableInitDataWithPlayersMinAndMax(49, 49);
 		table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 		CyclicBarrier casinoBarrier = new CyclicBarrier(101);
@@ -340,15 +340,15 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		})).toList();
 	}
 
-	private List<Thread> createDoubleDownThreads(int amount, CyclicBarrier casinoDoor) {
+	private List<Thread> createDoubleDownThreads(int threadAmount, CyclicBarrier barrier) {
 		BlackjackHand hand = (BlackjackHand) doubleDownPlayer.getActiveHand();
 		hand.addCard(Card.of(2, Suit.CLUB));
 		hand.addCard(Card.of(2, Suit.HEART));
 		hand.updateBet(new BigDecimal("10.0"));
-		return IntStream.rangeClosed(0, amount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
+		return IntStream.rangeClosed(0, threadAmount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
 			try {
 				BlackjackHand hand_ = (BlackjackHand) doubleDownPlayer.getHands().get(0);
-				casinoDoor.await();
+				barrier.await();
 				hand_.doubleDown(Card.of(3, Suit.CLUB));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -358,8 +358,8 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		})).toList();
 	}
 
-	private List<Thread> createCasinoPlayers(int amount, CyclicBarrier casinoDoor) {
-		return IntStream.rangeClosed(0, amount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
+	private List<Thread> createCasinoPlayers(int playerAmount, CyclicBarrier casinoDoor) {
+		return IntStream.rangeClosed(0, playerAmount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
 			Bridge indexedBridge = new Bridge("player:" + index, table.getId(), UUID.randomUUID(), null, MAX_BET);
 			try {
 				int seatNumber = index;
@@ -381,8 +381,8 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 		})).toList();
 	}
 
-	private List<Thread> addWatchersToTable(int amount, CyclicBarrier casinoDoor) {
-		return IntStream.rangeClosed(0, amount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
+	private List<Thread> addWatchersToTable(int threadAmount, CyclicBarrier casinoDoor) {
+		return IntStream.rangeClosed(0, threadAmount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
 			Bridge randomBridge = new Bridge("watcher:" + index, table.getId(), UUID.randomUUID(), null, MAX_BET);
 			try {
 				casinoDoor.await();
