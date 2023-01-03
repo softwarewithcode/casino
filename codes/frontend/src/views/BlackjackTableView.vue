@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { PlayerAction, GamePhase, type BlackjackPlayer, type Seat } from "@/types/blackjack";
 import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCardsAndHandValuesPainter } from "../components/composables/rendering/canvasUtils";
-import { useStartCounter } from "../components/composables/timing/clock";
 import { onMounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useTableStore } from "../stores/tableStore";
@@ -50,8 +49,8 @@ const clearCanvas = (): HTMLCanvasElement => {
     ctx?.clearRect(0, 0, canvas.width, canvas.height)
     return canvas
 }
-const drawTable = async (initialDeal: boolean) => {
 
+const drawTable = async (initialDeal: boolean) => {
     const canvas: HTMLCanvasElement = clearCanvas()
     useActorsPainter(table.value, getCenterPlayer(), canvas);
     if (initialDeal)
@@ -68,7 +67,6 @@ const getCenterPlayer = (): BlackjackPlayer => {
     const centerPlayer = table.value.seats.find((seat) => seat.player?.balance > 0)?.player as BlackjackPlayer;
     return centerPlayer
 }
-
 
 const seatStyle = (seatNumber: number) => {
     return { 'display': "inline", 'bottom': "200px", "margin-right": "45px", "left": "50px" }
@@ -114,8 +112,12 @@ const insuranceAvailable = computed<boolean>(() => {
                 Insure
             </button>
         </div>
+        <div v-if="table.gamePhase === GamePhase.ROUND_COMPLETED" id="betRoundStartsRow">
+            Next bet round starts {{ counter }}
+        </div>
         <div style="position:relative; bottom:25px: left:50px"
             v-if="table.gamePhase === 'PLAY' && table.playerInTurn.name === player.name" id="actionRow">
+            Player {{ table?.playerInTurn.name }} {{ counter }}
             <button v-if="table.playerInTurn.actions.includes(PlayerAction.TAKE.toString())"
                 @click="sendAction(PlayerAction.TAKE.toString())">
                 Take

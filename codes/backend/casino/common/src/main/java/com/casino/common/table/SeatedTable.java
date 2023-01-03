@@ -70,7 +70,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 			return Optional.empty();
 		if (seatNumber == null) {
 			seat = seats.stream().filter(Seat::isAvailable).findAny().get();
-		} else if (seatNumber < 0 || seatNumber >= seats.size())
+		} else if (seatNumber < 0 || seatNumber >= seats.size()) // TODO as first check
 			throw new IllegalArgumentException("seat number is incorrect " + seatNumber + " has:" + getSeats().size());
 		else
 			seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().get();

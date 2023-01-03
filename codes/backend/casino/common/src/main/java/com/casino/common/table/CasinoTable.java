@@ -92,7 +92,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	private void startPlayerClock(ICasinoPlayer player) {
-		stopClock();
+//		stopClock();
 		PlayerClockTask playerTimer = new PlayerClockTask(this, player);
 		startClock(playerTimer, 0);
 	}
@@ -279,6 +279,12 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	public TableCard getTableCard() {
 		return tableCard;
+	}
+
+	@JsonIgnore
+	@Override
+	public Thresholds getThresHolds() {
+		return tableInitData.thresholds();
 	}
 
 	@Override

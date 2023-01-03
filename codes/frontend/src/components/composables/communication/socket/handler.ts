@@ -5,7 +5,7 @@ import { Command } from "@/types/sockethander"
 import { useStartCounter } from "../../timing/clock"
 const store = useTableStore()
 
-export function handle(data: any) {
+export function useTableDataHandler(data: any) {
 	store.$patch({
 		command: data.title
 	})
@@ -19,10 +19,13 @@ export function handle(data: any) {
 			handleTableOpen(data)
 			break
 		case Command.BET_PHASE_STARTS:
+		case Command.WAITING_PLAYER_ACTION:
+		case Command.INSURANCE_PHASE_STARTS:
+		case Command.INITIAL_DEAL_DONE:
 			patchStoreAndStartTimer(data)
 			break
-		case Command.INSURANCE_PHASE_STARTS:
-			patchStoreAndStartTimer(data)
+		case Command.ROUND_COMPLETED:
+			finalizeRound(data)
 			break
 		default:
 			patchStore(data)
@@ -46,6 +49,12 @@ const patchStore = async (data: any) => {
 	store.$patch(patchObject)
 }
 const patchStoreAndStartTimer = async (data: any) => {
+	patchStore(data)
+	useStartCounter()
+}
+const finalizeRound = async (data: any) => {
+	const counterTime: number = data.table.tableCard.thresholds.phaseDelay
+	data.table.counterTime = counterTime / 1000 // millis to seconds
 	patchStore(data)
 	useStartCounter()
 }

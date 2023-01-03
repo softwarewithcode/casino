@@ -10,7 +10,7 @@ public record Thresholds(
 		Integer betPhaseTime, 
 		@JsonIgnore Integer secondPhaseTime, 
 		Integer playerTime, 
-		@JsonIgnore long phaseDelay, 
+		Long phaseDelay, 
 		Integer minPlayers, 
 		Integer maxPlayers, 
 		Integer seatCount) 

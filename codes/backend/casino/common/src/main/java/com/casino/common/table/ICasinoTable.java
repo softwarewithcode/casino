@@ -79,4 +79,6 @@ public interface ICasinoTable {
 
 	public void onPlayerInTurnUpdate(ICasinoPlayer player);
 
+	public Thresholds getThresHolds();
+
 }

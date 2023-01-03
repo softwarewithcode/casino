@@ -96,7 +96,7 @@ const paintPlayersHandValues = (playersWithCards: BlackjackPlayer[], mainBoxPlay
 	playersWithCards.forEach(player => {
 		const playerIndex = getPlayerBoxIndexRelativeToMainBoxPlayer(player.name)
 		const boxStartingCorner = getPlayerBoxStartingCorner(playerIndex, playerBoxWidth, playerBoxHeight)
-		console.log("boxStartingCorner:" + JSON.stringify(boxStartingCorner) + " index:" + playerIndex)
+
 		const halfOfPlayerBoxLength = playerIndex === largeBoxIndex ? canvas.width / 2 : playerBoxWidth / 2
 		getHands(player).forEach(hand => {
 			getHandValues(hand).forEach((value, index) => {
@@ -104,7 +104,7 @@ const paintPlayersHandValues = (playersWithCards: BlackjackPlayer[], mainBoxPlay
 					paintText("Total:" + value, { x: boxStartingCorner.x + halfOfPlayerBoxLength, y: boxStartingCorner.y + playerBoxHeight - 10 }, canvas, reservedSeatFont)
 				}
 				if (index === 1) {
-					paintText(" / " + value, { x: boxStartingCorner.x + halfOfPlayerBoxLength + 5, y: boxStartingCorner.y + playerBoxHeight - 10 }, canvas, reservedSeatFont)
+					paintText(" / " + value, { x: boxStartingCorner.x + halfOfPlayerBoxLength + 15, y: boxStartingCorner.y + playerBoxHeight - 10 }, canvas, reservedSeatFont)
 				}
 			})
 		})
@@ -160,19 +160,17 @@ const calculateCardPosition = (actorName: string, nthCard: number, nthHand: numb
 	}
 	const playerIndex = getPlayerBoxIndexRelativeToMainBoxPlayer(actorName)
 	let boxStartingCorner = getPlayerBoxStartingCorner(playerIndex, playerBoxWidth, playerBoxHeight)
-	console.log(JSON.stringify("index:" + playerIndex + " crener" + boxStartingCorner))
+
 	let cardPositionX = boxStartingCorner.x + playerCardSize.x * nthCard + 2
 	let cardPositionY = boxStartingCorner.y + boxStartingCorner.y / 3 + nthHand * playerCardSize.y
 	return { x: cardPositionX, y: cardPositionY }
 }
 
 const calculateCardSize = (actorName: string): Vector => {
-	console.log("calculateCardSize MainBoxPlayer:" + playerBoxHeight)
 	if (actorName === dealerName) {
 		if (!dealerCardSize) {
-			const dealerBoxWidth = playerBoxWidth * 2
-			const cardWidth = dealerBoxWidth / 5
-			const cardHeight = cardWidth / cardWidthHeightRatio
+			const cardHeight = playerBoxHeight
+			const cardWidth = cardHeight * cardWidthHeightRatio
 			dealerCardSize = { x: cardWidth, y: cardHeight }
 		}
 		return dealerCardSize

@@ -29,6 +29,7 @@ export interface Thresholds {
 	maximumBet: number
 	maxPlayers: number
 	seatCount: number
+	phaseDelay: number
 }
 
 export interface Card {

@@ -35,5 +35,6 @@ export enum PlayerAction {
 
 export enum GamePhase {
 	INSURE = "INSURE",
-	BET = "BET"
+	BET = "BET",
+	ROUND_COMPLETED = "ROUND_COMPLETED"
 }
