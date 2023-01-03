@@ -3,6 +3,10 @@ package com.casino.common.dealer;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.ICasinoTable;
 
+/**
+ * @author softwarewithcode from GitHub
+ * 
+ */
 public class CommunicationChannel {
 	private final ICasinoTable table;
 
@@ -17,16 +21,16 @@ public class CommunicationChannel {
 	}
 
 	public <T> void broadcast(T message) {
-		table.getPlayers().parallelStream().forEach(player -> player.sendMessage(message));
+		table.getPlayers().parallelStream().forEach(casinoPlayer -> casinoPlayer.sendMessage(message));
 //		Thread.ofVirtual().start(() -> {
-		table.getWatchers().entrySet().parallelStream().forEach(o -> o.getValue().sendMessage(message));
+		table.getWatchers().entrySet().parallelStream().forEach(casinoPlayerEntry -> casinoPlayerEntry.getValue().sendMessage(message));
 //		});
 	}
 
 	public <T> void multicast(T message, ICasinoPlayer excludedPlayer) {
-		table.getPlayers().parallelStream().filter(player -> !player.getId().equals(excludedPlayer.getId())).forEach(player -> player.sendMessage(message));
+		table.getPlayers().parallelStream().filter(casinoPlayer -> !casinoPlayer.getId().equals(excludedPlayer.getId())).forEach(casinoPlayer -> casinoPlayer.sendMessage(message));
 //		Thread.ofVirtual().start(() -> {
-		table.getWatchers().entrySet().parallelStream().forEach(entry -> entry.getValue().sendMessage(message));
+		table.getWatchers().entrySet().parallelStream().forEach(casinoPlayerEntry -> casinoPlayerEntry.getValue().sendMessage(message));
 //		});
 	}
 }
