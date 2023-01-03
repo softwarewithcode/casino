@@ -187,9 +187,10 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void takingCardOnSplittedHandAfterCallingStandAddsUpToSecondHand() {
+	public void callingStandActivatesSecondHandAndCardsAreAddedToSecondHand() {
 		List<Card> cards = dealer.getDecks();
-		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(11, Suit.SPADE));
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.DIAMOND));
@@ -202,8 +203,32 @@ public class StartingHandSplitTest extends BaseTest {
 		table.hit(bridge.userId());
 		table.stand(bridge.userId());
 		table.hit(bridge.userId());
-		assertEquals(2, table.getPlayer(bridge.userId()).getActiveHand().getCards().size());
-		assertEquals(13, table.getPlayer(bridge.userId()).getActiveHand().calculateValues().get(0));
+		assertEquals(2, table.getPlayer(bridge.userId()).getHands().size());
+		assertEquals(3, table.getPlayer(bridge.userId()).getActiveHand().getCards().size());
+		assertEquals(15, table.getPlayer(bridge.userId()).getActiveHand().calculateValues().get(0));
+	}
+
+	@Test
+	public void handsAreCompletedWhenSecondHandValueGoesOver21() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(12, Suit.DIAMOND));
+		cards.add(Card.of(11, Suit.SPADE));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(9, Suit.DIAMOND));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(13, Suit.HEART));
+		cards.add(Card.of(3, Suit.SPADE));
+		table.join(bridge, "5");
+		table.bet(bridge.userId(), new BigDecimal("99.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.split(bridge.userId());
+		table.hit(bridge.userId());
+		table.stand(bridge.userId());
+		table.hit(bridge.userId());
+		assertEquals(2, table.getPlayer(bridge.userId()).getHands().size());
+		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isCompleted());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(1).isCompleted());
 	}
 
 	@Test
@@ -320,5 +345,105 @@ public class StartingHandSplitTest extends BaseTest {
 		assertTrue(table.getPlayer(bridge.userId()).getHands().get(1).isCompleted());
 		assertFalse(table.getPlayer(bridge.userId()).getHands().get(0).isActive());
 		assertFalse(table.getPlayer(bridge.userId()).getHands().get(1).isActive());
+	}
+
+	@Test
+	public void callingStandOnFirstHandAddsAutomaticallySecondCardToSecondHand() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(6, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(12, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(11, Suit.SPADE));
+		table.join(bridge, "5");
+		table.bet(bridge.userId(), new BigDecimal("10.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(20, table.getPlayer(bridge.userId()).getActiveHand().calculateValues().get(0));
+		table.split(bridge.userId());
+		table.stand(bridge.userId());
+		assertEquals(15, table.getPlayer(bridge.userId()).getActiveHand().calculateValues().get(0));
+	}
+
+	@Test
+	public void secondHandIsActivatedWhenFirstHandValueGoesOver21() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(6, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(12, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(11, Suit.SPADE));
+		table.join(bridge, "5");
+		table.bet(bridge.userId(), new BigDecimal("10.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(20, table.getPlayer(bridge.userId()).getActiveHand().calculateValues().get(0));
+		table.split(bridge.userId());
+		table.hit(bridge.userId());
+		assertEquals(25, table.getPlayer(bridge.userId()).getHands().get(0).calculateValues().get(0));
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(1).isActive());
+	}
+
+	@Test
+	public void bothHandsAreCompletedAfterTimingOut() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(6, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(5, Suit.SPADE));
+		table.join(bridge, "5");
+		table.bet(bridge.userId(), new BigDecimal("10.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.split(bridge.userId());
+		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isCompleted());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(1).isCompleted());
+		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		assertEquals(15, table.getPlayer(bridge.userId()).getHands().get(0).calculateFinalValue());
+		assertEquals(16, table.getPlayer(bridge.userId()).getHands().get(1).calculateFinalValue());
+	}
+
+	@Test
+	public void bothHandsWinAfterTimeout() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(6, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(5, Suit.SPADE));
+		table.join(bridge, "5");
+		table.bet(bridge.userId(), new BigDecimal("10.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.split(bridge.userId());
+		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isCompleted());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(1).isCompleted());
+		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		assertEquals(new BigDecimal("1020.00"), table.getPlayer(bridge.userId()).getBalance());
+	}
+
+	@Test
+	public void bothHandsLoseAterTimeout() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.DIAMOND));// dealer
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));// dealer
+		cards.add(Card.of(5, Suit.SPADE));
+		table.join(bridge, "5");
+		table.bet(bridge.userId(), new BigDecimal("10.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.split(bridge.userId());
+		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isCompleted());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(1).isCompleted());
+		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		assertEquals(new BigDecimal("980.00"), table.getPlayer(bridge.userId()).getBalance());
 	}
 }

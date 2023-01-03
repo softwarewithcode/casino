@@ -19,6 +19,7 @@ import com.casino.blackjack.table.timing.InsurancePhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
+import com.casino.common.cards.Suit;
 import com.casino.common.dealer.CommunicationChannel;
 import com.casino.common.dealer.IDealer;
 import com.casino.common.exception.PlayerNotFoundException;
@@ -73,7 +74,7 @@ public class BlackjackDealer implements IDealer {
 		notifyAll(Title.INSURANCE_PHASE_STARTS, null);
 	}
 
-	public boolean hasDealerStartingAce() {
+	public boolean hasStartingAce() {
 		Card card = dealerHand.getCards().get(0);
 		return card != null & card.isAce();
 	}
@@ -134,8 +135,17 @@ public class BlackjackDealer implements IDealer {
 		hand.addCard(card);
 	}
 
-	public void addPlayerCard(ICasinoPlayer player) {
+	public void hit(BlackjackPlayer player) {
+		verifyPlayerHasSeat(player);
 		dealCard(player.getActiveHand());
+		if (shouldActivateSecondHand(player)) {
+			player.activateSecondHand();
+			dealCard(player.getActiveHand());
+		}
+	}
+
+	private boolean shouldActivateSecondHand(BlackjackPlayer player) {
+		return player.getHands().get(0).isCompleted() && player.getHands().size() == 2 && !player.getHands().get(1).isActive() && !player.getHands().get(1).isCompleted();
 	}
 
 	@Override
@@ -221,7 +231,7 @@ public class BlackjackDealer implements IDealer {
 		}
 		matchBalanceWithBet();
 		dealStartingHands();
-		if (hasDealerStartingAce()) {
+		if (hasStartingAce()) {
 			startInsurancePhase();
 			return;
 		}
@@ -259,7 +269,7 @@ public class BlackjackDealer implements IDealer {
 	private void completeRound() {
 		try {
 			if (table.getGamePhase() != GamePhase.PLAY) {
-				LOGGER.severe("complete round called in a wrong phase: " + table.getGamePhase());
+				LOGGER.severe("complete round called in a wrong phase was: " + table.getGamePhase());
 				throw new IllegalStateException("cannot complete round");
 			}
 			playDealerTurn();
@@ -353,6 +363,10 @@ public class BlackjackDealer implements IDealer {
 	public void stand(BlackjackPlayer player) {
 		verifyPlayerHasSeat(player);
 		player.stand();
+		if (shouldActivateSecondHand(player)) {
+			player.activateSecondHand();
+			dealCard(player.getActiveHand());
+		}
 	}
 
 	public void insure(BlackjackPlayer player) {

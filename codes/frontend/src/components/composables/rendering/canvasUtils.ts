@@ -153,6 +153,7 @@ const calculateCardPosition = (actorName: string, nthCard: number, nthHand: numb
 		const cardPositionY = playerBoxHeight + playerBoxHeight
 		return { x: cardPositionX, y: cardPositionY }
 	}
+
 	if (actorName === mainBoxPlayer.name) {
 		const cardPositionX = playerBoxWidth + nthCard * mainPlayerCardSize.x + 20
 		const cardPositionY = 3 * playerBoxHeight + nthHand * mainPlayerCardSize.y
@@ -175,21 +176,28 @@ const calculateCardSize = (actorName: string): Vector => {
 		}
 		return dealerCardSize
 	}
+	const handCount = getPlayerHandCount(actorName)
 	if (actorName === mainBoxPlayer.name) {
 		if (!mainPlayerCardSize) {
 			const mainBoxWidth = playerBoxWidth * 4
 			const cardWidth = mainBoxWidth / 10
-			const cardHeight = cardWidth / cardWidthHeightRatio
+			const cardHeight = cardWidth / cardWidthHeightRatio / handCount
 			mainPlayerCardSize = { x: cardWidth, y: cardHeight }
 		}
 		return mainPlayerCardSize
 	}
 	if (!playerCardSize) {
 		const cardWidth = playerBoxWidth / 4
-		const cardHeight = cardWidth / cardWidthHeightRatio
+		const cardHeight = cardWidth / cardWidthHeightRatio / handCount
 		playerCardSize = { x: cardWidth, y: cardHeight }
 	}
 	return playerCardSize
+}
+
+const getPlayerHandCount = (actorName: string) => {
+	const playerHandCount = table.seats.find(seat => seat.player?.name === actorName)?.player.hands.length
+	if (!playerHandCount) throw new Error("no hand count")
+	return playerHandCount
 }
 
 const getNextSeatNumber = (featuredSeatNumber: number, table: BlackjackTable): number => {
@@ -255,14 +263,21 @@ const paintDealerBox = (canvas: HTMLCanvasElement) => {
 	paintText("Dealer:", { x: playerBoxWidth + 10, y: playerBoxHeight + 20 }, canvas, dealerFont)
 }
 
+const paintMainPlayerBox = (player: BlackjackPlayer, canvas: HTMLCanvasElement, isInTurn: boolean) => {
+	const ctx = canvas.getContext("2d")
+	if (!ctx) return
+	paintRectangle({ x: 0, y: canvas.height * 0.75 }, { x: canvas.width, y: canvas.height }, canvas, isInTurn)
+	paintText(player.name, { x: 5, y: 3 * playerBoxHeight + 18 }, canvas, reservedSeatFont)
+	paintText("$" + player.balance, { x: 5, y: 3 * playerBoxHeight + 35 }, canvas, reservedSeatFont)
+}
 const paintPlayerBox = (boxStartingCorner: Vector, seat: Seat, canvas: HTMLCanvasElement, isInTurn: boolean) => {
 	paintRectangle(boxStartingCorner, { x: playerBoxWidth, y: playerBoxHeight }, canvas, isInTurn)
 	if (!seat.player) {
 		paintText("Seat " + (seat.number + 1), { x: boxStartingCorner.x + 10, y: boxStartingCorner.y + 50 }, canvas, infoFont)
 		return
 	}
-	paintText(seat.player.name, { x: boxStartingCorner.x + 10, y: boxStartingCorner.y + 20 }, canvas, reservedSeatFont)
-	paintText(seat.player.balance + "$", { x: boxStartingCorner.x + playerBoxWidth - 60, y: boxStartingCorner.y + 20 }, canvas, reservedSeatFont)
+	paintText(seat.player.name, { x: boxStartingCorner.x + 5, y: boxStartingCorner.y + 18 }, canvas, reservedSeatFont)
+	paintText("$" + seat.player.balance, { x: boxStartingCorner.x + 5, y: boxStartingCorner.y + 35 }, canvas, reservedSeatFont)
 }
 
 const paintRectangle = (startPosition: Vector, endPosition: Vector, canvas: HTMLCanvasElement, highlight: boolean) => {
@@ -277,15 +292,6 @@ const paintRectangle = (startPosition: Vector, endPosition: Vector, canvas: HTML
 	ctx.strokeRect(startPosition.x, startPosition.y, endPosition.x, endPosition.y)
 	ctx.strokeStyle = originalStyle
 	ctx.lineWidth = originalWidth
-}
-
-const paintMainPlayerBox = (player: BlackjackPlayer, canvas: HTMLCanvasElement, isInTurn: boolean) => {
-	const ctx = canvas.getContext("2d")
-	if (!ctx) return
-	//ctx.strokeRect(0, canvas.height * 0.75, canvas.width, canvas.height)
-	paintRectangle({ x: 0, y: canvas.height * 0.75 }, { x: canvas.width, y: canvas.height }, canvas, isInTurn)
-	paintText(player.name + " " + player.seatNumber, { x: 10, y: canvas.height - 60 }, canvas, reservedSeatFont)
-	paintText("Balance " + player.balance, { x: 10, y: canvas.height - 30 }, canvas, reservedSeatFont)
 }
 
 const paintText = (text: string, startPosition: Vector, canvas: HTMLCanvasElement, font: CasinoFont) => {

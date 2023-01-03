@@ -129,8 +129,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 			tryTakingPlayerLock();
 			IHand activeHand = getActiveHand();
 			activeHand.stand();
-			if (shouldActivateSecondHand(activeHand))
-				activateSecondHand();
+//			if (shouldActivateSecondHand(activeHand))
+//				activateSecondHand();
 		} finally {
 			releasePlayerLock();
 		}
@@ -140,7 +140,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return getHands().indexOf(activeHand) == 0 && getHands().size() == 2;
 	}
 
-	private void activateSecondHand() {
+	public void activateSecondHand() {
 		getSecondHand().activate();
 	}
 
@@ -223,12 +223,10 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return hands.stream().filter(IHand::isActive).findFirst().orElse(null);
 	}
 
-	public void addCard(IHand hand, Card card) {
-		if (hand == null)
-			throw new IllegalArgumentException("cannot add card to non existing hand");
+	public void hit(Card card) {
 		try {
 			tryTakingPlayerLock();
-			hand.addCard(card);
+			getActiveHand().addCard(card);
 		} finally {
 			releasePlayerLock();
 		}

@@ -119,7 +119,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			BlackjackPlayer player = getPlayer(playerId);
 			lockPlayerInTurn();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "hit");
-			dealer.addPlayerCard(player);
+			dealer.hit(player);
 			dealer.calculateNextActorAndNotify();
 		} finally {
 			unlockPlayerInTurn();

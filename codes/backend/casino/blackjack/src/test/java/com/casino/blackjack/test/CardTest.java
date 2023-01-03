@@ -32,8 +32,8 @@ public class CardTest extends BaseTest {
 	@Test
 	public void handValueIsCalculatedCorrectly() {
 		BlackjackPlayer player = createPlayer();
-		player.addCard(player.getHands().get(0), Card.of(7, Suit.CLUB));
-		player.addCard(player.getHands().get(0), Card.of(8, Suit.CLUB));
+		player.hit(Card.of(7, Suit.CLUB));
+		player.hit(Card.of(8, Suit.CLUB));
 		List<Integer> values = player.getHands().get(0).calculateValues();
 		Assertions.assertEquals(15, values.get(0));
 		Assertions.assertEquals(1, values.size());
@@ -42,16 +42,16 @@ public class CardTest extends BaseTest {
 	@Test
 	public void pictureCardsValuesAreCalculatedAsValueOfTen() {
 		BlackjackPlayer player = createPlayer();
-		player.addCard(player.getHands().get(0), Card.of(12, Suit.CLUB));
-		player.addCard(player.getHands().get(0), Card.of(13, Suit.CLUB));
+		player.hit(Card.of(12, Suit.CLUB));
+		player.hit(Card.of(13, Suit.CLUB));
 		Assertions.assertEquals(20, player.getHands().get(0).calculateValues().get(0));
 	}
 
 	@Test
 	public void initialAceCreatesTwoHandValues() {
 		BlackjackPlayer player = createPlayer();
-		player.addCard(player.getHands().get(0), Card.of(1, Suit.CLUB));
-		player.addCard(player.getHands().get(0), Card.of(2, Suit.CLUB));
+		player.hit(Card.of(1, Suit.CLUB));
+		player.hit(Card.of(2, Suit.CLUB));
 		List<Integer> values = player.getHands().get(0).calculateValues();
 		Assertions.assertEquals(2, values.size());
 		Assertions.assertEquals(3, values.get(0));
@@ -61,10 +61,10 @@ public class CardTest extends BaseTest {
 	@Test
 	public void addedAceCreatesTwoValuesWhenTotalValueRemainsUnder22() {
 		BlackjackPlayer player = createPlayer();
-		player.addCard(player.getHands().get(0), Card.of(5, Suit.CLUB));
-		player.addCard(player.getHands().get(0), Card.of(4, Suit.CLUB));
+		player.hit(Card.of(5, Suit.CLUB));
+		player.hit(Card.of(4, Suit.CLUB));
 		Assertions.assertEquals(1, player.getHands().size());
-		player.addCard(player.getHands().get(0), Card.of(1, Suit.CLUB));
+		player.hit(Card.of(1, Suit.CLUB));
 		List<Integer> values = player.getHands().get(0).calculateValues();
 		Assertions.assertEquals(2, values.size());
 		Assertions.assertEquals(10, values.get(0));
@@ -74,15 +74,15 @@ public class CardTest extends BaseTest {
 	@Test
 	public void addedAceCreatesCompletesHandWhen21Reached() {
 		BlackjackPlayer player = createPlayer();
-		player.addCard(player.getHands().get(0), Card.of(5, Suit.CLUB));
-		player.addCard(player.getHands().get(0), Card.of(4, Suit.CLUB));
+		player.hit(Card.of(5, Suit.CLUB));
+		player.hit(Card.of(4, Suit.CLUB));
 		Assertions.assertEquals(1, player.getHands().size());
-		player.addCard(player.getHands().get(0), Card.of(1, Suit.CLUB));
+		player.hit(Card.of(1, Suit.CLUB));
 		List<Integer> values = player.getHands().get(0).calculateValues();
 		Assertions.assertEquals(2, values.size());
 		Assertions.assertEquals(10, values.get(0));
 		Assertions.assertEquals(20, values.get(1));
-		player.addCard(player.getHands().get(0), Card.of(1, Suit.DIAMOND));
+		player.hit(Card.of(1, Suit.DIAMOND));
 		values = player.getHands().get(0).calculateValues();
 		Assertions.assertEquals(2, values.size());
 		Assertions.assertEquals(11, values.get(0));
