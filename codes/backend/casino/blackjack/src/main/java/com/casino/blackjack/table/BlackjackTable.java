@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import com.casino.blackjack.dealer.BlackjackDealer;
 import com.casino.blackjack.ext.IBlackjackTable;
@@ -175,7 +174,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public synchronized void onPlayerLeave(UUID playerId) {
+	public void onPlayerLeave(UUID playerId) {
 		System.out.println("player disconnected from table " + getId() + " player:" + playerId);
 		BlackjackPlayer leavingPlayer = null;
 		try {
