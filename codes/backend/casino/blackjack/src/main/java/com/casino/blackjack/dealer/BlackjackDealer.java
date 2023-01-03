@@ -259,8 +259,8 @@ public class BlackjackDealer implements IDealer {
 	private void completeRound() {
 		try {
 			if (table.getGamePhase() != GamePhase.PLAY) {
-				LOGGER.severe("complete round called on completed round");
-				return;
+				LOGGER.severe("complete round called in a wrong phase: " + table.getGamePhase());
+				throw new IllegalStateException("cannot complete round");
 			}
 			playDealerTurn();
 			if (table.hasPlayersWithWinningChances()) {
