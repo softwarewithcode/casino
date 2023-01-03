@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.table.BlackjackTable;
-import com.casino.common.player.PlayerStatus;
 import com.casino.common.table.Status;
 import com.casino.common.table.TableInitData;
 import com.casino.common.table.Thresholds;
