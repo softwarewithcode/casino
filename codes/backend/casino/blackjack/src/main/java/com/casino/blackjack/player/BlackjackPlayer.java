@@ -57,9 +57,9 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void updateAvailableActions() {
 		try {
 			tryTakingPlayerLock();
-			actions = new ArrayList<>();
 			if (!hasActiveHand())
 				return;
+			actions = new ArrayList<>();
 			actions.add(Action.TAKE);
 			actions.add(Action.STAND);
 			if (!getFirstHand().isActive())
@@ -320,7 +320,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 			secondHand.addCard(card); // card is used here
 			cardOptional = Optional.empty();
 		}
-		if (!secondHand.isCompleted())// Automatic blackjack can have completed the hand
+		if (!secondHand.isCompleted())// blackjack can have completed the hand automatically
 			secondHand.complete();
 		return cardOptional;
 	}

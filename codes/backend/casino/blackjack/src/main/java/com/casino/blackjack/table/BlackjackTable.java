@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
-	@JsonIgnore // Don't expose the dealer at all
+	@JsonIgnore
 	private final BlackjackDealer dealer;
 
 	public BlackjackTable(Status initialStatus, TableInitData initData) {
@@ -287,7 +287,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public TableCard getTableCard() {
 		TableCard card = super.getTableCard();
-		List<Integer> seats = getSeats().stream().filter(seat -> !seat.hasPlayer()).map(seat -> seat.getNumber()).collect(Collectors.toList());
+		List<Integer> seats = getSeats().stream().filter(seat -> !seat.hasPlayer()).map(Seat::getNumber).toList();
 		card.setAvailablePositions(seats);
 		return card;
 	}
