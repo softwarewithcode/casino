@@ -37,7 +37,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	public BlackjackTable(Status initialStatus, TableInitData initData) {
 		super(initialStatus, initData, PhasePathFactory.buildBlackjackPath());
-		this.dealer = new BlackjackDealer(this, initData.thresholds());
+		this.dealer = new BlackjackDealer(this);
 	}
 
 	@Override

@@ -100,7 +100,7 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void dealerCreatesEightDecks() {
-		BlackjackDealer d = new BlackjackDealer(null, table.getThresholds());
+		BlackjackDealer d = new BlackjackDealer(null);
 		Assertions.assertEquals(416, d.getDecks().size());
 	}
 

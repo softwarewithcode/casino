@@ -26,7 +26,6 @@ import com.casino.common.player.CasinoPlayer;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.player.PlayerStatus;
 import com.casino.common.table.Seat;
-import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.timing.BetPhaseClockTask;
 import com.casino.common.user.Title;
@@ -42,16 +41,16 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
 	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
-	private final Thresholds thresholds;
+//	private final Thresholds thresholds;
 	private final BlackjackTable table;
 	private final ReentrantLock betPhaseLock;
 	private final CommunicationChannel voice;
 	private List<Card> deck;
 	private BlackjackDealerHand dealerHand;
 
-	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds thresholds) {
+	public BlackjackDealer(BlackjackTable blackjackTable) {
 		this.table = blackjackTable;
-		this.thresholds = thresholds;
+//		this.thresholds = thresholds;
 		this.deck = Deck.combineDecks(8);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		betPhaseLock = new ReentrantLock();
@@ -104,10 +103,6 @@ public class BlackjackDealer implements IDealer {
 
 	public List<Card> getDecks() {
 		return deck;
-	}
-
-	public Thresholds getThresholds() {
-		return thresholds;
 	}
 
 	public BlackjackTable getTable() {
