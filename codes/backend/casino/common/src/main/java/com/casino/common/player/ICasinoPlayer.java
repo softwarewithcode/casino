@@ -63,4 +63,6 @@ public interface ICasinoPlayer {
 
 	public void updateAvailableActions();
 
+	public void updateLastBet(BigDecimal totalBet);
+
 }

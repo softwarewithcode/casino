@@ -1,7 +1,6 @@
 package com.casino.blackjack.player;
 
 import java.math.BigDecimal;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,14 +17,13 @@ import com.casino.common.table.ISeatedTable;
 import com.casino.common.user.Action;
 import com.casino.common.user.Bridge;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIncludeProperties(value = { "hands", "actions", "seatNumber", "name", "balance", "totalBet", "payout"})
+@JsonIncludeProperties(value = { "hands", "actions", "seatNumber", "name", "balance", "totalBet", "payout", "lastBet" })
 public class BlackjackPlayer extends CasinoPlayer {
 	private List<IHand> hands;
-	@JsonProperty
 	private List<Action> actions;
 	private Integer seatNumber;
+	private BigDecimal lastBet;
 
 	public BlackjackPlayer(Bridge bridge, ISeatedTable table) {
 		super(bridge, table);
@@ -108,6 +106,18 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return getFirstHand().isInsuranceCompensable();
 	}
 
+	public BigDecimal getLastBet() {
+		return super.lastBet;
+	}
+
+	public void setLastBet(BigDecimal lastBet) {
+		this.lastBet = lastBet;
+	}
+
+	public List<Action> getActions() {
+		return actions;
+	}
+
 	public void splitStartingHand() {
 		try {
 			tryTakingPlayerLock();
@@ -129,8 +139,6 @@ public class BlackjackPlayer extends CasinoPlayer {
 			tryTakingPlayerLock();
 			IHand activeHand = getActiveHand();
 			activeHand.stand();
-//			if (shouldActivateSecondHand(activeHand))
-//				activateSecondHand();
 		} finally {
 			releasePlayerLock();
 		}

@@ -29,6 +29,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	private volatile BigDecimal totalBet;
 	private volatile BigDecimal payout;
 	private volatile PlayerStatus status;
+	protected volatile BigDecimal lastBet;
 
 	public CasinoPlayer(Bridge bridge, ICasinoTable table) {
 		super();
@@ -165,6 +166,18 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		} finally {
 			releasePlayerLock();
 		}
+	}
+
+	@Override
+	public void updateLastBet(BigDecimal totalBet) {
+		try {
+			tryTakingPlayerLock();
+			this.lastBet = totalBet;
+			System.out.println("LastBet:" + totalBet);
+		} finally {
+			releasePlayerLock();
+		}
+
 	}
 
 	protected void releasePlayerLock() {

@@ -19,6 +19,8 @@ public class BetUtil {
 			throw new IllegalBetException("given bet in wrong phase: " + table.getGamePhase() + " table:" + table + " player:" + player + " bet:" + betAttempt.toString(), 1);
 		if (betAttempt == null)
 			throw new IllegalBetException("no bet is given in table:" + table + " player:" + player, 2);
+		if (betAttempt.equals(BigDecimal.ZERO))
+			return; // Resets bet
 		if (player.getBalance().compareTo(betAttempt) < 0)
 			throw new IllegalBetException("given bet is more than player can afford " + table + " player:" + player + " bet" + betAttempt.toString(), 3);
 		if (betAttempt.compareTo(table.getTableCard().getThresholds().minimumBet()) < 0)

@@ -6,6 +6,7 @@ export interface CasinoPlayer {
 	id: string
 	balance: number
 	totalBet: number
+	lastBet: number
 	actions: string[]
 }
 
