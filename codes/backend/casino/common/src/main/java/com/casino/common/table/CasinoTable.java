@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePath;
@@ -32,7 +31,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	private final UUID id;
 	private final Instant created;
 	private final Clock clock;
-	private Language language;
 	private ICasinoPlayer playerInTurn;
 	private boolean dealerTurn;
 	private volatile Status status;
@@ -118,11 +116,6 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	public int getWatcherCount() {
 		return watchers.size();
-	}
-
-	@Override
-	public Language getLanguage() {
-		return language;
 	}
 
 	@Override

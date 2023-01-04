@@ -6,7 +6,6 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
-import com.casino.common.language.Language;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.phase.GamePhase;
 
@@ -32,8 +31,6 @@ public interface ICasinoTable {
 	public int getPlayerTurnTime();
 
 	public void onTableClose();
-
-	public Language getLanguage();
 
 	public ICasinoPlayer getPlayerInTurn();
 
