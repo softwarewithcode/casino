@@ -15,7 +15,7 @@ public class Deck {
 	}
 
 	private void create() {
-		cards = new HashSet<Card>();
+		cards = new HashSet<>();
 		for (int i = 1; i < 14; i++) {
 			Card spade = new Card(i, Suit.SPADE);
 			cards.add(spade);
@@ -34,7 +34,7 @@ public class Deck {
 
 	public static List<Card> combineDecks(int count) {
 		List<Deck> decks = IntStream.range(0, count).mapToObj(i -> new Deck()).toList();
-		List<Card> cards = new ArrayList<Card>();
+		List<Card> cards = new ArrayList<>();
 		decks.forEach(deck -> {
 			cards.addAll(deck.getCards());
 		});

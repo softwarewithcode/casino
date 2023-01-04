@@ -29,7 +29,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public BlackjackPlayer(Bridge bridge, ISeatedTable table) {
 		super(bridge, table);
-		hands = new ArrayList<IHand>();
+		hands = new ArrayList<>();
 		hands.add(createNewHand(true));
 		actions = new ArrayList<>(4);
 	}
@@ -91,7 +91,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void prepareNextRound() {
 		try {
 			tryTakingPlayerLock();
-			hands = new ArrayList<IHand>();
+			hands = new ArrayList<>();
 			hands.add(createNewHand(true));
 			updateAvailableActions();
 			this.removeTotalBet();
@@ -257,7 +257,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		try {
 			tryTakingPlayerLock();
 			super.reset();
-			hands = new ArrayList<IHand>();
+			hands = new ArrayList<>();
 		} finally {
 			releasePlayerLock();
 		}

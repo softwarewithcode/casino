@@ -4,5 +4,7 @@ import jakarta.ws.rs.ApplicationPath;
 
 @ApplicationPath("/casino")
 public class CasinoAPI {
-
+	/*
+	 * base path for CasinoAPI
+	 */
 }

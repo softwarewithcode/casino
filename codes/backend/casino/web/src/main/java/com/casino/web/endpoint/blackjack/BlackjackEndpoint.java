@@ -37,13 +37,13 @@ public class BlackjackEndpoint {
 	private boolean watcher;
 
 	@OnOpen
-	public void onOpen(Session session, @PathParam("tableId") String tableId, EndpointConfig ec) {
+	public void onOpen(Session session, @PathParam("tableId") String tableId) {
 		System.out.println("onOpen called " + tableId);
 		try {
 			UUID id = Validator.validateId(tableId);
 			Optional<IBlackjackTable> table = tableService.fetchTable(id);
 			if (table.isEmpty()) {
-				tableId = null;
+				this.tableId = null;
 				bridge = null;
 				this.onClose(session, new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, " invalid table "));
 				return;

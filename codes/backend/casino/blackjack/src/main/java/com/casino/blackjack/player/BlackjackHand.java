@@ -36,14 +36,14 @@ public class BlackjackHand implements IHand {
 	public BlackjackHand(UUID id, boolean active) {
 		this.id = id;
 		this.created = Instant.now();
-		cards = new ArrayList<Card>();
+		cards = new ArrayList<>();
 		this.active = active;
 		lock = new ReentrantLock();
 	}
 
 	@Override
 	public List<Integer> calculateValues() {
-		List<Integer> values = new ArrayList<Integer>(2);
+		List<Integer> values = new ArrayList<>(2);
 		Integer smallestValue = cards.stream().collect(Collectors.summingInt(card -> card.getRank() > 10 ? 10 : card.getRank()));
 		values.add(smallestValue);
 		Optional<Card> aceOptional = cards.stream().filter(card -> card.getRank() == 1).findAny();

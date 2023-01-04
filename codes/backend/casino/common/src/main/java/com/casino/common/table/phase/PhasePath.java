@@ -13,7 +13,7 @@ public class PhasePath {
 	private final List<GamePhase> phases;
 	private volatile GamePhase currentPhase;
 
-	public PhasePath(List<GamePhase> phases, boolean around) {
+	public PhasePath(List<GamePhase> phases) {
 		if (phases == null || phases.size() < 2)
 			throw new IllegalArgumentException("Not enough phases");
 		this.phases = phases;

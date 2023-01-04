@@ -194,7 +194,7 @@ public class BlackjackDealer implements IDealer {
 		return (table.getPlayers().size() + dealer) * getMaximumNumberOfCardsPlayerCanHold() < deck.size();
 	}
 
-	private int getMaximumNumberOfCardsPlayerCanHold() {
+	private static int getMaximumNumberOfCardsPlayerCanHold() {
 		return 11; // 11 aces=21 (6 decks contains 24 aces)
 	}
 

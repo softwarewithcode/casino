@@ -10,10 +10,10 @@ public class PhasePathFactory {
 	}
 
 	private static PhasePath buildBlackjackPhasePath() {
-		List<GamePhase> phases = new ArrayList<GamePhase>();
+		List<GamePhase> phases = new ArrayList<>();
 		phases.add(GamePhase.BET);
 		phases.add(GamePhase.BETS_COMPLETED);
 		phases.add(GamePhase.PLAY);
-		return new PhasePath(phases, true);
+		return new PhasePath(phases);
 	}
 }
