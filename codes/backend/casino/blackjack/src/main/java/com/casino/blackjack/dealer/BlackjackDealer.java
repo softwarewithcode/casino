@@ -434,6 +434,7 @@ public class BlackjackDealer implements IDealer {
 	public void onPlayerLeave(BlackjackPlayer leavingPlayer) {
 		leavingPlayer.setStatus(PlayerStatus.LEFT);
 		finalizeInactivePlayerTurn(leavingPlayer);
+		calculateNextActorAndNotify();
 		if (!table.isRoundRunning()) {
 			sanitizeEmptySeats();
 			notifyAll(Title.PLAYER_LEFT, leavingPlayer);
@@ -448,7 +449,6 @@ public class BlackjackDealer implements IDealer {
 	private void finalizeInactivePlayerTurn(BlackjackPlayer player) {
 		if (player.hasBet() && player.equals(table.getPlayerInTurn())) {
 			autoplayForPlayer(player);
-			calculateNextActorAndNotify();
 		}
 	}
 
