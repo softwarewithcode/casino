@@ -170,7 +170,7 @@ const calculateCardPosition = (actorName: string, nthCard: number, nthHand: numb
 const calculateCardSize = (actorName: string): Vector => {
 	if (actorName === dealerName) {
 		if (!dealerCardSize) {
-			const cardHeight = playerBoxHeight
+			const cardHeight = playerBoxHeight * 0.65
 			const cardWidth = cardHeight * cardWidthHeightRatio
 			dealerCardSize = { x: cardWidth, y: cardHeight }
 		}
@@ -179,16 +179,16 @@ const calculateCardSize = (actorName: string): Vector => {
 	const handCount = getPlayerHandCount(actorName)
 	if (actorName === mainBoxPlayer.name) {
 		if (!mainPlayerCardSize) {
-			const mainBoxWidth = playerBoxWidth * 4
-			const cardWidth = mainBoxWidth / 10
-			const cardHeight = cardWidth / cardWidthHeightRatio / handCount
+			//const mainBoxWidth = playerBoxWidth * 4
+			const cardHeight = handCount > 0 ? playerBoxHeight / 2 : playerBoxHeight
+			const cardWidth = cardHeight * cardWidthHeightRatio
 			mainPlayerCardSize = { x: cardWidth, y: cardHeight }
 		}
 		return mainPlayerCardSize
 	}
 	if (!playerCardSize) {
-		const cardWidth = playerBoxWidth / 4
-		const cardHeight = cardWidth / cardWidthHeightRatio / handCount
+		const cardHeight = handCount > 0 ? playerBoxHeight / 2.5 : playerBoxHeight / 1.5
+		const cardWidth = cardHeight * cardWidthHeightRatio
 		playerCardSize = { x: cardWidth, y: cardHeight }
 	}
 	return playerCardSize
