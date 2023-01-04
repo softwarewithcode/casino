@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
  * @author softwarewithcode from GitHub
  * 
  */
-@JsonIgnoreProperties(value = { "dealer" })
+@JsonIgnoreProperties(value = { "dealer" /* explicitly ignoring dealer for not exposing deck to UI */ })
 @JsonIncludeProperties(value = { "type", "id", "language", "playerInTurn", "gamePhase", "watcherCount", "seats", "players", "counterTime", "tableCard", "dealerHand" })
 public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
