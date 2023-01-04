@@ -22,16 +22,17 @@ import com.casino.common.table.TableInitData;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePathFactory;
 import com.casino.common.user.Bridge;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
 /**
  * @author softwarewithcode from GitHub
  * 
  */
+@JsonIgnoreProperties(value = { "dealer" })
+@JsonIncludeProperties(value = { "type", "id", "language", "playerInTurn", "gamePhase", "watcherCount", "seats", "players", "counterTime", "tableCard", "dealerHand" })
 public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
-	@JsonIgnore
 	private final BlackjackDealer dealer;
 
 	public BlackjackTable(Status initialStatus, TableInitData initData) {
@@ -239,8 +240,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		}
 	}
 
-	@JsonProperty
-	public IHand dealerHand() {
+	public IHand getDealerHand() {
 		return dealer.getHand();
 	}
 

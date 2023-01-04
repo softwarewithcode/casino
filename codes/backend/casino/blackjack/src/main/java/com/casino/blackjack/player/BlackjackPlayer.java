@@ -1,6 +1,7 @@
 package com.casino.blackjack.player;
 
 import java.math.BigDecimal;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,15 +17,14 @@ import com.casino.common.table.ICasinoTable;
 import com.casino.common.table.ISeatedTable;
 import com.casino.common.user.Action;
 import com.casino.common.user.Bridge;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIncludeProperties(value = { "hands", "actions", "seatNumber", "name", "balance", "totalBet", "payout"})
 public class BlackjackPlayer extends CasinoPlayer {
-	//private static final Logger LOGGER = Logger.getLogger(BlackjackPlayer.class.getName());
-	@JsonProperty
 	private List<IHand> hands;
 	@JsonProperty
 	private List<Action> actions;
-	@JsonProperty
 	private Integer seatNumber;
 
 	public BlackjackPlayer(Bridge bridge, ISeatedTable table) {

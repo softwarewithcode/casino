@@ -15,27 +15,19 @@ import com.casino.common.exception.IllegalBetException;
 import com.casino.common.table.ICasinoTable;
 import com.casino.common.user.Bridge;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(value = { "id", "bridge" })
 public abstract class CasinoPlayer implements ICasinoPlayer {
 	private static final Logger LOGGER = Logger.getLogger(CasinoPlayer.class.getName());
-	@JsonIgnore
 	private final ICasinoTable table;
-	@JsonIgnore
 	private BigDecimal endBalance;
-	@JsonIgnore
 	private BigDecimal initialBalance;
-	@JsonIgnore
 	private final ReentrantLock playerLock;
-	@JsonIgnore
 	private final Bridge bridge;
-	@JsonProperty
 	private volatile BigDecimal balance;
-	@JsonProperty
 	private volatile BigDecimal totalBet;
-	@JsonProperty
 	private volatile BigDecimal payout;
-	@JsonProperty
 	private volatile PlayerStatus status;
 
 	public CasinoPlayer(Bridge bridge, ICasinoTable table) {
@@ -122,7 +114,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	public <T> void sendMessage(T message) {
 		if (!canSendMessage(message)) {
 			System.out.println("cannot send message " + getName());
-			LOGGER.log(Level.FINE, "Message cannot be delivered:"+message);
+			LOGGER.log(Level.FINE, "Message cannot be delivered:" + message);
 			LOGGER.log(Level.SEVERE, "Message cannot be delivered:");
 			return;
 		}

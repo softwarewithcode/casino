@@ -13,7 +13,7 @@ import com.casino.common.bet.BetUtil;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.player.PlayerStatus;
 import com.casino.common.table.phase.PhasePath;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -25,8 +25,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * For example blackjack and red dog games are order based games. Roulette is
  * not order based as people tend to add chips at the same time.
  */
+@JsonIncludeProperties(value = { /* implementing subclass defines exact fields */ })
 public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
-	@JsonIgnore
 	private Set<Seat> seats;
 
 	protected SeatedTable(Status initialStatus, TableInitData tableDescription, PhasePath phasePath) {

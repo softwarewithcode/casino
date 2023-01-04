@@ -15,44 +15,28 @@ import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.phase.PhasePath;
 import com.casino.common.table.timing.Clock;
 import com.casino.common.table.timing.PlayerClockTask;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
 /**
  * 
  * @author softwarewithcode from GitHub
  *
  */
-
+@JsonIncludeProperties(value = { /* implementing subclass defines exact fields */ })
 public abstract class CasinoTable implements ICasinoTable {
 
-	// private static final Logger LOGGER =
-	// Logger.getLogger(CasinoTable.class.getName());
-	@JsonIgnore
 	private final PhasePath phasePath;
-	@JsonProperty
 	private final Type type;
-	@JsonIgnore
 	private final ConcurrentHashMap<UUID, ICasinoPlayer> watchers;
-	@JsonIgnore
 	private final ReentrantLock playerInTurnLock;
-	@JsonProperty
 	private final UUID id;
-	@JsonIgnore
 	private final Instant created;
-	@JsonIgnore
 	private final Clock clock;
-	@JsonProperty
 	private Language language;
-	@JsonProperty
 	private ICasinoPlayer playerInTurn;
-	@JsonProperty
 	private boolean dealerTurn;
-	@JsonIgnore
 	private volatile Status status;
-	@JsonIgnore
 	private TableInitData tableInitData;
-	@JsonProperty
 	private final TableCard tableCard;
 
 	protected CasinoTable(Status initialStatus, TableInitData initData, PhasePath phases) {
@@ -85,7 +69,6 @@ public abstract class CasinoTable implements ICasinoTable {
 		this.clock.stopClock();
 	}
 
-	@JsonIgnore
 	@Override
 	public boolean isClockTicking() {
 		return this.clock.isTicking();
@@ -97,7 +80,6 @@ public abstract class CasinoTable implements ICasinoTable {
 		startClock(playerTimer, 0);
 	}
 
-	@JsonIgnore
 	@Override
 	public boolean isClosed() {
 		return status == Status.CLOSED;
@@ -108,27 +90,19 @@ public abstract class CasinoTable implements ICasinoTable {
 		return tableCard.getThresholds().maxPlayers() > 1;
 	}
 
-	@JsonIgnore
 	@Override
 	public boolean isPublic() {
 		return type == Type.PUBLIC;
 	}
 
-	@JsonIgnore
 	@Override
 	public boolean isPrivate() {
 		return type == Type.PRIVATE;
 	}
 
-	@JsonIgnore
 	@Override
 	public boolean isReserved() {
 		return type == Type.RESERVED;
-	}
-
-	@JsonIgnore
-	public Thresholds getThresholds() {
-		return getTableCard().getThresholds();
 	}
 
 	@Override
@@ -142,7 +116,6 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	}
 
-	@JsonProperty
 	public int getWatcherCount() {
 		return watchers.size();
 	}
@@ -230,7 +203,6 @@ public abstract class CasinoTable implements ICasinoTable {
 		return this.clock.getTime();
 	}
 
-	@JsonProperty
 	public GamePhase getPhase() {
 		return phasePath.getPhase();
 	}
@@ -281,9 +253,8 @@ public abstract class CasinoTable implements ICasinoTable {
 		return tableCard;
 	}
 
-	@JsonIgnore
 	@Override
-	public Thresholds getThresHolds() {
+	public Thresholds getThresholds() {
 		return tableInitData.thresholds();
 	}
 

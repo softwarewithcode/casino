@@ -14,30 +14,23 @@ import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /*
  * Player(s) and internal timers are possible concurrent actors. BlackjackPlayer getHands() - hands out references to these hands.
  * 
  */
+@JsonIncludeProperties(value = { "cards", "values", "blackjack", "bet", "insured", "active" })
 public class BlackjackHand implements IHand {
-	@JsonIgnore
 	private final UUID id;
-	@JsonIgnore
 	private final Instant created;
-	@JsonProperty
 	private final List<Card> cards;
-	@JsonIgnore
 	private volatile Instant completed;
-	@JsonProperty
 	private volatile boolean active;
-	@JsonProperty
 	private volatile boolean doubled;
-	@JsonProperty
 	private volatile BigDecimal bet;
-	@JsonProperty
 	private volatile BigDecimal insuranceBet;
-	@JsonIgnore
 	private ReentrantLock lock;
 
 	public BlackjackHand(UUID id, boolean active) {
@@ -253,6 +246,7 @@ public class BlackjackHand implements IHand {
 		return insuranceBet;
 	}
 
+	@JsonIgnore
 	@Override
 	public boolean isInsuranceCompensable() {
 		return isInsured() && isCompleted();

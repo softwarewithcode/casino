@@ -14,7 +14,7 @@ public class PlayerClockTask extends TimerTask {
 		this.table = table;
 		secondsLeft = table.getPlayerTurnTime();
 		player = playerRunningOutOfTurnTime;
-		table.updateCounterTime(table.getThresHolds().playerTime());
+		table.updateCounterTime(table.getThresholds().playerTime());
 	}
 
 	@Override

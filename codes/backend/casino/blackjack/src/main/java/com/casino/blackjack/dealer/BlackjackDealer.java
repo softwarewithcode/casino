@@ -19,7 +19,6 @@ import com.casino.blackjack.table.timing.InsurancePhaseClockTask;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
-import com.casino.common.cards.Suit;
 import com.casino.common.dealer.CommunicationChannel;
 import com.casino.common.dealer.IDealer;
 import com.casino.common.exception.PlayerNotFoundException;
@@ -31,26 +30,23 @@ import com.casino.common.table.Thresholds;
 import com.casino.common.table.phase.GamePhase;
 import com.casino.common.table.timing.BetPhaseClockTask;
 import com.casino.common.user.Title;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
 /**
  * @author softwarewithcode from GitHub
  * 
  */
+@JsonIgnoreType
+@JsonIncludeProperties(value = { /* explicitly nothing from here */ })
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
 	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
-	@JsonIgnore
 	private final Thresholds thresholds;
-	@JsonIgnore
 	private final BlackjackTable table;
-	@JsonIgnore
 	private final ReentrantLock betPhaseLock;
-	@JsonIgnore
 	private final CommunicationChannel voice;
-	@JsonIgnore
 	private List<Card> deck;
-	@JsonIgnore
 	private BlackjackDealerHand dealerHand;
 
 	public BlackjackDealer(BlackjackTable blackjackTable, Thresholds thresholds) {
@@ -86,8 +82,7 @@ public class BlackjackDealer implements IDealer {
 		seat.getPlayer().updateStartingBet(bet, table);
 	}
 
-	@JsonIgnore
-	public IHand getHand() {
+	public BlackjackDealerHand getHand() {
 		return dealerHand;
 	}
 
@@ -107,8 +102,6 @@ public class BlackjackDealer implements IDealer {
 		deck = Deck.combineDecks(6);
 	}
 
-	// @JsonIgnore just in case of an upcoming getter error
-	@JsonIgnore
 	public List<Card> getDecks() {
 		return deck;
 	}
@@ -117,7 +110,6 @@ public class BlackjackDealer implements IDealer {
 		return thresholds;
 	}
 
-	@JsonIgnore
 	public BlackjackTable getTable() {
 		return table;
 	}
@@ -282,7 +274,7 @@ public class BlackjackDealer implements IDealer {
 			if (table.getActivePlayerCount() == 0)
 				table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
 			if (shouldRestartBetPhase()) {
-				table.updateCounterTime(table.getThresHolds().phaseDelay().intValue());
+				table.updateCounterTime(table.getThresholds().phaseDelay().intValue());
 				startBetPhaseClock(table.getThresholds().phaseDelay());
 			}
 		} catch (Exception e) {
@@ -324,7 +316,6 @@ public class BlackjackDealer implements IDealer {
 		removeLastCardFromDeck();
 	}
 
-	@JsonIgnore
 	public Card getNextCard() {
 		return deck.get(deck.size() - 1);
 	}
