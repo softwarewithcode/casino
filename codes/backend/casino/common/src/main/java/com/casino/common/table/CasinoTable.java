@@ -31,11 +31,11 @@ public abstract class CasinoTable implements ICasinoTable {
 	private final UUID id;
 	private final Instant created;
 	private final Clock clock;
+	private final TableInitData tableInitData;
+	private final TableCard tableCard;
 	private ICasinoPlayer playerInTurn;
 	private boolean dealerTurn;
 	private volatile Status status;
-	private TableInitData tableInitData;
-	private final TableCard tableCard;
 
 	protected CasinoTable(Status initialStatus, TableInitData initData, PhasePath phases) {
 		this.watchers = new ConcurrentHashMap<>();
@@ -194,10 +194,6 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	public int getCounterTime() {
 		return this.clock.getTime();
-	}
-
-	public GamePhase getPhase() {
-		return phasePath.getPhase();
 	}
 
 	protected boolean isPlayerInTurn(ICasinoPlayer player) {
