@@ -115,7 +115,8 @@ public class StandTest extends BaseTest {
 	@Test
 	public void callingStandOnSecondHandOfSplitCompletesSecondHand() {
 		List<Card> cards = dealer.getDecks();
-		cards.add(Card.of(11, Suit.DIAMOND));
+		cards.add(Card.of(4, Suit.DIAMOND));
+		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.DIAMOND));
