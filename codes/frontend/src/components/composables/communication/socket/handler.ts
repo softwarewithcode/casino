@@ -5,7 +5,7 @@ import { Command } from "@/types/sockethander"
 import { useStartCounter } from "../../timing/clock"
 const store = useBlackjackStore()
 
-export function useTableDataHandler(data: any) {
+export function useBlackjackDataHandler(data: any) {
 	store.$patch({
 		command: data.title
 	})

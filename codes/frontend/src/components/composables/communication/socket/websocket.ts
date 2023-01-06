@@ -1,4 +1,4 @@
-import { useTableDataHandler } from "./handler"
+import { useBlackjackDataHandler } from "./handler"
 let websocket: WebSocket
 
 const base = import.meta.env.VITE_CASINO_WS_ENDPOINT
@@ -20,7 +20,13 @@ async function initSocket(finalURI: string) {
 	}
 	websocket.onmessage = event => {
 		let data = JSON.parse(event.data)
-		useTableDataHandler(data)
+		switch (data.table.tableCard.game) {
+			case "BLACKJACK":
+				useBlackjackDataHandler(data)
+				break
+			default:
+				throw new Error("no handler for data " + JSON.stringify(data))
+		}
 	}
 	websocket.onerror = event => {
 		console.error("socket error" + event)
