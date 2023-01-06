@@ -1,9 +1,9 @@
-import { useTableStore } from "../../../../stores/tableStore"
+import { useBlackjackStore } from "../../../../stores/blackjackStore"
 import { useRouter, useRoute } from "vue-router"
 import router from "../../../../router/router"
 import { Command } from "@/types/sockethander"
 import { useStartCounter } from "../../timing/clock"
-const store = useTableStore()
+const store = useBlackjackStore()
 
 export function useTableDataHandler(data: any) {
 	store.$patch({

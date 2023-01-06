@@ -3,12 +3,12 @@ import { PlayerAction, GamePhase, type BlackjackPlayer, type Seat } from "@/type
 import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCardsAndHandValuesPainter } from "../components/composables/rendering/canvasUtils";
 import { onMounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
-import { useTableStore } from "../stores/tableStore";
+import { useBlackjackStore } from "../stores/blackjackStore";
 import { mapActions, storeToRefs } from "pinia";
 import { Command } from "@/types/sockethander";
 const props = defineProps<{ tableId: string }>();
 const canvasReady = ref<boolean>(false);
-const store = useTableStore();
+const store = useBlackjackStore();
 const { table, command, player, counter } = storeToRefs(store);
 
 store.$subscribe((mutation, state) => {
@@ -142,23 +142,23 @@ const insuranceAvailable = computed<boolean>(() => {
         <div v-if="table.gamePhase === GamePhase.ROUND_COMPLETED" id="betRoundStartsRow">
             Next bet round starts {{ counter }}
         </div>
-        <div style="position:relative; bottom:25px: left:50px"
-            v-if="table.gamePhase === 'PLAY' && table.playerInTurn.name === player.name" id="actionRow">
+        <div v-if="table.gamePhase === 'PLAY' && table.playerInTurn.name === player.name" id="actionRow"
+            style="position:relative; bottom:25px: left:50px">
             Player {{ table?.playerInTurn.name }} {{ counter }}
-            <button v-if="table.playerInTurn.actions.includes(PlayerAction.TAKE.toString())"
-                @click="sendAction(PlayerAction.TAKE.toString())">
+            <button v-if="table.playerInTurn.actions.includes(PlayerAction.TAKE)"
+                @click="sendAction(PlayerAction.TAKE)">
                 Take
             </button>
-            <button v-if="table.playerInTurn.actions.includes(PlayerAction.SPLIT.toString())"
-                @click="sendAction(PlayerAction.SPLIT.toString())">
+            <button v-if="table.playerInTurn.actions.includes(PlayerAction.SPLIT)"
+                @click="sendAction(PlayerAction.SPLIT)">
                 Split
             </button>
-            <button v-if="table.playerInTurn.actions.includes(PlayerAction.DOUBLE_DOWN.toString())"
-                @click="sendAction(PlayerAction.DOUBLE_DOWN.toString())">
+            <button v-if="table.playerInTurn.actions.includes(PlayerAction.DOUBLE_DOWN)"
+                @click="sendAction(PlayerAction.DOUBLE_DOWN)">
                 Double down
             </button>
-            <button v-if="table.playerInTurn.actions.includes(PlayerAction.STAND.toString())"
-                @click="sendAction(PlayerAction.STAND.toString())">
+            <button v-if="table.playerInTurn.actions.includes(PlayerAction.STAND)"
+                @click="sendAction(PlayerAction.STAND)">
                 Stand
             </button>
         </div>

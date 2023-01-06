@@ -1,12 +1,12 @@
 import { useTableDataHandler } from "./handler"
 let websocket: WebSocket
 
-const base = import.meta.env.VITE_BLACKJACK_WS_ENDPOINT
+const base = import.meta.env.VITE_CASINO_WS_ENDPOINT
 const openTableJSON = '{ "action": "OPEN_TABLE"}'
 
-export async function useOpenTable(tableId: string) {
-	const finalURI = base + `/${tableId}`
-	await initSocket(finalURI)
+export async function useOpenTable(tableType: string, tableId: string) {
+	const finalURI = base + `/${tableType}/${tableId}`
+	await initSocket(finalURI.toLocaleLowerCase())
 }
 
 export function useSend(data: any) {

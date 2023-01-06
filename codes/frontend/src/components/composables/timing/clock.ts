@@ -1,9 +1,9 @@
-import { useTableStore } from "../../../stores/tableStore"
+import { useBlackjackStore } from "../../../stores/blackjackStore"
 
 let counterId: number
 let store
 export function useStartCounter() {
-	store = useTableStore()
+	store = useBlackjackStore()
 	startCounter()
 }
 

@@ -2,11 +2,11 @@
 import { onMounted, onUnmounted, onBeforeMount } from "vue"
 import { fetchTables } from "../components/composables/communication/http"
 import type { CasinoTable, TableCard } from "../types/casino"
-import {useTableStore} from "../stores/tableStore"
+import { useBlackjackStore } from "../stores/blackjackStore"
 import TableCardView from "./TableCardView.vue";
 import Blackjack from "./TableCardView.vue";
 
-const store = useTableStore()
+const store = useBlackjackStore()
 store.populateStore()
 
 </script>
@@ -14,6 +14,6 @@ store.populateStore()
 <template>
     <main>Casino</main>
     <div v-for="(table) in store.getTables" :key="table.id">
-        <TableCardView :card = "table" />
+        <TableCardView :card="table" />
     </div>
 </template>

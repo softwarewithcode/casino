@@ -6,7 +6,8 @@ import { fetchTables } from "../components/composables/communication/http"
 import type { TableCard } from "@/types/casino"
 import { useStartCounter } from "../components/composables/timing/clock"
 
-export const useTableStore = defineStore("tableStore", {
+const blackjackGameType = "blackjack"
+export const useBlackjackStore = defineStore("blackjackStore", {
 	state: () => ({
 		tables: [] as TableCard[],
 		table: {} as BlackjackTable, //{} as any //{} as CasinoTable,
@@ -32,7 +33,7 @@ export const useTableStore = defineStore("tableStore", {
 	actions: {
 		async populateStore() {
 			try {
-				this.tables = await fetchTables()
+				this.tables = await fetchTables(blackjackGameType)
 			} catch (error) {
 				alert(error)
 			}
