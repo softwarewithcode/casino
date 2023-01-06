@@ -2,6 +2,7 @@ package com.casino.web.endpoint.handler;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.casino.common.user.Bridge;
 import com.casino.common.validaton.Validator;
@@ -19,12 +20,7 @@ public class UserService {
 		return fetchUserDataLikeBalanceFromDB(validUserId, tableId, session);
 	}
 
-	private static int guestCount = 0;
-
-	private static synchronized int getNextGuestNumber() {
-		guestCount++;
-		return guestCount;
-	}
+	private static AtomicInteger guestCount = new AtomicInteger();
 
 	public static Bridge createGuestPlayerBridge(String userId, UUID tableId, Session session) {
 		return createDefaultGuestPlayerBridge(tableId, session);
@@ -33,17 +29,11 @@ public class UserService {
 	private static Bridge fetchUserDataLikeBalanceFromDB(UUID userId, UUID tableId, Session session) {
 		// TODO Auto-generated method stub
 		return new Bridge("authUser", tableId, userId, session, new BigDecimal("10000.0"));
-
 	}
 
 	private static Bridge createDefaultGuestPlayerBridge(UUID tableId, Session session) {
 		UUID id = UUID.randomUUID();
-		return new Bridge("guest" + getNextGuestNumber(), tableId, id, session, new BigDecimal("1000.0"));
+		int guestNumber = guestCount.addAndGet(1);
+		return new Bridge("guest" + guestNumber, tableId, id, session, new BigDecimal("1000.0"));
 	}
-
-//	private Bridge createDefaultWatcherBridge(UUID tableId, Session session) {
-//		// TODO Auto-generated method stub
-//		UUID id = UUID.randomUUID();
-//		return new Bridge("watcherGuest" + id, tableId, id, session, new BigDecimal("1000.0"));
-//	}
 }
