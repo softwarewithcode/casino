@@ -51,7 +51,7 @@ public class BlackjackDealer implements IDealer {
 	public BlackjackDealer(BlackjackTable blackjackTable) {
 		this.table = blackjackTable;
 //		this.thresholds = thresholds;
-		this.deck = Deck.combineDecks(8);
+		this.deck = Deck.pileUp(8);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		betPhaseLock = new ReentrantLock();
 		voice = new CommunicationChannel(table);
@@ -98,7 +98,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void createDecks() {
-		deck = Deck.combineDecks(6);
+		deck = Deck.pileUp(6);
 	}
 
 	public List<Card> getDecks() {
@@ -290,7 +290,7 @@ public class BlackjackDealer implements IDealer {
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		table.updateGamePhase(GamePhase.BET);
 		table.updateCounterTime(table.getThresholds().betPhaseTime());
-		deck = Deck.combineDecks(8);
+		deck = Deck.pileUp(8);
 		notifyAll(Title.BET_PHASE_STARTS, null);
 	}
 

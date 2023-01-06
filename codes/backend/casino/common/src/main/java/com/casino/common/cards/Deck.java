@@ -32,12 +32,13 @@ public class Deck {
 		return cards;
 	}
 
-	public static List<Card> combineDecks(int count) {
-		List<Deck> decks = IntStream.range(0, count).mapToObj(i -> new Deck()).toList();
+	public static List<Card> pileUp(int deckCount) {
+		if (deckCount < 0 || deckCount > 15) {
+			throw new IllegalArgumentException("Check stacked decks count was:" + deckCount);
+		}
+		List<Deck> decks = IntStream.range(0, deckCount).mapToObj(i -> new Deck()).toList();
 		List<Card> cards = new ArrayList<>();
-		decks.forEach(deck -> {
-			cards.addAll(deck.getCards());
-		});
+		decks.forEach(deck -> cards.addAll(deck.getCards()));
 		Collections.shuffle(cards);
 		return cards;
 	}
