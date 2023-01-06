@@ -20,7 +20,7 @@ public class UserService {
 		return fetchUserDataLikeBalanceFromDB(validUserId, tableId, session);
 	}
 
-	private AtomicInteger guestCount = new AtomicInteger();
+	private static AtomicInteger guestCount = new AtomicInteger();
 
 	public Bridge createGuestPlayerBridge(String userId, UUID tableId, Session session) {
 		return createDefaultGuestPlayerBridge(tableId, session);
@@ -33,7 +33,7 @@ public class UserService {
 
 	private Bridge createDefaultGuestPlayerBridge(UUID tableId, Session session) {
 		UUID id = UUID.randomUUID();
-		int guestNumber = guestCount.addAndGet(1);
+		int guestNumber = guestCount.incrementAndGet();
 		return new Bridge("guest" + guestNumber, tableId, id, session, new BigDecimal("1000.0"));
 	}
 }
