@@ -232,7 +232,6 @@ public class BlackjackDealer implements IDealer {
 		table.getPlayersWithBet().forEach(player -> {
 			player.getActiveHand().updateBet(player.getTotalBet());
 			player.subtractTotalBetFromBalance();
-			player.updateLastBet(player.getTotalBet());
 		});
 	}
 

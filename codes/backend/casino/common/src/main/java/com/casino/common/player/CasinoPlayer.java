@@ -168,18 +168,6 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		}
 	}
 
-	@Override
-	public void updateLastBet(BigDecimal totalBet) {
-		try {
-			tryTakingPlayerLock();
-			this.lastBet = totalBet;
-			System.out.println("LastBet:" + totalBet);
-		} finally {
-			releasePlayerLock();
-		}
-
-	}
-
 	protected void releasePlayerLock() {
 		if (getPlayerLock().isHeldByCurrentThread())
 			getPlayerLock().unlock();
