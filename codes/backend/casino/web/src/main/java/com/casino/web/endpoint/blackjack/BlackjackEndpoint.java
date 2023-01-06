@@ -9,8 +9,8 @@ import com.casino.blackjack.ext.IBlackjackTable;
 import com.casino.common.user.Bridge;
 import com.casino.common.validaton.Validator;
 import com.casino.common.web.Message;
-import com.casino.service.BlackjackTableService;
-import com.casino.web.endpoint.handler.UserHandler;
+import com.casino.service.BlackjackService;
+import com.casino.web.endpoint.handler.UserService;
 
 import jakarta.inject.Inject;
 import jakarta.websocket.CloseReason;
@@ -26,9 +26,9 @@ import jakarta.websocket.server.ServerEndpoint;
 public class BlackjackEndpoint {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackEndpoint.class.getName());
 	@Inject
-	private UserHandler userHandler;
+	private UserService userService;
 	@Inject
-	private BlackjackTableService tableService;
+	private BlackjackService tableService;
 
 	private IBlackjackTable table;
 	private Bridge bridge;
@@ -105,7 +105,7 @@ public class BlackjackEndpoint {
 
 	private void createBridge(Session session, Message message) {
 //		if (watcher)
-		this.bridge = userHandler.createGuestPlayerBridge(message.getUserId(), this.tableId, session);
+		this.bridge = userService.createGuestPlayerBridge(message.getUserId(), this.tableId, session);
 //		else
 //			this.bridge = userHandler.createPlayerBridge(message.getUserId(), this.tableId, session);
 	}

@@ -5,7 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.common.table.TableCard;
-import com.casino.service.BlackjackTableService;
+import com.casino.service.BlackjackService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.inject.Inject;
@@ -18,7 +18,7 @@ import jakarta.ws.rs.core.Response;
 public class TableResource {
 	private static final Logger LOGGER = Logger.getLogger(TableResource.class.getName());
 	@Inject
-	private BlackjackTableService blackjackService;
+	private BlackjackService blackjackService;
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 
 	@GET

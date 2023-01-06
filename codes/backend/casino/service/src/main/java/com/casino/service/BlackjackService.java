@@ -20,7 +20,7 @@ import com.casino.common.user.Bridge;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class BlackjackTableService {
+public class BlackjackService {
 	//private static final Logger LOGGER = Logger.getLogger(BlackjackTableService.class.getName());
 	private static final Integer BET_PHASE_TIME_SECONDS_DEFAULT = 15;
 	private static final Integer INSURANCE_PHASE_TIME_SECONDS_DEFAULT = 11;
@@ -32,7 +32,7 @@ public class BlackjackTableService {
 
 	private final ConcurrentHashMap<UUID, BlackjackTable> tables = new ConcurrentHashMap<>();
 
-	public BlackjackTableService() {
+	public BlackjackService() {
 		TableInitData tableInitData = createDefaultInitData(new BigDecimal("5"), new BigDecimal("10"));
 		BlackjackTable temp1 = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 		tables.putIfAbsent(temp1.getId(), temp1);

@@ -10,7 +10,7 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.websocket.Session;
 
 @Dependent
-public class UserHandler {
+public class UserService {
 
 	public Bridge createPlayerBridge(String userId, UUID tableId, Session session) {
 		if (userId == null || userId.isBlank())
