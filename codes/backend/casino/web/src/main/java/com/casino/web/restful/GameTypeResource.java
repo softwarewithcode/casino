@@ -15,7 +15,7 @@ import jakarta.ws.rs.core.Response;
 
 @Path("/gametypes")
 public class GameTypeResource {
-	private static final Logger LOGGER = Logger.getLogger(TableResource.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(GameTypeResource.class.getName());
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 
 	@GET
