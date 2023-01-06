@@ -20,18 +20,18 @@ public class UserService {
 		return fetchUserDataLikeBalanceFromDB(validUserId, tableId, session);
 	}
 
-	private static AtomicInteger guestCount = new AtomicInteger();
+	private AtomicInteger guestCount = new AtomicInteger();
 
-	public static Bridge createGuestPlayerBridge(String userId, UUID tableId, Session session) {
+	public Bridge createGuestPlayerBridge(String userId, UUID tableId, Session session) {
 		return createDefaultGuestPlayerBridge(tableId, session);
 	}
 
-	private static Bridge fetchUserDataLikeBalanceFromDB(UUID userId, UUID tableId, Session session) {
+	private Bridge fetchUserDataLikeBalanceFromDB(UUID userId, UUID tableId, Session session) {
 		// TODO Auto-generated method stub
 		return new Bridge("authUser", tableId, userId, session, new BigDecimal("10000.0"));
 	}
 
-	private static Bridge createDefaultGuestPlayerBridge(UUID tableId, Session session) {
+	private Bridge createDefaultGuestPlayerBridge(UUID tableId, Session session) {
 		UUID id = UUID.randomUUID();
 		int guestNumber = guestCount.addAndGet(1);
 		return new Bridge("guest" + guestNumber, tableId, id, session, new BigDecimal("1000.0"));
