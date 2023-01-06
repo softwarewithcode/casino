@@ -1,12 +1,9 @@
-import { onMounted, computed } from "vue"
 import { defineStore } from "pinia"
-import type { CasinoTable } from "../types/casino"
 import type { BlackjackTable, BlackjackPlayer } from "../types/blackjack"
 import { fetchTables } from "../components/composables/communication/http"
 import type { TableCard } from "@/types/casino"
-import { useStartCounter } from "../components/composables/timing/clock"
 
-const blackjackGameType = "blackjack"
+const blackjack = "blackjack"
 export const useBlackjackStore = defineStore("blackjackStore", {
 	state: () => ({
 		tables: [] as TableCard[],
@@ -33,12 +30,13 @@ export const useBlackjackStore = defineStore("blackjackStore", {
 	actions: {
 		async populateStore() {
 			try {
-				this.tables = await fetchTables(blackjackGameType)
+				this.tables = await fetchTables(blackjack)
 			} catch (error) {
 				alert(error)
 			}
 		},
 		async login(player: BlackjackPlayer) {
+			// To CasinoStore or rename?
 			this.player = player
 		},
 		reduceCounter() {

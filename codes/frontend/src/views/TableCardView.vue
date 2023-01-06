@@ -10,7 +10,7 @@ const openTable = (gameType: string, tableId: string) => {
 };
 </script>
 <template>
-    Description
+
     <div style="border-style: dashed solid">
         Game: {{ card.game }} <br />
         Min: {{ card.thresholds.minimumBet }} € ?<br />

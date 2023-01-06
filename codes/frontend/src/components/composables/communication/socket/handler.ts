@@ -1,10 +1,9 @@
 import { useBlackjackStore } from "../../../../stores/blackjackStore"
-import { useRouter, useRoute } from "vue-router"
 import router from "../../../../router/router"
 import { Command } from "@/types/sockethander"
 import { useStartCounter } from "../../timing/clock"
+// @author softwarewithcode from GitHub
 const store = useBlackjackStore()
-
 export function useBlackjackDataHandler(data: any) {
 	store.$patch({
 		command: data.title

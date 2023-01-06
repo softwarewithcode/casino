@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { PlayerAction, GamePhase, type BlackjackPlayer, type Seat } from "@/types/blackjack";
-import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCardsAndHandValuesPainter } from "../components/composables/rendering/canvasUtils";
+import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCardsAndHandValuesPainter } from "../../components/composables/rendering/canvasUtils";
 import { onMounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
-import { useBlackjackStore } from "../stores/blackjackStore";
+import { useBlackjackStore } from "../../stores/blackjackStore";
 import { mapActions, storeToRefs } from "pinia";
 import { Command } from "@/types/sockethander";
 const props = defineProps<{ tableId: string }>();

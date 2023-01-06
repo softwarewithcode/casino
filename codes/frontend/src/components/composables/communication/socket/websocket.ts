@@ -1,6 +1,6 @@
 import { useBlackjackDataHandler } from "./handler"
 let websocket: WebSocket
-
+// @author softwarewithcode from GitHub
 const base = import.meta.env.VITE_CASINO_WS_ENDPOINT
 const openTableJSON = '{ "action": "OPEN_TABLE"}'
 

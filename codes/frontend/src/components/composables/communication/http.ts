@@ -10,3 +10,9 @@ export async function fetchTables(gameType: string) {
 	const tables = await resp.json()
 	return tables
 }
+export async function fetchGameTypes() {
+	const finalURI = httpBase + `/gametypes`
+	const resp = await fetch(finalURI, requestInit)
+	const tables = await resp.json()
+	return tables
+}

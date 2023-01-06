@@ -30,7 +30,7 @@ public class TableResource {
 			var json = MAPPER.writeValueAsString(cards);
 			return Response.ok(json).build();
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "FeedBackResource error ", e);
+			LOGGER.log(Level.SEVERE, "Resource error ", e);
 		}
 		return Response.serverError().build();
 	}

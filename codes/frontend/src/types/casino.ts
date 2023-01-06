@@ -1,6 +1,10 @@
 export interface CasinoTable {
 	tableCard: TableCard
 }
+export interface GameType {
+	type: string
+	index: number
+}
 export interface CasinoPlayer {
 	name: string
 	id: string
