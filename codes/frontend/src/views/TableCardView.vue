@@ -11,11 +11,20 @@ const openTable = (gameType: string, tableId: string) => {
 </script>
 <template>
 
-    <div style="border-style: dashed solid">
-        Game: {{ card.game }} <br />
+    <div class="tableCard" @click="openTable(card.game, card.id)">
         Min: {{ card.thresholds.minimumBet }} € ?<br />
         Max: {{ card.thresholds.maximumBet }} € ? <br />
-        Available seats: {{ card.availablePositions.length }} <br />
-        <button @click="openTable(card.game, card.id)">Open</button>
+        Available seats: {{ card.availablePositions.length }}
     </div>
 </template>
+
+<style scoped>
+.tableCard {
+    border-style: dashed solid;
+    cursor: pointer;
+}
+
+.tableCard:hover {
+    background-color: yellow;
+}
+</style>
