@@ -14,7 +14,6 @@ import com.casino.web.endpoint.handler.UserHandler;
 
 import jakarta.inject.Inject;
 import jakarta.websocket.CloseReason;
-import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnError;
 import jakarta.websocket.OnMessage;

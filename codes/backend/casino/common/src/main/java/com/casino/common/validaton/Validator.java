@@ -11,6 +11,6 @@ public class Validator {
 		UUID validId = UUID.fromString(id);
 		if (validId.toString().equals(id))
 			return validId;
-		throw new IllegalArgumentException("not a valid id " + id);
+		throw new IllegalArgumentException("not a valid id " + id + " component produced:" + validId);
 	}
 }

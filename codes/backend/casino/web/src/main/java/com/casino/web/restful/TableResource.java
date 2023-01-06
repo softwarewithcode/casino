@@ -18,7 +18,7 @@ import jakarta.ws.rs.core.Response;
 public class TableResource {
 	private static final Logger LOGGER = Logger.getLogger(TableResource.class.getName());
 	@Inject
-	private BlackjackTableService tableService;
+	private BlackjackTableService blackjackService;
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 
 	@GET
@@ -26,13 +26,12 @@ public class TableResource {
 	@Produces("application/json")
 	public Response fetchTableCards() {
 		try {
-			List<TableCard> cards = tableService.fetchTableCards();
+			List<TableCard> cards = blackjackService.fetchTableCards();
 			var json = MAPPER.writeValueAsString(cards);
 			return Response.ok(json).build();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "FeedBackResource error ", e);
 		}
 		return Response.serverError().build();
-//		return Response.status(Status.BAD_REQUEST).build();
 	}
 }
