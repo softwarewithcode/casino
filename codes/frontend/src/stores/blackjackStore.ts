@@ -7,9 +7,8 @@ const blackjack = "blackjack"
 export const useBlackjackStore = defineStore("blackjackStore", {
 	state: () => ({
 		tables: [] as TableCard[],
-		table: {} as BlackjackTable, //{} as any //{} as CasinoTable,
+		table: {} as BlackjackTable,
 		command: {} as string,
-		commandPlayerId: {} as string,
 		player: {} as BlackjackPlayer,
 		counter: {} as number
 	}),
