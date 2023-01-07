@@ -422,7 +422,7 @@ public class BlackjackDealer implements IDealer {
 		notifyAll(title, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
-	public void calculateNextActorAndNotify() {
+	public void updateActorAndNotify() {
 		updateTableActor();
 		if (table.getPlayerInTurn() != null)
 			notifyAll(Title.WAITING_PLAYER_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
@@ -430,8 +430,10 @@ public class BlackjackDealer implements IDealer {
 
 	public void onPlayerLeave(BlackjackPlayer leavingPlayer) {
 		leavingPlayer.setStatus(PlayerStatus.LEFT);
-		finalizeInactivePlayerTurn(leavingPlayer);
-		calculateNextActorAndNotify();
+		if (table.isPlayerInTurn(leavingPlayer)) {
+			finalizeInactivePlayerTurn(leavingPlayer);
+			updateActorAndNotify();
+		}
 		if (!table.isRoundRunning()) {
 			sanitizeEmptySeats();
 			notifyAll(Title.PLAYER_LEFT, leavingPlayer);
@@ -444,7 +446,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void finalizeInactivePlayerTurn(BlackjackPlayer player) {
-		if (player.hasBet() && player.equals(table.getPlayerInTurn())) {
+		if (player.hasBet() && table.isPlayerInTurn(player)) {
 			autoplayForPlayer(player);
 		}
 	}
@@ -452,7 +454,7 @@ public class BlackjackDealer implements IDealer {
 	public void handleTimedoutPlayer(BlackjackPlayer timedOutPlayer) {
 		finalizeInactivePlayerTurn(timedOutPlayer);
 		notifyAll(Title.TIMED_OUT, timedOutPlayer);
-		calculateNextActorAndNotify();
+		updateActorAndNotify();
 	}
 
 	public void sendStatusUpdate(CasinoPlayer player) {

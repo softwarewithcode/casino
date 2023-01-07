@@ -196,7 +196,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		return this.clock.getTime();
 	}
 
-	protected boolean isPlayerInTurn(ICasinoPlayer player) {
+	public boolean isPlayerInTurn(ICasinoPlayer player) {
 		if (player == null)
 			return false;
 		return getPlayerInTurn() != null && getPlayerInTurn().equals(player);

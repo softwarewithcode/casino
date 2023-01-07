@@ -101,7 +101,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "stand");
 			dealer.stand(player);
-			dealer.calculateNextActorAndNotify();
+			dealer.updateActorAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "stand", " player:" + playerId + " table:" + getId());
@@ -120,7 +120,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "hit");
 			dealer.hit(player);
-			dealer.calculateNextActorAndNotify();
+			dealer.updateActorAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "hit", " player:" + playerId + " table:" + getId());
@@ -135,7 +135,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();
 			verifyActionClearance(player, "split");
 			dealer.handleSplit(player);
-			dealer.calculateNextActorAndNotify();
+			dealer.updateActorAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "split", " player:" + playerId + " table:" + getId());
@@ -150,7 +150,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			lockPlayerInTurn();
 			verifyActionClearance(player, "doubleDown");
 			dealer.doubleDown(player);
-			dealer.calculateNextActorAndNotify();
+			dealer.updateActorAndNotify();
 		} finally {
 			unlockPlayerInTurn();
 			LOGGER.exiting(getClass().getName(), "doubleDown", " player:" + playerId + " table:" + getId());
@@ -180,7 +180,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			leavingPlayer = getPlayer(playerId);
 			if (leavingPlayer == null)
 				return;
-			lockPlayerInTurn();
+			lockPlayerInTurn(); 
 			dealer.onPlayerLeave(leavingPlayer);
 		} finally {
 			unlockPlayerInTurn();
