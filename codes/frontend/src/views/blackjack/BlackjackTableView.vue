@@ -44,7 +44,7 @@ const canBetMinimum = computed<boolean>(() => {
 })
 
 const canIncreaseMinimum = computed<boolean>(() => {
-    return table.value.tableCard.thresholds.minimumBet + betAmount.value <= table.value.tableCard.thresholds.maximumBet
+    return betsAllowed.value && betAmount.value > 0 && table.value.tableCard.thresholds.minimumBet + betAmount.value <= table.value.tableCard.thresholds.maximumBet
 })
 const canBetMaximum = computed<boolean>(() => {
     return betsAllowed.value && player.value.balance > table.value.tableCard.thresholds.maximumBet && counter.value > 1
@@ -63,8 +63,10 @@ const counterVisible = computed<boolean>(() => {
 })
 
 const canBetPrevious = computed<boolean>(() => {
-
     return betsAllowed.value && previousBetAmount.value != -1 && player.value.balance >= previousBetAmount.value
+})
+const hasBet = computed<boolean>(() => {
+    return betAmount.value > 0
 })
 const insure = () => {
     insuranceClicked.value = true
@@ -110,6 +112,12 @@ const getCenterPlayer = (): BlackjackPlayer => {
 const seatStyle = (seatNumber: number) => {
     return { 'display': "inline", 'bottom': "200px", "margin-right": "45px", "left": "50px" }
 }
+const instructionStyle = computed(() => {
+    const bottom = (getCanvas().height / 2).toString() + "px"
+    const left = (getCanvas().width / 2).toString() + "px"
+    const color = counter.value > 5 ? 'green' : 'red'
+    return { 'left': left, 'bottom': bottom, "color": color }
+})
 
 const insuranceClicked = ref<boolean>(false)
 const insuranceAvailable = computed<boolean>(() => {
@@ -133,28 +141,26 @@ const insuranceAvailable = computed<boolean>(() => {
         </div>
         <div v-if="betPhaseRunning" id="betRow">
             <template v-if="counterVisible">
-                Bet time left {{ counter }}
+                <span :style="instructionStyle"> Bet time left {{ counter }}</span>
             </template>
 
-            <button v-show="canBetMinimum" @click="adjustBet(table.tableCard.thresholds.minimumBet)">
+            <button :disabled="!canBetMinimum" @click="adjustBet(table.tableCard.thresholds.minimumBet)">
                 Bet min ({{ table.tableCard.thresholds.minimumBet }})
             </button>
-            <button v-show="canBetPrevious" @click="adjustBet(previousBetAmount)">
+            <button :disabled="!canBetPrevious" @click="adjustBet(previousBetAmount)">
                 Bet previous ({{ player.lastBet }})
             </button>
-            <button v-show="canBetMaximum" @click="adjustBet(table.tableCard.thresholds.maximumBet)">
+            <button :disabled="!canBetMaximum" @click="adjustBet(table.tableCard.thresholds.maximumBet)">
                 Bet max ({{ table.tableCard.thresholds.maximumBet }} )
             </button>
-            <button v-show="player.seatNumber >= 0" @click="adjustBet(0)">
+            <button :disabled="!hasBet" @click="adjustBet(0)">
                 Remove bet
             </button>
-            <button v-show="betAmount > 0 && canIncreaseMinimum"
+            <button :disabled="canIncreaseMinimum"
                 @click="adjustBet(betAmount + table.tableCard.thresholds.minimumBet)">
                 Increase by minimum{{ table.tableCard.thresholds.minimumBet }}
             </button>
-            <template v-show="betAmount">
-                Current bet {{ betAmount }}
-            </template>
+            Current bet {{ betAmount }}
         </div>
         <div v-if="table.gamePhase === GamePhase.INSURE" id="insureRow">
             Insurance time left {{ counter }}
