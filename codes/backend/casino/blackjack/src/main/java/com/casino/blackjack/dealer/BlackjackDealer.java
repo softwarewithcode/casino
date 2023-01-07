@@ -265,7 +265,7 @@ public class BlackjackDealer implements IDealer {
 			}
 			table.updateGamePhase(GamePhase.ROUND_COMPLETED);
 			notifyAll(Title.ROUND_COMPLETED, null);
-			sanitizeEmptySeats();
+//			sanitizeEmptySeats(); TODO find place for this
 			if (table.getActivePlayerCount() == 0)
 				table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
 			if (shouldRestartBetPhase()) {

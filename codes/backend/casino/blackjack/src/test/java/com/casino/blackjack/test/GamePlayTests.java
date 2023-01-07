@@ -2,6 +2,7 @@ package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
@@ -24,9 +25,6 @@ import com.casino.common.user.Bridge;
 
 public class GamePlayTests extends BaseTest {
 	private BlackjackTable table;
-//	private BlackjackPlayer blackjackPlayer;
-//	private BlackjackPlayer blackjackPlayer2;
-//	private BlackjackPlayer blackjackPlayer3;
 	private BlackjackDealer dealer;
 
 	@BeforeEach
@@ -125,7 +123,6 @@ public class GamePlayTests extends BaseTest {
 		table.hit(bridge.userId());
 		assertEquals(1, table.getPlayer(bridge.userId()).getHands().get(0).calculateValues().size());
 		assertEquals(22, table.getPlayer(bridge.userId()).getHands().get(0).calculateValues().get(0));
-//		assertFalse(blackjackPlayer.canTake());
 	}
 
 	@Test // starting ace makes a second value if not blackjack
@@ -139,7 +136,6 @@ public class GamePlayTests extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(21, table.getPlayer(bridge.userId()).getHands().get(0).calculateValues().get(1));
 		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isBlackjack());
-//		assertFalse(blackjackPlayer.canTake());
 	}
 
 	@Test
@@ -255,4 +251,26 @@ public class GamePlayTests extends BaseTest {
 		assertEquals(new BigDecimal("1025.00"), table.getPlayer(bridge3.userId()).getBalance());
 	}
 
+	@Test
+	public void playerJoinsDuringBetPhaseAndDoesNotGetCardsAndHaveNoWinningChance() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(10, Suit.SPADE));
+		cards.add(Card.of(3, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(11, Suit.HEART));
+		cards.add(Card.of(5, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));
+		table.join(bridge, "5");
+		table.bet(bridge.userId(), new BigDecimal("99.0"));
+		table.join(bridge2, "2");
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		System.out.println("PLAYERRR:"+table.getPlayer(bridge2.userId()));
+		table.stand(bridge.userId());
+		System.out.println("PLAYERRR2:"+table.getPlayer(bridge2.userId()));
+		sleep(ONE_UNIT, ChronoUnit.SECONDS);
+		System.out.println("PLAYERRR3:"+table.getPlayer(bridge2.userId()));
+		assertEquals(0, table.getPlayer(bridge2.userId()).getHands().get(0).getCards().size());
+		assertEquals(18, table.getDealerHand().calculateFinalValue());
+		assertEquals(20, table.getPlayer(bridge.userId()).getHands().get(0).calculateFinalValue());
+	}
 }

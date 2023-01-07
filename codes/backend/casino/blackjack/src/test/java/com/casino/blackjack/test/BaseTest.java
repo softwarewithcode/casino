@@ -26,6 +26,7 @@ public class BaseTest {
 	protected static final Integer MAX_PLAYERS = 7;
 	protected static final Integer DEFAULT_SEAT_COUNT = 7;
 	protected static final Type PUBLIC_TABLE_TYPE = Type.PUBLIC;
+	protected static final int ONE_UNIT = 1;
 	protected Bridge bridge;
 	protected Bridge bridge2;
 	protected Bridge bridge3;

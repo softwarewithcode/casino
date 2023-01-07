@@ -1,6 +1,7 @@
 package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -238,18 +239,23 @@ public class InsuranceTest extends BaseTest {
 		joinBetInsure();
 		assertThrows(IllegalPlayerActionException.class, () -> table.split(bridge.userId()));
 	}
-	
-	@Disabled //waiting for error occur again with insureAndStand as cannot repeat
+
 	@Test
-	public void insureAndStandFailsRemainder() {
-		dealer.getDecks().add(Card.of(13, Suit.DIAMOND));
-		dealer.getDecks().add(Card.of(5, Suit.DIAMOND));
+	public void playerJoinsDuringInsurancePhaseAndDoesNotGetCardsAndHaveNoWinningChance() {
+		dealer.getDecks().add(Card.of(6, Suit.DIAMOND));
 		dealer.getDecks().add(Card.of(9, Suit.DIAMOND));
 		dealer.getDecks().add(Card.of(1, Suit.SPADE));
-		dealer.getDecks().add(Card.of(8, Suit.HEART));
-		joinBetInsure();
+		dealer.getDecks().add(Card.of(10, Suit.HEART));
+		table.join(bridge, "5");
+		table.bet(bridge.userId(), new BigDecimal("50.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.join(bridge2, "3");
+		table.insure(bridge.userId());
+		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.stand(bridge.userId());
-		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.userId()).getTotalBet());
-		assertEquals(new BigDecimal("925.00"), table.getPlayer(bridge.userId()).getBalance());
+		sleep(ONE_UNIT, ChronoUnit.SECONDS);
+		assertEquals(0, table.getPlayer(bridge2.userId()).getHands().get(0).getCards().size());
+		assertEquals(17, table.getDealerHand().calculateFinalValue());
+		assertEquals(19, table.getPlayer(bridge.userId()).getHands().get(0).calculateFinalValue());
 	}
 }

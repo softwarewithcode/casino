@@ -257,7 +257,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	@Override
 	public boolean hasWinningChance() {
-		return hands.stream().filter(hand -> hand.hasWinningChance()).findAny().isPresent();
+		return hands.stream().filter(IHand::hasWinningChance).findAny().isPresent();
 	}
 
 	@Override

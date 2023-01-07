@@ -239,7 +239,11 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public boolean hasWinningChance() {
-		return calculateFinalValue() <= 21 || isInsured();
+		return containsCards() && calculateFinalValue() <= 21 || isInsured();
+	}
+
+	private boolean containsCards() {
+		return cards.size() > 0;
 	}
 
 	public BigDecimal getInsuranceBet() {
