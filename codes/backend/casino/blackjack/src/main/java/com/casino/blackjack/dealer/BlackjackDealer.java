@@ -144,7 +144,6 @@ public class BlackjackDealer implements IDealer {
 				return;
 			}
 			if (shouldStartNewGame()) {
-				System.out.println("Start new game");
 				startNewGame();
 				notifyAll(Title.BET_PHASE_STARTS, (BlackjackPlayer) player);
 			}
@@ -184,7 +183,6 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private boolean shouldDealStartingHands() {
-		System.out.println("ShouldStartDealing?:" + table.isGamePhase(GamePhase.BETS_COMPLETED) + "  bet:" + hasSomebodyBet());
 		return table.isGamePhase(GamePhase.BETS_COMPLETED) && hasSomebodyBet() && isEnoughCardsForPlayersAndDealer();
 	}
 
@@ -225,7 +223,6 @@ public class BlackjackDealer implements IDealer {
 		table.updateGamePhase(GamePhase.PLAY);
 		updateTableActor();
 		notifyAll(Title.INITIAL_DEAL_DONE, (BlackjackPlayer) table.getPlayerInTurn());
-		System.out.println("Notified" + table.getCounterTime());
 	}
 
 	private void matchBalanceWithBet() {

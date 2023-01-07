@@ -33,7 +33,6 @@ public class BaseTest {
 
 	@BeforeAll
 	public static void setup() {
-		System.out.println("before all test -> setting skip serialization parameter ");
 		System.getProperties().setProperty(Mapper.JUNIT_RUNNER, "true");
 	}
 

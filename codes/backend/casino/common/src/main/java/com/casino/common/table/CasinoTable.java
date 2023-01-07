@@ -204,7 +204,6 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public void onPlayerInTurnUpdate(ICasinoPlayer player) {
-		System.out.println("Current table Actor:" + player.getName() + " stat " + player.getStatus());
 		if (!playerInTurnLock.isHeldByCurrentThread()) {
 			throw new ConcurrentModificationException("playerInTurnLock is missing");
 		}

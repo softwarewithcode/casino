@@ -264,11 +264,8 @@ public class GamePlayTests extends BaseTest {
 		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		table.join(bridge2, "2");
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		System.out.println("PLAYERRR:"+table.getPlayer(bridge2.userId()));
 		table.stand(bridge.userId());
-		System.out.println("PLAYERRR2:"+table.getPlayer(bridge2.userId()));
 		sleep(ONE_UNIT, ChronoUnit.SECONDS);
-		System.out.println("PLAYERRR3:"+table.getPlayer(bridge2.userId()));
 		assertEquals(0, table.getPlayer(bridge2.userId()).getHands().get(0).getCards().size());
 		assertEquals(18, table.getDealerHand().calculateFinalValue());
 		assertEquals(20, table.getPlayer(bridge.userId()).getHands().get(0).calculateFinalValue());

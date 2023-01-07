@@ -37,7 +37,6 @@ public class BlackjackEndpoint {
 
 	@OnOpen
 	public void onOpen(Session session, @PathParam("tableId") String tableId) {
-		System.out.println("onOpen called " + tableId);
 		try {
 			UUID id = Validator.validateId(tableId);
 			Optional<IBlackjackTable> table = tableService.fetchTable(id);
@@ -82,7 +81,6 @@ public class BlackjackEndpoint {
 			case INSURE -> table.insure(bridge.userId());
 			case REFRESH -> table.refresh(bridge.userId());
 			}
-			System.out.println("Command ok " + message.getAction());
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onMessage error:" + bridge, e);
 		}

@@ -43,7 +43,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public boolean join(Bridge bridge, String seatNmbr) {
 		LOGGER.entering(getClass().getName(), "join", getId());
-		System.out.println("table_join " + bridge + " seatNumber:" + seatNmbr);
 		try {
 			Integer seatNumber = seatNmbr != null ? Integer.parseInt(seatNmbr) : null;
 			BlackjackPlayer player = new BlackjackPlayer(bridge, this);
@@ -176,7 +175,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	@Override
 	public void onPlayerLeave(UUID playerId) {
-		System.out.println("player disconnected from table " + getId() + " player:" + playerId);
 		BlackjackPlayer leavingPlayer = null;
 		try {
 			leavingPlayer = getPlayer(playerId);
