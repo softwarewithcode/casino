@@ -41,7 +41,6 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
 	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
-//	private final Thresholds thresholds;
 	private final BlackjackTable table;
 	private final ReentrantLock betPhaseLock;
 	private final CommunicationChannel voice;
@@ -50,11 +49,10 @@ public class BlackjackDealer implements IDealer {
 
 	public BlackjackDealer(BlackjackTable blackjackTable) {
 		this.table = blackjackTable;
-//		this.thresholds = thresholds;
-		this.deck = Deck.pileUp(8);
+		this.deck = Deck.pileUpAndShuffle(8);
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
-		betPhaseLock = new ReentrantLock();
-		voice = new CommunicationChannel(table);
+		this.betPhaseLock = new ReentrantLock();
+		this.voice = new CommunicationChannel(table);
 	}
 
 	private void startBetPhaseClock(long initialDelay) {
@@ -98,7 +96,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void createDecks() {
-		deck = Deck.pileUp(6);
+		deck = Deck.pileUpAndShuffle(6);
 	}
 
 	public List<Card> getDecks() {
@@ -287,7 +285,7 @@ public class BlackjackDealer implements IDealer {
 		this.dealerHand = new BlackjackDealerHand(UUID.randomUUID(), true);
 		table.updateGamePhase(GamePhase.BET);
 		table.updateCounterTime(table.getThresholds().betPhaseTime());
-		deck = Deck.pileUp(8);
+		deck = Deck.pileUpAndShuffle(8);
 		notifyAll(Title.BET_PHASE_STARTS, null);
 	}
 
@@ -371,7 +369,6 @@ public class BlackjackDealer implements IDealer {
 
 	private void handlePayouts() {
 		LOGGER.info("Dealer starts payout");
-		// Deal the case where player has disconnected before payout
 		List<ICasinoPlayer> playersWithWinningChances = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasWinningChance).toList();
 		playersWithWinningChances.forEach(player -> payoutWinnings(player));
 	}

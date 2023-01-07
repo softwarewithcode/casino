@@ -175,12 +175,13 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	@Override
 	public void onPlayerLeave(UUID playerId) {
+		LOGGER.entering(getClass().getName(), "onPlayerLeave", " leavingPlayerId:" + playerId + " table:" + getId());
 		BlackjackPlayer leavingPlayer = null;
 		try {
 			leavingPlayer = getPlayer(playerId);
 			if (leavingPlayer == null)
 				return;
-			lockPlayerInTurn(); 
+			lockPlayerInTurn();
 			dealer.onPlayerLeave(leavingPlayer);
 		} finally {
 			unlockPlayerInTurn();

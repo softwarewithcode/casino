@@ -32,7 +32,7 @@ public class Deck {
 		return cards;
 	}
 
-	public static List<Card> pileUp(int deckCount) {
+	public static List<Card> pileUpAndShuffle(int deckCount) {
 		if (deckCount < 0 || deckCount > 15) {
 			throw new IllegalArgumentException("Check stacked decks count was:" + deckCount);
 		}
