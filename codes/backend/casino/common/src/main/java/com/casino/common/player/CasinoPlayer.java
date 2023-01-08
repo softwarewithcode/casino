@@ -138,13 +138,13 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		this.totalBet = bet;
 	}
 
-	protected void updateBalanceAndTotalBet(BigDecimal increaseAmount) {
+	protected void updateBalanceAndTotalBet(BigDecimal additionalBet) {
 		verifyCallersLock();
-		BetUtil.verifySufficentBalance(increaseAmount, this);
+		BetUtil.verifySufficentBalance(additionalBet, this);
 		if (this.totalBet == null)
-			throw new IllegalBetException("increase called but no initial bet was found", 6);
-		this.balance = this.getBalance().subtract(increaseAmount);
-		this.totalBet = getTotalBet().add(increaseAmount);
+			throw new IllegalBetException("updateBalanceAndTotalBet called but no initial bet was found", 6);
+		this.balance = this.getBalance().subtract(additionalBet);
+		this.totalBet = getTotalBet().add(additionalBet);
 	}
 
 	private void verifyCallersLock() {

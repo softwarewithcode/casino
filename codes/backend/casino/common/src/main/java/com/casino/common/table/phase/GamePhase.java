@@ -3,13 +3,13 @@ package com.casino.common.table.phase;
 public enum GamePhase {
 	BET(true), BETS_COMPLETED(true), INSURE(true), PLAY(true), ROUND_COMPLETED(false), ERROR(false);
 
-	private boolean onGoingRound;
+	private boolean running;
 
 	private GamePhase(boolean round) {
-		this.onGoingRound = round;
+		this.running = round;
 	}
 
-	public boolean isOnGoingRound() {
-		return this.onGoingRound;
+	public boolean isRoundRunning() {
+		return this.running;
 	}
 }

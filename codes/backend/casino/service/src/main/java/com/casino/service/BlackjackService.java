@@ -77,6 +77,6 @@ public class BlackjackService {
 	}
 
 	public List<TableCard> fetchTableCards() {
-		return tables.values().stream().filter(table -> table.getStatus().isVisible()).map(BlackjackTable::getTableCard).toList();
+		return tables.values().stream().filter(blackjackTable -> blackjackTable.getStatus().isVisible()).map(BlackjackTable::getTableCard).toList();
 	}
 }

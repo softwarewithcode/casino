@@ -53,11 +53,11 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 
 	// User might have disconnected, so don't compare to active status
 	public List<ICasinoPlayer> getPlayersWithBet() {
-		return seats.stream().filter(seat -> seat.hasPlayerWithBet()).map(seat -> seat.getPlayer()).collect(Collectors.toList());
+		return seats.stream().filter(Seat::hasPlayerWithBet).map(Seat::getPlayer).toList();
 	}
 
 	public boolean hasPlayersWithWinningChances() {
-		return seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().hasWinningChance()).findFirst().isPresent();
+		return seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().hasWinningChance()).findAny().isPresent();
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 			return Optional.empty();
 		if (seatNumber == null) {
 			seat = seats.stream().filter(Seat::isAvailable).findAny().get();
-		} else if (seatNumber < 0 || seatNumber >= seats.size()) // TODO as first check
+		} else if (seatNumber < 0 || seatNumber >= seats.size())
 			throw new IllegalArgumentException("seat number is incorrect " + seatNumber + " has:" + getSeats().size());
 		else
 			seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().get();
