@@ -31,9 +31,9 @@ public class BetUtil {
 			throw new IllegalBetException("bet cannot be negative" + table + " player:" + player, 9);
 	}
 
-	public static void verifySufficentBalance(BigDecimal attempt, ICasinoPlayer player) {
-		if (player.getBalance().compareTo(attempt) < 0)
-			throw new IllegalArgumentException("player has not enough money: Should have " + attempt.toString() + " has: " + player.getBalance().toString());
+	public static void verifySufficentBalance(BigDecimal requiredBalance, ICasinoPlayer player) {
+		if (player.getBalance().compareTo(requiredBalance) < 0)
+			throw new IllegalArgumentException("player has not enough money: Should have " + requiredBalance.toString() + " has: " + player.getBalance().toString());
 	}
 
 }
