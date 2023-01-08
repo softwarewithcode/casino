@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PlayerAction, GamePhase, type BlackjackPlayer, type Seat } from "@/types/blackjack";
-import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCardsAndHandValuesPainter } from "../../components/composables/rendering/canvasUtils";
+import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCardsAndHandValuesPainter } from "../../components/composables/rendering/multiSeatPainter";
 import { onMounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useBlackjackStore } from "../../stores/blackjackStore";
@@ -153,20 +153,20 @@ const insuranceAvailable = computed<boolean>(() => {
             </template>
 
             <button :disabled="!canBetMinimum" @click="adjustBet(table.tableCard.thresholds.minimumBet)">
-                Bet min ({{ table.tableCard.thresholds.minimumBet }})
+                Bet {{ table.tableCard.thresholds.minimumBet }}
             </button>
             <button :disabled="!canBetPrevious" @click="adjustBet(previousBetAmount)">
-                Bet previous ({{ player.lastBet }})
+                Bet {{ player.lastBet }}
             </button>
             <button :disabled="!canBetMaximum" @click="adjustBet(table.tableCard.thresholds.maximumBet)">
-                Bet max ({{ table.tableCard.thresholds.maximumBet }} )
+                Bet {{ table.tableCard.thresholds.maximumBet }}
             </button>
             <button :disabled="!hasBet" @click="adjustBet(0)">
                 Remove bet
             </button>
             <button :disabled="canIncreaseMinimum"
                 @click="adjustBet(betAmount + table.tableCard.thresholds.minimumBet)">
-                Increase by minimum{{ table.tableCard.thresholds.minimumBet }}
+                Increase {{ table.tableCard.thresholds.minimumBet }}
             </button>
             Current bet {{ betAmount }}
         </div>
