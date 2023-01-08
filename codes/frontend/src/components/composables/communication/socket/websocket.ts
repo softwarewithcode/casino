@@ -20,6 +20,10 @@ function initSocket(finalURI: string) {
 	}
 	websocket.onmessage = event => {
 		let data = JSON.parse(event.data)
+		if (!data.table) {
+			alert("error")
+			return
+		}
 		switch (data.table.tableCard.game) {
 			case BLACKJACK:
 				useBlackjackMessageHandler(data)

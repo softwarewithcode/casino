@@ -275,7 +275,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private void sanitizeEmptySeats() {
-		table.findInActivePlayerSeats().forEach(Seat::sanitize);
+		table.findInactivePlayerSeats().forEach(Seat::sanitize);
 	}
 
 	public synchronized void prepareNewRound() {

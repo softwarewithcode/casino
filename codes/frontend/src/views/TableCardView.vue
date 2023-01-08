@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { TableType, type TableCard } from "@/types/casino";
-import { defineComponent } from "vue";
 import { useOpenTable } from "@/components/composables/communication/socket/websocket";
 
 const props = defineProps<{ card: TableCard }>();
@@ -9,10 +8,11 @@ const openTable = (gameType: string, tableId: string) => {
     useOpenTable(gameType, tableId);
 };
 
-const getAvailableSeats = (card: TableCard) => {
-    if (card.type === TableType.SINGLE_PLAYER)
-        return card.availablePositions.length === card.thresholds.seatCount ? 1 : 0
-    return card.availablePositions.length
+const getStatusText = (card: TableCard) => {
+    // i18n becomes more difficult!
+    if (card.type === TableType.MULTIPLAYER)
+        return card.availablePositions.length > 0 ? "Available seats " + card.availablePositions.length : "Full"
+    return card.availablePositions.length === card.thresholds.seatCount ? "Available seats 1" : "Full"
 }
 </script>
 <template>
@@ -21,7 +21,7 @@ const getAvailableSeats = (card: TableCard) => {
         Type: {{ card.type.toLowerCase() }}<br>
         Min: {{ card.thresholds.minimumBet }} € <br>
         Max: {{ card.thresholds.maximumBet }} € <br>
-        Available seats: {{ getAvailableSeats(card) }}
+        {{ getStatusText(card) }} <br>
     </div>
 </template>
 

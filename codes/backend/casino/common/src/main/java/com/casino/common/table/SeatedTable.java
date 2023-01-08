@@ -64,7 +64,9 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	public Optional<Seat> trySeat(Integer seatNumber, ICasinoPlayer player) {
 		Seat seat = null;
 		BetUtil.verifySufficentBalance(getThresholds().minimumBet(), player);
-		if (!isAcceptingPlayers())
+		if (!isStatusAllowingPlayerEntries())
+			return Optional.empty();
+		if (isReservedSinglePlayerTable())
 			return Optional.empty();
 		if (hasSeat(player))
 			return Optional.empty();
@@ -75,6 +77,10 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		else
 			seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().get();
 		return seat.take(player);
+	}
+
+	private boolean isReservedSinglePlayerTable() {
+		return getType() == Type.SINGLE_PLAYER && getPlayers().size() != 0;
 	}
 
 	private boolean shouldSearchAnyFreeSeat(Integer seatNumber) {
@@ -129,7 +135,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return getReservedSeatCount() != 0;
 	}
 
-	public List<Seat> findInActivePlayerSeats() {
+	public List<Seat> findInactivePlayerSeats() {
 		return getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != PlayerStatus.ACTIVE).toList();
 	}
 

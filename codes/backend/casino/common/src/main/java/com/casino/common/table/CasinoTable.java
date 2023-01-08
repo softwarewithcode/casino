@@ -141,7 +141,7 @@ public abstract class CasinoTable implements ICasinoTable {
 		return watchers;
 	}
 
-	protected boolean isAcceptingPlayers() {
+	protected boolean isStatusAllowingPlayerEntries() {
 		return getStatus() == Status.WAITING_PLAYERS || getStatus() == Status.RUNNING;
 	}
 

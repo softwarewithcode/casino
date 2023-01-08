@@ -6,6 +6,7 @@ import { useSend } from "@/components/composables/communication/socket/websocket
 import { useBlackjackStore } from "../../stores/blackjackStore";
 import { mapActions, storeToRefs } from "pinia";
 import { Command } from "@/types/sockethander";
+import { TableType } from "@/types/casino";
 const props = defineProps<{ tableId: string }>();
 const canvasReady = ref<boolean>(false);
 const store = useBlackjackStore();
@@ -60,6 +61,13 @@ const betPhaseRunning = computed<boolean>(() => {
 
 const counterVisible = computed<boolean>(() => {
     return counter.value > 1
+})
+
+const isTakeSeatRowVisible = computed<boolean>(() => {
+    if (table.value.tableCard.type === TableType.SINGLE_PLAYER) {
+        return table.value.seats.filter(seat => !seat.available).length === 0
+    }
+    return true
 })
 
 const canBetPrevious = computed<boolean>(() => {
@@ -130,8 +138,8 @@ const insuranceAvailable = computed<boolean>(() => {
     <div style="position: relative">
         Table {{ table?.tableCard?.id }} {{ table.gamePhase }}{{ table.playerInTurn?.name }}
         <canvas id="canvas" width="1800" height="600" style="border-style: dashed solid"></canvas>
-        <div id="buttonRow">
-            <div v-for="(seat, index) in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
+        <div v-if="isTakeSeatRowVisible" id="takeSeatRow">
+            <div v-for="seat in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
                 :style="seatStyle(seat.number)">
                 <button v-if="seat.available && !Number.isInteger(player.seatNumber)"
                     @click="takeSeat(seat.number.toString())">
