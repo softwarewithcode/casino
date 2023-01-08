@@ -100,7 +100,8 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	}
 
 	protected void sanitizeAllSeats() {
-		seats.stream().forEach(seat -> seat.sanitize());
+		List<Seat> allSeats = seats.stream().toList();
+		allSeats.forEach(Seat::sanitize);
 	}
 
 	public Set<Seat> getSeats() {

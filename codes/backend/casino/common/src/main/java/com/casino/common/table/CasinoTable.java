@@ -30,6 +30,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	private final ReentrantLock playerInTurnLock;
 	private final UUID id;
 	private final Instant created;
+	private Instant closed;
 	private final Clock clock;
 	private final TableInitData tableInitData;
 	private final TableCard tableCard;
@@ -110,8 +111,8 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public void onClose() {
-		// TODO Auto-generated method stub
-
+		this.closed = Instant.now();
+		setStatus(Status.CLOSED);
 	}
 
 	public int getWatcherCount() {
@@ -229,7 +230,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	public boolean isRoundRunning() {
-		return phasePath.getPhase().isOnGoingRound();
+		return phasePath.getPhase().isRoundRunning();
 	}
 
 	@Override

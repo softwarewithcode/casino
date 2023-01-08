@@ -44,7 +44,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public boolean join(Bridge bridge, String seatNmbr) {
 		LOGGER.entering(getClass().getName(), "join", getId());
 		try {
-			Integer seatNumber = seatNmbr != null ? Integer.parseInt(seatNmbr) : null;
+			Integer seatNumber = Integer.parseInt(seatNmbr);
 			BlackjackPlayer player = new BlackjackPlayer(bridge, this);
 			Optional<Seat> seatOptional = trySeat(seatNumber, player);
 			if (seatOptional.isEmpty()) {
@@ -55,6 +55,9 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			super.removeWatcher(player.getId());
 			dealer.onPlayerArrival(player);
 			return true;
+		} catch (Exception e) {
+			LOGGER.severe("BlackjackTable error joining: table:" + this.getId() + " bridge:" + bridge + " seatNumber:" + seatNmbr);
+			return false;
 		} finally {
 			LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNmbr + " bridge:" + bridge + " tableId:" + getId());
 		}
@@ -63,7 +66,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void bet(UUID playerId, BigDecimal bet) {
 		LOGGER.entering(getClass().getName(), "bet", bet + " player:" + playerId + " table:" + getId());
-		LOGGER.info("table_bet " + playerId + " bet:" + bet);
 		try {
 			BlackjackPlayer player = getPlayer(playerId);
 			if (isGamePhase(GamePhase.BET))
@@ -244,8 +246,12 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public synchronized void onTableClose() {
-		// TODO Auto-generated method stub
+	public synchronized void onClose() {
+		setStatus(Status.CLOSING);
+		super.onClose();
+		super.sanitizeAllSeats();
+		super.getWatchers().clear();
+		setStatus(Status.CLOSED);
 	}
 
 	@Override

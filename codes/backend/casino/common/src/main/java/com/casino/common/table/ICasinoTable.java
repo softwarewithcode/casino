@@ -30,13 +30,9 @@ public interface ICasinoTable {
 
 	public int getPlayerTurnTime();
 
-	public void onTableClose();
-
 	public ICasinoPlayer getPlayerInTurn();
 
 	public boolean addWatcher(ICasinoPlayer player);
-
-//	public boolean removePlayer(ICasinoPlayer p);
 
 	public void removeWatcher(UUID id);
 
