@@ -4,6 +4,8 @@ import { Command } from "@/types/sockethander"
 import { useStartCounter } from "../../../timing/clock"
 // @author softwarewithcode from GitHub
 const store = useBlackjackStore()
+
+export const BLACKJACK = "BLACKJACK"
 export function useBlackjackMessageHandler(data: any) {
 	store.$patch({
 		command: data.title

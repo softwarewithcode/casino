@@ -1,4 +1,4 @@
-import { useBlackjackMessageHandler } from "./handlers/blackjackMessageHandler"
+import { useBlackjackMessageHandler, BLACKJACK } from "./handlers/blackjackMessageHandler"
 let websocket: WebSocket
 // @author softwarewithcode from GitHub
 const base = import.meta.env.VITE_CASINO_WS_ENDPOINT
@@ -12,7 +12,7 @@ export async function useOpenTable(tableType: string, tableId: string) {
 export function useSend(data: any) {
 	websocket.send(JSON.stringify(data))
 }
-const BLACKJACK = "BLACKJACK"
+
 function initSocket(finalURI: string) {
 	websocket = new WebSocket(finalURI)
 	websocket.onopen = event => {
