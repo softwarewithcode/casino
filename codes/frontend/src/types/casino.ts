@@ -65,7 +65,7 @@ export enum TableType {
 	SINGLE_PLAYER = "SINGLE_PLAYER"
 }
 
-export interface SpriteImageMetadata {
+export interface CardImageMetadata {
 	position: Vector
 	size: Vector
 }

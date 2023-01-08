@@ -1,6 +1,6 @@
 import type { BlackjackHand, BlackjackPlayer, BlackjackTable, Seat } from "@/types/blackjack"
-import type { Vector, CasinoFont, Card, SpriteImageMetadata } from "@/types/casino"
-import { useCardLocator } from "./cardSpriteUtils"
+import type { Vector, CasinoFont, Card } from "@/types/casino"
+import { useCardLocator } from "./cardLocator"
 const infoFont: CasinoFont = {
 	color: "blue",
 	faceAndSize: "20px Arial"

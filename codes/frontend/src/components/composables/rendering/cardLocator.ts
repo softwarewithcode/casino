@@ -1,12 +1,12 @@
 import { Suit } from "../../../types/casino"
-import type { Vector, CasinoFont, Card, SpriteImageMetadata } from "@/types/casino"
+import type { Vector, CasinoFont, Card, CardImageMetadata } from "@/types/casino"
 const cardWidthInSprite = 76
 const cardHeightInSprite = 107.2
 const gapHorizontalInSprite = 21
 const gapVerticalInSprite = 34.6
 const originalCardWidthAndHeight: Vector = { x: cardWidthInSprite, y: cardHeightInSprite }
 
-export function useCardLocator(card: Card): SpriteImageMetadata {
+export function useCardLocator(card: Card): CardImageMetadata {
 	const positionInArray: Vector = { x: getColumnNumber(card), y: getRowNumber(card) }
 	const x = positionInArray.x * cardWidthInSprite + gapHorizontalInSprite * positionInArray.x
 	const y = positionInArray.y * cardHeightInSprite + gapVerticalInSprite * positionInArray.y + 0.7
