@@ -68,13 +68,17 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 			return Optional.empty();
 		if (hasSeat(player))
 			return Optional.empty();
-		if (seatNumber == null) {
+		if (shouldSearchAnyFreeSeat(seatNumber)) {
 			seat = seats.stream().filter(Seat::isAvailable).findAny().get();
 		} else if (seatNumber < 0 || seatNumber >= seats.size())
 			throw new IllegalArgumentException("seat number is incorrect " + seatNumber + " has:" + getSeats().size());
 		else
 			seat = seats.stream().filter(s -> s.getNumber() == seatNumber).findFirst().get();
 		return seat.take(player);
+	}
+
+	private boolean shouldSearchAnyFreeSeat(Integer seatNumber) {
+		return seatNumber == null;
 	}
 
 	@Override

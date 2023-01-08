@@ -30,7 +30,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	private final ReentrantLock playerInTurnLock;
 	private final UUID id;
 	private final Instant created;
-	private Instant closed;
 	private final Clock clock;
 	private final TableInitData tableInitData;
 	private final TableCard tableCard;
@@ -74,7 +73,6 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	private void startPlayerClock(ICasinoPlayer player) {
-//		stopClock();
 		PlayerClockTask playerTimer = new PlayerClockTask(this, player);
 		startClock(playerTimer, 0);
 	}
@@ -111,8 +109,10 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public void onClose() {
-		this.closed = Instant.now();
 		setStatus(Status.CLOSED);
+		getWatchers().clear();
+		playerInTurn = null;
+		dealerTurn = false;
 	}
 
 	public int getWatcherCount() {
@@ -206,7 +206,7 @@ public abstract class CasinoTable implements ICasinoTable {
 	@Override
 	public void onPlayerInTurnUpdate(ICasinoPlayer player) {
 		if (!playerInTurnLock.isHeldByCurrentThread()) {
-			throw new ConcurrentModificationException("playerInTurnLock is missing");
+			throw new ConcurrentModificationException("playerInTurnLock is missing " + player);
 		}
 		playerInTurn = player;
 		if (playerInTurn != null) {
