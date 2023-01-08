@@ -25,7 +25,7 @@ public class BaseTest {
 	protected static final Integer MIN_PLAYERS = 0;
 	protected static final Integer MAX_PLAYERS = 7;
 	protected static final Integer DEFAULT_SEAT_COUNT = 7;
-	protected static final Type PUBLIC_TABLE_TYPE = Type.PUBLIC;
+	protected static final Type PUBLIC_TABLE_TYPE = Type.MULTIPLAYER;
 	protected static final int ONE_UNIT = 1;
 	protected Bridge bridge;
 	protected Bridge bridge2;
@@ -49,19 +49,19 @@ public class BaseTest {
 	}
 
 	protected TableInitData getDefaultTableInitData() {
-		return new TableInitData(getDefaultThresholds(), UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC, Game.BLACKJACK);
+		return new TableInitData(getDefaultThresholds(), UUID.randomUUID(), Language.ENGLISH, Type.MULTIPLAYER, Game.BLACKJACK);
 	}
 
 	protected TableInitData getDefaultTableInitDataWithThresholds(Thresholds thresholds) {
-		return new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC, Game.BLACKJACK);
+		return new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.MULTIPLAYER, Game.BLACKJACK);
 	}
 
 	protected TableInitData getDefaultTableInitDataWithBets(BigDecimal minBet, BigDecimal maxBet) {
-		return new TableInitData(getThresholdsWithMinBets(minBet, maxBet), UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC, Game.BLACKJACK);
+		return new TableInitData(getThresholdsWithMinBets(minBet, maxBet), UUID.randomUUID(), Language.ENGLISH, Type.MULTIPLAYER, Game.BLACKJACK);
 	}
 
 	protected TableInitData getDefaultTableInitDataWithPlayersMinAndMax(Integer minPlayers, Integer maxPlayers) {
-		return new TableInitData(getThresholdsWithPlayersMinAndMax(minPlayers, maxPlayers), UUID.randomUUID(), Language.ENGLISH, Type.PUBLIC, Game.BLACKJACK);
+		return new TableInitData(getThresholdsWithPlayersMinAndMax(minPlayers, maxPlayers), UUID.randomUUID(), Language.ENGLISH, Type.MULTIPLAYER, Game.BLACKJACK);
 	}
 
 	protected void sleep(int i, ChronoUnit unit) {

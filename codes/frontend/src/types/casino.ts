@@ -27,6 +27,7 @@ export interface TableCard {
 	id: string
 	language: string
 	game: string
+	type: TableType
 }
 
 export interface Thresholds {
@@ -57,6 +58,11 @@ export enum Suit {
 	DIAMOND = "DIAMOND",
 	HEART = "HEART",
 	SPADE = "SPADE"
+}
+
+export enum TableType {
+	MULTIPLAYER = "MULTIPLAYER",
+	SINGLE_PLAYER = "SINGLE_PLAYER"
 }
 
 export interface SpriteImageMetadata {

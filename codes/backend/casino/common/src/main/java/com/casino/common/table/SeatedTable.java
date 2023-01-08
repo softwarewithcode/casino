@@ -29,11 +29,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	private Set<Seat> seats;
 
-	protected SeatedTable(Status initialStatus, TableInitData tableDescription, PhasePath phasePath) {
-		super(initialStatus, tableDescription, phasePath);
-		if (tableDescription.thresholds().maxPlayers() > tableDescription.thresholds().seatCount())
+	protected SeatedTable(Status initialStatus, TableInitData initData, PhasePath phasePath) {
+		super(initialStatus, initData, phasePath);
+		if (initData.thresholds().maxPlayers() > initData.thresholds().seatCount())
 			throw new IllegalArgumentException("not enough seats for the players");
-		createSeats(tableDescription.thresholds().seatCount());
+		createSeats(initData.thresholds().seatCount());
 	}
 
 	private void createSeats(int seatCount) {

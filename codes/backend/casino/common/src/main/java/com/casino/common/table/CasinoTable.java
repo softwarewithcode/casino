@@ -84,22 +84,12 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public boolean isMultiplayer() {
-		return tableCard.getThresholds().maxPlayers() > 1;
+		return type == Type.MULTIPLAYER;
 	}
 
 	@Override
-	public boolean isPublic() {
-		return type == Type.PUBLIC;
-	}
-
-	@Override
-	public boolean isPrivate() {
-		return type == Type.PRIVATE;
-	}
-
-	@Override
-	public boolean isReserved() {
-		return type == Type.RESERVED;
+	public boolean isSinglePlayer() {
+		return type == Type.SINGLE_PLAYER;
 	}
 
 	@Override

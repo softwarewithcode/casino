@@ -1,5 +1,5 @@
 package com.casino.common.table;
 
 public enum Type {
-	PUBLIC, PRIVATE, PASSWORD, RESERVED
+	MULTIPLAYER, SINGLE_PLAYER,
 }

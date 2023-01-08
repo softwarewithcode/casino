@@ -16,11 +16,8 @@ public interface ICasinoTable {
 
 	public boolean isMultiplayer();
 
-	public boolean isPublic();
 
-	public boolean isReserved();
-
-	public boolean isPrivate();
+	public boolean isSinglePlayer();
 
 	public boolean isDealerTurn();
 

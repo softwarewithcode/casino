@@ -13,6 +13,7 @@ public class TableCard implements Serializable {
 	private final UUID id;
 	private final Language language;
 	private final Game game;
+	private final Type type;
 	private List<Integer> availablePositions;
 
 	public TableCard(TableInitData initData) {
@@ -21,6 +22,7 @@ public class TableCard implements Serializable {
 		this.id = initData.id();
 		this.language = initData.language();
 		this.game = initData.game();
+		this.type = initData.tableType();
 	}
 
 	public Thresholds getThresholds() {
@@ -45,6 +47,10 @@ public class TableCard implements Serializable {
 
 	public void setAvailablePositions(List<Integer> availablePositions) {
 		this.availablePositions = availablePositions;
+	}
+
+	public Type getType() {
+		return type;
 	}
 
 }
