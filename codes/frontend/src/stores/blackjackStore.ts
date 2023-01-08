@@ -1,6 +1,6 @@
 import { defineStore } from "pinia"
 import type { BlackjackTable, BlackjackPlayer } from "../types/blackjack"
-import { fetchTables } from "../components/composables/communication/http"
+import { useTablesFetch } from "../components/composables/communication/http"
 import type { TableCard } from "@/types/casino"
 
 const blackjack = "blackjack"
@@ -29,7 +29,7 @@ export const useBlackjackStore = defineStore("blackjackStore", {
 	actions: {
 		async populateStore() {
 			try {
-				this.tables = await fetchTables(blackjack)
+				this.tables = await useTablesFetch(blackjack)
 			} catch (error) {
 				alert(error)
 			}

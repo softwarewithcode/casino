@@ -4,15 +4,13 @@ const requestInit: RequestInit = {
 	method: "GET",
 	headers: acceptHeader
 }
-export async function fetchTables(gameType: string) {
+export async function useTablesFetch(gameType: string) {
 	const finalURI = httpBase + `/${gameType}/tables`
 	const resp = await fetch(finalURI, requestInit)
-	const tables = await resp.json()
-	return tables
+	return await resp.json()
 }
-export async function fetchGameTypes() {
+export async function useGametypesFetch() {
 	const finalURI = httpBase + `/gametypes`
 	const resp = await fetch(finalURI, requestInit)
-	const tables = await resp.json()
-	return tables
+	return await resp.json()
 }

@@ -1,6 +1,6 @@
 import type { GameType } from "@/types/casino"
 import { defineStore } from "pinia"
-import { fetchGameTypes } from "../components/composables/communication/http"
+import { useGametypesFetch } from "../components/composables/communication/http"
 
 export const useCasinoStore = defineStore("casinoStore", {
 	state: () => ({
@@ -15,7 +15,7 @@ export const useCasinoStore = defineStore("casinoStore", {
 	actions: {
 		async populateStore() {
 			try {
-				this.gameTypes = await fetchGameTypes()
+				this.gameTypes = await useGametypesFetch()
 			} catch (error) {
 				alert(error)
 			}
