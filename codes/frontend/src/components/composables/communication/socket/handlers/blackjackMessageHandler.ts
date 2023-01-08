@@ -1,10 +1,10 @@
-import { useBlackjackStore } from "../../../../stores/blackjackStore"
-import router from "../../../../router/router"
+import { useBlackjackStore } from "../../../../../stores/blackjackStore"
+import router from "../../../../../router/router"
 import { Command } from "@/types/sockethander"
-import { useStartCounter } from "../../timing/clock"
+import { useStartCounter } from "../../../timing/clock"
 // @author softwarewithcode from GitHub
 const store = useBlackjackStore()
-export function useBlackjackDataHandler(data: any) {
+export function useBlackjackMessageHandler(data: any) {
 	store.$patch({
 		command: data.title
 	})

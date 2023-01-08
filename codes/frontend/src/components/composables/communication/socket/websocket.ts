@@ -1,4 +1,4 @@
-import { useBlackjackDataHandler } from "./handler"
+import { useBlackjackMessageHandler } from "./handlers/blackjackMessageHandler"
 let websocket: WebSocket
 // @author softwarewithcode from GitHub
 const base = import.meta.env.VITE_CASINO_WS_ENDPOINT
@@ -12,8 +12,8 @@ export async function useOpenTable(tableType: string, tableId: string) {
 export function useSend(data: any) {
 	websocket.send(JSON.stringify(data))
 }
-
-async function initSocket(finalURI: string) {
+const BLACKJACK = "BLACKJACK"
+function initSocket(finalURI: string) {
 	websocket = new WebSocket(finalURI)
 	websocket.onopen = event => {
 		useSend(JSON.parse(openTableJSON))
@@ -21,8 +21,8 @@ async function initSocket(finalURI: string) {
 	websocket.onmessage = event => {
 		let data = JSON.parse(event.data)
 		switch (data.table.tableCard.game) {
-			case "BLACKJACK":
-				useBlackjackDataHandler(data)
+			case BLACKJACK:
+				useBlackjackMessageHandler(data)
 				break
 			default:
 				throw new Error("no handler for data " + JSON.stringify(data))
