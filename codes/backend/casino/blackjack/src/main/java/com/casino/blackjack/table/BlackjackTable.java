@@ -44,7 +44,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public boolean join(Bridge bridge, String seatNmbr) {
 		LOGGER.entering(getClass().getName(), "join", getId());
 		try {
-			Integer seatNumber = Integer.parseInt(seatNmbr);
+			Integer seatNumber = seatNmbr != null ? Integer.parseInt(seatNmbr) : null;
 			BlackjackPlayer player = new BlackjackPlayer(bridge, this);
 			Optional<Seat> seatOptional = trySeat(seatNumber, player);
 			if (seatOptional.isEmpty()) {
@@ -55,9 +55,6 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			super.removeWatcher(player.getId());
 			dealer.onPlayerArrival(player);
 			return true;
-		} catch (Exception e) {
-			LOGGER.severe("BlackjackTable error joining: table:" + this.getId() + " bridge:" + bridge + " seatNumber:" + seatNmbr);
-			return false;
 		} finally {
 			LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNmbr + " bridge:" + bridge + " tableId:" + getId());
 		}

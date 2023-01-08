@@ -52,6 +52,10 @@ public class BaseTest {
 		return new TableInitData(getDefaultThresholds(), UUID.randomUUID(), Language.ENGLISH, Type.MULTIPLAYER, Game.BLACKJACK);
 	}
 
+	protected TableInitData getDefaultSinglePlayerTableInitData() {
+		return new TableInitData(getDefaultThresholds(), UUID.randomUUID(), Language.ENGLISH, Type.SINGLE_PLAYER, Game.BLACKJACK);
+	}
+
 	protected TableInitData getDefaultTableInitDataWithThresholds(Thresholds thresholds) {
 		return new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, Type.MULTIPLAYER, Game.BLACKJACK);
 	}
