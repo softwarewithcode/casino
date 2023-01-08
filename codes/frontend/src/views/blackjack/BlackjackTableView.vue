@@ -17,9 +17,9 @@ const unSubscribe = store.$subscribe((mutation, state) => {
         drawTable(table.value.gamePhase === "PLAY" && command.value === Command.INITIAL_DEAL_DONE);
         if (table.value.gamePhase === GamePhase.ROUND_COMPLETED) {
             betAmount.value = 0
-            // const player = table.value.seats.find(seat => seat.player?.name === player.value?.name)?.player
-            // if (player)
-            //     previousBetAmount.value = player.totalBet
+            const tablePlayer = table.value.seats.find(seat => seat.player?.name === player.value?.name)?.player
+            if (tablePlayer)
+                previousBetAmount.value = tablePlayer.totalBet
         }
     }
 })
@@ -43,20 +43,26 @@ const adjustBet = (amount: number) => {
     useSend({ action: PlayerAction.BET, amount: amount });
 }
 
+const canReduceMinimum = computed<boolean>(() => {
+    return betsAllowed.value && betAmount.value - table.value.tableCard.thresholds.minimumBet >= table.value.tableCard.thresholds.minimumBet
+})
+
+const canAddMinimum = computed<boolean>(() => {
+    return canBetMinimum.value && betAmount.value > 0
+        && betAmount.value + table.value.tableCard.thresholds.minimumBet <= table.value.tableCard.thresholds.maximumBet
+        && player.value.balance - (betAmount.value + table.value.tableCard.thresholds.minimumBet) >= 0
+})
 const canBetMinimum = computed<boolean>(() => {
-
-    return betsAllowed.value && player.value.balance > table.value.tableCard.thresholds.minimumBet
+    return betsAllowed.value
+        && player.value.balance > table.value.tableCard.thresholds.minimumBet
 })
 
-const canIncreaseMinimum = computed<boolean>(() => {
-    return betsAllowed.value && betAmount.value > 0 && table.value.tableCard.thresholds.minimumBet + betAmount.value <= table.value.tableCard.thresholds.maximumBet
-})
 const canBetMaximum = computed<boolean>(() => {
-    return betsAllowed.value && player.value.balance > table.value.tableCard.thresholds.maximumBet && counter.value > 1
+    return betsAllowed.value && player.value.balance > table.value.tableCard.thresholds.maximumBet
 })
 
 const betsAllowed = computed<boolean>(() => {
-    return table.value.gamePhase === GamePhase.BET && player.value.seatNumber >= 0
+    return table.value.gamePhase === GamePhase.BET && player.value.seatNumber >= 0 && counter.value > 0
 })
 
 const betPhaseRunning = computed<boolean>(() => {
@@ -155,12 +161,15 @@ const insuranceAvailable = computed<boolean>(() => {
             <template v-if="counterVisible">
                 <span :style="instructionStyle"> Bet time left {{ counter }}</span>
             </template>
-
-            <button :disabled="!canBetMinimum" @click="adjustBet(table.tableCard.thresholds.minimumBet)">
-                Bet {{ table.tableCard.thresholds.minimumBet }}
+            <div> Current bet {{ betAmount }}</div>
+            <button :disabled="!canReduceMinimum" @click="adjustBet(betAmount - table.tableCard.thresholds.minimumBet)">
+                Reduce {{ table.tableCard.thresholds.minimumBet }}
             </button>
             <button :disabled="!canBetPrevious" @click="adjustBet(previousBetAmount)">
-                Bet {{ player.lastBet }}
+                Previous {{ player.lastBet }}
+            </button>
+            <button :disabled="!canBetMinimum" @click="adjustBet(table.tableCard.thresholds.maximumBet)">
+                Bet {{ table.tableCard.thresholds.minimumBet }}
             </button>
             <button :disabled="!canBetMaximum" @click="adjustBet(table.tableCard.thresholds.maximumBet)">
                 Bet {{ table.tableCard.thresholds.maximumBet }}
@@ -168,11 +177,10 @@ const insuranceAvailable = computed<boolean>(() => {
             <button :disabled="!hasBet" @click="adjustBet(0)">
                 Remove bet
             </button>
-            <button :disabled="canIncreaseMinimum"
-                @click="adjustBet(betAmount + table.tableCard.thresholds.minimumBet)">
-                Increase {{ table.tableCard.thresholds.minimumBet }}
+            <button :disabled="!canAddMinimum" @click="adjustBet(betAmount + table.tableCard.thresholds.minimumBet)">
+                Add {{ table.tableCard.thresholds.minimumBet }}
             </button>
-            Current bet {{ betAmount }}
+
         </div>
         <div v-if="table.gamePhase === GamePhase.INSURE" id="insureRow">
             Insurance time left {{ counter }}
