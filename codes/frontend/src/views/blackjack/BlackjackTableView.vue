@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PlayerAction, GamePhase, type BlackjackPlayer, type Seat } from "@/types/blackjack";
 import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCardsAndHandValuesPainter } from "../../components/composables/rendering/multiSeatPainter";
-import { onMounted, ref, computed, reactive } from "vue";
+import { onMounted, onUnmounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useBlackjackStore } from "../../stores/blackjackStore";
 import { mapActions, storeToRefs } from "pinia";
@@ -12,7 +12,7 @@ const canvasReady = ref<boolean>(false);
 const store = useBlackjackStore();
 const { table, command, player, counter } = storeToRefs(store);
 
-store.$subscribe((mutation, state) => {
+const unSubscribe = store.$subscribe((mutation, state) => {
     if (mutation.type === "patch object") {
         drawTable(table.value.gamePhase === "PLAY" && command.value === Command.INITIAL_DEAL_DONE);
         if (table.value.gamePhase === GamePhase.ROUND_COMPLETED) {
@@ -31,6 +31,10 @@ onMounted(() => {
     useCanvasInitializer(getCanvas());
     drawTable(false);
 });
+
+onUnmounted(() => {
+    unSubscribe()
+})
 const takeSeat = (seat: string) => {
     useSend({ action: "JOIN", seat: seat });
 };
