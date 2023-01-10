@@ -7,7 +7,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.websocket.Session;
 
-public record Bridge(String name, UUID tableId, @JsonIgnore UUID userId, @JsonIgnore Session session, BigDecimal initialBalance) {
+public record Bridge(
+		String userName,
+		@JsonIgnore UUID userId, 
+		UUID tableId, 
+		@JsonIgnore Session session, 
+		BigDecimal initialBalance) {
 
 	public boolean isConnected() {
 		return session != null && session.isOpen();

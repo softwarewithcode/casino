@@ -44,8 +44,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	}
 
 	@Override
-	public String getName() {
-		return bridge.name();
+	public String getUserName() {
+		return bridge.userName();
 	}
 
 	public ICasinoTable getTable() {
@@ -122,7 +122,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 			bridge.session().getBasicRemote().sendText(message.toString());
 		} catch (IOException e) {
 			UUID logIdentifier = UUID.randomUUID();
-			LOGGER.log(Level.SEVERE, "Could not reach player: logIdentifier: " + logIdentifier + " name;" + getName() + " id:" + getId(), e);
+			LOGGER.log(Level.SEVERE, "Could not reach player: logIdentifier: " + logIdentifier + " name;" + getUserName() + " id:" + getId(), e);
 			throw new RuntimeException("cannot be reached ->  LogId:" + logIdentifier);
 		}
 	}
@@ -197,7 +197,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public String toString() {
-		return "CasinoPlayer [name=" + bridge.name() + "balance=" + balance + ", totalBet=" + totalBet + ", status=" + status + "]";
+		return "CasinoPlayer [name=" + bridge.userName() + "balance=" + balance + ", totalBet=" + totalBet + ", status=" + status + "]";
 	}
 
 	@Override

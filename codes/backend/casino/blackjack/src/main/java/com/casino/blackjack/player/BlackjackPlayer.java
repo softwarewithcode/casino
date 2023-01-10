@@ -220,11 +220,11 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	private void validateActionConditions() {
 		if (this.hands.size() != 1)
-			throw new IllegalPlayerActionException("wrong hand count:" + getName() + " " + hands.size(), 1);
+			throw new IllegalPlayerActionException("wrong hand count:" + getUserName() + " " + hands.size(), 1);
 		if (!hands.get(0).isActive())
-			throw new IllegalPlayerActionException("first hand is not active " + getName() + " " + getFirstHand(), 2);
+			throw new IllegalPlayerActionException("first hand is not active " + getUserName() + " " + getFirstHand(), 2);
 		if (hands.get(0).getCards().size() != 2)
-			throw new IllegalPlayerActionException("starting hand does not contain exactly two cards:" + getName() + " " + hands.get(0).getCards(), 3);
+			throw new IllegalPlayerActionException("starting hand does not contain exactly two cards:" + getUserName() + " " + hands.get(0).getCards(), 3);
 	}
 
 	public IHand getActiveHand() {
@@ -247,7 +247,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	@Override
 	public String toString() {
-		return "[name=" + getName() + ", id=" + getId() + ", hands=" + hands + "]";
+		return "[name=" + getUserName() + ", id=" + getId() + ", hands=" + hands + "]";
 	}
 
 	@Override

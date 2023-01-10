@@ -9,7 +9,7 @@ import com.casino.common.cards.IHand;
 import com.casino.common.table.ICasinoTable;
 
 public interface ICasinoPlayer {
-	public String getName();
+	public String getUserName();
 
 	public BigDecimal getInitialBalance();
 
