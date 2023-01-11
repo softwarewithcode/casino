@@ -43,7 +43,7 @@ const handleTableOpen = async (data: any) => {
 
 const patchStore = async (data: any) => {
 	let patchObject = { table: data.table, command: data.title, counter: data.table.counterTime }
-	const patchPlayer = data.table.players.find(player => player.name === store.getPlayer?.name)
+	const patchPlayer = data.table.players.find(player => player.name === store.getPlayer?.userName)
 	if (patchPlayer) {
 		patchObject["player"] = patchPlayer
 	}

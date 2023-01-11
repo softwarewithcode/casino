@@ -1,6 +1,7 @@
 import type { BlackjackHand, BlackjackPlayer, BlackjackTable, Seat } from "@/types/blackjack"
 import type { Vector, CasinoFont, Card } from "@/types/casino"
 import { useCardLocator } from "./cardLocator"
+import { cardsSprite } from "../images"
 const infoFont: CasinoFont = {
 	color: "blue",
 	faceAndSize: "20px Arial"
@@ -57,7 +58,7 @@ const paintPlayersCards = (playersWithCards: BlackjackPlayer[], mainBoxPlayer: B
 		player.hands.forEach((hand, handIndex) => {
 			hand.cards.forEach((card, cardIndex) => {
 				//const cardPosition: Vector = calculateCardPositionInPlayerBox(player, mainBoxPlayer, cardIndex, handIndex, canvas)
-				paintCard(player.name, card, cardIndex, handIndex, canvas)
+				paintCard(player.userName, card, cardIndex, handIndex, canvas)
 			})
 		})
 	})
@@ -87,14 +88,14 @@ const showOneCardFromFirstHandWithDelay = async (players: BlackjackPlayer[], can
 		const cardIndex = player.hands[0].cards.findIndex(card => !card.hasOwnProperty("visible"))
 		const card = player.hands[0].cards[cardIndex]
 		const handIndex = 0
-		await paintCardWithDelay(INITIAL_DEAL_CARD_DELAY, player.name, card, cardIndex, handIndex, canvas)
+		await paintCardWithDelay(INITIAL_DEAL_CARD_DELAY, player.userName, card, cardIndex, handIndex, canvas)
 		card.visible = true
 	}
 }
 
 const paintPlayersHandValues = (playersWithCards: BlackjackPlayer[], mainBoxPlayer: BlackjackPlayer, canvas: HTMLCanvasElement) => {
 	playersWithCards.forEach(player => {
-		const playerIndex = getPlayerBoxIndexRelativeToMainBoxPlayer(player.name)
+		const playerIndex = getPlayerBoxIndexRelativeToMainBoxPlayer(player.userName)
 		const boxStartingCorner = getPlayerBoxStartingCorner(playerIndex, playerBoxWidth, playerBoxHeight)
 
 		const halfOfPlayerBoxLength = playerIndex === largeBoxIndex ? canvas.width / 2 : playerBoxWidth / 2
@@ -130,7 +131,6 @@ const paintCardWithDelay = async (delayMillis: number, actorName: string, card: 
 	await wait(delayMillis)
 	paintCard(actorName, card, nth, handNth, canvas)
 }
-const cardsSprite: HTMLImageElement = document.getElementById("cardsSprite") as HTMLImageElement
 
 const paintCard = (actorName: string, card: Card, nth: number, handNth: number, canvas: HTMLCanvasElement) => {
 	const ctx = canvas.getContext("2d")
@@ -154,7 +154,7 @@ const calculateCardPosition = (actorName: string, nthCard: number, nthHand: numb
 		return { x: cardPositionX, y: cardPositionY }
 	}
 
-	if (actorName === mainBoxPlayer.name) {
+	if (actorName === mainBoxPlayer.userName) {
 		const cardPositionX = playerBoxWidth + nthCard * mainPlayerCardSize.x + 20
 		const cardPositionY = 3 * playerBoxHeight + nthHand * mainPlayerCardSize.y
 		return { x: cardPositionX, y: cardPositionY }
@@ -177,7 +177,7 @@ const calculateCardSize = (actorName: string): Vector => {
 		return dealerCardSize
 	}
 	const handCount = getPlayerHandCount(actorName)
-	if (actorName === mainBoxPlayer.name) {
+	if (actorName === mainBoxPlayer.userName) {
 		if (!mainPlayerCardSize) {
 			//const mainBoxWidth = playerBoxWidth * 4
 			const cardHeight = handCount > 0 ? playerBoxHeight / 2 : playerBoxHeight
@@ -195,7 +195,7 @@ const calculateCardSize = (actorName: string): Vector => {
 }
 
 const getPlayerHandCount = (actorName: string) => {
-	const playerHandCount = table.seats.find(seat => seat.player?.name === actorName)?.player.hands.length
+	const playerHandCount = table.seats.find(seat => seat.player?.userName === actorName)?.player.hands.length
 	if (!playerHandCount) throw new Error("no hand count")
 	return playerHandCount
 }
@@ -222,12 +222,12 @@ const paintPlayersBoxesExcluding = (excludedSeatNumber: number, table: Blackjack
 
 const isPlayerInTurn = (table: BlackjackTable, player: BlackjackPlayer): boolean => {
 	if (!player) return false
-	return player.name === table.playerInTurn?.name
+	return player.userName === table.playerInTurn?.userName
 }
 
 const getPlayerBoxIndexRelativeToMainBoxPlayer = (actorName: string) => {
-	if (mainBoxPlayer.name === actorName) return largeBoxIndex
-	const seat = table.seats.find(seat => seat.player?.name === actorName)
+	if (mainBoxPlayer.userName === actorName) return largeBoxIndex
+	const seat = table.seats.find(seat => seat.player?.userName === actorName)
 	if (!seat) throw new Error("player not found " + actorName)
 	if (mainBoxPlayer.seatNumber > seat.number) {
 		return largeBoxIndex - (mainBoxPlayer.seatNumber - seat.number)
@@ -267,7 +267,7 @@ const paintMainPlayerBox = (player: BlackjackPlayer, canvas: HTMLCanvasElement, 
 	const ctx = canvas.getContext("2d")
 	if (!ctx) return
 	paintRectangle({ x: 0, y: canvas.height * 0.75 }, { x: canvas.width, y: canvas.height }, canvas, isInTurn)
-	paintText(player.name, { x: 5, y: 3 * playerBoxHeight + 18 }, canvas, reservedSeatFont)
+	paintText(player.userName, { x: 5, y: 3 * playerBoxHeight + 18 }, canvas, reservedSeatFont)
 	paintText("$" + player.balance, { x: 5, y: 3 * playerBoxHeight + 35 }, canvas, reservedSeatFont)
 }
 const paintPlayerBox = (boxStartingCorner: Vector, seat: Seat, canvas: HTMLCanvasElement, isInTurn: boolean) => {
@@ -276,7 +276,7 @@ const paintPlayerBox = (boxStartingCorner: Vector, seat: Seat, canvas: HTMLCanva
 		paintText("Seat " + (seat.number + 1), { x: boxStartingCorner.x + 10, y: boxStartingCorner.y + 50 }, canvas, infoFont)
 		return
 	}
-	paintText(seat.player.name, { x: boxStartingCorner.x + 5, y: boxStartingCorner.y + 18 }, canvas, reservedSeatFont)
+	paintText(seat.player.userName, { x: boxStartingCorner.x + 5, y: boxStartingCorner.y + 18 }, canvas, reservedSeatFont)
 	paintText("$" + seat.player.balance, { x: boxStartingCorner.x + 5, y: boxStartingCorner.y + 35 }, canvas, reservedSeatFont)
 }
 

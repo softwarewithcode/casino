@@ -1,0 +1,11 @@
+Playing cards
+    https://opengameart.org/content/playing-cards-3
+
+    license:
+    https://creativecommons.org/publicdomain/zero/1.0/
+
+Background:
+    https://opengameart.org/content/light-wood-1024x1024
+
+    license:
+    https://creativecommons.org/publicdomain/zero/1.0/

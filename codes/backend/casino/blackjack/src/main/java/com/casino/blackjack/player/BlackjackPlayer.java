@@ -18,12 +18,11 @@ import com.casino.common.user.Action;
 import com.casino.common.user.Bridge;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
-@JsonIncludeProperties(value = { "hands", "actions", "seatNumber", "name", "balance", "totalBet", "payout", "lastBet" })
+@JsonIncludeProperties(value = { "hands", "actions", "seatNumber", "userName", "balance", "totalBet", "payout", "lastBet" })
 public class BlackjackPlayer extends CasinoPlayer {
 	private List<IHand> hands;
 	private List<Action> actions;
 	private Integer seatNumber;
-	private BigDecimal lastBet;
 
 	public BlackjackPlayer(Bridge bridge, ISeatedTable table) {
 		super(bridge, table);

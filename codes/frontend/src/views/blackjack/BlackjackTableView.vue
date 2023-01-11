@@ -5,7 +5,7 @@ import { onMounted, onUnmounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useBlackjackStore } from "../../stores/blackjackStore";
 import { mapActions, storeToRefs } from "pinia";
-import { bgImage, } from "../../components/composables/rendering/images"
+import { bgImage, } from "../../components/composables/images"
 import { Command } from "@/types/sockethander";
 import { TableType } from "@/types/casino";
 const props = defineProps<{ tableId: string }>();
@@ -18,7 +18,7 @@ const unSubscribe = store.$subscribe((mutation, state) => {
         drawTable(table.value.gamePhase === "PLAY" && command.value === Command.INITIAL_DEAL_DONE);
         if (table.value.gamePhase !== GamePhase.ROUND_COMPLETED) return
         betAmount.value = 0
-        const tablePlayer = table.value.seats.find(seat => seat.player?.name === player.value?.name)?.player
+        const tablePlayer = table.value.seats.find(seat => seat.player?.userName === player.value?.userName)?.player
         if (tablePlayer)
             previousBetAmount.value = tablePlayer.totalBet
     }
@@ -115,7 +115,7 @@ const drawTable = async (initialDeal: boolean) => {
     const canvas: HTMLCanvasElement = clearCanvas()
     const ctx = canvas.getContext("2d")
     if (!ctx) return
-    ctx.drawImage(bgImage, 0, 0);
+    ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
     useActorsPainter(table.value, getCenterPlayer(), canvas);
     if (initialDeal)
         useInitialDealPainter(table.value, getCenterPlayer(), canvas)
@@ -125,7 +125,7 @@ const drawTable = async (initialDeal: boolean) => {
 }
 
 const getCenterPlayer = (): BlackjackPlayer => {
-    if (player.value?.name) {
+    if (player.value?.userName) {
         return player.value;
     }
     const centerPlayer = table.value.seats.find((seat) => seat.player?.balance > 0)?.player as BlackjackPlayer;
@@ -151,8 +151,8 @@ const insuranceAvailable = computed<boolean>(() => {
 
 <template v-if="canvasReady">
     <div style="position: relative">
-        Table {{ table?.tableCard?.id }} {{ table.gamePhase }}{{ table.playerInTurn?.name }}
-        <canvas id="canvas" width="1800" height="600" style="border-style: dashed solid"></canvas>
+        Table {{ table?.tableCard?.id }} {{ table.gamePhase }}{{ table.playerInTurn?.userName }}
+        <canvas id="canvas" width="1800" height="600"></canvas>
         <div v-if="isTakeSeatRowVisible" id="takeSeatRow">
             <div v-for="seat in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
                 :style="seatStyle(seat.number)">
@@ -197,9 +197,9 @@ const insuranceAvailable = computed<boolean>(() => {
         <div v-if="table.gamePhase === GamePhase.ROUND_COMPLETED" id="betRoundStartsRow">
             Next bet round starts {{ counter }}
         </div>
-        <div v-if="table.gamePhase === 'PLAY' && table.playerInTurn.name === player.name" id="actionRow"
+        <div v-if="table.gamePhase === 'PLAY' && table.playerInTurn.userName === player.userName" id="actionRow"
             style="position:relative; bottom:25px: left:50px">
-            Player {{ table?.playerInTurn.name }} {{ counter }}
+            Player {{ table?.playerInTurn.userName }} {{ counter }}
             <button v-if="table.playerInTurn.actions.includes(PlayerAction.TAKE)"
                 @click="sendAction(PlayerAction.TAKE)">
                 Take

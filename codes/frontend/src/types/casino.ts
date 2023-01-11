@@ -6,7 +6,7 @@ export interface GameType {
 	index: number
 }
 export interface CasinoPlayer {
-	name: string
+	userName: string
 	id: string
 	balance: number
 	totalBet: number
