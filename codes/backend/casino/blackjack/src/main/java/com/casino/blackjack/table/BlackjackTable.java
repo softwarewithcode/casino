@@ -264,6 +264,10 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public boolean watch(Bridge user) {
 		BlackjackPlayer player = new BlackjackPlayer(user, null);
+		if (getPlayer(user.userId()) != null) {
+			LOGGER.info("User " + user.userName() + " is already playing in table:" + this.toString());
+			return false;
+		}
 		boolean joined = super.joinAsWatcher(player);
 		if (joined)
 			dealer.onWatcherArrival(player);

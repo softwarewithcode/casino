@@ -130,10 +130,10 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public void removeWatcher(UUID watcherId) {
+	public ICasinoPlayer removeWatcher(UUID watcherId) {
 		if (watcherId == null)
-			return;
-		watchers.remove(watcherId);
+			return null;
+		return watchers.remove(watcherId);
 	}
 
 	@Override

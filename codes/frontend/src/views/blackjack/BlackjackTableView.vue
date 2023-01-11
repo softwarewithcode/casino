@@ -22,7 +22,6 @@ const unSubscribe = store.$subscribe((mutation, state) => {
         if (tablePlayer)
             previousBetAmount.value = tablePlayer.totalBet
     }
-
 })
 const betAmount = ref<number>(0)
 const previousBetAmount = ref<number>(0)
@@ -44,6 +43,11 @@ const adjustBet = (amount: number) => {
     useSend({ action: PlayerAction.BET, amount: amount });
 }
 
+
+const hasSeat = computed<boolean>(() => {
+    return player.value?.seatNumber >= 0
+})
+
 const canReduceMinimum = computed<boolean>(() => {
     return betsAllowed.value && betAmount.value - table.value.tableCard.thresholds.minimumBet >= 0
 })
@@ -51,20 +55,20 @@ const canReduceMinimum = computed<boolean>(() => {
 const canAddMinimum = computed<boolean>(() => {
     return betsAllowed.value && betAmount.value >= 0
         && betAmount.value + table.value.tableCard.thresholds.minimumBet <= table.value.tableCard.thresholds.maximumBet
-        && player.value.balance - (betAmount.value + table.value.tableCard.thresholds.minimumBet) >= 0
+        && player.value?.balance - (betAmount.value + table.value.tableCard.thresholds.minimumBet) >= 0
 })
 const canBetMinimum = computed<boolean>(() => {
     return betsAllowed.value
-        && player.value.balance >= table.value.tableCard.thresholds.minimumBet
+        && player.value?.balance >= table.value.tableCard.thresholds.minimumBet
         && betAmount.value !== table.value.tableCard.thresholds.minimumBet
 })
 
 const canBetMaximum = computed<boolean>(() => {
-    return betsAllowed.value && player.value.balance > table.value.tableCard.thresholds.maximumBet
+    return betsAllowed.value && player.value?.balance > table.value.tableCard.thresholds.maximumBet
 })
 
 const betsAllowed = computed<boolean>(() => {
-    return table.value.gamePhase === GamePhase.BET && player.value.seatNumber >= 0 && counter.value > 0
+    return table.value.gamePhase === GamePhase.BET && hasSeat.value && counter.value > 0
 })
 
 const betPhaseRunning = computed<boolean>(() => {
@@ -75,15 +79,21 @@ const counterVisible = computed<boolean>(() => {
     return counter.value > 1
 })
 
-const isTakeSeatRowVisible = computed<boolean>(() => {
-    if (table.value.tableCard.type === TableType.SINGLE_PLAYER) {
-        return table.value.seats.filter(seat => !seat.available).length === 0
-    }
-    return true
+const canTakeSeat = computed<boolean>(() => {
+    const tableCard = table.value.tableCard
+    if (tableCard.type === TableType.MULTIPLAYER)
+        return !hasSeat.value && table.value.seats.map(seat => seat.available) != null
+    return tableCard.availablePositions.length >= tableCard.thresholds.seatCount
 })
 
+
+const canAct = computed<boolean>(() => {
+    return table.value.gamePhase === 'PLAY' && table.value.playerInTurn.userName === player.value?.userName
+})
+
+
 const canBetPrevious = computed<boolean>(() => {
-    return betsAllowed.value && previousBetAmount.value != -1 && player.value.balance >= previousBetAmount.value
+    return betsAllowed.value && previousBetAmount.value > 0 && player?.value.balance >= previousBetAmount.value
 })
 const hasBet = computed<boolean>(() => {
     return betAmount.value > 0
@@ -144,8 +154,10 @@ const instructionStyle = computed(() => {
 
 const insuranceClicked = ref<boolean>(false)
 const insuranceAvailable = computed<boolean>(() => {
-    return player.value.seatNumber >= 0 && table.value.gamePhase === GamePhase.INSURE
-        && player.value.balance >= player.value.totalBet / 2 && !Number.isInteger(player.value.insuranceAmount) && insuranceClicked.value === false
+    return hasSeat.value && table.value.gamePhase === GamePhase.INSURE
+        && player.value.balance >= player.value.totalBet / 2
+        && !Number.isInteger(player.value.insuranceAmount)
+        && insuranceClicked.value === false
 });
 </script>
 
@@ -153,16 +165,15 @@ const insuranceAvailable = computed<boolean>(() => {
     <div style="position: relative">
         Table {{ table?.tableCard?.id }} {{ table.gamePhase }}{{ table.playerInTurn?.userName }}
         <canvas id="canvas" width="1800" height="600"></canvas>
-        <div v-if="isTakeSeatRowVisible" id="takeSeatRow">
+        <div v-if="canTakeSeat" id="takeSeatRow">
             <div v-for="seat in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
                 :style="seatStyle(seat.number)">
-                <button v-if="seat.available && !Number.isInteger(player.seatNumber)"
-                    @click="takeSeat(seat.number.toString())">
+                <button v-if="seat.available" @click="takeSeat(seat.number.toString())">
                     Take {{ seat.number + 1 }}
                 </button>
             </div>
         </div>
-        <div v-if="betPhaseRunning" id="betRow">
+        <div v-if="betsAllowed" id="betRow">
             <template v-if="counterVisible">
                 <span :style="instructionStyle"> Bet time left {{ counter }}</span>
             </template>
@@ -185,8 +196,6 @@ const insuranceAvailable = computed<boolean>(() => {
             <button :disabled="!hasBet" @click="adjustBet(0)">
                 Remove bet
             </button>
-
-
         </div>
         <div v-if="table.gamePhase === GamePhase.INSURE" id="insureRow">
             Insurance time left {{ counter }}
@@ -197,8 +206,7 @@ const insuranceAvailable = computed<boolean>(() => {
         <div v-if="table.gamePhase === GamePhase.ROUND_COMPLETED" id="betRoundStartsRow">
             Next bet round starts {{ counter }}
         </div>
-        <div v-if="table.gamePhase === 'PLAY' && table.playerInTurn.userName === player.userName" id="actionRow"
-            style="position:relative; bottom:25px: left:50px">
+        <div v-if="canAct" id="actionRow" style="position:relative; bottom:25px: left:50px">
             Player {{ table?.playerInTurn.userName }} {{ counter }}
             <button v-if="table.playerInTurn.actions.includes(PlayerAction.TAKE)"
                 @click="sendAction(PlayerAction.TAKE)">

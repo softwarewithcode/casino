@@ -26,11 +26,27 @@ public class Seat {
 	}
 
 	public boolean hasPlayerWhoCanAct() {
-		return hasPlayerWithBet() && this.player.getStatus() == PlayerStatus.ACTIVE && player.hasActiveHand();
+		return hasPlayerWithBet() && hasPlayerWithActiveStatus() && hasPlayerWithActiveHand();
+	}
+
+	private boolean hasPlayerWithActiveHand() {
+		return player.hasActiveHand();
+	}
+
+	private boolean hasPlayerWithActiveStatus() {
+		return this.player.getStatus() == PlayerStatus.ACTIVE;
 	}
 
 	public boolean hasPlayer() {
 		return this.player != null;
+	}
+
+	public boolean hasActivePlayer() {
+		return hasPlayer() && hasPlayerWithActiveStatus();
+	}
+
+	public boolean hasInactivePlayer() {
+		return hasPlayer() && !hasPlayerWithActiveStatus();
 	}
 
 	public Seat(int number, ICasinoPlayer player) {

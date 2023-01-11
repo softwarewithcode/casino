@@ -2,6 +2,7 @@ import { useBlackjackStore } from "../../../../../stores/blackjackStore"
 import router from "../../../../../router/router"
 import { Command } from "@/types/sockethander"
 import { useStartCounter } from "../../../timing/clock"
+
 // @author softwarewithcode from GitHub
 const store = useBlackjackStore()
 
@@ -17,7 +18,10 @@ export function useBlackjackMessageHandler(data: any) {
 			})
 			break
 		case Command.OPEN_TABLE:
-			handleTableOpen(data)
+			openTable(data)
+			break
+		case Command.NO_BETS_NO_DEAL:
+			standUp(data)
 			break
 		case Command.BET_PHASE_STARTS:
 		case Command.WAITING_PLAYER_ACTION:
@@ -33,7 +37,7 @@ export function useBlackjackMessageHandler(data: any) {
 	}
 }
 
-const handleTableOpen = async (data: any) => {
+const openTable = async (data: any) => {
 	let table = data.table
 	router.push({ name: "blackjack", params: { tableId: table.id } })
 	store.$patch({
@@ -41,10 +45,15 @@ const handleTableOpen = async (data: any) => {
 	})
 }
 
+const standUp = async (data: any) => {
+	let patchObject = { table: data.table, player: data.player, command: data.title, counter: data.table.counterTime }
+	await store.$patch(patchObject)
+}
+
 const patchStore = async (data: any) => {
 	let patchObject = { table: data.table, command: data.title, counter: data.table.counterTime }
-	const patchPlayer = data.table.players.find(player => player.name === store.getPlayer?.userName)
-	if (patchPlayer) {
+	const patchPlayer = data.table.players.find(player => player.userName === store.getPlayer?.userName)
+	if (store.getPlayer && patchPlayer) {
 		patchObject["player"] = patchPlayer
 	}
 	store.$patch(patchObject)

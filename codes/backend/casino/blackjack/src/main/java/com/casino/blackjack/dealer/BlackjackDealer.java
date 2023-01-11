@@ -209,7 +209,8 @@ public class BlackjackDealer implements IDealer {
 		updatePlayerStatuses();
 		if (!shouldDealStartingHands()) {
 			LOGGER.info("dealer does not deal cards now");
-			// removeInactivePlayers(); //commented for testing
+			table.moveInactivePlayersToWatchers();
+			notifyAll(Title.NO_BETS_NO_DEAL, null);
 			return;
 		}
 		matchBalanceWithBet();
@@ -260,18 +261,21 @@ public class BlackjackDealer implements IDealer {
 			}
 			table.updateGamePhase(GamePhase.ROUND_COMPLETED);
 			notifyAll(Title.ROUND_COMPLETED, null);
-//			sanitizeEmptySeats(); TODO find place for this
 			if (table.getActivePlayerCount() == 0)
 				table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
 			if (shouldRestartBetPhase()) {
-				table.updateCounterTime(table.getThresholds().phaseDelay().intValue());
-				startBetPhaseClock(table.getThresholds().phaseDelay());
+				restartBetPhase();
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Something unexpected happend. Waiting for brush to arrive.", e);
 			BlackjackUtil.dumpTable(table, "dealer player turn:" + e);
 			throw new IllegalStateException("what to do");
 		}
+	}
+
+	private void restartBetPhase() {
+		table.updateCounterTime(table.getThresholds().phaseDelay().intValue());
+		startBetPhaseClock(table.getThresholds().phaseDelay());
 	}
 
 	private void sanitizeEmptySeats() {
@@ -290,7 +294,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	private boolean shouldRestartBetPhase() {
-		return table.getStatus() == com.casino.common.table.Status.RUNNING && table.getActivePlayerCount() > 0;
+		return table.getStatus() == com.casino.common.table.Status.RUNNING && table.getActivePlayerCount() > 0 && table.getGamePhase() == GamePhase.ROUND_COMPLETED;
 	}
 
 	private void onDealerTurnChange() {

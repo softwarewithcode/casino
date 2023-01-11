@@ -9,8 +9,8 @@ import jakarta.websocket.Session;
 
 public record Bridge(
 		String userName,
-		@JsonIgnore UUID userId, 
 		UUID tableId, 
+		@JsonIgnore UUID userId, 
 		@JsonIgnore Session session, 
 		BigDecimal initialBalance) {
 

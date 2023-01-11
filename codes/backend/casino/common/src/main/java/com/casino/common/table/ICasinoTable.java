@@ -16,7 +16,6 @@ public interface ICasinoTable {
 
 	public boolean isMultiplayer();
 
-
 	public boolean isSinglePlayer();
 
 	public boolean isDealerTurn();
@@ -31,7 +30,7 @@ public interface ICasinoTable {
 
 	public boolean addWatcher(ICasinoPlayer player);
 
-	public void removeWatcher(UUID id);
+	public ICasinoPlayer removeWatcher(UUID id);
 
 	public List<ICasinoPlayer> getPlayers();
 

@@ -51,6 +51,10 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		return (int) seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != com.casino.common.player.PlayerStatus.SIT_OUT).count();
 	}
 
+	protected boolean hasActivePlayers() {
+		return getActivePlayerCount() > 0;
+	}
+
 	// User might have disconnected, so don't compare to active status
 	public List<ICasinoPlayer> getPlayersWithBet() {
 		return seats.stream().filter(Seat::hasPlayerWithBet).map(Seat::getPlayer).toList();
@@ -112,6 +116,12 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	protected void sanitizeAllSeats() {
 		List<Seat> allSeats = seats.stream().toList();
 		allSeats.forEach(Seat::sanitize);
+	}
+
+	public void moveInactivePlayersToWatchers() {
+		List<Seat> inactiveSeats = seats.stream().filter(Seat::hasInactivePlayer).toList();
+		inactiveSeats.forEach(seat -> super.addWatcher(seat.getPlayer()));
+		inactiveSeats.forEach(Seat::sanitize);
 	}
 
 	public Set<Seat> getSeats() {

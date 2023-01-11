@@ -29,7 +29,6 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	private volatile BigDecimal totalBet;
 	private volatile BigDecimal payout;
 	private volatile PlayerStatus status;
-	protected volatile BigDecimal lastBet;
 
 	public CasinoPlayer(Bridge bridge, ICasinoTable table) {
 		super();

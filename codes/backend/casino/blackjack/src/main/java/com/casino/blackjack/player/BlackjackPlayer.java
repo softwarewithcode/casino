@@ -18,7 +18,7 @@ import com.casino.common.user.Action;
 import com.casino.common.user.Bridge;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
-@JsonIncludeProperties(value = { "hands", "actions", "seatNumber", "userName", "balance", "totalBet", "payout", "lastBet" })
+@JsonIncludeProperties(value = { "hands", "actions", "seatNumber", "userName", "balance", "totalBet", "payout" })
 public class BlackjackPlayer extends CasinoPlayer {
 	private List<IHand> hands;
 	private List<Action> actions;
@@ -103,14 +103,6 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	public boolean isInsuranceCompensable() {
 		return getFirstHand().isInsuranceCompensable();
-	}
-
-	public BigDecimal getLastBet() {
-		return super.lastBet;
-	}
-
-	public void setLastBet(BigDecimal lastBet) {
-		this.lastBet = lastBet;
 	}
 
 	public List<Action> getActions() {

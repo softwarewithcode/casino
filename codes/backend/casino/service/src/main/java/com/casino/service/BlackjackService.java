@@ -79,9 +79,13 @@ public class BlackjackService {
 		return Optional.ofNullable(tables.get(id));
 	}
 
-	public void removeWatcher(Bridge bridge) {
+	public void onBridgeClose(Bridge bridge) {
 		BlackjackTable table = tables.get(bridge.tableId());
-		table.removeWatcher(bridge.userId());
+		if (table == null)
+			return;
+		if (table.removeWatcher(bridge.userId()) != null)
+			return;
+		table.onPlayerLeave(bridge.userId());
 	}
 
 	public List<TableCard> fetchTableCards() {

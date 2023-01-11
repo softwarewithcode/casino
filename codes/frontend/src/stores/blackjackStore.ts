@@ -34,10 +34,6 @@ export const useBlackjackStore = defineStore("blackjackStore", {
 				alert(error)
 			}
 		},
-		async login(player: BlackjackPlayer) {
-			// To CasinoStore or rename?
-			this.player = player
-		},
 		reduceCounter() {
 			let counterCurrent = this.counter
 			counterCurrent--
