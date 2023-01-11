@@ -427,7 +427,7 @@ public class StartingHandSplitTest extends BaseTest {
 	}
 
 	@Test
-	public void bothHandsLoseAterTimeout() {
+	public void bothHandsLoseAferTimeout() {
 		List<Card> cards = dealer.getDecks();
 		cards.add(Card.of(10, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.DIAMOND));// dealer
@@ -446,4 +446,44 @@ public class StartingHandSplitTest extends BaseTest {
 		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
 		assertEquals(new BigDecimal("980.00"), table.getPlayer(bridge.userId()).getBalance());
 	}
+
+	@Test
+	public void firstHandWinsAfterTimeOut() {
+		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(10, Suit.DIAMOND));// dealer
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(2, Suit.DIAMOND));
+		cards.add(Card.of(1, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.DIAMOND));
+		cards.add(Card.of(10, Suit.SPADE));// dealer
+		cards.add(Card.of(10, Suit.SPADE));
+		table.join(bridge, "5");
+		table.bet(bridge.userId(), new BigDecimal("10.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table.split(bridge.userId());
+		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("1005.00"), table.getPlayer(bridge.userId()).getBalance());
+		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isBlackjack());
+	}
+
+//	@Test
+//	public void aceSplitGivesOnlyOneCardForEach() {
+//		List<Card> cards = dealer.getDecks();
+//		cards.add(Card.of(10, Suit.DIAMOND));// dealer
+//		cards.add(Card.of(10, Suit.DIAMOND));
+//		cards.add(Card.of(2, Suit.DIAMOND));
+//		cards.add(Card.of(1, Suit.DIAMOND));
+//		cards.add(Card.of(1, Suit.DIAMOND));
+//		cards.add(Card.of(10, Suit.SPADE));// dealer
+//		cards.add(Card.of(1, Suit.SPADE));
+//		table.join(bridge, "5");
+//		table.bet(bridge.userId(), new BigDecimal("10.0"));
+//		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+//		table.split(bridge.userId());
+//		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isCompleted());
+//		assertTrue(table.getPlayer(bridge.userId()).getHands().get(1).isCompleted());
+//		assertEquals(12, table.getPlayer(bridge.userId()).getHands().get(0).calculateFinalValue());
+//		assertEquals(new BigDecimal("1005.00"), table.getPlayer(bridge.userId()).getBalance());
+//		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isBlackjack());
+//	}
 }
