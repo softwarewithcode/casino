@@ -15,12 +15,7 @@ const { table, command, player, counter } = storeToRefs(store);
 
 const unSubscribe = store.$subscribe((mutation, state) => {
     if (mutation.type === "patch object") {
-        drawTable(table.value.gamePhase === "PLAY" && command.value === Command.INITIAL_DEAL_DONE);
-        if (table.value.gamePhase !== GamePhase.ROUND_COMPLETED) return
-        betAmount.value = 0
-        const tablePlayer = table.value.seats.find(seat => seat.player?.userName === player.value?.userName)?.player
-        if (tablePlayer)
-            previousBetAmount.value = tablePlayer.totalBet
+        onStorePatch()
     }
 })
 const betAmount = ref<number>(0)
@@ -35,14 +30,23 @@ onMounted(() => {
 onUnmounted(() => {
     unSubscribe()
 })
+const onStorePatch = () => {
+    drawTable(table.value.gamePhase === "PLAY" && command.value === Command.INITIAL_DEAL_DONE);
+    if (table.value.gamePhase !== GamePhase.ROUND_COMPLETED) return
+    betAmount.value = 0
+    const tablePlayer = table.value.seats.find(seat => seat.player?.userName === player.value?.userName)?.player
+    if (tablePlayer)
+        previousBetAmount.value = tablePlayer.totalBet
+}
 const takeSeat = (seat: string) => {
     useSend({ action: "JOIN", seat: seat });
 };
 const adjustBet = (amount: number) => {
     betAmount.value = amount
     useSend({ action: PlayerAction.BET, amount: amount });
+    player.value.totalBet = betAmount.value
+    drawTable(false)
 }
-
 
 const hasSeat = computed<boolean>(() => {
     return player.value?.seatNumber >= 0
@@ -71,10 +75,6 @@ const betsAllowed = computed<boolean>(() => {
     return table.value.gamePhase === GamePhase.BET && hasSeat.value && counter.value > 0
 })
 
-const betPhaseRunning = computed<boolean>(() => {
-    return table.value.gamePhase === GamePhase.BET && counter.value > 1
-})
-
 const counterVisible = computed<boolean>(() => {
     return counter.value > 1
 })
@@ -86,11 +86,9 @@ const canTakeSeat = computed<boolean>(() => {
     return tableCard.availablePositions.length >= tableCard.thresholds.seatCount
 })
 
-
 const canAct = computed<boolean>(() => {
     return table.value.gamePhase === 'PLAY' && table.value.playerInTurn.userName === player.value?.userName
 })
-
 
 const canBetPrevious = computed<boolean>(() => {
     return betsAllowed.value && previousBetAmount.value > 0 && player?.value.balance >= previousBetAmount.value
@@ -131,7 +129,6 @@ const drawTable = async (initialDeal: boolean) => {
         useInitialDealPainter(table.value, getCenterPlayer(), canvas)
     else
         useCardsAndHandValuesPainter(table.value, getCenterPlayer(), canvas)
-
 }
 
 const getCenterPlayer = (): BlackjackPlayer => {
@@ -142,17 +139,23 @@ const getCenterPlayer = (): BlackjackPlayer => {
     return centerPlayer
 }
 
-const seatStyle = (seatNumber: number) => {
+const getMainBoxActionRowStyle = (seatNumber: number) => {
     if (table.value.seats.some(seat => seat.player?.seatNumber >= 0)) {
-        return { 'display': "inline", "margin-right": "45px", "left": "50px" }
+        return { 'display': "inline", "margin-right": "45px", "left": "25px" }
     }
-    return { 'display': "inline", 'bottom': "200px", "margin-right": "45px", "left": "50px" }
+    return { 'display': "inline", 'bottom': "200px", "margin-right": "45px", "left": "25px" }
 }
+
+const getMainBoxPlayerActionStyle = () => {
+    const liftUp = getCanvas().height / 5 + "px"
+    return { 'display': "inline", 'bottom': liftUp, "margin-right": "45px", "left": "25px" }
+}
+
 const instructionStyle = computed(() => {
     const bottom = (getCanvas().height / 2).toString() + "px"
     const left = (getCanvas().width / 2).toString() + "px"
-    const color = counter.value > 5 ? 'green' : 'red'
-    return { 'left': left, 'bottom': bottom, "color": color }
+    const color = counter.value > 4 ? 'yellow' : 'red'
+    return { 'left': left, 'bottom': bottom, "color": color, "font-size": 22 + "px" }
 })
 
 const insuranceClicked = ref<boolean>(false)
@@ -170,17 +173,16 @@ const insuranceAvailable = computed<boolean>(() => {
         <canvas id="canvas" width="1800" height="600"></canvas>
         <div v-if="canTakeSeat" id="takeSeatRow">
             <div v-for="seat in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
-                :style="seatStyle(seat.number)">
+                :style="getMainBoxActionRowStyle(seat.number)">
                 <button v-if="seat.available" @click="takeSeat(seat.number.toString())">
                     Take {{ seat.number + 1 }}
                 </button>
             </div>
         </div>
-        <div v-if="betsAllowed" id="betRow">
+        <div v-if="betsAllowed" id="betRow" :style="getMainBoxPlayerActionStyle()">
             <template v-if="counterVisible">
                 <span :style="instructionStyle"> Bet time left {{ counter }}</span>
             </template>
-            <div> Current bet {{ betAmount }}</div>
             <button :disabled="!canReduceMinimum" @click="adjustBet(betAmount - table.tableCard.thresholds.minimumBet)">
                 Reduce {{ table.tableCard.thresholds.minimumBet }}
             </button>
@@ -200,13 +202,14 @@ const insuranceAvailable = computed<boolean>(() => {
                 Remove bet
             </button>
         </div>
-        <div v-if="table.gamePhase === GamePhase.INSURE" id="insureRow">
+        <div v-if="table.gamePhase === GamePhase.INSURE" id="insureRow" :style="getMainBoxActionRowStyle">
             Insurance time left {{ counter }}
             <button v-if="insuranceAvailable" @click="insure()">
                 Insure
             </button>
         </div>
-        <div v-if="table.gamePhase === GamePhase.ROUND_COMPLETED" id="betRoundStartsRow">
+        <div v-if="table.gamePhase === GamePhase.ROUND_COMPLETED" id="betRoundStartsRow"
+            :style="getMainBoxActionRowStyle">
             Next bet round starts {{ counter }}
         </div>
         <div v-if="canAct" id="actionRow" style="position:relative; bottom:25px: left:50px">
@@ -232,6 +235,6 @@ const insuranceAvailable = computed<boolean>(() => {
 </template>
 <style scoped>
 button {
-    margin: 20px
+    margin: 15px
 }
 </style>

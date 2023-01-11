@@ -25,7 +25,7 @@ export function useActorsPainter(table: BlackjackTable, mainBoxPlayer: Blackjack
 	if (!mainBoxPlayer || Object.keys(mainBoxPlayer).length === 0) return
 	paintMainPlayerBox(mainBoxPlayer, canvas, isPlayerInTurn(table, mainBoxPlayer))
 	paintPlayersBoxesExcluding(mainBoxPlayer.seatNumber, table, canvas)
-	paintDealerBox(canvas)
+	paintDealerBox(table, canvas)
 }
 export function useCardsAndHandValuesPainter(table: BlackjackTable, mainBoxPlayer: BlackjackPlayer, canvas: HTMLCanvasElement) {
 	initPainterData(canvas, mainBoxPlayer, table)
@@ -243,12 +243,12 @@ const getPlayerBoxStartingCorner = (index: number, boxWidth: number, boxHeight: 
 	return corner
 }
 
-const paintDealerBox = (canvas: HTMLCanvasElement) => {
+const paintDealerBox = (table: BlackjackTable, canvas: HTMLCanvasElement) => {
 	const ctx = canvas.getContext("2d")
 	if (!ctx) return
-	//ctx.strokeRect(playerBoxWidth, playerBoxHeight, 2 * playerBoxWidth, 2 * playerBoxHeight)
 	paintRectangle({ x: playerBoxWidth, y: playerBoxHeight }, { x: 2 * playerBoxWidth, y: 2 * playerBoxHeight }, canvas, false)
-	paintText("Dealer ", { x: playerBoxWidth + 10, y: playerBoxHeight + 20 }, canvas, dealerFont)
+	const dealerText = "Dealer" + (table.dealerHand.values[0] > 0 ? " has " + table.dealerHand.values[0].toString() : "")
+	paintText(dealerText, { x: playerBoxWidth + 10, y: playerBoxHeight + 20 }, canvas, dealerFont)
 }
 
 const paintMainPlayerBox = (player: BlackjackPlayer, canvas: HTMLCanvasElement, isInTurn: boolean) => {
@@ -256,8 +256,11 @@ const paintMainPlayerBox = (player: BlackjackPlayer, canvas: HTMLCanvasElement, 
 	if (!ctx) return
 	paintRectangle({ x: 0, y: canvas.height * 0.75 }, { x: canvas.width, y: canvas.height }, canvas, isInTurn)
 	paintText(player.userName, { x: 5, y: 3 * playerBoxHeight + 18 }, canvas, infoFont)
-	paintText("$" + player.balance, { x: 5, y: 3 * playerBoxHeight + 35 }, canvas, infoFont)
+	paintText("total$ " + player.balance, { x: 5, y: 3 * playerBoxHeight + 35 }, canvas, infoFont)
+	const totalBet = player.totalBet != null ? player.totalBet : 0
+	paintText("bet$ " + totalBet, { x: 5, y: 3 * playerBoxHeight + 55 }, canvas, infoFont)
 }
+
 const paintPlayerBox = (boxStartingCorner: Vector, seat: Seat, canvas: HTMLCanvasElement, isInTurn: boolean) => {
 	paintRectangle(boxStartingCorner, { x: playerBoxWidth, y: playerBoxHeight }, canvas, isInTurn)
 	if (!seat.player) {
@@ -276,8 +279,8 @@ const paintRectangle = (startPosition: Vector, endPosition: Vector, canvas: HTML
 	if (highlight) {
 		ctx.strokeStyle = "green"
 		ctx.lineWidth = 14
-		ctx.strokeRect(startPosition.x, startPosition.y, endPosition.x, endPosition.y)
 	}
+	ctx.strokeRect(startPosition.x, startPosition.y, endPosition.x, endPosition.y)
 	ctx.strokeStyle = originalStyle
 	ctx.lineWidth = originalWidth
 }
