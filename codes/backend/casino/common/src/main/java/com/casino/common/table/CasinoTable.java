@@ -3,6 +3,7 @@ package com.casino.common.table;
 import java.time.Instant;
 import java.util.ConcurrentModificationException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -130,10 +131,10 @@ public abstract class CasinoTable implements ICasinoTable {
 	}
 
 	@Override
-	public ICasinoPlayer removeWatcher(UUID watcherId) {
+	public Optional<ICasinoPlayer> removeWatcher(UUID watcherId) {
 		if (watcherId == null)
-			return null;
-		return watchers.remove(watcherId);
+			return Optional.empty();
+		return Optional.ofNullable(watchers.remove(watcherId));
 	}
 
 	@Override

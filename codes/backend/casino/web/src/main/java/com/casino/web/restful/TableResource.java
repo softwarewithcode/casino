@@ -26,7 +26,7 @@ public class TableResource {
 	@Produces("application/json")
 	public Response fetchTableCards() {
 		try {
-			List<TableCard> cards = blackjackService.fetchTableCards();
+			List<TableCard> cards = blackjackService.fetchTableCards(0, 100);
 			var json = MAPPER.writeValueAsString(cards);
 			return Response.ok(json).build();
 		} catch (Exception e) {

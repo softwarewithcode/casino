@@ -105,7 +105,7 @@ public class BlackjackEndpoint {
 		try {
 			LOGGER.info("Closing session:" + closeReason);
 			session.close();
-			tableService.onBridgeClose(bridge);
+			tableService.onSocketClose(bridge);
 			this.table = null;
 			this.tableId = null;
 			this.bridge = null;

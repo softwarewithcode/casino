@@ -20,7 +20,7 @@ import com.casino.common.user.Bridge;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class BlackjackService {
+public class BlackjackService implements GameService {
 	// private static final Logger LOGGER =
 	// Logger.getLogger(BlackjackTableService.class.getName());
 	private static final Integer BET_PHASE_TIME_SECONDS_DEFAULT = 15;
@@ -30,7 +30,6 @@ public class BlackjackService {
 	private static final Integer MIN_PLAYER_DEFAULT = 0;
 	private static final Integer MAX_PLAYERS_DEFAULT = 7;
 	private static final Integer SEAT_COUNT_DEFAULT = 7;
-
 	private final ConcurrentHashMap<UUID, BlackjackTable> tables = new ConcurrentHashMap<>();
 
 	public BlackjackService() {
@@ -67,19 +66,22 @@ public class BlackjackService {
 		// delete closed status tables
 	}
 
+	@Override
 	public void createTable(Status status, TableInitData initData) {
 		UUID id = UUID.randomUUID();
 		BlackjackTable table = new BlackjackTable(status, initData);
 		tables.putIfAbsent(id, table);
 	}
 
+	@Override
 	public Optional<IBlackjackTable> fetchTable(UUID id) {
 		if (id == null)
 			throw new IllegalArgumentException("table id is required:" + id);
 		return Optional.ofNullable(tables.get(id));
 	}
 
-	public void onBridgeClose(Bridge bridge) {
+	@Override
+	public void onSocketClose(Bridge bridge) {
 		BlackjackTable table = tables.get(bridge.tableId());
 		if (table == null)
 			return;
@@ -88,7 +90,7 @@ public class BlackjackService {
 		table.onPlayerLeave(bridge.userId());
 	}
 
-	public List<TableCard> fetchTableCards() {
+	public List<TableCard> fetchTableCards(Integer from, Integer till) {
 		return tables.values().stream().filter(blackjackTable -> blackjackTable.getStatus().isVisible()).map(BlackjackTable::getTableCard).toList();
 	}
 }
