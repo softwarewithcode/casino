@@ -260,15 +260,15 @@ const paintDealerBox = (canvas: HTMLCanvasElement) => {
 	if (!ctx) return
 	//ctx.strokeRect(playerBoxWidth, playerBoxHeight, 2 * playerBoxWidth, 2 * playerBoxHeight)
 	paintRectangle({ x: playerBoxWidth, y: playerBoxHeight }, { x: 2 * playerBoxWidth, y: 2 * playerBoxHeight }, canvas, false)
-	paintText("Dealer:", { x: playerBoxWidth + 10, y: playerBoxHeight + 20 }, canvas, dealerFont)
+	paintText("Dealer ", { x: playerBoxWidth + 10, y: playerBoxHeight + 20 }, canvas, dealerFont)
 }
 
 const paintMainPlayerBox = (player: BlackjackPlayer, canvas: HTMLCanvasElement, isInTurn: boolean) => {
 	const ctx = canvas.getContext("2d")
 	if (!ctx) return
 	paintRectangle({ x: 0, y: canvas.height * 0.75 }, { x: canvas.width, y: canvas.height }, canvas, isInTurn)
-	paintText(player.userName, { x: 5, y: 3 * playerBoxHeight + 18 }, canvas, reservedSeatFont)
-	paintText("$" + player.balance, { x: 5, y: 3 * playerBoxHeight + 35 }, canvas, reservedSeatFont)
+	paintText(player.userName, { x: 5, y: 3 * playerBoxHeight + 18 }, canvas, infoFont)
+	paintText("$" + player.balance, { x: 5, y: 3 * playerBoxHeight + 35 }, canvas, infoFont)
 }
 const paintPlayerBox = (boxStartingCorner: Vector, seat: Seat, canvas: HTMLCanvasElement, isInTurn: boolean) => {
 	paintRectangle(boxStartingCorner, { x: playerBoxWidth, y: playerBoxHeight }, canvas, isInTurn)
@@ -276,8 +276,8 @@ const paintPlayerBox = (boxStartingCorner: Vector, seat: Seat, canvas: HTMLCanva
 		paintText("Seat " + (seat.number + 1), { x: boxStartingCorner.x + 10, y: boxStartingCorner.y + 50 }, canvas, infoFont)
 		return
 	}
-	paintText(seat.player.userName, { x: boxStartingCorner.x + 5, y: boxStartingCorner.y + 18 }, canvas, reservedSeatFont)
-	paintText("$" + seat.player.balance, { x: boxStartingCorner.x + 5, y: boxStartingCorner.y + 35 }, canvas, reservedSeatFont)
+	paintText(seat.player.userName, { x: boxStartingCorner.x + 5, y: boxStartingCorner.y + 18 }, canvas, infoFont)
+	paintText("$" + seat.player.balance, { x: boxStartingCorner.x + 5, y: boxStartingCorner.y + 35 }, canvas, infoFont)
 }
 
 const paintRectangle = (startPosition: Vector, endPosition: Vector, canvas: HTMLCanvasElement, highlight: boolean) => {
