@@ -1,19 +1,8 @@
 import type { BlackjackHand, BlackjackPlayer, BlackjackTable, Seat } from "@/types/blackjack"
-import type { Vector, CasinoFont, Card } from "@/types/casino"
+import type { Vector, Card } from "@/types/casino"
+import { dealerFont, type CasinoFont, infoFont, reservedSeatFont } from "../../composables/fonts"
 import { useCardLocator } from "./cardLocator"
 import { cardsSprite } from "../images"
-const infoFont: CasinoFont = {
-	color: "blue",
-	faceAndSize: "20px Arial"
-}
-const dealerFont: CasinoFont = {
-	color: "E97451",
-	faceAndSize: "22px Arial"
-}
-const reservedSeatFont: CasinoFont = {
-	color: "#E97451",
-	faceAndSize: "16px Arial"
-}
 
 const dealerName = "-"
 const INITIAL_DEAL_CARD_DELAY = 1500
@@ -57,7 +46,6 @@ const paintPlayersCards = (playersWithCards: BlackjackPlayer[], mainBoxPlayer: B
 	playersWithCards.forEach(player => {
 		player.hands.forEach((hand, handIndex) => {
 			hand.cards.forEach((card, cardIndex) => {
-				//const cardPosition: Vector = calculateCardPositionInPlayerBox(player, mainBoxPlayer, cardIndex, handIndex, canvas)
 				paintCard(player.userName, card, cardIndex, handIndex, canvas)
 			})
 		})
@@ -77,7 +65,7 @@ export async function useInitialDealPainter(table: BlackjackTable, mainBoxPlayer
 }
 
 const paintDealerHandValue = (value: number, canvas: HTMLCanvasElement) => {
-	paintText("Value:" + value, { x: 2 * playerBoxWidth, y: playerBoxHeight + 20 }, canvas, dealerFont)
+	paintText("Value " + value, { x: 2 * playerBoxWidth, y: playerBoxHeight + 20 }, canvas, dealerFont)
 }
 const getPlayersWithCards = (table: BlackjackTable) => {
 	return table.seats.map(seat => seat.player).filter(player => player?.hands && player.hands[0]?.cards.length > 0)
@@ -287,9 +275,9 @@ const paintRectangle = (startPosition: Vector, endPosition: Vector, canvas: HTML
 	const originalWidth = ctx.lineWidth
 	if (highlight) {
 		ctx.strokeStyle = "green"
-		ctx.lineWidth = 10
+		ctx.lineWidth = 14
+		ctx.strokeRect(startPosition.x, startPosition.y, endPosition.x, endPosition.y)
 	}
-	ctx.strokeRect(startPosition.x, startPosition.y, endPosition.x, endPosition.y)
 	ctx.strokeStyle = originalStyle
 	ctx.lineWidth = originalWidth
 }

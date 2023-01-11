@@ -1,5 +1,5 @@
 import { Suit } from "../../../types/casino"
-import type { Vector, CasinoFont, Card, CardImageMetadata } from "@/types/casino"
+import type { Vector, Card, CardImageMetadata } from "@/types/casino"
 const cardWidthInSprite = 76
 const cardHeightInSprite = 107.2
 const gapHorizontalInSprite = 21

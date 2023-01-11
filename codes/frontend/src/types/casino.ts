@@ -48,10 +48,6 @@ export interface Vector {
 	x: number
 	y: number
 }
-export interface CasinoFont {
-	faceAndSize: string
-	color: string
-}
 
 export enum Suit {
 	CLUB = "CLUB",
