@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PlayerAction, GamePhase, type BlackjackPlayer, type Seat } from "@/types/blackjack";
-import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCardsAndHandValuesPainter } from "../../components/composables/rendering/multiSeatPainter";
+import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCardsAndHandValuesPainter } from "../../components/composables/rendering/multiplayerTablePainter";
 import { onMounted, onUnmounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useBlackjackStore } from "../../stores/blackjackStore";
@@ -143,6 +143,9 @@ const getCenterPlayer = (): BlackjackPlayer => {
 }
 
 const seatStyle = (seatNumber: number) => {
+    if (table.value.seats.some(seat => seat.player?.seatNumber >= 0)) {
+        return { 'display': "inline", "margin-right": "45px", "left": "50px" }
+    }
     return { 'display': "inline", 'bottom': "200px", "margin-right": "45px", "left": "50px" }
 }
 const instructionStyle = computed(() => {

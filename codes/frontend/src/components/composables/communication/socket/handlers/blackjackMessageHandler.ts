@@ -47,7 +47,7 @@ const openTable = async (data: any) => {
 
 const standUp = async (data: any) => {
 	let patchObject = { table: data.table, player: data.player, command: data.title, counter: data.table.counterTime }
-	await store.$patch(patchObject)
+	store.$patch(patchObject)
 }
 
 const patchStore = async (data: any) => {
