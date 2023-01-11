@@ -152,7 +152,7 @@ const getMainBoxPlayerActionStyle = () => {
 }
 
 const instructionStyle = computed(() => {
-    const bottom = (getCanvas().height / 2).toString() + "px"
+    const bottom = (getCanvas().height / 4).toString() + "px"
     const left = (getCanvas().width / 2).toString() + "px"
     const color = counter.value > 4 ? 'yellow' : 'red'
     return { 'left': left, 'bottom': bottom, "color": color, "font-size": 22 + "px" }
