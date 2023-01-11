@@ -1,5 +1,6 @@
 package com.casino.web.endpoint.blackjack;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -33,7 +34,6 @@ public class BlackjackEndpoint {
 	private IBlackjackTable table;
 	private Bridge bridge;
 	private UUID tableId;
-	private boolean watcher;
 
 	@OnOpen
 	public void onOpen(Session session, @PathParam("tableId") String tableId) {
@@ -41,14 +41,11 @@ public class BlackjackEndpoint {
 			UUID id = Validator.validateId(tableId);
 			Optional<IBlackjackTable> table = tableService.fetchTable(id);
 			if (table.isEmpty()) {
-				this.tableId = null;
-				bridge = null;
 				this.onClose(session, new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, " invalid table "));
 				return;
 			}
 			this.tableId = id;
 			this.table = table.get();
-//			this.table.watch(bridge);
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "onOpen error ", e);
 		}
@@ -63,14 +60,9 @@ public class BlackjackEndpoint {
 			}
 			validateMessageAndBridge(message);
 			switch (message.getAction()) {
-			case OPEN_TABLE -> {
-				watcher = true;
-				table.watch(bridge);
-			}
+			case OPEN_TABLE -> table.watch(bridge);
 			case JOIN -> {
-				if (table.join(bridge, message.getSeat()))
-					watcher = false;
-				else
+				if (!table.join(bridge, message.getSeat()))
 					session.getBasicRemote().sendText("{\"title\":\"FORBIDDEN\"}");
 			}
 			case BET -> table.bet(bridge.userId(), message.getAmount());
@@ -80,6 +72,7 @@ public class BlackjackEndpoint {
 			case STAND -> table.stand(bridge.userId());
 			case INSURE -> table.insure(bridge.userId());
 			case REFRESH -> table.refresh(bridge.userId());
+			default -> throw new IllegalArgumentException("Unexpected value: " + message.getAction());
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onMessage error:" + bridge, e);
@@ -89,10 +82,8 @@ public class BlackjackEndpoint {
 	private void validateMessageAndBridge(Message message) {
 		if (!containsMessage(message))
 			throw new IllegalArgumentException("BlackjackEndpoint: action is missing");
-//		if (watcher && message.getAction() != Action.JOIN)
-//			throw new IllegalArgumentException("Watcher cannot play " + bridge);
 		if (bridge == null || bridge.userId() == null)
-			throw new IllegalArgumentException("Bridge detached");
+			throw new IllegalArgumentException("No bridge");
 		if (table == null)
 			throw new IllegalArgumentException("Not related to real table");
 	}
@@ -102,10 +93,7 @@ public class BlackjackEndpoint {
 	}
 
 	private void createBridge(Session session, Message message) {
-//		if (watcher)
 		this.bridge = userService.createGuestPlayerBridge(message.getUserId(), this.tableId, session);
-//		else
-//			this.bridge = userHandler.createPlayerBridge(message.getUserId(), this.tableId, session);
 	}
 
 	private boolean isFirstMessage(Session session) {
@@ -116,31 +104,23 @@ public class BlackjackEndpoint {
 	public void onClose(Session session, CloseReason closeReason) {
 		try {
 			LOGGER.info("Closing session:" + closeReason);
-			if (shouldCloseImmediately(session))
-				session.close();
-			if (isPlayerSessionClosing())
-				table.onPlayerLeave(bridge.userId());
-			else if (isWatcherSessionClosing())
-				tableService.removeWatcher(bridge);
+			session.close();
+			tableService.onBridgeClose(bridge);
+			this.table = null;
+			this.tableId = null;
+			this.bridge = null;
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onClose error,", e);
 		}
 	}
 
-	private boolean shouldCloseImmediately(Session session) {
-		return this.table == null && session != null && session.isOpen();
-	}
-
-	private boolean isWatcherSessionClosing() {
-		return bridge != null && bridge.userId() != null && this.watcher == true;
-	}
-
-	private boolean isPlayerSessionClosing() {
-		return bridge != null && bridge.userId() != null && this.watcher == false;
-	}
-
 	@OnError
 	public void onError(Session session, Throwable throwable) {
 		LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onError ", throwable);
+		try {
+			session.close();
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, "OnError, got error in error", e);
+		}
 	}
 }

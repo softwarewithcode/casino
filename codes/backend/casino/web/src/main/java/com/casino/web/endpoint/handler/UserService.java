@@ -32,8 +32,8 @@ public class UserService {
 	}
 
 	private Bridge createDefaultGuestPlayerBridge(UUID tableId, Session session) {
-		UUID id = UUID.randomUUID();
+		UUID randomGuestId = UUID.randomUUID();
 		int guestNumber = guestCount.incrementAndGet();
-		return new Bridge("guest" + guestNumber, tableId, id, session, new BigDecimal("1000.0"));
+		return new Bridge("guest" + guestNumber, tableId, randomGuestId, session, new BigDecimal("1000.0"));
 	}
 }
