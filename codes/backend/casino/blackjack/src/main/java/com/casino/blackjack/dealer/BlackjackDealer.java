@@ -64,7 +64,7 @@ public class BlackjackDealer implements IDealer {
 		table.updateGamePhase(GamePhase.INSURE);
 		InsurancePhaseClockTask task = new InsurancePhaseClockTask(table);
 		getTable().startClock(task, 0);
-		notifyAll(Title.INSURANCE_PHASE_STARTS, null);
+		notifyAll(Title.INSURANCE_TIME_START, null);
 	}
 
 	public boolean hasStartingAce() {
@@ -143,7 +143,7 @@ public class BlackjackDealer implements IDealer {
 			}
 			if (shouldStartNewGame()) {
 				startNewGame();
-				notifyAll(Title.BET_PHASE_STARTS, (BlackjackPlayer) player);
+				notifyAll(Title.BET_TIME_START, (BlackjackPlayer) player);
 			}
 		} finally {
 			if (betPhaseLock.isHeldByCurrentThread())
@@ -290,7 +290,7 @@ public class BlackjackDealer implements IDealer {
 		table.updateGamePhase(GamePhase.BET);
 		table.updateCounterTime(table.getThresholds().betPhaseTime());
 		deck = Deck.pileUpAndShuffle(8);
-		notifyAll(Title.BET_PHASE_STARTS, null);
+		notifyAll(Title.BET_TIME_START, null);
 	}
 
 	private boolean shouldRestartBetPhase() {
@@ -419,14 +419,14 @@ public class BlackjackDealer implements IDealer {
 	public void finalizeInsurancePhase() {
 		table.updateGamePhase(GamePhase.PLAY);
 		updateTableActor();
-		Title title = table.getPlayerInTurn() != null ? Title.WAITING_PLAYER_ACTION : Title.ROUND_COMPLETED;
+		Title title = table.getPlayerInTurn() != null ? Title.PLAYER_TIME_START : Title.ROUND_COMPLETED;
 		notifyAll(title, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
 	public void updateActorAndNotify() {
 		updateTableActor();
 		if (table.getPlayerInTurn() != null)
-			notifyAll(Title.WAITING_PLAYER_ACTION, (BlackjackPlayer) table.getPlayerInTurn());
+			notifyAll(Title.PLAYER_TIME_START, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
 	public void onPlayerLeave(BlackjackPlayer leavingPlayer) {

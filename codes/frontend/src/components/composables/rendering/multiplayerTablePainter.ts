@@ -1,8 +1,8 @@
 import type { BlackjackHand, BlackjackPlayer, BlackjackTable, Seat } from "@/types/blackjack"
 import type { Vector, Card } from "@/types/casino"
-import { dealerFont, type CasinoFont, blueFont, orangeFont } from "../../composables/fonts"
+import { dealerFont, type CasinoFont, blueFont, orangeFont } from "../../../types/fonts"
 import { useCardLocator } from "./cardLocator"
-import { cardsSprite } from "../images"
+import { cardsSprite } from "../../../types/images"
 
 const dealerName = "-"
 const INITIAL_DEAL_CARD_DELAY = 1500

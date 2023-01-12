@@ -14,14 +14,14 @@ import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.CasinoPlayer;
 import com.casino.common.table.ICasinoTable;
 import com.casino.common.table.ISeatedTable;
-import com.casino.common.user.Action;
+import com.casino.common.user.PlayerAction;
 import com.casino.common.user.Bridge;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
 @JsonIncludeProperties(value = { "hands", "actions", "seatNumber", "userName", "balance", "totalBet", "payout" })
 public class BlackjackPlayer extends CasinoPlayer {
 	private List<IHand> hands;
-	private List<Action> actions;
+	private List<PlayerAction> actions;
 	private Integer seatNumber;
 
 	public BlackjackPlayer(Bridge bridge, ISeatedTable table) {
@@ -57,8 +57,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 			if (!hasActiveHand())
 				return;
 			actions = new ArrayList<>();
-			actions.add(Action.TAKE);
-			actions.add(Action.STAND);
+			actions.add(PlayerAction.TAKE);
+			actions.add(PlayerAction.STAND);
 			if (!getFirstHand().isActive())
 				return;
 			if (getFirstHand().getCards().size() != 2)
@@ -66,12 +66,12 @@ public class BlackjackPlayer extends CasinoPlayer {
 			Card first = getFirstHand().getCards().get(0);
 			Card second = getFirstHand().getCards().get(1);
 			if (first.getRank() == second.getRank() && !hasSecondHand())
-				actions.add(Action.SPLIT);
+				actions.add(PlayerAction.SPLIT);
 			else if (first.getRank() > 9 && second.getRank() > 9 && !hasSecondHand())
-				actions.add(Action.SPLIT);
+				actions.add(PlayerAction.SPLIT);
 			int handValue = getFirstHand().calculateValues().get(0);
 			if (handValue >= 9 && handValue <= 11 && !hasSecondHand())
-				actions.add(Action.DOUBLE_DOWN);
+				actions.add(PlayerAction.DOUBLE_DOWN);
 		} finally {
 			releasePlayerLock();
 		}
@@ -105,7 +105,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return getFirstHand().isInsuranceCompensable();
 	}
 
-	public List<Action> getActions() {
+	public List<PlayerAction> getActions() {
 		return actions;
 	}
 

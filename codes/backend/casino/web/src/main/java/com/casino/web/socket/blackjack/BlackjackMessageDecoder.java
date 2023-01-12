@@ -1,4 +1,4 @@
-package com.casino.web.endpoint.blackjack;
+package com.casino.web.socket.blackjack;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

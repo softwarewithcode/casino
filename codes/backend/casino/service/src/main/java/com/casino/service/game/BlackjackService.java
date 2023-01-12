@@ -1,4 +1,4 @@
-package com.casino.service;
+package com.casino.service.game;
 
 import java.math.BigDecimal;
 import java.util.List;

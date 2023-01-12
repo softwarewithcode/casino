@@ -12,20 +12,20 @@ export function useBlackjackMessageHandler(data: any) {
 		command: data.title
 	})
 	switch (data.title) {
+		case Command.OPEN_TABLE:
+			openTable(data)
+			break
 		case Command.LOGIN:
 			store.$patch({
 				player: data.player
 			})
 			break
-		case Command.OPEN_TABLE:
-			openTable(data)
-			break
 		case Command.NO_BETS_NO_DEAL:
 			standUp(data)
 			break
-		case Command.BET_PHASE_STARTS:
-		case Command.WAITING_PLAYER_ACTION:
-		case Command.INSURANCE_PHASE_STARTS:
+		case Command.BET_TIME_START:
+		case Command.PLAYER_TIME_START:
+		case Command.INSURANCE_TIME_START:
 		case Command.INITIAL_DEAL_DONE:
 			patchStoreAndStartTimer(data)
 			break

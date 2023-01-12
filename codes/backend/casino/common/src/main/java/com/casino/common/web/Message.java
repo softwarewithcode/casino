@@ -2,13 +2,13 @@ package com.casino.common.web;
 
 import java.math.BigDecimal;
 
-import com.casino.common.user.Action;
+import com.casino.common.user.PlayerAction;
 
 import jakarta.json.bind.annotation.JsonbProperty;
 
 public class Message {
 	@JsonbProperty("action")
-	private Action action;
+	private PlayerAction action;
 	@JsonbProperty("userId")
 	private String userId;
 
@@ -18,11 +18,11 @@ public class Message {
 	@JsonbProperty("amount")
 	private BigDecimal amount;
 
-	public Action getAction() {
+	public PlayerAction getAction() {
 		return action;
 	}
 
-	public void setAction(Action action) {
+	public void setAction(PlayerAction action) {
 		this.action = action;
 	}
 

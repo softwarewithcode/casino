@@ -1,4 +1,4 @@
-package com.casino.web.endpoint.blackjack;
+package com.casino.web.socket.blackjack;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -10,8 +10,8 @@ import com.casino.blackjack.ext.IBlackjackTable;
 import com.casino.common.user.Bridge;
 import com.casino.common.validaton.Validator;
 import com.casino.common.web.Message;
-import com.casino.service.BlackjackService;
-import com.casino.web.endpoint.handler.UserService;
+import com.casino.service.game.BlackjackService;
+import com.casino.service.user.UserService;
 
 import jakarta.inject.Inject;
 import jakarta.websocket.CloseReason;

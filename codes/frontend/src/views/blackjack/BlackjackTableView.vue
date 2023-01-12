@@ -5,7 +5,7 @@ import { onMounted, onUnmounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useBlackjackStore } from "../../stores/blackjackStore";
 import { mapActions, storeToRefs } from "pinia";
-import { bgImage, } from "../../components/composables/images"
+import { bgImage, } from "../../types/images"
 import { Command } from "@/types/sockethander";
 import { TableType } from "@/types/casino";
 const props = defineProps<{ tableId: string }>();
@@ -169,19 +169,19 @@ const insuranceAvailable = computed<boolean>(() => {
 
 <template v-if="canvasReady">
     <div style="position: relative">
-        Table {{ table?.tableCard?.id }} {{ table.gamePhase }}{{ table.playerInTurn?.userName }}
+        Welcome {{ table?.tableCard?.id }} {{ table.gamePhase }}{{ table.playerInTurn?.userName }}
         <canvas id="canvas" width="1800" height="600"></canvas>
         <div v-if="canTakeSeat" id="takeSeatRow">
             <div v-for="seat in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
                 :style="getMainBoxActionRowStyle(seat.number)">
                 <button v-if="seat.available" @click="takeSeat(seat.number.toString())">
-                    Take {{ seat.number + 1 }}
+                    Take seat {{ seat.number + 1 }}
                 </button>
             </div>
         </div>
         <div v-if="betsAllowed" id="betRow" :style="getMainBoxPlayerActionStyle()">
             <template v-if="counterVisible">
-                <span :style="instructionStyle"> Bet time left {{ counter }}</span>
+                <div :style="instructionStyle"> Bet time left {{ counter }}</div>
             </template>
             <button :disabled="!canReduceMinimum" @click="adjustBet(betAmount - table.tableCard.thresholds.minimumBet)">
                 Reduce {{ table.tableCard.thresholds.minimumBet }}
@@ -203,14 +203,16 @@ const insuranceAvailable = computed<boolean>(() => {
             </button>
         </div>
         <div v-if="table.gamePhase === GamePhase.INSURE" id="insureRow" :style="getMainBoxActionRowStyle">
-            Insurance time left {{ counter }}
+            <div :style="instructionStyle"> Insurance time left {{ counter }}</div>
             <button v-if="insuranceAvailable" @click="insure()">
                 Insure
             </button>
         </div>
         <div v-if="table.gamePhase === GamePhase.ROUND_COMPLETED" id="betRoundStartsRow"
             :style="getMainBoxActionRowStyle">
-            Next bet round starts {{ counter }}
+            <template v-if="counterVisible">
+                <div :style="instructionStyle"> Next bet round starts {{ counter }}</div>
+            </template>
         </div>
         <div v-if="canAct" id="actionRow" style="position:relative; bottom:25px: left:50px">
             Player {{ table?.playerInTurn.userName }} {{ counter }}

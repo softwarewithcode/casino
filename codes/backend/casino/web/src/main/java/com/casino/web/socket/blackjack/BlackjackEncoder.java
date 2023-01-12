@@ -1,4 +1,4 @@
-package com.casino.web.endpoint.blackjack;
+package com.casino.web.socket.blackjack;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,8 +13,11 @@ import jakarta.websocket.Encoder;
 
 public class BlackjackEncoder implements Encoder.Text<Message> {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackEncoder.class.getName());
-	private final JsonbConfig config = new JsonbConfig();
-	private Jsonb jsonb = JsonbBuilder.create(config);
+	private static final JsonbConfig config; // not-thread-safe
+	static {
+		config = new JsonbConfig();
+	}
+	private static Jsonb jsonb = JsonbBuilder.create(config);
 
 	@Override
 	public String encode(Message object) throws EncodeException {

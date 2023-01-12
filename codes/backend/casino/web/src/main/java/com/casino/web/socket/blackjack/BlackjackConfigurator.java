@@ -1,4 +1,4 @@
-package com.casino.web.endpoint.blackjack;
+package com.casino.web.socket.blackjack;
 
 import jakarta.websocket.server.ServerEndpointConfig;
 

@@ -1,4 +1,4 @@
-package com.casino.web.endpoint.handler;
+package com.casino.service.user;
 
 import java.math.BigDecimal;
 import java.util.UUID;
