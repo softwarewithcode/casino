@@ -43,23 +43,26 @@ const takeSeat = (seat: string) => {
 }
 
 const counterText = computed<string>(() => {
-    if (counter.value <= 0)
+    if (counter.value <= 0 || getCanvas() === null)
         return ""
     if (table.value.gamePhase === GamePhase.ROUND_COMPLETED) {
         return "Next round starts in " + counter.value
     }
-    if (betsAllowed.value) {
-        return "Place your bets " + counter.value
-    }
+
     if (table.value.gamePhase === GamePhase.INSURE) {
         return "Insurance time left " + counter.value
     }
-    if (table.value.gamePhase === GamePhase.BET && !player.value) {
+    if (table.value.gamePhase === GamePhase.BET && !player.value && canTakeSeat.value) {
         return "Take seat to play " + counter.value
     }
     if (command.value === Command.PLAYER_TIME_START || command.value === Command.INITIAL_DEAL_DONE) {
-        return "Player time " + counter.value
+        return "Player " + table.value.playerInTurn?.userName + " " + counter.value
     }
+    if (betsAllowed.value) {
+        return "Place your bets " + counter.value
+    }
+    if (table.value.gamePhase === GamePhase.BET)
+        return "Bet phase " + counter.value
     return ""
 })
 const adjustBet = (amount: number) => {
@@ -158,14 +161,14 @@ const getCenterPlayer = (): BlackjackPlayer => {
 
 const getMainBoxActionRowStyle = (seatNumber: number) => {
     if (table.value.seats.some(seat => seat.player?.seatNumber >= 0)) {
-        return { 'display': "inline", "margin-right": "45px", "left": "25px" }
+        return { 'display': "inline", "margin-right": "45px", "left": "50px" }
     }
-    return { 'display': "inline", 'bottom': "200px", "margin-right": "45px", "left": "25px" }
+    return { 'display': "inline", 'bottom': "200px", "margin-right": "45px", "left": "50px" }
 }
 
 const getMainBoxPlayerActionStyle = () => {
     const liftUp = getCanvas().height / 5 + "px"
-    return { 'display': "inline", 'bottom': liftUp, "margin-right": "45px", "left": "25px" }
+    return { 'display': "inline", 'bottom': liftUp, "margin-right": "45px", "left": "75px" }
 }
 
 const instructionStyle = computed(() => {
@@ -189,9 +192,7 @@ const insuranceAvailable = computed<boolean>(() => {
 <template v-if="canvasReady">
     <div style="position: relative">
         Welcome {{ player?.userName }}
-
         <div v-if="counterText" :style="instructionStyle">{{ counterText }}</div>
-
         <canvas id="canvas" width="1800" height="600"></canvas>
         <div v-if="canTakeSeat" id="takeSeatRow">
             <div v-for="seat in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
