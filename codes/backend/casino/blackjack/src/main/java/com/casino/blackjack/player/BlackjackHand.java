@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIncludeProperties(value = { "cards", "values", "blackjack", "bet", "insured", "active" })
+@JsonIncludeProperties(value = { "cards", "values", "blackjack", "bet", "insured", "doubled", "active" })
 public class BlackjackHand implements IHand {
 	private final UUID id;
 	private final Instant created;
@@ -27,7 +27,7 @@ public class BlackjackHand implements IHand {
 	private volatile boolean doubled;
 	private volatile BigDecimal bet;
 	private volatile BigDecimal insuranceBet;
-	private ReentrantLock lock;
+	private final ReentrantLock lock;
 
 	public BlackjackHand(UUID id, boolean active) {
 		this.id = id;
