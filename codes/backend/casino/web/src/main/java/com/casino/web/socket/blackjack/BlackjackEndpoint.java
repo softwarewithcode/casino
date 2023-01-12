@@ -10,7 +10,7 @@ import com.casino.blackjack.ext.IBlackjackTable;
 import com.casino.common.user.Bridge;
 import com.casino.common.validaton.Validator;
 import com.casino.common.web.Message;
-import com.casino.service.game.BlackjackService;
+import com.casino.service.game.GameService;
 import com.casino.service.user.UserService;
 
 import jakarta.inject.Inject;
@@ -29,7 +29,7 @@ public class BlackjackEndpoint {
 	@Inject
 	private UserService userService;
 	@Inject
-	private BlackjackService tableService;
+	private GameService blackjackService;
 
 	private IBlackjackTable table;
 	private Bridge bridge;
@@ -39,7 +39,7 @@ public class BlackjackEndpoint {
 	public void onOpen(Session session, @PathParam("tableId") String tableId) {
 		try {
 			UUID id = Validator.validateId(tableId);
-			Optional<IBlackjackTable> table = tableService.fetchTable(id);
+			Optional<IBlackjackTable> table = blackjackService.fetchTable(id);
 			if (table.isEmpty()) {
 				this.onClose(session, new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, " invalid table "));
 				return;
@@ -72,7 +72,7 @@ public class BlackjackEndpoint {
 			case STAND -> table.stand(bridge.userId());
 			case INSURE -> table.insure(bridge.userId());
 			case REFRESH -> table.refresh(bridge.userId());
-			default -> throw new IllegalArgumentException("Unexpected value: " + message.getAction());
+			default -> throw new IllegalArgumentException("Unexpected messageAction: " + message.getAction());
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onMessage error:" + bridge, e);
@@ -105,7 +105,7 @@ public class BlackjackEndpoint {
 		try {
 			LOGGER.info("Closing session:" + closeReason);
 			session.close();
-			tableService.onSocketClose(bridge);
+			blackjackService.onSocketClose(bridge);
 			this.table = null;
 			this.tableId = null;
 			this.bridge = null;
