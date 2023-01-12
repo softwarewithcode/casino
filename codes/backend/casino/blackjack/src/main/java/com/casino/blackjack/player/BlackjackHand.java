@@ -17,10 +17,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/*
- * Player(s) and internal timers are possible concurrent actors. BlackjackPlayer getHands() - hands out references to these hands.
- * 
- */
 @JsonIncludeProperties(value = { "cards", "values", "blackjack", "bet", "insured", "active" })
 public class BlackjackHand implements IHand {
 	private final UUID id;
@@ -239,7 +235,7 @@ public class BlackjackHand implements IHand {
 
 	@Override
 	public boolean hasWinningChance() {
-		return containsCards() && calculateFinalValue() <= 21 || isInsured();
+		return containsCards() && bet != null && isCompleted() && calculateFinalValue() <= 21 || isInsured();
 	}
 
 	private boolean containsCards() {
@@ -254,6 +250,31 @@ public class BlackjackHand implements IHand {
 	@Override
 	public boolean isInsuranceCompensable() {
 		return isInsured() && isCompleted();
+	}
+
+	@Override
+	public int compareTo(IHand dealerHand) {
+		if (dealerHand == null)
+			return -1;
+		int dealerVal = calculateFinalValue();
+		int playerVal = dealerHand.calculateFinalValue();
+		boolean dealerBlackjack = this.isBlackjack();
+		boolean playerBlackjack = dealerHand.isBlackjack();
+		if (dealerBlackjack && playerBlackjack)
+			return 0;
+		if (dealerBlackjack && !playerBlackjack)
+			return -1;
+		if (!dealerBlackjack && playerBlackjack)
+			return 1;
+		if (dealerVal > 21 && playerVal > 21)
+			return -1;
+		if (dealerVal > 21 && playerVal <= 21)
+			return 1;
+		if (dealerVal <= 21 && playerVal > 21)
+			return -1;
+		if (dealerVal == playerVal)
+			return 0;
+		return dealerVal > playerVal ? -1 : 1;
 	}
 
 }

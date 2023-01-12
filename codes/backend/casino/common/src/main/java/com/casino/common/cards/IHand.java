@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-public interface IHand {
+public interface IHand extends Comparable<IHand> {
 
 	public List<Integer> calculateValues();
 

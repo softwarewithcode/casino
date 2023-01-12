@@ -11,6 +11,7 @@ module casino.common {
 	exports com.casino.common.table;
 	exports com.casino.common.user;
 	exports com.casino.common.bet;
+	exports com.casino.common.bank;
 
 	requires transitive com.fasterxml.jackson.annotation;
 	requires transitive com.fasterxml.jackson.databind;

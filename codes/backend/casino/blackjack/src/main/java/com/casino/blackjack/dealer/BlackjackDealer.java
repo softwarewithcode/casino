@@ -16,6 +16,7 @@ import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.blackjack.table.BlackjackUtil;
 import com.casino.blackjack.table.timing.InsurancePhaseClockTask;
+import com.casino.common.bank.Bank;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
@@ -256,9 +257,7 @@ public class BlackjackDealer implements IDealer {
 				throw new IllegalStateException("cannot complete round");
 			}
 			playDealerTurn();
-			if (table.hasPlayersWithWinningChances()) {
-				handlePayouts();
-			}
+			Bank.matchBalances(table.getPlayersWithBet(), dealerHand);
 			table.updateGamePhase(GamePhase.ROUND_COMPLETED);
 			notifyAll(Title.ROUND_COMPLETED, null);
 			if (table.getActivePlayerCount() == 0)
@@ -370,12 +369,6 @@ public class BlackjackDealer implements IDealer {
 	private void completeActiveHands() {
 		List<ICasinoPlayer> players = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasActiveHand).toList();
 		players.forEach(player -> player.getActiveHand().complete());
-	}
-
-	private void handlePayouts() {
-		LOGGER.info("Dealer starts payout");
-		List<ICasinoPlayer> playersWithWinningChances = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasWinningChance).toList();
-		new PayoutCalculator(dealerHand, playersWithWinningChances).calculate();
 	}
 
 	private void addDealerCards() {
