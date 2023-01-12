@@ -11,9 +11,9 @@ public class Bank {
 	private static final Logger LOGGER = Logger.getLogger(Bank.class.getName());
 	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
 
-	public static void matchBalances(List<ICasinoPlayer> allTablePlayers, IHand dealerHand) {
-		LOGGER.info("Dealer starts payout");
-		List<ICasinoPlayer> playersWithWinningChances = allTablePlayers.stream().filter(ICasinoPlayer::hasWinningChance).toList();
+	public static void matchBalances(List<ICasinoPlayer> allPlayers, IHand dealerHand) {
+		LOGGER.info("Dealer starts balance matching");
+		List<ICasinoPlayer> playersWithWinningChances = allPlayers.stream().filter(ICasinoPlayer::hasWinningChance).toList();
 		playersWithWinningChances.forEach(player -> checkWinnersAndPay(player, dealerHand));
 	}
 

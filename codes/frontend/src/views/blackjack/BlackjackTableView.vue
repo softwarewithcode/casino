@@ -40,7 +40,25 @@ const onStorePatch = () => {
 }
 const takeSeat = (seat: string) => {
     useSend({ action: "JOIN", seat: seat });
-};
+}
+
+const counterText = computed<string>(() => {
+    if (!counterVisible.value)
+        return "not visible"
+    if (table.value.gamePhase === GamePhase.ROUND_COMPLETED) {
+        return "Next round starts in " + counter.value
+    }
+    if (betsAllowed.value) {
+        return "Bet time left " + counter.value
+    }
+    if (table.value.gamePhase === GamePhase.INSURE) {
+        return "Insurance time left " + counter.value
+    }
+    if (table.value.gamePhase === GamePhase.BET) {
+        return "Place your bets " + counter.value
+    }
+    return "nope"
+})
 const adjustBet = (amount: number) => {
     betAmount.value = amount
     useSend({ action: PlayerAction.BET, amount: amount });
@@ -169,7 +187,11 @@ const insuranceAvailable = computed<boolean>(() => {
 
 <template v-if="canvasReady">
     <div style="position: relative">
-        Welcome {{ table?.tableCard?.id }} {{ table.gamePhase }}{{ table.playerInTurn?.userName }}
+        Welcome {{ player.userName }}
+        <template v-if="counterText.length > 0">
+            <!--<div :style="instructionStyle"> {{ counterText }}</div> -->
+            <div> {{ counterText }}</div>
+        </template>
         <canvas id="canvas" width="1800" height="600"></canvas>
         <div v-if="canTakeSeat" id="takeSeatRow">
             <div v-for="seat in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
@@ -180,9 +202,6 @@ const insuranceAvailable = computed<boolean>(() => {
             </div>
         </div>
         <div v-if="betsAllowed" id="betRow" :style="getMainBoxPlayerActionStyle()">
-            <template v-if="counterVisible">
-                <div :style="instructionStyle"> Bet time left {{ counter }}</div>
-            </template>
             <button :disabled="!canReduceMinimum" @click="adjustBet(betAmount - table.tableCard.thresholds.minimumBet)">
                 Reduce {{ table.tableCard.thresholds.minimumBet }}
             </button>
@@ -203,19 +222,11 @@ const insuranceAvailable = computed<boolean>(() => {
             </button>
         </div>
         <div v-if="table.gamePhase === GamePhase.INSURE" id="insureRow" :style="getMainBoxActionRowStyle">
-            <div :style="instructionStyle"> Insurance time left {{ counter }}</div>
             <button v-if="insuranceAvailable" @click="insure()">
                 Insure
             </button>
         </div>
-        <div v-if="table.gamePhase === GamePhase.ROUND_COMPLETED" id="betRoundStartsRow"
-            :style="getMainBoxActionRowStyle">
-            <template v-if="counterVisible">
-                <div :style="instructionStyle"> Next bet round starts {{ counter }}</div>
-            </template>
-        </div>
         <div v-if="canAct" id="actionRow" style="position:relative; bottom:25px: left:50px">
-            Player {{ table?.playerInTurn.userName }} {{ counter }}
             <button v-if="table.playerInTurn.actions.includes(PlayerAction.TAKE)"
                 @click="sendAction(PlayerAction.TAKE)">
                 Take
