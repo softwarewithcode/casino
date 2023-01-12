@@ -14,10 +14,10 @@ public class Bank {
 	public static void matchBalances(List<ICasinoPlayer> allPlayers, IHand dealerHand) {
 		LOGGER.info("Dealer starts balance matching");
 		List<ICasinoPlayer> playersWithWinningChances = allPlayers.stream().filter(ICasinoPlayer::hasWinningChance).toList();
-		playersWithWinningChances.forEach(player -> checkWinnersAndPay(player, dealerHand));
+		playersWithWinningChances.forEach(player -> payForWinners(player, dealerHand));
 	}
 
-	private static void checkWinnersAndPay(ICasinoPlayer player, IHand dealerHand) {
+	private static void payForWinners(ICasinoPlayer player, IHand dealerHand) {
 		player.getHands().forEach(playerHand -> {
 			if (shouldPayInsuranceBet(playerHand, dealerHand))
 				player.increaseBalanceAndPayout(playerHand.getInsuranceBet().multiply(BigDecimal.TWO));
