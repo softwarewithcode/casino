@@ -256,7 +256,8 @@ public class BlackjackDealer implements IDealer {
 				LOGGER.severe("complete round called in a wrong phase was: " + table.getGamePhase());
 				throw new IllegalStateException("cannot complete round");
 			}
-			playDealerTurn();
+			completeActiveHands();
+			addDealerCards();
 			Bank.matchBalances(table.getPlayersWithBet(), dealerHand);
 			table.updateGamePhase(GamePhase.ROUND_COMPLETED);
 			notifyAll(Title.ROUND_COMPLETED, null);
@@ -357,13 +358,6 @@ public class BlackjackDealer implements IDealer {
 	public void insure(BlackjackPlayer player) {
 		verifyPlayerHasSeat(player);
 		player.insure();
-	}
-
-	private void playDealerTurn() {
-		LOGGER.info("Dealer starts completeRound");
-		completeActiveHands();
-		// Indicates more clearly that round has completed if dealer always takes cards
-		addDealerCards();
 	}
 
 	private void completeActiveHands() {
