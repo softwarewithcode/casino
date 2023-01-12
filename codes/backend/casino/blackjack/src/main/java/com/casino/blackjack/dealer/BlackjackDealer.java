@@ -40,7 +40,7 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 @JsonIncludeProperties(value = { /* explicitly nothing from here */ })
 public class BlackjackDealer implements IDealer {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
-	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
+
 	private final BlackjackTable table;
 	private final ReentrantLock betPhaseLock;
 	private final CommunicationChannel voice;
@@ -269,6 +269,7 @@ public class BlackjackDealer implements IDealer {
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Something unexpected happend. Waiting for brush to arrive.", e);
 			BlackjackUtil.dumpTable(table, "dealer player turn:" + e);
+			table.onClose();
 			throw new IllegalStateException("what to do");
 		}
 	}
@@ -374,38 +375,7 @@ public class BlackjackDealer implements IDealer {
 	private void handlePayouts() {
 		LOGGER.info("Dealer starts payout");
 		List<ICasinoPlayer> playersWithWinningChances = table.getPlayersWithBet().stream().filter(ICasinoPlayer::hasWinningChance).toList();
-		playersWithWinningChances.forEach(player -> payoutWinnings(player));
-	}
-
-	private void payoutWinnings(ICasinoPlayer player) {
-		player.getHands().forEach(playerHand -> {
-			if (shouldPayInsuranceBet(playerHand))
-				player.increaseBalanceAndPayout(playerHand.getInsuranceBet().multiply(BigDecimal.TWO));
-			BigDecimal betMultiplier = determineBetMultiplier(playerHand);
-			BigDecimal handPayout = playerHand.getBet().multiply(betMultiplier);
-			player.increaseBalanceAndPayout(handPayout);
-		});
-	}
-
-	private boolean shouldPayInsuranceBet(IHand playerHand) {
-		return playerHand.isInsuranceCompensable() && dealerHand.isBlackjack();
-	}
-
-	private BigDecimal determineBetMultiplier(IHand playerHand) {
-		int handComparison = dealerHand.compareTo(playerHand);
-		if (evenResult(handComparison))
-			return BigDecimal.ONE;
-		if (playerWins(handComparison))
-			return playerHand.isBlackjack() ? BLACKJACK_FACTOR : BigDecimal.TWO;
-		return BigDecimal.ZERO;
-	}
-
-	private boolean evenResult(int comparison) {
-		return comparison == 0;
-	}
-
-	private boolean playerWins(int comparison) {
-		return comparison > 0;
+		new PayoutCalculator(dealerHand, playersWithWinningChances).calculate();
 	}
 
 	private void addDealerCards() {
