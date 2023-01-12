@@ -43,21 +43,24 @@ const takeSeat = (seat: string) => {
 }
 
 const counterText = computed<string>(() => {
-    if (!counterVisible.value)
-        return "not visible"
+    if (counter.value <= 0)
+        return ""
     if (table.value.gamePhase === GamePhase.ROUND_COMPLETED) {
         return "Next round starts in " + counter.value
     }
     if (betsAllowed.value) {
-        return "Bet time left " + counter.value
+        return "Place your bets " + counter.value
     }
     if (table.value.gamePhase === GamePhase.INSURE) {
         return "Insurance time left " + counter.value
     }
-    if (table.value.gamePhase === GamePhase.BET) {
-        return "Place your bets " + counter.value
+    if (table.value.gamePhase === GamePhase.BET && !player.value) {
+        return "Take seat to play " + counter.value
     }
-    return "nope"
+    if (command.value === Command.PLAYER_TIME_START || command.value === Command.INITIAL_DEAL_DONE) {
+        return "Player time " + counter.value
+    }
+    return ""
 })
 const adjustBet = (amount: number) => {
     betAmount.value = amount
@@ -91,10 +94,6 @@ const canBetMaximum = computed<boolean>(() => {
 
 const betsAllowed = computed<boolean>(() => {
     return table.value.gamePhase === GamePhase.BET && hasSeat.value && counter.value > 0
-})
-
-const counterVisible = computed<boolean>(() => {
-    return counter.value > 1
 })
 
 const canTakeSeat = computed<boolean>(() => {
@@ -170,10 +169,12 @@ const getMainBoxPlayerActionStyle = () => {
 }
 
 const instructionStyle = computed(() => {
-    const bottom = (getCanvas().height / 4).toString() + "px"
-    const left = (getCanvas().width / 2).toString() + "px"
+    const top = (getCanvas().height * 0.72).toString() + "px"
+    const left = (getCanvas().width / 3).toString() + "px"
     const color = counter.value > 4 ? 'yellow' : 'red'
-    return { 'left': left, 'bottom': bottom, "color": color, "font-size": 22 + "px" }
+    return {
+        'left': left, 'top': top, "color": color, "font-size": 22 + "px", 'z-index': 10
+    }
 })
 
 const insuranceClicked = ref<boolean>(false)
@@ -187,11 +188,10 @@ const insuranceAvailable = computed<boolean>(() => {
 
 <template v-if="canvasReady">
     <div style="position: relative">
-        Welcome {{ player.userName }}
-        <template v-if="counterText.length > 0">
-            <!--<div :style="instructionStyle"> {{ counterText }}</div> -->
-            <div> {{ counterText }}</div>
-        </template>
+        Welcome {{ player?.userName }}
+
+        <div v-if="counterText" :style="instructionStyle">{{ counterText }}</div>
+
         <canvas id="canvas" width="1800" height="600"></canvas>
         <div v-if="canTakeSeat" id="takeSeatRow">
             <div v-for="seat in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
