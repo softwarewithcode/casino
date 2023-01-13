@@ -1,6 +1,6 @@
 import type { BlackjackHand, BlackjackPlayer, BlackjackTable, Seat } from "@/types/blackjack"
 import type { Vector, Card } from "@/types/casino"
-import { dealerFont, type CasinoFont, blueFont, orangeFont } from "../../../types/fonts"
+import { blackFont, type CasinoFont, blueFont, orangeFont } from "../../../types/fonts"
 import { useCardLocator } from "./cardLocator"
 import { cardsSprite } from "../../../types/images"
 
@@ -33,7 +33,6 @@ export function useCardsAndHandValuesPainter(table: BlackjackTable, mainBoxPlaye
 	if (playersWithCards.length === 0) return
 	paintPlayersCards(playersWithCards, mainBoxPlayer, canvas)
 	paintDealerCards(table, canvas)
-	//paintDealerHandValue(table.dealerHand.values[0], canvas)
 	paintPlayersHandValues(playersWithCards, mainBoxPlayer, canvas)
 }
 const paintDealerCards = (table: BlackjackTable, canvas: HTMLCanvasElement) => {
@@ -59,15 +58,10 @@ export async function useInitialDealPainter(table: BlackjackTable, mainBoxPlayer
 	showOneCardFromFirstHandWithDelay(playersWithCards, canvas)
 	const dealerCard: Card = table.dealerHand.cards[0]
 	await paintCardWithDelay(INITIAL_DEAL_CARD_DELAY, dealerName, dealerCard, 0, 0, canvas)
-	//paintDealerHandValue(table.dealerHand.values[0], canvas)
 	showOneCardFromFirstHandWithDelay(playersWithCards, canvas)
 	paintPlayersHandValues(playersWithCards, mainBoxPlayer, canvas)
 }
-/*
-const paintDealerHandValue = (value: number, canvas: HTMLCanvasElement) => {
-	paintText("Value " + value, { x: 2 * playerBoxWidth, y: playerBoxHeight + 20 }, canvas, dealerFont)
-}
-*/
+
 const getPlayersWithCards = (table: BlackjackTable) => {
 	return table.seats.map(seat => seat.player).filter(player => player?.hands && player.hands[0]?.cards.length > 0)
 }
@@ -83,23 +77,24 @@ const showOneCardFromFirstHandWithDelay = async (players: BlackjackPlayer[], can
 }
 
 const paintPlayersHandValues = (playersWithCards: BlackjackPlayer[], mainBoxPlayer: BlackjackPlayer, canvas: HTMLCanvasElement) => {
-	playersWithCards.forEach(player => {
+	for (const player of playersWithCards) {
 		const playerIndex = getPlayerBoxIndexRelativeToMainBoxPlayer(player.userName)
 		const boxStartingCorner = getPlayerBoxStartingCorner(playerIndex, playerBoxWidth, playerBoxHeight)
-
-		const halfOfPlayerBoxLength = playerIndex === largeBoxIndex ? canvas.width / 2 : playerBoxWidth / 2
-		// const xFromLeft = player.userName === mainBoxPlayer.userName?
-		getHands(player).forEach(hand => {
-			getHandValues(hand).forEach((value, index) => {
-				if (index === 0) {
-					paintText("=" + value, { x: boxStartingCorner.x + halfOfPlayerBoxLength, y: boxStartingCorner.y + playerBoxHeight - 10 }, canvas, blueFont)
+		const cardHeight = player.userName === mainBoxPlayer.userName ? mainPlayerCardSize.y : playerCardSize.y
+		getHands(player).forEach((hand, handIndex) => {
+			getHandValues(hand).forEach((value, handValueIndex) => {
+				const factorial = handValueIndex + 1
+				if (handIndex === 0) {
+					paintText("=" + value, { x: boxStartingCorner.x + playerBoxWidth - 50, y: boxStartingCorner.y + (cardHeight / 2) * factorial }, canvas, blueFont)
+					if (handValueIndex > 0) paintText("/" + value, { x: boxStartingCorner.x + playerBoxWidth - 20, y: boxStartingCorner.y + (cardHeight / 2) * factorial }, canvas, blueFont)
 				}
-				if (index === 1) {
-					paintText(" / " + value, { x: boxStartingCorner.x + halfOfPlayerBoxLength + 15, y: boxStartingCorner.y + playerBoxHeight - 10 }, canvas, blueFont)
+				if (handIndex === 1) {
+					paintText("=" + value, { x: boxStartingCorner.x + playerBoxWidth - 50, y: boxStartingCorner.y + (cardHeight / 2) * factorial }, canvas, blueFont)
+					if (handValueIndex > 0) paintText("/" + value, { x: boxStartingCorner.x + playerBoxWidth - 20, y: boxStartingCorner.y + (cardHeight / 2) * factorial }, canvas, blueFont)
 				}
 			})
 		})
-	})
+	}
 }
 
 const getHandValues = (hand: BlackjackHand) => {
@@ -250,7 +245,7 @@ const paintDealerBox = (table: BlackjackTable, canvas: HTMLCanvasElement) => {
 	if (!ctx) return
 	paintRectangle({ x: playerBoxWidth, y: playerBoxHeight }, { x: 2 * playerBoxWidth, y: 2 * playerBoxHeight }, canvas, false)
 	const dealerText = "Dealer" + (table.dealerHand.values[0] > 0 ? " has " + table.dealerHand.values[0].toString() : "")
-	paintText(dealerText, { x: playerBoxWidth + 10, y: playerBoxHeight + 20 }, canvas, dealerFont)
+	paintText(dealerText, { x: playerBoxWidth + 10, y: playerBoxHeight + 20 }, canvas, blackFont)
 }
 
 const paintMainPlayerBox = (player: BlackjackPlayer, canvas: HTMLCanvasElement, isInTurn: boolean) => {
@@ -258,9 +253,9 @@ const paintMainPlayerBox = (player: BlackjackPlayer, canvas: HTMLCanvasElement, 
 	if (!ctx) return
 	paintRectangle({ x: 0, y: canvas.height * 0.75 }, { x: canvas.width, y: canvas.height }, canvas, isInTurn)
 	paintText(player.userName, { x: 5, y: 3 * playerBoxHeight + 18 }, canvas, blueFont)
-	paintText("total$ " + player.balance, { x: 5, y: 3 * playerBoxHeight + 35 }, canvas, blueFont)
+	paintText("total " + player.balance, { x: 5, y: 3 * playerBoxHeight + 35 }, canvas, blackFont)
 	const totalBet = player.totalBet != null ? player.totalBet : 0
-	paintText("bet$ " + totalBet, { x: 5, y: 3 * playerBoxHeight + 55 }, canvas, blueFont)
+	paintText("bet " + totalBet, { x: 5, y: 3 * playerBoxHeight + 55 }, canvas, blueFont)
 }
 
 const paintPlayerBox = (boxStartingCorner: Vector, seat: Seat, canvas: HTMLCanvasElement, isInTurn: boolean) => {
