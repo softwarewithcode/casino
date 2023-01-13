@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.casino.common.cards.IHand;
 import com.casino.common.table.ICasinoTable;
+import com.casino.common.user.PlayerAction;
 
 public interface ICasinoPlayer {
 	public String getUserName();
@@ -63,4 +64,5 @@ public interface ICasinoPlayer {
 
 	public void updateAvailableActions();
 
+	public List<PlayerAction> getActions();
 }

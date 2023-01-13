@@ -40,7 +40,7 @@ public class BaseTest {
 		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
 	}
 
-	protected Thresholds getThresholdsWithMinBets(BigDecimal minbet, BigDecimal maxBet) {
+	protected Thresholds getThresholdsWithBets(BigDecimal minbet, BigDecimal maxBet) {
 		return new Thresholds(minbet, maxBet, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
 	}
 
@@ -61,7 +61,7 @@ public class BaseTest {
 	}
 
 	protected TableInitData getDefaultTableInitDataWithBets(BigDecimal minBet, BigDecimal maxBet) {
-		return new TableInitData(getThresholdsWithMinBets(minBet, maxBet), UUID.randomUUID(), Language.ENGLISH, Type.MULTIPLAYER, Game.BLACKJACK);
+		return new TableInitData(getThresholdsWithBets(minBet, maxBet), UUID.randomUUID(), Language.ENGLISH, Type.MULTIPLAYER, Game.BLACKJACK);
 	}
 
 	protected TableInitData getDefaultTableInitDataWithPlayersMinAndMax(Integer minPlayers, Integer maxPlayers) {

@@ -1,7 +1,6 @@
 package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.dealer.BlackjackDealer;
@@ -23,20 +21,26 @@ import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.table.Status;
 import com.casino.common.user.Bridge;
+import com.casino.common.user.PlayerAction;
 
 public class InsuranceTest extends BaseTest {
 	private BlackjackTable table;
+	private BlackjackTable table2;
 	private BlackjackDealer dealer;
+	private BlackjackDealer dealer2;
 
 	@BeforeEach
 	public void initTest() {
 		try {
 			table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
+			table2 = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitDataWithThresholds(getThresholdsWithBets(new BigDecimal("15.0"), new BigDecimal("100.0"))));
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
+			bridge3 = new Bridge("JaneDoe2", table2.getId(), UUID.randomUUID(), null, new BigDecimal("450.0"));
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
+			dealer2 = (BlackjackDealer) f.get(table2);
 			List<Card> cards = dealer.getDecks();
 			cards.add(Card.of(4, Suit.CLUB));
 			cards.add(Card.of(8, Suit.DIAMOND));
@@ -257,5 +261,83 @@ public class InsuranceTest extends BaseTest {
 		assertEquals(0, table.getPlayer(bridge2.userId()).getHands().get(0).getCards().size());
 		assertEquals(17, table.getDealerHand().calculateFinalValue());
 		assertEquals(19, table.getPlayer(bridge.userId()).getHands().get(0).calculateFinalValue());
+	}
+
+	@Test
+	public void insuredHandLosesByTimeoutAndBalanceIsUpdated() {
+		dealer2.getDecks().add(Card.of(6, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(3, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(1, Suit.CLUB));
+		dealer2.getDecks().add(Card.of(9, Suit.SPADE));
+		table2.join(bridge3, "5");
+		table2.bet(bridge3.userId(), new BigDecimal("100"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table2.insure(bridge3.userId());
+		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(12, table2.getPlayer(bridge3.userId()).getHands().get(0).calculateValues().get(0));
+		assertEquals(1, table2.getDealerHand().calculateValues().get(0));
+		assertEquals(11, table2.getDealerHand().calculateValues().get(1));
+		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("300.00"), table2.getPlayer(bridge3.userId()).getBalance());
+	}
+
+	@Test
+	public void insuredHandWinsByTimeoutAndBalanceIsUpdated() {
+		dealer2.getDecks().add(Card.of(6, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(11, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(1, Suit.CLUB));
+		dealer2.getDecks().add(Card.of(9, Suit.SPADE));
+		table2.join(bridge3, "5");
+		table2.bet(bridge3.userId(), new BigDecimal("100"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table2.insure(bridge3.userId());
+		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertEquals(new BigDecimal("500.00"), table2.getPlayer(bridge3.userId()).getBalance());
+	}
+
+	@Test
+	public void onlyInsuranceBetGetsPaidWhenGoingOver21() {
+		dealer2.getDecks().add(Card.of(10, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(6, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(11, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(1, Suit.CLUB));
+		dealer2.getDecks().add(Card.of(9, Suit.SPADE));
+		table2.join(bridge3, "5");
+		table2.bet(bridge3.userId(), new BigDecimal("100"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table2.insure(bridge3.userId());
+		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table2.hit(bridge3.userId());
+		assertEquals(new BigDecimal("400.00"), table2.getPlayer(bridge3.userId()).getBalance());
+	}
+
+	@Test
+	public void splitIsNotAnOptionWhenHandIsInsured() {
+		dealer2.getDecks().add(Card.of(10, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(6, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(11, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(1, Suit.CLUB));
+		dealer2.getDecks().add(Card.of(9, Suit.SPADE));
+		table2.join(bridge3, "5");
+		table2.bet(bridge3.userId(), new BigDecimal("100"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table2.insure(bridge3.userId());
+		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertTrue(table2.getPlayer(bridge3.userId()).getActions().stream().filter(action -> action == PlayerAction.SPLIT).findAny().isEmpty());
+	}
+	@Test
+	public void doubleDownIsAnOptionWithInsuredHand() {
+		dealer2.getDecks().add(Card.of(10, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(6, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(2, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(1, Suit.CLUB));
+		dealer2.getDecks().add(Card.of(9, Suit.SPADE));
+		table2.join(bridge3, "5");
+		table2.bet(bridge3.userId(), new BigDecimal("100"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table2.insure(bridge3.userId());
+		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertTrue(table2.getPlayer(bridge3.userId()).getActions().stream().filter(action -> action == PlayerAction.DOUBLE_DOWN).findAny().isPresent());
 	}
 }

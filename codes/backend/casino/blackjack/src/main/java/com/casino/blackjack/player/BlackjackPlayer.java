@@ -63,18 +63,24 @@ public class BlackjackPlayer extends CasinoPlayer {
 				return;
 			if (getFirstHand().getCards().size() != 2)
 				return;
-			Card first = getFirstHand().getCards().get(0);
-			Card second = getFirstHand().getCards().get(1);
-			if (first.getRank() == second.getRank() && !hasSecondHand())
+			if (isSplitAllowed())
 				actions.add(PlayerAction.SPLIT);
-			else if (first.getRank() > 9 && second.getRank() > 9 && !hasSecondHand())
-				actions.add(PlayerAction.SPLIT);
-			int handValue = getFirstHand().calculateValues().get(0);
-			if (handValue >= 9 && handValue <= 11 && !hasSecondHand())
+			if (isDoubleDownAllowed())
 				actions.add(PlayerAction.DOUBLE_DOWN);
 		} finally {
 			releasePlayerLock();
 		}
+	}
+
+	private boolean isDoubleDownAllowed() {
+		int handValue = getFirstHand().calculateValues().get(0);
+		return handValue >= 9 && handValue <= 11 && !hasSecondHand();
+	}
+
+	private boolean isSplitAllowed() {
+		Card first = getFirstHand().getCards().get(0);
+		Card second = getFirstHand().getCards().get(1);
+		return BlackjackUtil.haveSameValue(first, second) && !hasSecondHand() && !getFirstHand().isInsured();
 	}
 
 	private IHand getSecondHand() {
