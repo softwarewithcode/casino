@@ -36,7 +36,7 @@ const onStorePatch = () => {
     betAmount.value = 0
     const tablePlayer = table.value.seats.find(seat => seat.player?.userName === player.value?.userName)?.player
     if (tablePlayer)
-        previousBetAmount.value = tablePlayer.totalBet
+        previousBetAmount.value = tablePlayer.totalBet > table.value.tableCard.thresholds.maximumBet ? table.value.tableCard.thresholds.maximumBet : tablePlayer.totalBet
 }
 const takeSeat = (seat: string) => {
     useSend({ action: "JOIN", seat: seat });
