@@ -70,7 +70,7 @@
 		<dependency>
 			<groupId>jakarta.json</groupId>
 			<artifactId>jakarta.json-api</artifactId>
-			<version>2.0.1</version>
+			<version>2.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.json.bind</groupId>
@@ -135,7 +135,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.0.0-M7</version>
+					<version>3.0.0-M8</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-war-plugin</artifactId>
@@ -144,7 +144,7 @@
 
 				<plugin>
 					<artifactId>maven-install-plugin</artifactId>
-					<version>2.5.2</version>
+					<version>3.1.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
