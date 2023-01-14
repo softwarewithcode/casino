@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeAll;
 
@@ -38,15 +39,17 @@ public class BaseTest {
 	}
 
 	protected Thresholds getDefaultThresholds() {
-		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT,DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
+		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT,
+				DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
 	}
 
 	protected Thresholds getThresholdsWithBets(BigDecimal minbet, BigDecimal maxBet) {
-		return new Thresholds(minbet, maxBet, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT,DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
+		return new Thresholds(minbet, maxBet, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT,
+				DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
 	}
 
 	protected Thresholds getThresholdsWithPlayersMinAndMax(Integer minPlayers, Integer maxPlayers) {
-		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, minPlayers, maxPlayers, maxPlayers,DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
+		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, minPlayers, maxPlayers, maxPlayers, DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
 	}
 
 	protected TableInitData getDefaultTableInitData() {
@@ -69,9 +72,9 @@ public class BaseTest {
 		return new TableInitData(getThresholdsWithPlayersMinAndMax(minPlayers, maxPlayers), UUID.randomUUID(), Language.ENGLISH, Type.MULTIPLAYER, Game.BLACKJACK);
 	}
 
-	protected void sleep(int i, ChronoUnit unit) {
+	protected void sleep(int i, Object unit) {
 		try {
-			Thread.sleep(Duration.of(i, unit));
+			Thread.sleep((Integer) i * 1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

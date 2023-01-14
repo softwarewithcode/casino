@@ -286,7 +286,7 @@ public class BlackjackDealer implements IDealer {
 		startBetPhaseClock(table.getThresholds().phaseDelay());
 	}
 
-	private void sanitizeEmptySeats() {
+	private void sanitizeInactivePlayersSeats() {
 		table.findInactivePlayerSeats().forEach(Seat::sanitize);
 	}
 
@@ -401,7 +401,7 @@ public class BlackjackDealer implements IDealer {
 			updateActorAndNotify();
 		}
 		if (!table.isRoundRunning()) {
-			sanitizeEmptySeats();
+			sanitizeInactivePlayersSeats();
 			notifyAll(Title.PLAYER_LEFT, leavingPlayer);
 		} else
 			notifyAll(Title.SIT_OUT, leavingPlayer);

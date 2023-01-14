@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  app:
+    container_name: casino-app-container
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+    networks:
+      

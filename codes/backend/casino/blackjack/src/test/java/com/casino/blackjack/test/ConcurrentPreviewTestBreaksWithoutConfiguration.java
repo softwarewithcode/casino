@@ -40,7 +40,8 @@ import com.casino.common.user.Bridge;
  * With other IDEs something similar.
  */
 public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
-	private BlackjackTable table;
+/*	
+ private BlackjackTable table;
 	private BlackjackTable tableWith49MinAnd49MaxPlayers;
 	BlackjackPlayer doubleDownPlayer;
 	private BlackjackDealer dealer;
@@ -394,4 +395,5 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 			}
 		})).toList();
 	}
+	*/
 }

@@ -173,7 +173,7 @@ public class BlackjackHand implements IHand {
 			if (!isActive() || isDoubled())
 				throw new IllegalPlayerActionException("doubling not allowed active:" + this, 15);
 			this.doubled = true;
-			this.bet = this.bet.multiply(BigDecimal.TWO);
+			this.bet = this.bet.multiply(new BigDecimal("2"));
 			this.cards.add(ref);
 			this.complete();
 		} finally {
@@ -227,7 +227,7 @@ public class BlackjackHand implements IHand {
 			lock.lock();
 			if (!isActive() || isInsured() || isBlackjack())
 				throw new IllegalPlayerActionException("insurance not allowed:" + this, 15);
-			insuranceBet = bet.divide(BigDecimal.TWO);
+			insuranceBet = bet.divide(new BigDecimal("2"));
 		} finally {
 			lock.unlock();
 		}

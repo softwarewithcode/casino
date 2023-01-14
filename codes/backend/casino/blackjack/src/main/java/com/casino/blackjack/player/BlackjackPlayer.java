@@ -176,7 +176,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 			tryTakingPlayerLock();
 			validateInsuringConditions();
 			getFirstHand().insure();
-			updateBalanceAndTotalBet(getFirstHand().getBet().divide(BigDecimal.TWO));
+			updateBalanceAndTotalBet(getFirstHand().getBet().divide(new BigDecimal("2")));
 		} finally {
 			if (getPlayerLock().isHeldByCurrentThread())
 				getPlayerLock().unlock();
@@ -241,9 +241,6 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public List<IHand> getHands() {
 		return hands;
 	}
-
-
-
 
 	@Override
 	public String toString() {
