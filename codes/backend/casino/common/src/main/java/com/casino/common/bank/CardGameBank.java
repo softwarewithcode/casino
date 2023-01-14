@@ -9,13 +9,14 @@ import com.casino.common.player.ICasinoPlayer;
 
 /**
  * 
- * Bank for cardGames where comparison is made between player's and dealer's cards
- * a.k.a hands
+ * Bank for cardGames where comparison is made between player's and dealer's
+ * cards a.k.a hands
  *
  */
 public class CardGameBank {
 	private static final Logger LOGGER = Logger.getLogger(CardGameBank.class.getName());
 	private static final BigDecimal TWO_AND_HALF = new BigDecimal("2.5");
+	private static final BigDecimal TWO = new BigDecimal("2.0");
 
 	public static void matchBalances(List<ICasinoPlayer> players, IHand dealerHand) {
 		LOGGER.info("Dealer starts balance matching");
@@ -26,7 +27,7 @@ public class CardGameBank {
 	private static void payForWinners(ICasinoPlayer player, IHand dealerHand) {
 		player.getHands().forEach(playerHand -> {
 			if (shouldPayInsuranceBet(playerHand, dealerHand))
-				player.increaseBalanceAndPayout(playerHand.getInsuranceBet().multiply(BigDecimal.TWO));
+				player.increaseBalanceAndPayout(playerHand.getInsuranceBet().multiply(TWO));
 			BigDecimal betMultiplier = determineBetMultiplier(playerHand, dealerHand);
 			BigDecimal winAmount = playerHand.getBet().multiply(betMultiplier);
 			player.increaseBalanceAndPayout(winAmount);
@@ -42,7 +43,7 @@ public class CardGameBank {
 		if (evenResult(handComparison))
 			return BigDecimal.ONE;
 		if (playerWins(handComparison))
-			return playerHand.isBlackjack() ? TWO_AND_HALF : BigDecimal.TWO;
+			return playerHand.isBlackjack() ? TWO_AND_HALF : TWO;
 		return BigDecimal.ZERO;
 	}
 

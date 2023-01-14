@@ -39,6 +39,8 @@ import com.casino.common.user.Bridge;
  * -> Use VM Arguments -> "-ea --enable-preview" <br>
  * With other IDEs something similar.
  */
+
+//01/14/2023 -> requires jdk19. So let's see. At least tests have helped during development!
 public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 /*	
  private BlackjackTable table;

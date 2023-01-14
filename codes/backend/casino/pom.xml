@@ -9,10 +9,10 @@
 		<maven.compiler.release>17</maven.compiler.release>
 	</properties>
 	<modules>
-		<module>blackjack</module>
 		<module>common</module>
-		<module>web</module>
+		<module>blackjack</module>
 		<module>service</module>
+		<module>web</module>
 	</modules>
 	<dependencies>
 		<dependency>
