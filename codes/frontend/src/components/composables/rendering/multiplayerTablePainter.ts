@@ -80,19 +80,15 @@ const paintPlayersHandValues = (playersWithCards: BlackjackPlayer[], mainBoxPlay
 	for (const player of playersWithCards) {
 		const playerIndex = getPlayerBoxIndexRelativeToMainBoxPlayer(player.userName)
 		const boxStartingCorner = getPlayerBoxStartingCorner(playerIndex, playerBoxWidth, playerBoxHeight)
+		calculateCardSize(player.userName)
 		const cardHeight = player.userName === mainBoxPlayer.userName ? mainPlayerCardSize.y : playerCardSize.y
 		getHands(player).forEach((hand, handIndex) => {
-			getHandValues(hand).forEach((value, handValueIndex) => {
-				const factorial = handValueIndex + 1
-				if (handIndex === 0) {
-					paintText("=" + value, { x: boxStartingCorner.x + playerBoxWidth - 50, y: boxStartingCorner.y + (cardHeight / 2) * factorial }, canvas, blueFont)
-					if (handValueIndex > 0) paintText("/" + value, { x: boxStartingCorner.x + playerBoxWidth - 20, y: boxStartingCorner.y + (cardHeight / 2) * factorial }, canvas, blueFont)
-				}
-				if (handIndex === 1) {
-					paintText("=" + value, { x: boxStartingCorner.x + playerBoxWidth - 50, y: boxStartingCorner.y + (cardHeight / 2) * factorial }, canvas, blueFont)
-					if (handValueIndex > 0) paintText("/" + value, { x: boxStartingCorner.x + playerBoxWidth - 20, y: boxStartingCorner.y + (cardHeight / 2) * factorial }, canvas, blueFont)
-				}
-			})
+			const verticalPositionAsideOfCard = boxStartingCorner.y + cardHeight / 2 + cardHeight * handIndex
+			if (hand.values.length === 1) {
+				paintText(hand.values[0].toString(), { x: boxStartingCorner.x + playerBoxWidth - 50, y: verticalPositionAsideOfCard }, canvas, blueFont)
+			} else {
+				paintText(hand.values[0].toString() + "/" + hand.values[1].toString(), { x: boxStartingCorner.x + playerBoxWidth - 50, y: verticalPositionAsideOfCard }, canvas, blueFont)
+			}
 		})
 	}
 }

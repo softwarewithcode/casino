@@ -297,4 +297,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		return card;
 	}
 
+	public void updatePlayersToWatchers(boolean all) {
+		super.updatePlayersToWatchers(all);
+	}
 }

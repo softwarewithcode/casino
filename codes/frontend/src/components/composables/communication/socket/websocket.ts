@@ -33,7 +33,10 @@ function initSocket(finalURI: string) {
 		}
 	}
 	websocket.onerror = event => {
-		console.error("socket error" + event)
+		console.error("socket error" + JSON.stringify(event))
+		alert("an error occured")
 	}
-	websocket.onclose = event => {}
+	websocket.onclose = event => {
+		console.log("socket closes, bye!")
+	}
 }

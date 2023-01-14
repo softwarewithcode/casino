@@ -2,6 +2,7 @@ import { useBlackjackStore } from "../../../../../stores/blackjackStore"
 import router from "../../../../../router/router"
 import { Command } from "@/types/sockethander"
 import { useStartCounter } from "../../../timing/clock"
+import type { BlackjackPlayer } from "@/types/blackjack"
 
 // @author softwarewithcode from GitHub
 const store = useBlackjackStore()
@@ -11,6 +12,12 @@ export function useBlackjackMessageHandler(data: any) {
 	store.$patch({
 		command: data.title
 	})
+	if (store.getPlayer) {
+		const isPlayerInStorePlayingInCurrentTable: BlackjackPlayer = data.table.players.find(tablePlayer => tablePlayer.userName === store.getPlayer.userName)
+		if (!isPlayerInStorePlayingInCurrentTable) {
+			store.logout({})
+		}
+	}
 	switch (data.title) {
 		case Command.OPEN_TABLE:
 			openTable(data)
@@ -40,9 +47,7 @@ export function useBlackjackMessageHandler(data: any) {
 const openTable = async (data: any) => {
 	let table = data.table
 	router.push({ name: "blackjack", params: { tableId: table.id } })
-	store.$patch({
-		table: table
-	})
+	patchStoreAndStartTimer(data)
 }
 
 const standUp = async (data: any) => {

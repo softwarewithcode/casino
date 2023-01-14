@@ -65,4 +65,12 @@ public interface ICasinoPlayer {
 	public void updateAvailableActions();
 
 	public List<PlayerAction> getActions();
+
+	public void increaseBetRoundSkips();
+
+	public void clearBetRoundSkips();
+
+	public Integer getSitOutRounds();
+
+	public boolean shouldStandUp();
 }

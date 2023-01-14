@@ -76,7 +76,7 @@ public class SeatTest extends BaseTest {
 
 	@Test
 	public void seatsAreCreatedPerSeatRequirement() {
-		Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 6, 15);
+		Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 6, 15,DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
 		TableInitData tableInitData = getDefaultTableInitDataWithThresholds(thresholds);
 		table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 		Assertions.assertEquals(15, table.getSeats().size());
@@ -85,7 +85,7 @@ public class SeatTest extends BaseTest {
 	@Test
 	public void exceptionIsThrownIfNotEnoughSeatsForMaximumAmountPlayers() {
 		String expectedMessage = "not enough seats for the players";
-		Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 6, 2);
+		Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 6, 2,DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
 		TableInitData tableInitData = getDefaultTableInitDataWithThresholds(thresholds);
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData));
 		String actualMessage = exception.getMessage();

@@ -242,9 +242,12 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return hands;
 	}
 
+
+
+
 	@Override
 	public String toString() {
-		return "[name=" + getUserName() + ", id=" + getId() + ", hands=" + hands + "]";
+		return "BlackjackPlayer [hands=" + hands + ", actions=" + actions + ", seatNumber=" + seatNumber + ", toString()=" + super.toString() + "]";
 	}
 
 	@Override
@@ -327,4 +330,5 @@ public class BlackjackPlayer extends CasinoPlayer {
 			secondHand.complete();
 		return cardOptional;
 	}
+
 }

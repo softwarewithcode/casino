@@ -43,17 +43,13 @@ const takeSeat = (seat: string) => {
 }
 
 const counterText = computed<string>(() => {
-    if (counter.value <= 0 || getCanvas() === null)
+    if (counter.value <= 0 || !canvasReady.value)
         return ""
     if (table.value.gamePhase === GamePhase.ROUND_COMPLETED) {
         return "Next round starts in " + counter.value
     }
-
     if (table.value.gamePhase === GamePhase.INSURE) {
         return "Insurance time left " + counter.value
-    }
-    if (table.value.gamePhase === GamePhase.BET && !player.value && canTakeSeat.value) {
-        return "Take seat to play " + counter.value
     }
     if (command.value === Command.PLAYER_TIME_START || command.value === Command.INITIAL_DEAL_DONE) {
         return "Player " + table.value.playerInTurn?.userName + " " + counter.value
@@ -171,7 +167,7 @@ const getMainBoxPlayerActionStyle = () => {
     return { 'display': "inline", 'bottom': liftUp, "margin-right": "45px", "left": "75px" }
 }
 
-const instructionStyle = computed(() => {
+const getInstructionStyle = computed(() => {
     const top = (getCanvas().height * 0.72).toString() + "px"
     const left = (getCanvas().width / 3).toString() + "px"
     const color = counter.value > 4 ? 'yellow' : 'red'
@@ -180,19 +176,26 @@ const instructionStyle = computed(() => {
     }
 })
 
+const getHandNumberText = () => {
+    if (player.value.hands.length === 1) {
+        return "Take"
+    }
+    return player.value.hands[0].active ? "Take ( first )" : "Take ( second )"
+}
+
 const insuranceClicked = ref<boolean>(false)
 const insuranceAvailable = computed<boolean>(() => {
     return hasSeat.value && table.value.gamePhase === GamePhase.INSURE
         && player.value.balance >= player.value.totalBet / 2
-        && !Number.isInteger(player.value.insuranceAmount)
         && insuranceClicked.value === false
+        && player.value.hands[0].cards.length > 0
 });
 </script>
 
 <template v-if="canvasReady">
     <div style="position: relative">
         Welcome {{ player?.userName }}
-        <div v-if="counterText" :style="instructionStyle">{{ counterText }}</div>
+        <div v-if="counterText" :style="getInstructionStyle">{{ counterText }}</div>
         <canvas id="canvas" width="1800" height="600"></canvas>
         <div v-if="canTakeSeat" id="takeSeatRow">
             <div v-for="seat in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
@@ -230,7 +233,7 @@ const insuranceAvailable = computed<boolean>(() => {
         <div v-if="canAct" id="actionRow" style="position:relative; bottom:25px: left:50px">
             <button v-if="table.playerInTurn.actions.includes(PlayerAction.TAKE)"
                 @click="sendAction(PlayerAction.TAKE)">
-                Take
+                {{ getHandNumberText() }}
             </button>
             <button v-if="table.playerInTurn.actions.includes(PlayerAction.SPLIT)"
                 @click="sendAction(PlayerAction.SPLIT)">

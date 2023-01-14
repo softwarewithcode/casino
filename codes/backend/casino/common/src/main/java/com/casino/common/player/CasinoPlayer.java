@@ -21,14 +21,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public abstract class CasinoPlayer implements ICasinoPlayer {
 	private static final Logger LOGGER = Logger.getLogger(CasinoPlayer.class.getName());
 	private final ICasinoTable table;
-	private BigDecimal endBalance;
-	private BigDecimal initialBalance;
 	private final ReentrantLock playerLock;
 	private final Bridge bridge;
+	private BigDecimal endBalance;
+	private BigDecimal initialBalance;
 	private volatile BigDecimal balance;
 	private volatile BigDecimal totalBet;
 	private volatile BigDecimal payout;
 	private volatile PlayerStatus status;
+	private volatile Integer skippedBetRounds = 0;
 
 	public CasinoPlayer(Bridge bridge, ICasinoTable table) {
 		super();
@@ -69,8 +70,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public void onLeave() {
-		// TODO Auto-generated method stub
-
+		this.endBalance = balance;
+		LOGGER.info("Player:" + getUserName() + " leaves table:" + table + " with money:" + endBalance + " started:" + initialBalance);
 	}
 
 	protected ReentrantLock getPlayerLock() {
@@ -196,7 +197,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	@Override
 	public String toString() {
-		return "CasinoPlayer [name=" + bridge.userName() + "balance=" + balance + ", totalBet=" + totalBet + ", status=" + status + "]";
+		return "CasinoPlayer [bridge=" + bridge + ", initialBalance=" + initialBalance + ", balance=" + balance + ", totalBet=" + totalBet + ", payout=" + payout + ", status=" + status + ", sitOutRounds=" + skippedBetRounds + "]";
 	}
 
 	@Override
@@ -230,4 +231,27 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 		this.totalBet = null;
 	}
 
+	@Override
+	public void clearBetRoundSkips() {
+		this.skippedBetRounds = 0;
+	}
+
+	@Override
+	public void increaseBetRoundSkips() {
+		this.skippedBetRounds++;
+	}
+
+	@Override
+	public Integer getSitOutRounds() {
+		return skippedBetRounds;
+	}
+
+	@Override
+	public boolean shouldStandUp() {
+		return this.status != PlayerStatus.ACTIVE && this.skippedBetRounds > getAllowedBetRoundSkips();
+	}
+
+	private Integer getAllowedBetRoundSkips() {
+		return getTable().getThresholds().allowedBetRoundSkips();
+	}
 }

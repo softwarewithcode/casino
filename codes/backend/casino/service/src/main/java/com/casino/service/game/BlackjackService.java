@@ -30,6 +30,7 @@ public class BlackjackService implements GameService {
 	private static final Integer MIN_PLAYER_DEFAULT = 0;
 	private static final Integer MAX_PLAYERS_DEFAULT = 7;
 	private static final Integer SEAT_COUNT_DEFAULT = 7;
+	private static final Integer DEFAULT_ALLOWED_SIT_OUT_ROUNDS = 1;
 	private final ConcurrentHashMap<UUID, BlackjackTable> tables = new ConcurrentHashMap<>();
 
 	public BlackjackService() {
@@ -56,7 +57,7 @@ public class BlackjackService implements GameService {
 
 	private TableInitData createDefaultInitData(BigDecimal min, BigDecimal max, Type type, Integer maxPlayer, Integer seatCount) {
 		Thresholds thresholds = new Thresholds(min, max, BET_PHASE_TIME_SECONDS_DEFAULT, INSURANCE_PHASE_TIME_SECONDS_DEFAULT, PLAYER_TIME_SECONDS_DEFAULT, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS_DEFAULT, MIN_PLAYER_DEFAULT, maxPlayer,
-				seatCount);
+				seatCount, DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
 		TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, type, Game.BLACKJACK);
 		return tableInitData;
 	}

@@ -118,10 +118,14 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 		allSeats.forEach(Seat::sanitize);
 	}
 
-	public void moveInactivePlayersToWatchers() {
-		List<Seat> inactiveSeats = seats.stream().filter(Seat::hasInactivePlayer).toList();
-		inactiveSeats.forEach(seat -> super.addWatcher(seat.getPlayer()));
-		inactiveSeats.forEach(Seat::sanitize);
+	public void updatePlayersToWatchers(boolean sanitizeAllSeats) {
+		List<Seat> seatsToSanitize;
+		if (sanitizeAllSeats)
+			seatsToSanitize = seats.stream().toList();
+		else
+			seatsToSanitize = seats.stream().filter(Seat::hasPlayerWhoShouldStandUp).toList();
+		seatsToSanitize.forEach(seat -> super.addWatcher(seat.getPlayer()));
+		seatsToSanitize.forEach(Seat::sanitize);
 	}
 
 	public Set<Seat> getSeats() {

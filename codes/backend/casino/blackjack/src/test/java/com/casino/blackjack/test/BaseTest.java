@@ -25,6 +25,7 @@ public class BaseTest {
 	protected static final Integer MIN_PLAYERS = 0;
 	protected static final Integer MAX_PLAYERS = 7;
 	protected static final Integer DEFAULT_SEAT_COUNT = 7;
+	protected static final Integer DEFAULT_ALLOWED_SIT_OUT_ROUNDS = 1;
 	protected static final Type PUBLIC_TABLE_TYPE = Type.MULTIPLAYER;
 	protected static final int ONE_UNIT = 1;
 	protected Bridge bridge;
@@ -37,15 +38,15 @@ public class BaseTest {
 	}
 
 	protected Thresholds getDefaultThresholds() {
-		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
+		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT,DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
 	}
 
 	protected Thresholds getThresholdsWithBets(BigDecimal minbet, BigDecimal maxBet) {
-		return new Thresholds(minbet, maxBet, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
+		return new Thresholds(minbet, maxBet, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT,DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
 	}
 
 	protected Thresholds getThresholdsWithPlayersMinAndMax(Integer minPlayers, Integer maxPlayers) {
-		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, minPlayers, maxPlayers, maxPlayers);
+		return new Thresholds(MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, minPlayers, maxPlayers, maxPlayers,DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
 	}
 
 	protected TableInitData getDefaultTableInitData() {

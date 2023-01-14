@@ -16,7 +16,7 @@ import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.blackjack.table.BlackjackUtil;
 import com.casino.blackjack.table.timing.InsurancePhaseClockTask;
-import com.casino.common.bank.Bank;
+import com.casino.common.bank.CardGameBank;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.cards.IHand;
@@ -210,11 +210,12 @@ public class BlackjackDealer implements IDealer {
 		updatePlayerStatuses();
 		if (!shouldDealStartingHands()) {
 			LOGGER.info("dealer does not deal cards now");
-			table.moveInactivePlayersToWatchers();
+			table.updatePlayersToWatchers(true);
 			notifyAll(Title.NO_BETS_NO_DEAL, null);
 			return;
 		}
-		matchBalanceWithBet();
+		table.updatePlayersToWatchers(false);
+		matchPlayersBalancesWithBets();
 		dealStartingHands();
 		if (hasStartingAce()) {
 			startInsurancePhase();
@@ -225,23 +226,30 @@ public class BlackjackDealer implements IDealer {
 		notifyAll(Title.INITIAL_DEAL_DONE, (BlackjackPlayer) table.getPlayerInTurn());
 	}
 
-	private void matchBalanceWithBet() {
-		table.getPlayersWithBet().forEach(player -> {
-			player.getActiveHand().updateBet(player.getTotalBet());
-			player.subtractTotalBetFromBalance();
-		});
+	private void matchPlayersBalancesWithBets() {
+		table.getPlayersWithBet().forEach(player -> matchPlayerBalanceAccordingToBet(player));
+	}
+
+	private void matchPlayerBalanceAccordingToBet(ICasinoPlayer player) {
+		player.getActiveHand().updateBet(player.getTotalBet());
+		player.subtractTotalBetFromBalance();
 	}
 
 	private void updatePlayerStatuses() {
 		List<ICasinoPlayer> players = table.getSeats().stream().filter(Seat::hasPlayer).map(Seat::getPlayer).toList();
-		players.forEach(player -> {
-			if (player.getStatus() == PlayerStatus.LEFT)
-				return;
-			if (player.hasBet())
-				player.setStatus(PlayerStatus.ACTIVE);
-			else
-				player.setStatus(PlayerStatus.SIT_OUT);
-		});
+		players.forEach(player -> updatePlayerStatus(player));
+	}
+
+	private void updatePlayerStatus(ICasinoPlayer player) {
+		if (player.getStatus() == PlayerStatus.LEFT)
+			return;
+		if (player.hasBet()) {
+			player.setStatus(PlayerStatus.ACTIVE);
+			player.clearBetRoundSkips();
+		} else {
+			player.setStatus(PlayerStatus.SIT_OUT);
+			player.increaseBetRoundSkips();
+		}
 	}
 
 	public void updateTableActor() {
@@ -258,9 +266,8 @@ public class BlackjackDealer implements IDealer {
 			}
 			completeActiveHands();
 			addDealerCards();
-			Bank.matchBalances(table.getPlayersWithBet(), dealerHand);
+			CardGameBank.matchBalances(table.getPlayersWithBet(), dealerHand);
 			table.updateGamePhase(GamePhase.ROUND_COMPLETED);
-			notifyAll(Title.ROUND_COMPLETED, null);
 			if (table.getActivePlayerCount() == 0)
 				table.setStatus(com.casino.common.table.Status.WAITING_PLAYERS);
 			if (shouldRestartBetPhase()) {
@@ -302,6 +309,7 @@ public class BlackjackDealer implements IDealer {
 		table.updateDealerTurn(true);
 		table.clearPlayerInTurn();
 		completeRound();
+		notifyAll(Title.ROUND_COMPLETED, null);
 	}
 
 	public void doubleDown(BlackjackPlayer player) {
@@ -317,7 +325,7 @@ public class BlackjackDealer implements IDealer {
 
 	private void verifyPlayerHasSeat(BlackjackPlayer player) {
 		if (!table.hasSeat(player))
-			throw new PlayerNotFoundException("cannot doubleDown(), player not found from table:" + player, 0);
+			throw new PlayerNotFoundException("Player not found from table:" + player, 0);
 	}
 
 	public void handleSplit(BlackjackPlayer player) {

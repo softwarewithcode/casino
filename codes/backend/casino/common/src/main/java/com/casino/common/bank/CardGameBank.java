@@ -7,13 +7,19 @@ import java.util.logging.Logger;
 import com.casino.common.cards.IHand;
 import com.casino.common.player.ICasinoPlayer;
 
-public class Bank {
-	private static final Logger LOGGER = Logger.getLogger(Bank.class.getName());
-	private static final BigDecimal BLACKJACK_FACTOR = new BigDecimal("2.5");
+/**
+ * 
+ * Bank for cardGames where comparison is made between player's and dealer's cards
+ * a.k.a hands
+ *
+ */
+public class CardGameBank {
+	private static final Logger LOGGER = Logger.getLogger(CardGameBank.class.getName());
+	private static final BigDecimal TWO_AND_HALF = new BigDecimal("2.5");
 
-	public static void matchBalances(List<ICasinoPlayer> allPlayers, IHand dealerHand) {
+	public static void matchBalances(List<ICasinoPlayer> players, IHand dealerHand) {
 		LOGGER.info("Dealer starts balance matching");
-		List<ICasinoPlayer> playersWithWinningChances = allPlayers.stream().filter(ICasinoPlayer::hasWinningChance).toList();
+		List<ICasinoPlayer> playersWithWinningChances = players.stream().filter(ICasinoPlayer::hasWinningChance).toList();
 		playersWithWinningChances.forEach(player -> payForWinners(player, dealerHand));
 	}
 
@@ -22,8 +28,8 @@ public class Bank {
 			if (shouldPayInsuranceBet(playerHand, dealerHand))
 				player.increaseBalanceAndPayout(playerHand.getInsuranceBet().multiply(BigDecimal.TWO));
 			BigDecimal betMultiplier = determineBetMultiplier(playerHand, dealerHand);
-			BigDecimal handPayout = playerHand.getBet().multiply(betMultiplier);
-			player.increaseBalanceAndPayout(handPayout);
+			BigDecimal winAmount = playerHand.getBet().multiply(betMultiplier);
+			player.increaseBalanceAndPayout(winAmount);
 		});
 	}
 
@@ -36,7 +42,7 @@ public class Bank {
 		if (evenResult(handComparison))
 			return BigDecimal.ONE;
 		if (playerWins(handComparison))
-			return playerHand.isBlackjack() ? BLACKJACK_FACTOR : BigDecimal.TWO;
+			return playerHand.isBlackjack() ? TWO_AND_HALF : BigDecimal.TWO;
 		return BigDecimal.ZERO;
 	}
 

@@ -10,8 +10,8 @@ export function useCardLocator(card: Card): CardImageMetadata {
 	const positionInArray: Vector = { x: getColumnNumber(card), y: getRowNumber(card) }
 	const x = positionInArray.x * cardWidthInSprite + gapHorizontalInSprite * positionInArray.x
 	const y = positionInArray.y * cardHeightInSprite + gapVerticalInSprite * positionInArray.y + 0.7
-	const locationInSprite: Vector = { x: x, y: y }
-	return { position: locationInSprite, size: originalCardWidthAndHeight }
+	const topLeftCornerOfCard: Vector = { x: x, y: y }
+	return { position: topLeftCornerOfCard, size: originalCardWidthAndHeight }
 }
 const getColumnNumber = (card: Card) => {
 	if (card.rank < 8) {

@@ -13,7 +13,9 @@ public record Thresholds(
 		Long phaseDelay, 
 		Integer minPlayers, 
 		Integer maxPlayers, 
-		Integer seatCount) 
+		Integer seatCount,
+		Integer allowedBetRoundSkips
+		) 
 {
 	// compact constructor
 	public Thresholds {

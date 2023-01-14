@@ -45,8 +45,8 @@ public class Seat {
 		return hasPlayer() && hasPlayerWithActiveStatus();
 	}
 
-	public boolean hasInactivePlayer() {
-		return hasPlayer() && !hasPlayerWithActiveStatus();
+	public boolean hasPlayerWhoShouldStandUp() {
+		return hasPlayer() && player.shouldStandUp();
 	}
 
 	public Seat(int number, ICasinoPlayer player) {

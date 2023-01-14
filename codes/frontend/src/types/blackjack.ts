@@ -22,6 +22,7 @@ export interface BlackjackHand extends CasinoHand {
 	split: boolean
 	insuranceBet: number
 	blackjack: boolean
+	active: boolean
 }
 
 export enum PlayerAction {

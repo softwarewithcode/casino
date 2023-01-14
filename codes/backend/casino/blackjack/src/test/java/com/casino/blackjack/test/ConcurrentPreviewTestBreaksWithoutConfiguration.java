@@ -188,7 +188,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	@Test
 	public void tableAcceptsWatchersSimultaneously() throws InterruptedException, BrokenBarrierException {
 		int betPhaseTimeSeconds = 6;
-		Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, betPhaseTimeSeconds, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 49, 49);
+		Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, betPhaseTimeSeconds, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 49, 49, 0);
 		TableInitData tableInitData = getDefaultTableInitDataWithThresholds(thresholds);
 		table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 		CyclicBarrier casinoBarrier = new CyclicBarrier(10001);

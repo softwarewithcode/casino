@@ -326,6 +326,7 @@ public class InsuranceTest extends BaseTest {
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertTrue(table2.getPlayer(bridge3.userId()).getActions().stream().filter(action -> action == PlayerAction.SPLIT).findAny().isEmpty());
 	}
+
 	@Test
 	public void doubleDownIsAnOptionWithInsuredHand() {
 		dealer2.getDecks().add(Card.of(10, Suit.DIAMOND));

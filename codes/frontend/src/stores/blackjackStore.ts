@@ -38,6 +38,9 @@ export const useBlackjackStore = defineStore("blackjackStore", {
 			let counterCurrent = this.counter
 			counterCurrent--
 			this.counter = counterCurrent
+		},
+		logout(empty) {
+			this.player = empty
 		}
 	}
 })
