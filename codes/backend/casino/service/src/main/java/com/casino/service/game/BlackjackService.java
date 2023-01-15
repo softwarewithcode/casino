@@ -105,9 +105,9 @@ public class BlackjackService implements GameService {
 		TableInitData temp11 = createFastTable(new BigDecimal("100"), new BigDecimal("200"), Type.MULTIPLAYER, 1, 7);
 		BlackjackTable table11 = new BlackjackTable(Status.WAITING_PLAYERS, temp11);
 		tables.putIfAbsent(table11.getId(), table11);
-		TableInitData temp12 = createFastTable2(new BigDecimal("10"), new BigDecimal("100"), Type.MULTIPLAYER, 1, 7);
+		TableInitData temp12 = createFastTable2(new BigDecimal("11"), new BigDecimal("100"), Type.MULTIPLAYER, 1, 7);
 		BlackjackTable table12 = new BlackjackTable(Status.WAITING_PLAYERS, temp12);
-		tables.putIfAbsent(table11.getId(), table12);
+		tables.putIfAbsent(table12.getId(), table12);
 	}
 
 	private TableInitData createDefaultInitData(BigDecimal min, BigDecimal max, Type type, Integer maxPlayer, Integer seatCount) {
