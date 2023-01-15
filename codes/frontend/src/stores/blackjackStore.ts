@@ -9,7 +9,8 @@ export const useBlackjackStore = defineStore("blackjackStore", {
 		tables: [] as TableCard[],
 		table: {} as BlackjackTable,
 		command: {} as string,
-		player: {} as BlackjackPlayer
+		player: {} as BlackjackPlayer,
+		counter: {} as number
 	}),
 	getters: {
 		getTables(state) {
@@ -17,6 +18,9 @@ export const useBlackjackStore = defineStore("blackjackStore", {
 		},
 		getTable(state) {
 			return state.table
+		},
+		getCounter(state) {
+			return state.counter
 		},
 		getPlayer(state) {
 			return state.player
@@ -30,6 +34,11 @@ export const useBlackjackStore = defineStore("blackjackStore", {
 			} catch (error) {
 				alert(error)
 			}
+		},
+		reduceCounter() {
+			let counterCurrent = this.counter
+			counterCurrent--
+			this.counter = counterCurrent
 		},
 		logout(empty) {
 			this.player = empty
