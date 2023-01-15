@@ -19,7 +19,7 @@ public class CardGameBank {
 	private static final BigDecimal TWO = new BigDecimal("2.0");
 
 	public static void matchBalances(List<ICasinoPlayer> players, IHand dealerHand) {
-		LOGGER.info("Dealer starts balance matching");
+		LOGGER.fine("Dealer starts balance matching");
 		List<ICasinoPlayer> playersWithWinningChances = players.stream().filter(ICasinoPlayer::hasWinningChance).toList();
 		playersWithWinningChances.forEach(player -> payForWinners(player, dealerHand));
 	}

@@ -25,7 +25,7 @@ public class BetPhaseClockTask extends TimerTask {
 			return;
 		}
 		if (shouldPrepareNewRound()) {
-			LOGGER.info("BetPhaseClockTask, clear previous round" + table);
+			LOGGER.fine("BetPhaseClockTask, clear previous round" + table);
 			table.prepareNewRound();
 		}
 		int counterValue = table.getCounterTime();

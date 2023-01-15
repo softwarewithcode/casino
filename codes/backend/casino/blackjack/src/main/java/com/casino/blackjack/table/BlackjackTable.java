@@ -265,7 +265,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	public boolean watch(Bridge user) {
 		BlackjackPlayer player = new BlackjackPlayer(user, null);
 		if (getPlayer(user.userId()) != null) {
-			LOGGER.info("User " + user.userName() + " is already playing in table:" + this.toString());
+			LOGGER.fine("User " + user.userName() + " is already playing in table:" + this.toString());
 			return false;
 		}
 		boolean joined = super.joinAsWatcher(player);
@@ -277,7 +277,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	@Override
 	public void refresh(UUID playerId) {
 		LOGGER.entering(getClass().getName(), "refresh table:" + getId() + " player:" + playerId);
-		LOGGER.info("table_refresh ");
+		LOGGER.fine("table_refresh ");
 		if (playerId == null)
 			return;
 		try {

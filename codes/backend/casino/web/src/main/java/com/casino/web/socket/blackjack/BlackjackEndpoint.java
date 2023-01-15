@@ -46,6 +46,9 @@ public class BlackjackEndpoint {
 			}
 			this.tableId = id;
 			this.table = table.get();
+			session.setMaxIdleTimeout(30 * 60 * 1000);
+			session.setMaxTextMessageBufferSize(1024 * 2);
+			session.setMaxBinaryMessageBufferSize(0);
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "onOpen error ", e);
 		}
@@ -53,7 +56,7 @@ public class BlackjackEndpoint {
 
 	@OnMessage
 	public void onMessage(Session session, Message message) {
-		LOGGER.info("endpoint got message: " + "\n-> message:" + message);
+		LOGGER.fine("endpoint got message: " + "\n-> message:" + message);
 		try {
 			if (isFirstMessage(session)) {
 				createBridge(session, message);
@@ -103,7 +106,7 @@ public class BlackjackEndpoint {
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason) {
 		try {
-			LOGGER.info("Closing session:" + closeReason);
+			LOGGER.fine("Closing session:" + closeReason);
 			session.close();
 			blackjackService.onSocketClose(bridge);
 			this.table = null;

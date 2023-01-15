@@ -71,7 +71,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@Override
 	public void onLeave() {
 		this.endBalance = balance;
-		LOGGER.info("Player:" + getUserName() + " leaves table:" + table + " with money:" + endBalance + " started:" + initialBalance);
+		LOGGER.fine("Player:" + getUserName() + " leaves table:" + table + " with money:" + endBalance + " started:" + initialBalance);
 	}
 
 	protected ReentrantLock getPlayerLock() {

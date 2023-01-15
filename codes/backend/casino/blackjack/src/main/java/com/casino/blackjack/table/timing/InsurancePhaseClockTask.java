@@ -24,7 +24,7 @@ public class InsurancePhaseClockTask extends TimerTask {
 		int curTime = table.getCounterTime();
 		curTime--;
 		table.updateCounterTime(curTime);
-		LOGGER.info("InsurancePhase running, left:" + curTime);
+		LOGGER.fine("InsurancePhase running, left:" + curTime);
 		if (curTime == 0) {
 			table.stopClock();
 			table.onInsurancePhaseEnd();

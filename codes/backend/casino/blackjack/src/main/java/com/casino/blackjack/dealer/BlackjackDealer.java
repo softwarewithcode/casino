@@ -109,7 +109,7 @@ public class BlackjackDealer implements IDealer {
 	}
 
 	public void dealStartingHands() {
-		LOGGER.info("dealer deals starting hands");
+		LOGGER.fine("dealer deals starting hands");
 		List<ICasinoPlayer> orderedPlayers = getOrderedPlayersWithBet();
 		orderedPlayers.forEach(player -> dealCard(player.getActiveHand())); // first the players
 		dealCard(dealerHand); // then the dealer
@@ -209,7 +209,7 @@ public class BlackjackDealer implements IDealer {
 		table.updateGamePhase(GamePhase.BETS_COMPLETED);
 		updatePlayerStatuses();
 		if (!shouldDealStartingHands()) {
-			LOGGER.info("dealer does not deal cards now");
+			LOGGER.fine("dealer does not deal cards now");
 			table.updatePlayersToWatchers(true);
 			notifyAll(Title.NO_BETS_NO_DEAL, null);
 			return;
@@ -375,7 +375,7 @@ public class BlackjackDealer implements IDealer {
 
 	private void addDealerCards() {
 		while (!dealerHand.isCompleted()) {
-			LOGGER.info("Dealer takes cards:");
+			LOGGER.fine("Dealer takes cards:");
 			Card card = removeLastCardFromDeck();
 			addCard(card);
 		}
