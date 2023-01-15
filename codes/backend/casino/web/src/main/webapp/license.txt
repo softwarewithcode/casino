@@ -1,10 +1,16 @@
-Playing cards
+January 15, 2023
+License: AGPL 3.0
+https://www.gnu.org/licenses/agpl-3.0.en.html
+Origin:
+https://github.com/softwarewithcode/casino
+
+Playing cards sprite image:
     https://opengameart.org/content/playing-cards-3
 
     license:
     https://creativecommons.org/publicdomain/zero/1.0/
 
-Background:
+Background image:
     https://opengameart.org/content/light-wood-1024x1024
 
     license:
