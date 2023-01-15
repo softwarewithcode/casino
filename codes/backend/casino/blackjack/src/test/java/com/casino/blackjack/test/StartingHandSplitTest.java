@@ -299,7 +299,7 @@ public class StartingHandSplitTest extends BaseTest {
 		table.bet(bridge2.userId(), new BigDecimal("50.1"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(new BigDecimal("49.90"), table.getPlayer(bridge2.userId()).getBalance());
-		assertThrows(IllegalArgumentException.class, () -> {
+		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.split(bridge2.userId());
 		});
 	}

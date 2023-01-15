@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import com.casino.blackjack.dealer.BlackjackDealer;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
-import com.casino.common.bet.BetUtil;
+import com.casino.common.bet.BetVerifier;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalBetException;
@@ -66,7 +66,7 @@ public class BetTest extends BaseTest {
 		table.updateGamePhase(GamePhase.BETS_COMPLETED);
 		BlackjackPlayer blackjackPlayer = new BlackjackPlayer(bridge, table);
 		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
-			BetUtil.verifyStartingBet(table, blackjackPlayer, MAX_BET);
+			BetVerifier.verifyStartingBet(table, blackjackPlayer, MAX_BET);
 		});
 		assertEquals(1, exception.getCode());
 	}

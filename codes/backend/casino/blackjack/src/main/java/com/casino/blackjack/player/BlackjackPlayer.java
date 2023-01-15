@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.casino.blackjack.table.BlackjackUtil;
-import com.casino.common.bet.BetUtil;
+import com.casino.common.bet.BetVerifier;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.player.CasinoPlayer;
@@ -118,11 +118,10 @@ public class BlackjackPlayer extends CasinoPlayer {
 		try {
 			tryTakingPlayerLock();
 			ActionValidator.validateSplitPreConditions(this);
-			BetUtil.verifySufficentBalance(hands.get(0).getBet(), this); // Check balance after getting lock
 			IHand splitHand = new BlackjackHand(UUID.randomUUID(), false);
 			Card cardFromStartingHand = hands.get(0).getCards().remove(1);
 			splitHand.addCard(cardFromStartingHand);
-			splitHand.updateBet(hands.get(0).getBet());// immutable BigDecimal
+			splitHand.updateBet(hands.get(0).getBet());
 			updateBalanceAndTotalBet(splitHand.getBet());
 			hands.add(splitHand);
 		} finally {

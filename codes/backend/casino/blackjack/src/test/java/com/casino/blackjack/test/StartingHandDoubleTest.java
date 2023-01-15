@@ -158,7 +158,7 @@ public class StartingHandDoubleTest extends BaseTest {
 		table.join(bridge, "5");
 		table.bet(bridge.userId(), new BigDecimal("100"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertThrows(IllegalArgumentException.class, () -> {
+		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.doubleDown(bridge.userId());
 		});
 	}

@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.casino.common.bet.BetUtil;
+import com.casino.common.bet.BetVerifier;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.table.ICasinoTable;
 import com.casino.common.user.Bridge;
@@ -134,13 +134,15 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	@Override
 	public void updateStartingBet(BigDecimal bet, ICasinoTable table) {
 		verifyCallersLock();
-		BetUtil.verifyStartingBet(table, this, bet);
+		// verifyStartingBet here is the last line of defence just before updating.
+		BetVerifier.verifyStartingBet(table, this, bet);
 		this.totalBet = bet;
 	}
 
 	protected void updateBalanceAndTotalBet(BigDecimal additionalBet) {
 		verifyCallersLock();
-		BetUtil.verifySufficentBalance(additionalBet, this);
+		// additionalBet verification here is the last line of defence just before updating.
+		BetVerifier.verifySufficentBalance(additionalBet, this);
 		if (this.totalBet == null)
 			throw new IllegalBetException("updateBalanceAndTotalBet called but no initial bet was found", 6);
 		this.balance = this.getBalance().subtract(additionalBet);

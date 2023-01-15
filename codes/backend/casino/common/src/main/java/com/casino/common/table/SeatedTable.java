@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.casino.common.bet.BetUtil;
+import com.casino.common.bet.BetVerifier;
 import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.player.PlayerStatus;
 import com.casino.common.table.phase.PhasePath;
@@ -67,7 +67,7 @@ public abstract class SeatedTable extends CasinoTable implements ISeatedTable {
 	@Override
 	public Optional<Seat> trySeat(Integer seatNumber, ICasinoPlayer player) {
 		Seat seat = null;
-		BetUtil.verifySufficentBalance(getThresholds().minimumBet(), player);
+		BetVerifier.verifySufficentBalance(getThresholds().minimumBet(), player);
 		if (!isStatusAllowingPlayerEntries())
 			return Optional.empty();
 		if (isReservedSinglePlayerTable())

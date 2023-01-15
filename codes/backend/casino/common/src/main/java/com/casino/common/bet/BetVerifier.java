@@ -7,7 +7,7 @@ import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.table.ICasinoTable;
 import com.casino.common.table.phase.GamePhase;
 
-public class BetUtil {
+public class BetVerifier {
 
 	public static void verifyStartingBet(ICasinoTable table, ICasinoPlayer player, BigDecimal betAttempt) {
 		verify(table, player, betAttempt);

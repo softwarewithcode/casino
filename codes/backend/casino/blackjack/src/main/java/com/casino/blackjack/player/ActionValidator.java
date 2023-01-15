@@ -3,6 +3,7 @@ package com.casino.blackjack.player;
 import java.util.List;
 
 import com.casino.blackjack.table.BlackjackUtil;
+import com.casino.common.bet.BetVerifier;
 import com.casino.common.exception.IllegalPlayerActionException;
 
 public class ActionValidator {
@@ -45,5 +46,10 @@ public class ActionValidator {
 			throw new IllegalPlayerActionException("first hand is not active " + player.getUserName() + " " + player.getFirstHand(), 2);
 		if (player.getHands().get(0).getCards().size() != 2)
 			throw new IllegalPlayerActionException("starting hand does not contain exactly two cards:" + player.getUserName() + " " + player.getHands().get(0).getCards(), 3);
+		try {
+			BetVerifier.verifySufficentBalance(player.getFirstHand().getBet(), player);
+		} catch (IllegalArgumentException i) {
+			throw new IllegalPlayerActionException(i.getMessage(), 55);
+		}
 	}
 }
