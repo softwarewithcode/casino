@@ -105,6 +105,9 @@ public class BlackjackService implements GameService {
 		TableInitData temp11 = createFastTable(new BigDecimal("100"), new BigDecimal("200"), Type.MULTIPLAYER, 1, 7);
 		BlackjackTable table11 = new BlackjackTable(Status.WAITING_PLAYERS, temp11);
 		tables.putIfAbsent(table11.getId(), table11);
+		TableInitData temp12 = createFastTable2(new BigDecimal("10"), new BigDecimal("100"), Type.MULTIPLAYER, 1, 7);
+		BlackjackTable table12 = new BlackjackTable(Status.WAITING_PLAYERS, temp12);
+		tables.putIfAbsent(table11.getId(), table12);
 	}
 
 	private TableInitData createDefaultInitData(BigDecimal min, BigDecimal max, Type type, Integer maxPlayer, Integer seatCount) {
@@ -116,6 +119,12 @@ public class BlackjackService implements GameService {
 
 	private TableInitData createFastTable(BigDecimal min, BigDecimal max, Type type, Integer maxPlayer, Integer seatCount) {
 		Thresholds thresholds = new Thresholds(min, max, 7, 6, 10, 5000l, MIN_PLAYER_DEFAULT, maxPlayer, seatCount, DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
+		TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, type, Game.BLACKJACK);
+		return tableInitData;
+	}
+
+	private TableInitData createFastTable2(BigDecimal min, BigDecimal max, Type type, Integer maxPlayer, Integer seatCount) {
+		Thresholds thresholds = new Thresholds(min, max, 8, 7, 11, 5000l, MIN_PLAYER_DEFAULT, maxPlayer, seatCount, DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
 		TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, type, Game.BLACKJACK);
 		return tableInitData;
 	}
