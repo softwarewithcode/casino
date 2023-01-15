@@ -4,15 +4,17 @@ import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCards
 import { onMounted, onUnmounted, ref, computed, reactive } from "vue";
 import { useSend } from "@/components/composables/communication/socket/websocket";
 import { useBlackjackStore } from "../../stores/blackjackStore";
+import { counter } from "../../stores/casinoStore";
 import { mapActions, storeToRefs } from "pinia";
 import { bgImage, } from "../../types/images"
 import { Command } from "@/types/sockethander";
 import { TableType } from "@/types/casino";
 const props = defineProps<{ tableId: string }>();
 const canvasReady = ref<boolean>(false);
-const store = useBlackjackStore();
-const { table, command, player, counter } = storeToRefs(store);
-
+const blackjackStore = useBlackjackStore();
+const casinoStore = useBlackjackStore();
+const { table, command, player } = storeToRefs(blackjackStore);
+const { counter } = storeToRefs(casinoStore);
 const unSubscribe = store.$subscribe((mutation, state) => {
     if (mutation.type === "patch object") {
         onStorePatch()

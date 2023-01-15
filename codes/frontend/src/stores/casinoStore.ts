@@ -5,11 +5,14 @@ import { useGametypesFetch } from "../components/composables/communication/http"
 export const useCasinoStore = defineStore("casinoStore", {
 	state: () => ({
 		gameTypes: [] as GameType[],
-		locale: "us-en" //new Intl.locale
+		counter: {} as number
 	}),
 	getters: {
 		getTypes(state): GameType[] {
 			return state.gameTypes
+		},
+		getCounter(state) {
+			return state.counter
 		}
 	},
 	actions: {
@@ -19,6 +22,11 @@ export const useCasinoStore = defineStore("casinoStore", {
 			} catch (error) {
 				alert(error)
 			}
+		},
+		reduceCounter() {
+			let counterCurrent = this.counter
+			counterCurrent--
+			this.counter = counterCurrent
 		},
 		async login() {
 			//?? sessionStorage? location
