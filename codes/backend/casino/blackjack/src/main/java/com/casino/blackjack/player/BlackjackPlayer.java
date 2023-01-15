@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.casino.blackjack.table.BlackjackUtil;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.player.CasinoPlayer;
@@ -69,23 +68,8 @@ public class BlackjackPlayer extends CasinoPlayer {
 		}
 	}
 
-	private boolean isDoubleDownAllowed() {
-		int handValue = getFirstHand().calculateValues().get(0);
-		return handValue >= 9 && handValue <= 11 && !hasSecondHand();
-	}
-
-	private boolean isSplitAllowed() {
-		Card first = getFirstHand().getCards().get(0);
-		Card second = getFirstHand().getCards().get(1);
-		return BlackjackUtil.haveSameValue(first, second) && !hasSecondHand() && !getFirstHand().isInsured();
-	}
-
 	private IHand getSecondHand() {
 		return getHands().get(1);
-	}
-
-	private boolean hasSecondHand() {
-		return getHands().size() > 1;
 	}
 
 	public void prepareNextRound() {

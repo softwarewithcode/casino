@@ -115,7 +115,6 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	public <T> void sendMessage(T message) {
 		if (!canSendMessage(message)) {
 			LOGGER.log(Level.FINE, "Message cannot be delivered:" + message);
-			LOGGER.log(Level.SEVERE, "Message cannot be delivered:");
 			return;
 		}
 		try {
@@ -141,7 +140,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
 	protected void updateBalanceAndTotalBet(BigDecimal additionalBet) {
 		verifyCallersLock();
-		// additionalBet verification here is the last line of defence just before updating.
+		// additionalBet verification here is the last line of defence
 		BetVerifier.verifySufficentBalance(additionalBet, this);
 		if (this.totalBet == null)
 			throw new IllegalBetException("updateBalanceAndTotalBet called but no initial bet was found", 6);

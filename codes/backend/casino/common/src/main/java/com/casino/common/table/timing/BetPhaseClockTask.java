@@ -28,13 +28,12 @@ public class BetPhaseClockTask extends TimerTask {
 			LOGGER.info("BetPhaseClockTask, clear previous round" + table);
 			table.prepareNewRound();
 		}
-		int curTime = table.getCounterTime();
-		curTime--;
-		table.updateCounterTime(curTime);
+		int counterValue = table.getCounterTime();
+		counterValue--;
+		table.updateCounterTime(counterValue);
 		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine("BetPhaseClockTask, secondsLeft:" + curTime + " in table:" + table.getId());
-		LOGGER.info("BetPhaseClock running, left:" + curTime);
-		if (curTime == 0) {
+			LOGGER.fine("BetPhaseClockTask, secondsLeft:" + counterValue + " in table:" + table.getId());
+		if (counterValue == 0) {
 			table.stopClock();
 			table.onBetPhaseEnd();
 		}
