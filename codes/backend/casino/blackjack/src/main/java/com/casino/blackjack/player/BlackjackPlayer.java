@@ -10,12 +10,11 @@ import com.casino.blackjack.table.BlackjackUtil;
 import com.casino.common.bet.BetUtil;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
-import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.CasinoPlayer;
 import com.casino.common.table.ICasinoTable;
 import com.casino.common.table.ISeatedTable;
-import com.casino.common.user.PlayerAction;
 import com.casino.common.user.Bridge;
+import com.casino.common.user.PlayerAction;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
 @JsonIncludeProperties(value = { "hands", "actions", "seatNumber", "userName", "balance", "totalBet", "payout" })
@@ -118,7 +117,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void splitStartingHand() {
 		try {
 			tryTakingPlayerLock();
-			validateSplitPreConditions();
+			ActionValidator.validateSplitPreConditions(this);
 			BetUtil.verifySufficentBalance(hands.get(0).getBet(), this); // Check balance after getting lock
 			IHand splitHand = new BlackjackHand(UUID.randomUUID(), false);
 			Card cardFromStartingHand = hands.get(0).getCards().remove(1);
@@ -141,10 +140,6 @@ public class BlackjackPlayer extends CasinoPlayer {
 		}
 	}
 
-	private boolean shouldActivateSecondHand(IHand activeHand) {
-		return getHands().indexOf(activeHand) == 0 && getHands().size() == 2;
-	}
-
 	public void activateSecondHand() {
 		getSecondHand().activate();
 	}
@@ -152,7 +147,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void doubleDown(Card ref) {
 		try {
 			tryTakingPlayerLock();
-			validateDoubleDownPreConditions();
+			ActionValidator.validateDoubleDownPreConditions(this);
 			updateBalanceAndTotalBet(getTotalBet());
 			getFirstHand().doubleDown(ref);
 		} finally {
@@ -165,7 +160,6 @@ public class BlackjackPlayer extends CasinoPlayer {
 		try {
 			tryTakingPlayerLock();
 			super.updateStartingBet(bet, table);
-			// getFirstHand().updateBet(bet);
 		} finally {
 			releasePlayerLock();
 		}
@@ -174,58 +168,16 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void insure() {
 		try {
 			tryTakingPlayerLock();
-			validateInsuringConditions();
+			ActionValidator.validateInsuringConditions(this);
 			getFirstHand().insure();
 			updateBalanceAndTotalBet(getFirstHand().getBet().divide(new BigDecimal("2")));
 		} finally {
-			if (getPlayerLock().isHeldByCurrentThread())
-				getPlayerLock().unlock();
+			releasePlayerLock();
 		}
 	}
 
-	private void validateInsuringConditions() {
-		validateActionConditions();
-		if (getFirstHand().isInsured())
-			throw new IllegalPlayerActionException("hand has been insured earlier ", 10);
-		if (getFirstHand().isDoubled())
-			throw new IllegalPlayerActionException("cannot insure, hand has been doubled earlier ", 10);
-		if (getFirstHand().isBlackjack())
-			throw new IllegalPlayerActionException("cannot insure, hand is blackjack ", 10);
-	}
-
-	private void validateDoubleDownPreConditions() {
-		validateActionConditions();
-		if (getFirstHand().isDoubled())
-			throw new IllegalPlayerActionException("hand has been doubled before ", 10);
-		if (getFirstHand().isBlackjack())
-			throw new IllegalPlayerActionException("blackjack cannot be doubled ", 10);
-		List<Integer> values = getFirstHand().calculateValues();
-		int val = values.get(0);
-		if (!(val >= 9 && val <= 11))
-			throw new IllegalPlayerActionException("hand value does not allow doubling; " + getFirstHand().getCards().get(0) + " " + getFirstHand().getCards().get(1), 10);
-	}
-
-	private void validateSplitPreConditions() {
-		validateActionConditions();
-		if (!BlackjackUtil.haveSameValue(getFirstHand().getCards().get(0), getFirstHand().getCards().get(1)))
-			throw new IllegalPlayerActionException("not equal values", 4);
-		if (getFirstHand().isInsured())
-			throw new IllegalPlayerActionException("cannot split insured hand", 4);
-		if (getFirstHand().isDoubled())
-			throw new IllegalPlayerActionException("hand has been doubled before ", 10);
-	}
-
-	private void validateActionConditions() {
-		if (this.hands.size() != 1)
-			throw new IllegalPlayerActionException("wrong hand count:" + getUserName() + " " + hands.size(), 1);
-		if (!hands.get(0).isActive())
-			throw new IllegalPlayerActionException("first hand is not active " + getUserName() + " " + getFirstHand(), 2);
-		if (hands.get(0).getCards().size() != 2)
-			throw new IllegalPlayerActionException("starting hand does not contain exactly two cards:" + getUserName() + " " + hands.get(0).getCards(), 3);
-	}
-
 	public IHand getActiveHand() {
-		return hands.stream().filter(IHand::isActive).findFirst().orElse(null);
+		return hands.stream().filter(IHand::isActive).findFirst().orElse(null); //to Optional
 	}
 
 	public void hit(Card card) {
@@ -273,7 +225,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return getFirstHand().isInsuranceCompensable();
 	}
 
-	private IHand getFirstHand() {
+	public IHand getFirstHand() {
 		return getHands().get(0);
 	}
 
