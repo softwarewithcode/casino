@@ -25,7 +25,8 @@ export const useBlackjackStore = defineStore("blackjackStore", {
 	actions: {
 		async populateStore() {
 			try {
-				this.tables = await useTablesFetch(blackjack)
+				let tables = await useTablesFetch(blackjack)
+				this.tables = tables.sort((a, b) => a.thresholds.minimumBet - b.thresholds.minimumBet)
 			} catch (error) {
 				alert(error)
 			}
