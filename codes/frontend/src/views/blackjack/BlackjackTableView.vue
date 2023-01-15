@@ -197,7 +197,7 @@ const insuranceAvailable = computed<boolean>(() => {
 <template v-if="canvasReady">
     <div style="position: relative">
         Welcome {{ player?.userName }}
-        <div v-if="counterText" :style="getInstructionStyle">{{ counterText }}</div>
+        <div v-if="counterText" style="position:absolute" :style="getInstructionStyle">{{ counterText }}</div>
         <canvas id="canvas" width="1800" height="600"></canvas>
         <div v-if="canTakeSeat" id="takeSeatRow">
             <div v-for="seat in getSeatsDescending" :key="seat.number" :id="seat.number.toString()"
@@ -207,7 +207,7 @@ const insuranceAvailable = computed<boolean>(() => {
                 </button>
             </div>
         </div>
-        <div v-if="betsAllowed" id="betRow" :style="getMainBoxPlayerActionStyle()">
+        <div v-if="betsAllowed" id="betRow" style="position:absolute" :style="getMainBoxPlayerActionStyle()">
             <button :disabled="!canReduceMinimum" @click="adjustBet(betAmount - table.tableCard.thresholds.minimumBet)">
                 Reduce {{ table.tableCard.thresholds.minimumBet }}
             </button>
@@ -227,25 +227,26 @@ const insuranceAvailable = computed<boolean>(() => {
                 Remove bet
             </button>
         </div>
-        <div v-if="table.gamePhase === GamePhase.INSURE" id="insureRow" :style="getMainBoxActionRowStyle">
+        <div v-if="table.gamePhase === GamePhase.INSURE" id="insureRow" style="position:absolute"
+            :style="getMainBoxActionRowStyle">
             <button v-if="insuranceAvailable" @click="insure()">
                 Insure
             </button>
         </div>
-        <div v-if="canAct" id="actionRow" style="position:relative; bottom:25px: left:50px">
-            <button v-if="table.playerInTurn.actions.includes(PlayerAction.TAKE)"
+        <div v-show="canAct" id="actionRow" style="position:absolute; bottom:25px: left:50px">
+            <button v-if="table.playerInTurn?.actions.includes(PlayerAction.TAKE)"
                 @click="sendAction(PlayerAction.TAKE)">
                 {{ getHandNumberText() }}
             </button>
-            <button v-if="table.playerInTurn.actions.includes(PlayerAction.SPLIT)"
+            <button v-if="table.playerInTurn?.actions.includes(PlayerAction.SPLIT)"
                 @click="sendAction(PlayerAction.SPLIT)">
                 Split
             </button>
-            <button v-if="table.playerInTurn.actions.includes(PlayerAction.DOUBLE_DOWN)"
+            <button v-if="table.playerInTurn?.actions.includes(PlayerAction.DOUBLE_DOWN)"
                 @click="sendAction(PlayerAction.DOUBLE_DOWN)">
                 Double down
             </button>
-            <button v-if="table.playerInTurn.actions.includes(PlayerAction.STAND)"
+            <button v-if="table.playerInTurn?.actions.includes(PlayerAction.STAND)"
                 @click="sendAction(PlayerAction.STAND)">
                 Stand
             </button>
