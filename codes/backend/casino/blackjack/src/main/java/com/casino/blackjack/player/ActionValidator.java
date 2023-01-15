@@ -7,7 +7,7 @@ import com.casino.common.bet.BetVerifier;
 import com.casino.common.exception.IllegalPlayerActionException;
 
 public class ActionValidator {
-	public static void validateInsuringConditions(BlackjackPlayer player) {
+	public static void validateInsureAction(BlackjackPlayer player) {
 		validateActionConditions(player);
 		if (player.getFirstHand().isInsured())
 			throw new IllegalPlayerActionException("hand has been insured earlier ");
@@ -17,7 +17,7 @@ public class ActionValidator {
 			throw new IllegalPlayerActionException("cannot insure, hand is blackjack ");
 	}
 
-	public static void validateDoubleDownPreConditions(BlackjackPlayer player) {
+	public static void validateDoubleDownAction(BlackjackPlayer player) {
 		validateActionConditions(player);
 		if (player.getFirstHand().isDoubled())
 			throw new IllegalPlayerActionException("hand has been doubled before ");
@@ -29,7 +29,7 @@ public class ActionValidator {
 			throw new IllegalPlayerActionException("hand value does not allow doubling; " + player.getFirstHand().getCards().get(0) + " " + player.getFirstHand().getCards().get(1));
 	}
 
-	public static void validateSplitPreConditions(BlackjackPlayer player) {
+	public static void validateSplitAction(BlackjackPlayer player) {
 		validateActionConditions(player);
 		if (!BlackjackUtil.haveSameValue(player.getFirstHand().getCards().get(0), player.getFirstHand().getCards().get(1)))
 			throw new IllegalPlayerActionException("not equal values");
@@ -41,7 +41,7 @@ public class ActionValidator {
 
 	public static boolean isSplitAllowed(BlackjackPlayer player) {
 		try {
-			validateSplitPreConditions(player);
+			validateSplitAction(player);
 			return true;
 		} catch (IllegalPlayerActionException i) {
 			return false;
@@ -50,7 +50,7 @@ public class ActionValidator {
 
 	public static boolean isDoubleDownAllowed(BlackjackPlayer player) {
 		try {
-			validateDoubleDownPreConditions(player);
+			validateDoubleDownAction(player);
 			return true;
 		} catch (IllegalPlayerActionException i) {
 			return false;

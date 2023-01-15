@@ -115,7 +115,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void splitStartingHand() {
 		try {
 			tryTakingPlayerLock();
-			ActionValidator.validateSplitPreConditions(this);
+			ActionValidator.validateSplitAction(this);
 			IHand splitHand = new BlackjackHand(UUID.randomUUID(), false);
 			Card cardFromStartingHand = hands.get(0).getCards().remove(1);
 			splitHand.addCard(cardFromStartingHand);
@@ -144,7 +144,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void doubleDown(Card ref) {
 		try {
 			tryTakingPlayerLock();
-			ActionValidator.validateDoubleDownPreConditions(this);
+			ActionValidator.validateDoubleDownAction(this);
 			updateBalanceAndTotalBet(getTotalBet());
 			getFirstHand().doubleDown(ref);
 		} finally {
@@ -165,7 +165,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	public void insure() {
 		try {
 			tryTakingPlayerLock();
-			ActionValidator.validateInsuringConditions(this);
+			ActionValidator.validateInsureAction(this);
 			getFirstHand().insure();
 			updateBalanceAndTotalBet(getFirstHand().getBet().divide(new BigDecimal("2")));
 		} finally {
