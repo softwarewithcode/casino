@@ -39,6 +39,24 @@ public class ActionValidator {
 			throw new IllegalPlayerActionException("hand has been doubled before ");
 	}
 
+	public static boolean isSplitAllowed(BlackjackPlayer player) {
+		try {
+			validateSplitPreConditions(player);
+			return true;
+		} catch (IllegalPlayerActionException i) {
+			return false;
+		}
+	}
+
+	public static boolean isDoubleDownAllowed(BlackjackPlayer player) {
+		try {
+			validateDoubleDownPreConditions(player);
+			return true;
+		} catch (IllegalPlayerActionException i) {
+			return false;
+		}
+	}
+
 	private static void validateActionConditions(BlackjackPlayer player) {
 		if (player.getHands().size() != 1)
 			throw new IllegalPlayerActionException("wrong hand count:" + player.getUserName() + " " + player.getHands().size());

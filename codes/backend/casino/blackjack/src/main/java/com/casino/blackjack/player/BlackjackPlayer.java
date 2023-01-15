@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.casino.blackjack.table.BlackjackUtil;
-import com.casino.common.bet.BetVerifier;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.IHand;
 import com.casino.common.player.CasinoPlayer;
@@ -50,6 +49,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 		this.seatNumber = seatNumber;
 	}
 
+	// UI checks player insurance capability. Backend validates still.
 	public void updateAvailableActions() {
 		try {
 			tryTakingPlayerLock();
@@ -58,14 +58,12 @@ public class BlackjackPlayer extends CasinoPlayer {
 			actions = new ArrayList<>();
 			actions.add(PlayerAction.TAKE);
 			actions.add(PlayerAction.STAND);
-			if (!getFirstHand().isActive())
-				return;
-			if (getFirstHand().getCards().size() != 2)
-				return;
-			if (isSplitAllowed())
-				actions.add(PlayerAction.SPLIT);
-			if (isDoubleDownAllowed())
+			if (ActionValidator.isDoubleDownAllowed(this)) {
 				actions.add(PlayerAction.DOUBLE_DOWN);
+			}
+			if (ActionValidator.isSplitAllowed(this)) {
+				actions.add(PlayerAction.SPLIT);
+			}
 		} finally {
 			releasePlayerLock();
 		}
@@ -176,7 +174,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 	}
 
 	public IHand getActiveHand() {
-		return hands.stream().filter(IHand::isActive).findFirst().orElse(null); //to Optional
+		return hands.stream().filter(IHand::isActive).findFirst().orElse(null); // to Optional
 	}
 
 	public void hit(Card card) {
