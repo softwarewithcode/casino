@@ -6,6 +6,10 @@
 		<version>0.0.1</version>
 	</parent>
 	<artifactId>service</artifactId>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.release>17</maven.compiler.release>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>casino</groupId>
