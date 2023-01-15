@@ -22,7 +22,7 @@ public class GameTypeResource {
 	@Produces("application/json")
 	public Response fetchGameTypes() {
 		try {
-			List<GameType> types = Arrays.asList(new GameType(0, "Blackjack"), new GameType(1, "Test"));
+			List<GameType> types = Arrays.asList(new GameType(0, "Blackjack"));
 			var json = MAPPER.writeValueAsString(types);
 			return Response.ok(json).build();
 		} catch (Exception e) {
