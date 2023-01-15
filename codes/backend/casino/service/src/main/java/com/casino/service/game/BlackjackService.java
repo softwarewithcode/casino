@@ -34,25 +34,7 @@ public class BlackjackService implements GameService {
 	private final ConcurrentHashMap<UUID, BlackjackTable> tables = new ConcurrentHashMap<>();
 
 	public BlackjackService() {
-		createTempTables();
-	}
-
-	private void createTempTables() {
-		TableInitData tableInitData = createDefaultInitData(new BigDecimal("5"), new BigDecimal("10"), Type.MULTIPLAYER, MAX_PLAYERS_DEFAULT, SEAT_COUNT_DEFAULT);
-		BlackjackTable temp1 = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
-		tables.putIfAbsent(temp1.getId(), temp1);
-		TableInitData tableInitData2 = createDefaultInitData(new BigDecimal("15"), new BigDecimal("100"), Type.MULTIPLAYER, MAX_PLAYERS_DEFAULT, SEAT_COUNT_DEFAULT);
-		BlackjackTable temp2 = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData2);
-		tables.putIfAbsent(temp2.getId(), temp2);
-		TableInitData temp3 = createDefaultInitData(new BigDecimal("0.5"), new BigDecimal("1.0"), Type.MULTIPLAYER, MAX_PLAYERS_DEFAULT, SEAT_COUNT_DEFAULT);
-		BlackjackTable table3 = new BlackjackTable(Status.WAITING_PLAYERS, temp3);
-		tables.putIfAbsent(table3.getId(), table3);
-		TableInitData temp4 = createDefaultInitData(new BigDecimal("1.0"), new BigDecimal("2.0"), Type.MULTIPLAYER, MAX_PLAYERS_DEFAULT, SEAT_COUNT_DEFAULT);
-		BlackjackTable table4 = new BlackjackTable(Status.CLOSED, temp4);
-		tables.putIfAbsent(table4.getId(), table4);
-		TableInitData temp5 = createDefaultInitData(new BigDecimal("10.0"), new BigDecimal("100.0"), Type.SINGLE_PLAYER, 1, 5);
-		BlackjackTable table5 = new BlackjackTable(Status.WAITING_PLAYERS, temp5);
-		tables.putIfAbsent(table5.getId(), table5);
+		createSomeTables();
 	}
 
 	private TableInitData createDefaultInitData(BigDecimal min, BigDecimal max, Type type, Integer maxPlayer, Integer seatCount) {
@@ -60,11 +42,6 @@ public class BlackjackService implements GameService {
 				seatCount, DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
 		TableInitData tableInitData = new TableInitData(thresholds, UUID.randomUUID(), Language.ENGLISH, type, Game.BLACKJACK);
 		return tableInitData;
-	}
-
-	public void monitorTables() {
-		// create new tables as tables get full
-		// delete closed status tables
 	}
 
 	@Override
@@ -93,5 +70,40 @@ public class BlackjackService implements GameService {
 
 	public List<TableCard> fetchTableCards(Integer from, Integer till) {
 		return tables.values().stream().filter(blackjackTable -> blackjackTable.getStatus().isVisible()).map(BlackjackTable::getTableCard).toList();
+	}
+
+	///////
+	private void createSomeTables() {
+		TableInitData tableInitData = createDefaultInitData(new BigDecimal("5"), new BigDecimal("10"), Type.MULTIPLAYER, MAX_PLAYERS_DEFAULT, SEAT_COUNT_DEFAULT);
+		BlackjackTable temp1 = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
+		tables.putIfAbsent(temp1.getId(), temp1);
+		TableInitData tableInitData2 = createDefaultInitData(new BigDecimal("5"), new BigDecimal("200"), Type.MULTIPLAYER, MAX_PLAYERS_DEFAULT, SEAT_COUNT_DEFAULT);
+		BlackjackTable temp2 = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData2);
+		tables.putIfAbsent(temp2.getId(), temp2);
+		TableInitData temp3 = createDefaultInitData(new BigDecimal("0.5"), new BigDecimal("1.0"), Type.MULTIPLAYER, MAX_PLAYERS_DEFAULT, SEAT_COUNT_DEFAULT);
+		BlackjackTable table3 = new BlackjackTable(Status.WAITING_PLAYERS, temp3);
+		tables.putIfAbsent(table3.getId(), table3);
+		TableInitData temp4 = createDefaultInitData(new BigDecimal("50"), new BigDecimal("100"), Type.MULTIPLAYER, MAX_PLAYERS_DEFAULT, SEAT_COUNT_DEFAULT);
+		BlackjackTable table4 = new BlackjackTable(Status.CLOSED, temp4);
+		tables.putIfAbsent(table4.getId(), table4);
+		TableInitData temp5 = createDefaultInitData(new BigDecimal("10.0"), new BigDecimal("100.0"), Type.SINGLE_PLAYER, 1, 5);
+		BlackjackTable table5 = new BlackjackTable(Status.WAITING_PLAYERS, temp5);
+		tables.putIfAbsent(table5.getId(), table5);
+
+		TableInitData temp6 = createDefaultInitData(new BigDecimal("10.0"), new BigDecimal("100.0"), Type.MULTIPLAYER, 3, 7);
+		BlackjackTable table6 = new BlackjackTable(Status.WAITING_PLAYERS, temp6);
+		tables.putIfAbsent(table6.getId(), table6);
+
+		TableInitData temp7 = createDefaultInitData(new BigDecimal("100.0"), new BigDecimal("500.0"), Type.MULTIPLAYER, 4, 4);
+		BlackjackTable table7 = new BlackjackTable(Status.WAITING_PLAYERS, temp7);
+		tables.putIfAbsent(table7.getId(), table7);
+
+		TableInitData temp8 = createDefaultInitData(new BigDecimal("100.0"), new BigDecimal("10000.0"), Type.SINGLE_PLAYER, 3, 7);
+		BlackjackTable table8 = new BlackjackTable(Status.WAITING_PLAYERS, temp8);
+		tables.putIfAbsent(table8.getId(), table5);
+
+		TableInitData temp9 = createDefaultInitData(new BigDecimal("1000.0"), new BigDecimal("100000"), Type.MULTIPLAYER, 1, 7);
+		BlackjackTable table9 = new BlackjackTable(Status.WAITING_PLAYERS, temp9);
+		tables.putIfAbsent(table9.getId(), table9);
 	}
 }
