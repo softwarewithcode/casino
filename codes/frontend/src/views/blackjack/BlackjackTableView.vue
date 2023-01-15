@@ -152,20 +152,20 @@ const getCenterPlayer = (): BlackjackPlayer => {
     if (player.value?.userName) {
         return player.value;
     }
-    const centerPlayer = table.value.seats.find((seat) => seat.player?.balance > 0)?.player as BlackjackPlayer;
+    const centerPlayer = table.value.seats.find((seat) => seat.player?.userName)?.player as BlackjackPlayer;
     return centerPlayer
 }
 
 const getMainBoxActionRowStyle = (seatNumber: number) => {
     if (table.value.seats.some(seat => seat.player?.seatNumber >= 0)) {
-        return { 'display': "inline", "margin-right": "45px", "left": "50px" }
+        return { 'display': "inline", "margin-right": "45px", "left": "35px" }
     }
     return { 'display': "inline", 'bottom': "200px", "margin-right": "45px", "left": "50px" }
 }
 
 const getMainBoxPlayerActionStyle = () => {
-    const liftUp = getCanvas().height / 5 + "px"
-    return { 'display': "inline", 'bottom': liftUp, "margin-right": "45px", "left": "75px" }
+    const liftUp = getCanvas().height / 8 + "px"
+    return { 'display': "inline", 'bottom': liftUp, "margin-right": "45px", "left": "55px" }
 }
 
 const getInstructionStyle = computed(() => {
@@ -178,6 +178,9 @@ const getInstructionStyle = computed(() => {
 })
 
 const getHandNumberText = () => {
+    if (!player.value.hands) {
+        return ""
+    }
     if (player.value.hands.length === 1) {
         return "Take"
     }
