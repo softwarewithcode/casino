@@ -55,10 +55,9 @@ public class BetTest extends BaseTest {
 	public void placingBetWhenBetPhaseIsCompleteResultsToException() {
 		table.join(bridge, "0");
 		sleep(BET_ROUND_TIME_SECONDS + 1, ChronoUnit.SECONDS);
-		IllegalPlayerActionException exception = assertThrows(IllegalPlayerActionException.class, () -> {
+		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.bet(bridge.tableId(), new BigDecimal("50.0"));
 		});
-		assertEquals(16, exception.getCode());
 	}
 
 	@Test

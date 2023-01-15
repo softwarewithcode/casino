@@ -69,7 +69,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 				dealer.updatePlayerBet(player, bet);
 			else {
 				LOGGER.severe("Starting bet is not accepted:phase " + getGamePhase() + " table:" + this + " player:" + player);
-				throw new IllegalPlayerActionException("placeStartingBet is not allowed:" + player + " bet:" + bet.toString(), 16);
+				throw new IllegalPlayerActionException("placeStartingBet is not allowed:" + player + " bet:" + bet.toString());
 			}
 		} finally {
 			LOGGER.exiting(getClass().getName(), "bet", bet + " player:" + playerId + " table:" + getId());
@@ -85,7 +85,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 				dealer.insure(player);
 			else {
 				LOGGER.severe("insuring is not accepted:phase " + getGamePhase() + " table:" + this + " player:" + player);
-				throw new IllegalPlayerActionException("insuring is not allowed in phase: " + getGamePhase() + " table:" + this + " player:" + player, 44);
+				throw new IllegalPlayerActionException("insuring is not allowed in phase: " + getGamePhase() + " table:" + this + " player:" + player);
 			}
 		} finally {
 			LOGGER.exiting(getClass().getName(), "insure", " player:" + playerId + " table:" + getId());
@@ -164,7 +164,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	private void verifyActionClearance(ICasinoPlayer player, String actionName) {
 		if (!isPlayerAllowedToMakeAction(player)) {
 			LOGGER.log(Level.SEVERE, "Player:" + player + " not allowed to make action: '" + actionName + "' playerInTurn:" + getPlayerInTurn() + " phase: " + getGamePhase() + " in table:" + this);
-			throw new IllegalPlayerActionException(actionName + " not allowed for player:" + player, 14);
+			throw new IllegalPlayerActionException(actionName + " not allowed for player:" + player);
 		}
 	}
 
