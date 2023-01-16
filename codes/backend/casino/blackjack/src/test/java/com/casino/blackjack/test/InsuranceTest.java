@@ -1,6 +1,7 @@
 package com.casino.blackjack.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -18,6 +19,7 @@ import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
+import com.casino.common.exception.IllegalBetException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.table.Status;
 import com.casino.common.user.Bridge;
@@ -33,7 +35,7 @@ public class InsuranceTest extends BaseTest {
 	public void initTest() {
 		try {
 			table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
-			table2 = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitDataWithThresholds(getThresholdsWithBets(new BigDecimal("15.0"), new BigDecimal("100.0"))));
+			table2 = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitDataWithThresholds(getThresholdsWithBets(new BigDecimal("15.0"), new BigDecimal("3000.0"))));
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge3 = new Bridge("JaneDoe2", table2.getId(), UUID.randomUUID(), null, new BigDecimal("450.0"));
@@ -323,6 +325,7 @@ public class InsuranceTest extends BaseTest {
 		table2.bet(bridge3.userId(), new BigDecimal("100"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table2.insure(bridge3.userId());
+		assertTrue(table2.getPlayer(bridge3.userId()).getHands().get(0).isInsured());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertTrue(table2.getPlayer(bridge3.userId()).getActions().stream().filter(action -> action == PlayerAction.SPLIT).findAny().isEmpty());
 	}
@@ -338,7 +341,33 @@ public class InsuranceTest extends BaseTest {
 		table2.bet(bridge3.userId(), new BigDecimal("100"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table2.insure(bridge3.userId());
+		assertTrue(table2.getPlayer(bridge3.userId()).getHands().get(0).isInsured());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertTrue(table2.getPlayer(bridge3.userId()).getActions().stream().filter(action -> action == PlayerAction.DOUBLE_DOWN).findAny().isPresent());
 	}
+
+	@Test
+	public void insureIsAnOptionWhenPlayerHasLeftHalfOfTheTotalBet() {
+		dealer2.getDecks().add(Card.of(2, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(1, Suit.CLUB));
+		dealer2.getDecks().add(Card.of(9, Suit.SPADE));
+		table2.join(bridge3, "5");
+		table2.bet(bridge3.userId(), new BigDecimal("300.0"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		table2.insure(bridge3.userId());
+		assertTrue(table2.getPlayer(bridge3.userId()).getHands().get(0).isInsured());
+	}
+
+	@Test
+	public void insureNotAnOptionWhenPlayerHasLeftLessThanHalfOfTheTotalBet() {
+		dealer2.getDecks().add(Card.of(2, Suit.DIAMOND));
+		dealer2.getDecks().add(Card.of(1, Suit.CLUB));
+		dealer2.getDecks().add(Card.of(9, Suit.SPADE));
+		table2.join(bridge3, "5");
+		table2.bet(bridge3.userId(), new BigDecimal("300.01"));
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertFalse(table2.getPlayer(bridge3.userId()).getHands().get(0).isInsured());
+		assertThrows(IllegalPlayerActionException.class, () -> table2.insure(bridge3.userId()));
+	}
+
 }

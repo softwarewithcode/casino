@@ -57,10 +57,10 @@ public class BlackjackPlayer extends CasinoPlayer {
 			actions = new ArrayList<>();
 			actions.add(PlayerAction.TAKE);
 			actions.add(PlayerAction.STAND);
-			if (ActionValidator.isDoubleDownAllowed(this)) {
+			if (ActionValidator.isDoubleDownTechnicallyAllowed(this)) {
 				actions.add(PlayerAction.DOUBLE_DOWN);
 			}
-			if (ActionValidator.isSplitAllowed(this)) {
+			if (ActionValidator.isSplitTechnicallyAllowed(this)) {
 				actions.add(PlayerAction.SPLIT);
 			}
 		} finally {
