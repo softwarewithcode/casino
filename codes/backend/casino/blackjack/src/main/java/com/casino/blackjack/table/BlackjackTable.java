@@ -41,12 +41,12 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 	}
 
 	@Override
-	public boolean join(Bridge bridge, String seatNmbr) {
+	public boolean join(Bridge bridge, String seatNumber) {
 		LOGGER.entering(getClass().getName(), "join", getId());
 		try {
-			Integer seatNumber = seatNmbr != null ? Integer.parseInt(seatNmbr) : null;
+			Integer seatNumbr = seatNumber != null ? Integer.parseInt(seatNumber) : null;
 			BlackjackPlayer player = new BlackjackPlayer(bridge, this);
-			Optional<Seat> seatOptional = trySeat(seatNumber, player);
+			Optional<Seat> seatOptional = trySeat(seatNumbr, player);
 			if (seatOptional.isEmpty()) {
 				return false;
 			}
@@ -56,7 +56,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			dealer.onPlayerArrival(player);
 			return true;
 		} finally {
-			LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNmbr + " bridge:" + bridge + " tableId:" + getId());
+			LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNumber + " bridge:" + bridge + " tableId:" + getId());
 		}
 	}
 
