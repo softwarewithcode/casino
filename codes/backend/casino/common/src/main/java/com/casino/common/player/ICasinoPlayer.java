@@ -73,4 +73,6 @@ public interface ICasinoPlayer {
 	public Integer getSitOutRounds();
 
 	public boolean shouldStandUp();
+
+	public boolean isConnected();
 }

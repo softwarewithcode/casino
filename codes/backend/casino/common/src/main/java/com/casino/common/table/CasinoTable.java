@@ -112,7 +112,7 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public boolean addWatcher(ICasinoPlayer watcher) {
-		if (watcher == null)
+		if (watcher == null || !watcher.isConnected())
 			return false;
 		return watchers.putIfAbsent(watcher.getId(), watcher) != null;
 	}
@@ -252,7 +252,8 @@ public abstract class CasinoTable implements ICasinoTable {
 
 	@Override
 	public String toString() {
-		return "CasinoTable [type=" + type + ", id=" + id + ", created=" + created + ", playerInTurn=" + playerInTurn + ", tableInitData=" + tableInitData + "]";
+		return "CasinoTable [type=" + type + ", id=" + id + ", created=" + created + ", playerInTurn=" + playerInTurn
+				+ ", tableInitData=" + tableInitData + "]";
 	}
 
 }

@@ -246,6 +246,11 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 	public Integer getSitOutRounds() {
 		return skippedBetRounds;
 	}
+	
+	@Override
+	public boolean isConnected() {
+		return bridge.isConnected();
+	}
 
 	@Override
 	public boolean shouldStandUp() {
