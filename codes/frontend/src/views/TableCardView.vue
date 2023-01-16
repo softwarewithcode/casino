@@ -9,7 +9,6 @@ const openTable = (gameType: string, tableId: string) => {
 };
 
 const getStatusText = (card: TableCard) => {
-    // i18n becomes more difficult!
     if (card.type === TableType.MULTIPLAYER)
         return card.availablePositions.length > 0 ? "Available seats " + card.availablePositions.length : "Full"
     return card.availablePositions.length === card.thresholds.seatCount ? "Available (seats " + card.thresholds.seatCount + ")" : "Full"
@@ -21,6 +20,7 @@ const getStatusText = (card: TableCard) => {
         Type: {{ card.type.toLowerCase() }}<br>
         Min: {{ card.thresholds.minimumBet }} <br>
         Max: {{ card.thresholds.maximumBet }} <br>
+        Turn time {{ card.thresholds.playerTime }}s <br>
         {{ getStatusText(card) }} <br>
     </div>
 </template>

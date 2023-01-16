@@ -96,6 +96,10 @@ public class BlackjackService implements GameService {
 		TableInitData temp9 = createDefaultInitData(new BigDecimal("1000.0"), new BigDecimal("100000"), Type.MULTIPLAYER, 1, 7);
 		BlackjackTable table9 = new BlackjackTable(Status.WAITING_PLAYERS, temp9);
 		tables.putIfAbsent(table9.getId(), table9);
+		
+		TableInitData temp13 = createDefaultInitData(new BigDecimal("1000.0"), new BigDecimal("10000"), Type.MULTIPLAYER, 1, 7);
+		BlackjackTable table13 = new BlackjackTable(Status.WAITING_PLAYERS, temp13);
+		tables.putIfAbsent(table13.getId(), table13);
 
 		// Fast table
 		TableInitData temp10 = createFastTable(new BigDecimal("1000.0"), new BigDecimal("10000"), Type.MULTIPLAYER, 1, 7);

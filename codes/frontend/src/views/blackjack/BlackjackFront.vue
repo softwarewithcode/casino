@@ -9,7 +9,7 @@ store.populateStore()
 </script>
 
 <template>
-    <h1>Blackjack games</h1><br>
+    <h1>Blackjack tables</h1><br>
     <div v-for="(table) in store.getTables" :key="table.id">
         <TableCardView :card="table" />
     </div>

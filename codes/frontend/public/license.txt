@@ -1,9 +1,9 @@
 January 15, 2023
 
-License: AGPL 3.0
-https://www.gnu.org/licenses/agpl-3.0.en.html
 Origin:
 https://github.com/softwarewithcode/casino
+License: AGPL 3.0
+https://www.gnu.org/licenses/agpl-3.0.en.html
 
 Playing cards sprite image:
     https://opengameart.org/content/playing-cards-3

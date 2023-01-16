@@ -9,7 +9,7 @@ store.populateStore()
 
 <template>
     <main>
-        <h1> Casino tables</h1>
+        <h1>Casino games</h1>
         <div style="display: block" v-for="(gameType, index) in store.getTypes" :key="index">
             <router-link :to="{ name: 'blackjackFront' }">{{ gameType.type }}</router-link>
         </div>

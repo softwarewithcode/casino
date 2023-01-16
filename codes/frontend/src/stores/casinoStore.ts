@@ -27,9 +27,6 @@ export const useCasinoStore = defineStore("casinoStore", {
 			let counterCurrent = this.counter
 			counterCurrent--
 			this.counter = counterCurrent
-		},
-		async login() {
-			//?? sessionStorage? location
 		}
 	}
 })
