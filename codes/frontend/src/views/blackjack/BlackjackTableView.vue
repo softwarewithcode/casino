@@ -2,7 +2,7 @@
 import { PlayerAction, GamePhase, type BlackjackPlayer, type Seat } from "@/types/blackjack";
 import { useActorsPainter, useCanvasInitializer, useInitialDealPainter, useCardsAndHandValuesPainter } from "../../components/composables/rendering/multiplayerTablePainter";
 import { onMounted, onUnmounted, ref, computed, reactive } from "vue";
-import { useSend } from "@/components/composables/communication/socket/websocket";
+import { useSocketSend, useSocketClose } from "@/components/composables/communication/socket/websocket";
 import { useBlackjackStore } from "../../stores/blackjackStore";
 import { mapActions, storeToRefs } from "pinia";
 import { bgImage, } from "../../types/images"
@@ -11,7 +11,7 @@ import { TableType } from "@/types/casino";
 const props = defineProps<{ tableId: string }>();
 const canvasReady = ref<boolean>(false);
 const blackjackStore = useBlackjackStore();
-const casinoStore = useBlackjackStore();
+
 const { table, command, player } = storeToRefs(blackjackStore);
 const { counter } = storeToRefs(blackjackStore);
 const unSubscribe = blackjackStore.$subscribe((mutation, state) => {
@@ -30,6 +30,8 @@ onMounted(() => {
 
 onUnmounted(() => {
     unSubscribe()
+    useSocketClose()
+    blackjackStore.$reset()
 })
 const onStorePatch = () => {
     drawTable(table.value.gamePhase === "PLAY" && command.value === Command.INITIAL_DEAL_DONE);
@@ -40,7 +42,7 @@ const onStorePatch = () => {
         previousBetAmount.value = tablePlayer.totalBet > table.value.tableCard.thresholds.maximumBet ? table.value.tableCard.thresholds.maximumBet : tablePlayer.totalBet
 }
 const takeSeat = (seat: string) => {
-    useSend({ action: "JOIN", seat: seat });
+    useSocketSend({ action: "JOIN", seat: seat });
 }
 
 const counterText = computed<string>(() => {
@@ -64,7 +66,7 @@ const counterText = computed<string>(() => {
 })
 const adjustBet = (amount: number) => {
     betAmount.value = amount
-    useSend({ action: PlayerAction.BET, amount: amount });
+    useSocketSend({ action: PlayerAction.BET, amount: amount });
     player.value.totalBet = betAmount.value
     drawTable(false)
 }
@@ -115,10 +117,10 @@ const hasBet = computed<boolean>(() => {
 })
 const insure = () => {
     insuranceClicked.value = true
-    useSend({ action: PlayerAction.INSURE })
+    useSocketSend({ action: PlayerAction.INSURE })
 }
 const sendAction = (action: string) => {
-    useSend({ action: action });
+    useSocketSend({ action: action });
 };
 
 const getSeatsDescending = computed<Array<Seat>>(() => {
@@ -231,7 +233,7 @@ const insuranceAvailable = computed<boolean>(() => {
         </div>
         <div v-if="table.gamePhase === GamePhase.INSURE" id="insureRow" style="position:absolute"
             :style="getMainBoxActionRowStyle">
-            <button v-if="insuranceAvailable" @click="insure()">
+            <button :disabled="!insuranceAvailable" @click="insure()">
                 Insure
             </button>
         </div>

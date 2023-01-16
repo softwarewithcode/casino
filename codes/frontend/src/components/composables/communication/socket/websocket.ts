@@ -9,14 +9,18 @@ export async function useOpenTable(tableType: string, tableId: string) {
 	await initSocket(finalURI.toLocaleLowerCase())
 }
 
-export function useSend(data: any) {
+export function useSocketSend(data: any) {
 	websocket.send(JSON.stringify(data))
+}
+
+export function useSocketClose() {
+	websocket?.close()
 }
 
 function initSocket(finalURI: string) {
 	websocket = new WebSocket(finalURI)
 	websocket.onopen = event => {
-		useSend(JSON.parse(openTableJSON))
+		useSocketSend(JSON.parse(openTableJSON))
 	}
 	websocket.onmessage = event => {
 		let data = JSON.parse(event.data)
