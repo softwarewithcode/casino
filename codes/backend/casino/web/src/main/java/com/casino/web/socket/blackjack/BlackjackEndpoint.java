@@ -46,7 +46,7 @@ public class BlackjackEndpoint {
 			}
 			this.tableId = id;
 			this.table = table.get();
-			session.setMaxIdleTimeout(30 * 60 * 1000);
+			session.setMaxIdleTimeout(4 * 60 * 1000);
 			session.setMaxTextMessageBufferSize(1024 * 2);
 			session.setMaxBinaryMessageBufferSize(0);
 		} catch (Exception e) {
