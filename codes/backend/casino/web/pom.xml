@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>casino</groupId>
 		<artifactId>casino</artifactId>
-		<version>0.0.1</version>
+		<version>1.0.0</version>
 	</parent>
 	<artifactId>web</artifactId>
 	<packaging>war</packaging>
@@ -18,17 +18,17 @@
 		<dependency>
 			<groupId>casino</groupId>
 			<artifactId>blackjack</artifactId>
-			<version>0.0.1</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>casino</groupId>
 			<artifactId>common</artifactId>
-			<version>0.0.1</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>casino</groupId>
 			<artifactId>service</artifactId>
-			<version>0.0.1</version>
+			<version>1.0.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/jakarta.ejb/jakarta.ejb-api -->
 		<dependency>
@@ -53,11 +53,6 @@
 			<groupId>jakarta.websocket</groupId>
 			<artifactId>jakarta.websocket-api</artifactId>
 			<version>2.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mariadb.jdbc</groupId>
-			<artifactId>mariadb-java-client</artifactId>
-			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.annotation</groupId>
@@ -115,7 +110,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>casino.web</finalName>
+		<finalName>casino</finalName>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -125,7 +120,7 @@
 				<!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_war_packaging -->
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.10.1</version>
+					<version>3.9.0</version>
 					<configuration>
 						<release>17</release>
 					</configuration>

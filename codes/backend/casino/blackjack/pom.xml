@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>casino</groupId>
 		<artifactId>casino</artifactId>
-		<version>0.0.1</version>
+		<version>1.0.0</version>
 	</parent>
 	<artifactId>blackjack</artifactId>
 	<properties>
@@ -14,19 +14,13 @@
 		<dependency>
 			<groupId>casino</groupId>
 			<artifactId>common</artifactId>
-			<version>0.0.1</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
 			<version>5.9.1</version>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mariadb.jdbc</groupId>
-			<artifactId>mariadb-java-client</artifactId>
-			<version>3.1.0</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -38,7 +32,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.10.1</version>
+				<version>3.9.0</version>
 				<configuration>
 					<release>17</release>
 				</configuration>
