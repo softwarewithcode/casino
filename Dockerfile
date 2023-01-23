@@ -1,9 +1,8 @@
-# This Casino-app is not fully working using this dockerfile. This file serves as a remainder for tested commands.
-# With this Dockerfile the Docker container's Tomee server's casino-app is not setting the context-root in server.xml file.
+# Casino is not fully working using this dockerfile. Only a list of tables are returned for restful calls.
 # Websockets in this app require the context root to be set, otherwise 404.
-# Line 22 starting with "RUN sed.." tries to solve the missing context root problem in server.xml
-# But seems that there is timing error with Tomee startup and the "sed" command. The "sed" command works ok after Tomee has started.
-# And after restarting the container also websockets start to work in the container.
+# With this Dockerfile the Docker container's Tomee server's casino-app is not setting the context-root in server.xml file.
+# Line 21 starting with "RUN sed.." tries to solve the missing context root problem in server.xml
+# Seems that there is timing error with Tomee startup and the "sed" command. The "sed" command works ok after Tomee has started.
 
 FROM maven:3.8.5-openjdk-17 AS build
 RUN mkdir /app
@@ -17,8 +16,12 @@ FROM tomee:9.0.0.RC1-jre17-alpine-webprofile
 RUN apk update && \
     apk add nano
 
-COPY --from=build /app/* /usr/local/tomee/webapps/   # Copies all, should copy only package
+COPY --from=build /app/* /usr/local/tomee/webapps/
 
 #RUN sed -i '138i \<Context docBase="casino" path="/casino" reloadable="true"/\>' /usr/local/tomee/conf/server.xml
 #CMD ["catalina.sh", "start"]
 EXPOSE 8080
+
+
+
+#docker build -t casino .
