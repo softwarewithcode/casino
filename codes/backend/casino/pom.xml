@@ -22,7 +22,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>casino</finalName>
+		<finalName>casino-all</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -34,6 +34,10 @@
 				<configuration>
 					<release>17</release>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.3.2</version>
 			</plugin>
 		</plugins>
 	</build>
