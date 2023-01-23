@@ -1,7 +1,7 @@
 # casino
 
 ## Docker
-Dockerfile not yet fully working. If you have time and interest to get the Docker working -> pull request or a message would be cool for working setup.
+Dockerfile not yet fully working. If you have time and interest to get the Docker working and share your solution for free (only with username credits if wanted)  -> pull request or a message would be cool for working setup.
 
 ## Workspace instructions from scratch<br>
 /utils/workspace folder
