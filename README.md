@@ -1,40 +1,33 @@
 # casino
 
-## Docker
-Dockerfile not yet fully working. If you have time and interest to get the Docker working and share your solution for free (only with username credits if wanted)  -> pull request or a message would be cool for working setup.
+## About <br>
+This repository contains modularized building blocks for a simple virtual casino and includes a blackjack game. Users from different machines can see every players' cards and chips on the table just like playing a real game. Turn changes from player to player based on actions, timeouts and by received cards. <br>
 
-## Workspace instructions from scratch<br>
-/utils/workspace folder
+### Documentation
+/utils/documentation
 
-## User interface 
-Current UI is only a reference implementation without any fancy animations. <br> If you are interested in developing your own version of the UI then reference implementation and it's communication with backend might be a place to start. Frontend folder contains UI sources.
+### Workspace instructions and technical
+ /utils/workspace
 
-UI <br>
-1)fetches tables from http://localhost:8080/casino/blackjack/tables <br>
-2)connects to a selected table at ws://localhost:8080/casino/blackjack/{tableId} <br>
-Expected context root for web-app is /casino which is possible to configure when starting backend server. <br>
-For example if running TomEE plume, it can be configured to use 8080 port and "/casino" context path. <br>
-->  server.xml -> <Context docBase="web" path="/casino" reloadable="true"  <br>
+### Frontend
+Current frontend is merely a reference implementation for backend testing. Repo description contains a link which shows how the UI works without building a workspace. <br>
+Frontend is reactive using Pinia and Vue combination. Frontend has no animations. <br>
+Documentation section has more information about ui-backend websocket communications. It might be useful if you want to test/study WebSockets using this project. Or maybe build brand new user interface. 
+
+### Backend
+Built originally using Java 19 with Virtual Threads / JakartaEE. Downgraded later to LTS Java17, point being to get the (backend) workspace running in a Docker container. Currently Tomee has only Java17 docker images available. Check issues tab with Docker. <br>
+
+Some classes have Virtual Threads parts commented out for future. + ConcurrentPreviewTestBreaksWithoutConfiguration.java as Junit test class which uses Virtual Threads and Cyclic Barriers for concurrent testing.
+
+### Future development ideas
+Next game? Roulette, Texas Hold'em, Omaha etc. <br>
+Database handling, authentication. <br>
+
+### For learning
+On the backend side it would be really nice to hear if you find/see some bugs especially concurrency related but all are welcomed.
 
 
-##
-Backend portion contains the compiled UI files. So it's possible to check the app without setting up the UI environment. <br>
-http://localhost:8080/casino/ with pre compiled files, without setting the frontend dev environment. <br>
 
-## initial idea and goals 25/11/2022
-* Build a casino where play money is used 
-* Start with a blackjack game 
-* Public and private tables with custom token coins
-* Free daily play money reload if all is lost
-* Username and guest players
-* Once the user 'withdraws' the play money could be converted to top list position.
-* Start development from database and the core game itself
-* Build UI on top of working internals
-* Partly reuse code from my previous projects
-## Technology
-* JakartaEE backend with MariaDB for the core data. Finished hands into MongoDB cloud?
-* UI: Browser? Html canvas for visualization?
-* Timetable?
-* OpenJDK 19 with compiler level 19
-* used IDE Eclipse 2022-09 -> import as Maven projects
-* running tests in Eclipse -> run as JUnit test from the main test folder level "blackjack/src/test/java" with mouse right click
+
+
+ 
