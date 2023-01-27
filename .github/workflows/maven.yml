@@ -57,4 +57,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: artifact
-          path: /codes/backend/casino/web/target/casino.war
+          path: /codes/backend/casino/web/casino.war
