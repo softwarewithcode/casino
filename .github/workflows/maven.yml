@@ -37,6 +37,7 @@ jobs:
           tree target
           cd ..
           cd web
+          pwd
           tree target
           cd ..
           cd blackjack
