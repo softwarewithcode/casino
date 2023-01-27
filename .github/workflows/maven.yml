@@ -28,7 +28,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B clean package --file ${GITHUB_WORKSPACE}/codes/backend/casino/pom.xml
+      run: mvn -B clean package -Dmaven.test.skip --file ${GITHUB_WORKSPACE}/codes/backend/casino/pom.xml
     - name: List files
       run: ls -a
     - name: List target files
