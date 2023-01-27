@@ -33,7 +33,7 @@ jobs:
       run: ls -a
     - name: List target files
       run: | 
-          cd /target
+          cd ${GITHUB_WORKSPACE}/target
           ls -a
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
