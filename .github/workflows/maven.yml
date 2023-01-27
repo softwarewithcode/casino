@@ -32,9 +32,8 @@ jobs:
     - name: List files
       run: ls -a
     - name: List target files
-      run: | 
+      run: 
           ls -l
-          ls -a
           
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
