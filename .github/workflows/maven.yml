@@ -56,8 +56,14 @@ jobs:
       - name: print current directory
         run: |
             tree
+            ls -a
       - name: publish to GitHub
-        uses: actions/upload-artifact@v3
+        uses: actions/cache@v2
+        env:
+            cache-name: cache-files
         with:
           name: artifact
-          path: ${GITHUB_WORKSPACE}/codes/backend/casino/web/target/casino.war
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
