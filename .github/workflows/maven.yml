@@ -34,13 +34,13 @@ jobs:
           cd codes/backend/casino/common
           tree target
           cd ..
-          cd codes/backend/casino/service
+          cd service
           tree target
           cd ..
-          cd codes/backend/casino/web
+          cd web
           tree target
           cd ..
-          cd codes/backend/casino/blackjack
+          cd blackjack
           tree target
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     #- name: Update dependency graph
