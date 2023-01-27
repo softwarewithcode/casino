@@ -31,8 +31,8 @@ jobs:
       run: mvn -B clean package -Dmaven.test.skip --file ${GITHUB_WORKSPACE}/codes/backend/casino/pom.xml
     - name: List target files
       run: | 
-          cd codes/backend/casino/
-          ls -a
+          cd codes/backend/casino/blackjack
+          tree target
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     #- name: Update dependency graph
