@@ -32,10 +32,11 @@ jobs:
     - name: List files
       run: ls -a
     - name: List target files
-      run: | 
-          cd ${GITHUB_WORKSPACE}/codes/backend/casino/target
-          ls -a
+      run: |
           ls -l
+# cd ${GITHUB_WORKSPACE}/codes/backend/casino/target
+          ls -a
+          
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
