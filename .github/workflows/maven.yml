@@ -32,9 +32,8 @@ jobs:
     - name: List files
       run: ls -a
     - name: List target files
-      run: |
+      run: | 
           ls -l
-# cd ${GITHUB_WORKSPACE}/codes/backend/casino/target
           ls -a
           
 
