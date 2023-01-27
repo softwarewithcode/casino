@@ -53,6 +53,9 @@ jobs:
     
     needs: build
     steps:
+      - name: print current directory
+        run: |
+            tree
       - name: publish to GitHub
         uses: actions/upload-artifact@v3
         with:
