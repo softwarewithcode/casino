@@ -47,3 +47,13 @@ jobs:
      # uses: advanced-security/maven-dependency-submission-action@v1 --d ${GITHUB_WORKSPACE}/codes/backend/casino/
      
     #Currently the action is limited to single module Maven projects, with a future update that will add support for multi-module based projects.
+    
+   publish:
+        
+    needs: build
+    - name: publish to GitHub
+    - uses: actions/upload-artifact@v3
+    - with:
+        name: assets
+        path: /codes/backend/target/Casino.war
+    
