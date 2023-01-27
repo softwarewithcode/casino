@@ -37,5 +37,7 @@ jobs:
           
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@v1 --d ${GITHUB_WORKSPACE}/codes/backend/casino/
+    #- name: Update dependency graph
+     # uses: advanced-security/maven-dependency-submission-action@v1 --d ${GITHUB_WORKSPACE}/codes/backend/casino/
+     
+    #Currently the action is limited to single module Maven projects, with a future update that will add support for multi-module based projects.
