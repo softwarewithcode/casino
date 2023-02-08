@@ -1,5 +1,6 @@
 # casino
 
+Current and latest dev branch is "texas-hold'em" -> git checkout texas-hold'em <br>
 ## About <br>
 This repository contains modularized building blocks for a simple virtual casino and includes a blackjack game. Users from different machines can see every players' cards and chips on the table just like playing a real game. Turn changes from player to player based on actions, timeouts and by received cards. <br>
 
