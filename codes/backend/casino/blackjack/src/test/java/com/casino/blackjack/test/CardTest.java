@@ -12,15 +12,15 @@ import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
-import com.casino.common.table.Status;
 import com.casino.common.user.Bridge;
 
 public class CardTest extends BaseTest {
+	BlackjackTable table;
 
 	@BeforeEach
 	public void initTest() {
 		try {
-			BlackjackTable table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
+			table = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 
@@ -91,7 +91,7 @@ public class CardTest extends BaseTest {
 	}
 
 	private BlackjackPlayer createPlayer() {
-		BlackjackPlayer player = new BlackjackPlayer(bridge, null);
+		BlackjackPlayer player = new BlackjackPlayer(bridge, table);
 
 		return player;
 	}

@@ -1,6 +1,6 @@
 <script setup lang = "ts">
 import { useCasinoStore } from "../stores/casinoStore"
-import Blackjack from "./TableCardView.vue";
+import { useViewIdToViewNameMapper } from "@/components/composables/common/Views";
 
 const store = useCasinoStore()
 store.populateStore()
@@ -11,7 +11,7 @@ store.populateStore()
     <main>
         <h1>Casino games</h1>
         <div style="display: block" v-for="(gameType, index) in store.getTypes" :key="index">
-            <router-link :to="{ name: 'blackjackFront' }">{{ gameType.type }}</router-link>
+            <router-link :to="{ name: useViewIdToViewNameMapper(gameType.index) }">{{ gameType.type }}</router-link>
         </div>
     </main>
 </template>

@@ -68,5 +68,5 @@ $RECYCLE.BIN/
 *.suo
 *.ntvs*
 *.njsproj
-*dist*
+*.iml*
 No newline at end of file

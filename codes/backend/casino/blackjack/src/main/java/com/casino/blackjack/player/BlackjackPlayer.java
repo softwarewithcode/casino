@@ -1,47 +1,45 @@
 package com.casino.blackjack.player;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.casino.blackjack.export.BlackjackPlayerAction;
+import com.casino.common.bet.BetVerifier;
 import com.casino.common.cards.Card;
-import com.casino.common.cards.IHand;
 import com.casino.common.player.CasinoPlayer;
-import com.casino.common.table.ICasinoTable;
-import com.casino.common.table.ISeatedTable;
+import com.casino.common.player.PlayerStatus;
+import com.casino.common.table.structure.ISeatedTable;
 import com.casino.common.user.Bridge;
-import com.casino.common.user.PlayerAction;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIncludeProperties(value = { "hands", "actions", "seatNumber", "userName", "balance", "totalBet", "payout" })
-public class BlackjackPlayer extends CasinoPlayer {
-	private List<IHand> hands;
-	private List<PlayerAction> actions;
+@JsonIncludeProperties(value = { "hands", "actions", "seatNumber", "userName", "currentBalance", "totalBet", "payout" })
+public final class BlackjackPlayer extends CasinoPlayer {
+	private List<BlackjackHand> hands;
+	private List<BlackjackPlayerAction> actions;
 	private Integer seatNumber;
 
-	public BlackjackPlayer(Bridge bridge, ISeatedTable table) {
+	public BlackjackPlayer(Bridge bridge, ISeatedTable<BlackjackPlayer> table) {
 		super(bridge, table);
 		hands = new ArrayList<>();
-		hands.add(createNewHand(true));
+		hands.add(createNewHand());
 		actions = new ArrayList<>(4);
 	}
 
 	public boolean canTake() {
-		IHand hand = getActiveHand();
+		BlackjackHand hand = getActiveHand();
 		if (hand == null)
 			return false;
 		List<Integer> values = hand.calculateValues(); // Smallest value in 0 pos.
 		return values.get(0) < 21;
 	}
 
-	private BlackjackHand createNewHand(boolean active) {
-		return new BlackjackHand(UUID.randomUUID(), active);
-	}
-
-	public Integer getSeatNumber() {
-		return seatNumber;
+	private BlackjackHand createNewHand() {
+		return new BlackjackHand(UUID.randomUUID(), true);
 	}
 
 	public void setSeatNumber(Integer seatNumber) {
@@ -51,127 +49,132 @@ public class BlackjackPlayer extends CasinoPlayer {
 	// UI checks player insurance capability. Backend validates still.
 	public void updateAvailableActions() {
 		try {
-			tryTakingPlayerLock();
+			tryLock();
 			if (!hasActiveHand())
 				return;
 			actions = new ArrayList<>();
-			actions.add(PlayerAction.TAKE);
-			actions.add(PlayerAction.STAND);
-			if (ActionValidator.isDoubleDownTechnicallyAllowed(this)) {
-				actions.add(PlayerAction.DOUBLE_DOWN);
-			}
-			if (ActionValidator.isSplitTechnicallyAllowed(this)) {
-				actions.add(PlayerAction.SPLIT);
-			}
+			actions.add(BlackjackPlayerAction.TAKE);
+			actions.add(BlackjackPlayerAction.STAND);
+			if (BlackjackActionValidator.isDoubleDownTechnicallyAllowed(this))
+				actions.add(BlackjackPlayerAction.DOUBLE_DOWN);
+			if (BlackjackActionValidator.isSplitTechnicallyAllowed(this))
+				actions.add(BlackjackPlayerAction.SPLIT);
 		} finally {
-			releasePlayerLock();
+			releaseLock();
 		}
 	}
 
-	private IHand getSecondHand() {
+	private BlackjackHand getSecondHand() {
 		return getHands().get(1);
 	}
 
-	public void prepareNextRound() {
+	@Override
+	public void prepareForNextRound() {
 		try {
-			tryTakingPlayerLock();
+			tryLock();
 			hands = new ArrayList<>();
-			hands.add(createNewHand(true));
+			hands.add(createNewHand());
 			updateAvailableActions();
 			this.removeTotalBet();
 		} finally {
-			releasePlayerLock();
+			releaseLock();
 		}
 	}
 
+	@Override
 	public boolean hasActiveHand() {
-		return hands.stream().filter(IHand::isActive).findAny().isPresent();
+		return hands.stream().anyMatch(BlackjackHand::isActive);
 	}
 
-	public boolean isInsuranceCompensable() {
-		return getFirstHand().isInsuranceCompensable();
-	}
-
-	public List<PlayerAction> getActions() {
+	@Override
+	public List<BlackjackPlayerAction> getActions() {
 		return actions;
 	}
 
 	public void splitStartingHand() {
 		try {
-			tryTakingPlayerLock();
-			ActionValidator.validateSplitAction(this);
-			IHand splitHand = new BlackjackHand(UUID.randomUUID(), false);
+			tryLock();
+			BlackjackActionValidator.validateSplitAction(this);
+			BlackjackHand splitHand = new BlackjackHand(UUID.randomUUID(), false);
 			Card cardFromStartingHand = hands.get(0).getCards().remove(1);
 			splitHand.addCard(cardFromStartingHand);
 			splitHand.updateBet(hands.get(0).getBet());
 			updateBalanceAndTotalBet(splitHand.getBet());
 			hands.add(splitHand);
 		} finally {
-			releasePlayerLock();
+			releaseLock();
 		}
 	}
 
 	public void stand() {
 		try {
-			tryTakingPlayerLock();
-			IHand activeHand = getActiveHand();
+			tryLock();
+			BlackjackHand activeHand = getActiveHand();
 			activeHand.stand();
 		} finally {
-			releasePlayerLock();
+			releaseLock();
 		}
 	}
 
 	public void activateSecondHand() {
-		getSecondHand().activate();
+		try {
+			tryLock();
+			getSecondHand().activate();
+		} finally {
+			releaseLock();
+		}
 	}
 
 	public void doubleDown(Card ref) {
 		try {
-			tryTakingPlayerLock();
-			ActionValidator.validateDoubleDownAction(this);
+			tryLock();
+			BlackjackActionValidator.validateDoubleDownAction(this);
 			updateBalanceAndTotalBet(getTotalBet());
 			getFirstHand().doubleDown(ref);
 		} finally {
-			releasePlayerLock();
+			releaseLock();
 		}
 	}
 
-	@Override
-	public void updateStartingBet(BigDecimal bet, ICasinoTable table) {
+	public void updateStartingBet(BigDecimal bet) {
 		try {
-			tryTakingPlayerLock();
-			super.updateStartingBet(bet, table);
+			tryLock();
+			BetVerifier.verifyBetIsAllowedInTable(table, this, bet);
+			this.totalBet = bet;
 		} finally {
-			releasePlayerLock();
+			releaseLock();
 		}
+	}
+	@JsonProperty // getter for serialization
+	public Integer getSeatNumber() {
+		return seatNumber;
 	}
 
 	public void insure() {
 		try {
-			tryTakingPlayerLock();
-			ActionValidator.validateInsureAction(this);
+			tryLock();
+			BlackjackActionValidator.validateInsureAction(this);
 			getFirstHand().insure();
-			updateBalanceAndTotalBet(getFirstHand().getBet().divide(new BigDecimal("2")));
+			updateBalanceAndTotalBet(getFirstHand().getBet().divide(BigDecimal.TWO,RoundingMode.DOWN));
 		} finally {
-			releasePlayerLock();
+			releaseLock();
 		}
 	}
 
-	public IHand getActiveHand() {
-		return hands.stream().filter(IHand::isActive).findFirst().orElse(null); // to Optional
+	public BlackjackHand getActiveHand() {
+		return hands.stream().filter(BlackjackHand::isActive).findFirst().orElse(null); // to Optional
 	}
 
 	public void hit(Card card) {
 		try {
-			tryTakingPlayerLock();
+			tryLock();
 			getActiveHand().addCard(card);
 		} finally {
-			releasePlayerLock();
+			releaseLock();
 		}
 	}
 
-	@Override
-	public List<IHand> getHands() {
+	public List<BlackjackHand> getHands() {
 		return hands;
 	}
 
@@ -182,31 +185,25 @@ public class BlackjackPlayer extends CasinoPlayer {
 
 	@Override
 	public boolean canAct() {
-		return getActiveHand() != null;
+		return getStatus() == PlayerStatus.ACTIVE && getActiveHand() != null;
 	}
 
-	@Override
 	public boolean hasWinningChance() {
-		return hands.stream().filter(IHand::hasWinningChance).findAny().isPresent();
+		return hands.stream().anyMatch(BlackjackHand::hasWinningChance);
 	}
 
 	@Override
 	public void reset() {
 		try {
-			tryTakingPlayerLock();
+			tryLock();
 			super.reset();
 			hands = new ArrayList<>();
 		} finally {
-			releasePlayerLock();
+			releaseLock();
 		}
 	}
 
-	@Override
-	public boolean isCompensable() {
-		return getFirstHand().isInsuranceCompensable();
-	}
-
-	public IHand getFirstHand() {
+	public BlackjackHand getFirstHand() {
 		return getHands().get(0);
 	}
 
@@ -218,21 +215,12 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return getFirstHand().isInsured();
 	}
 
-	public boolean hasSplit() {
-		return hands.size() == 2;
-	}
-
-	@Override
-	public BigDecimal getInsuranceAmount() {
-		return getFirstHand().getInsuranceBet();
-	}
-
 	public boolean hasCompletedFirstHand() {
 		return getFirstHand().isCompleted();
 	}
 
 	public Integer getFirstHandFinalValue() {
-		IHand hand = getFirstHand();
+		BlackjackHand hand = getFirstHand();
 		return hand.isCompleted() ? hand.calculateFinalValue() : null;
 	}
 
@@ -242,7 +230,6 @@ public class BlackjackPlayer extends CasinoPlayer {
 		return getHands().get(handNumber).getBet();
 	}
 
-	@Override
 	public <T> Optional<T> autoplay(T t) {
 		Optional<T> cardOptional = Optional.of(t);
 		if (!hasActiveHand() || !(t instanceof Card card))
@@ -251,7 +238,7 @@ public class BlackjackPlayer extends CasinoPlayer {
 			getFirstHand().complete();
 		if (getHands().size() != 2)
 			return cardOptional;
-		IHand secondHand = getSecondHand();
+		BlackjackHand secondHand = getSecondHand();
 		if (secondHand.getCards().size() < 2) {
 			secondHand.addCard(card); // card is used here
 			cardOptional = Optional.empty();

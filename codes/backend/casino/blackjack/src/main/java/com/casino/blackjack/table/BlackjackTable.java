@@ -8,19 +8,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.casino.blackjack.dealer.BlackjackDealer;
-import com.casino.blackjack.ext.IBlackjackTable;
+import com.casino.blackjack.export.BlackjackAPI;
+import com.casino.blackjack.game.BlackjackGamePhase;
+import com.casino.blackjack.game.BlackjackInitData;
+import com.casino.blackjack.player.BlackjackHand;
 import com.casino.blackjack.player.BlackjackPlayer;
-import com.casino.common.cards.IHand;
-import com.casino.common.exception.IllegalPhaseException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.ICasinoPlayer;
-import com.casino.common.table.Seat;
-import com.casino.common.table.SeatedTable;
-import com.casino.common.table.Status;
+import com.casino.common.player.PlayerStatus;
+import com.casino.common.table.structure.Seat;
+import com.casino.common.table.structure.SeatedTable;
+import com.casino.common.table.TableStatus;
 import com.casino.common.table.TableCard;
-import com.casino.common.table.TableInitData;
-import com.casino.common.table.phase.GamePhase;
-import com.casino.common.table.phase.PhasePathFactory;
+import com.casino.common.table.TableData;
 import com.casino.common.user.Bridge;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
@@ -30,31 +30,31 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
  * 
  */
 @JsonIgnoreProperties(value = { "dealer" /* explicitly ignoring dealer for not exposing deck to UI */ })
-@JsonIncludeProperties(value = { "type", "id", "language", "playerInTurn", "gamePhase", "watcherCount", "seats", "players", "counterTime", "tableCard", "dealerHand" })
-public final class BlackjackTable extends SeatedTable implements IBlackjackTable {
+@JsonIncludeProperties(value = { "type", "id", "activePlayer", "gamePhase", "watcherCount", "seats", "players", "counterTime", "tableCard", "dealerHand" })
+public final class BlackjackTable extends SeatedTable<BlackjackPlayer> implements BlackjackAPI {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTable.class.getName());
 	private final BlackjackDealer dealer;
+	private final TableCard tableCard;
 
-	public BlackjackTable(Status initialStatus, TableInitData initData) {
-		super(initialStatus, initData, PhasePathFactory.buildBlackjackPath());
-		this.dealer = new BlackjackDealer(this);
+	public BlackjackTable(TableData initData, BlackjackInitData blackjackInitData) {
+		super(initData);
+		this.dealer = new BlackjackDealer(this, blackjackInitData);
+		this.tableCard = new TableCard(initData, blackjackInitData);
 	}
 
 	@Override
 	public boolean join(Bridge bridge, String seatNumber) {
 		LOGGER.entering(getClass().getName(), "join", getId());
 		try {
-			Integer seatNumbr = seatNumber != null ? Integer.parseInt(seatNumber) : null;
 			BlackjackPlayer player = new BlackjackPlayer(bridge, this);
-			Optional<Seat> seatOptional = trySeat(seatNumbr, player);
-			if (seatOptional.isEmpty()) {
-				return false;
+			Optional<Seat<BlackjackPlayer>> seatOptional = super.join(seatNumber, player);
+			if (seatOptional.isPresent()) {
+				player.setSeatNumber(seatOptional.get().getNumber());
+				player.setStatus(PlayerStatus.ACTIVE);
+				dealer.onPlayerArrival(player);
+				removeWatcher(bridge.userId());
 			}
-			player.setStatus(com.casino.common.player.PlayerStatus.ACTIVE);
-			player.setSeatNumber(seatOptional.get().getNumber());
-			super.removeWatcher(player.getId());
-			dealer.onPlayerArrival(player);
-			return true;
+			return seatOptional.isPresent();
 		} finally {
 			LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNumber + " bridge:" + bridge + " tableId:" + getId());
 		}
@@ -65,7 +65,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		LOGGER.entering(getClass().getName(), "bet", bet + " player:" + playerId + " table:" + getId());
 		try {
 			BlackjackPlayer player = getPlayer(playerId);
-			if (isGamePhase(GamePhase.BET))
+			if (isGamePhase(BlackjackGamePhase.BET))
 				dealer.updatePlayerBet(player, bet);
 			else {
 				LOGGER.severe("Starting bet is not accepted:phase " + getGamePhase() + " table:" + this + " player:" + player);
@@ -81,7 +81,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		LOGGER.entering(getClass().getName(), "insure", " player:" + playerId + " table:" + getId());
 		try {
 			BlackjackPlayer player = getPlayer(playerId);
-			if (isGamePhase(GamePhase.INSURE))
+			if (isGamePhase(BlackjackGamePhase.INSURE))
 				dealer.insure(player);
 			else {
 				LOGGER.severe("insuring is not accepted:phase " + getGamePhase() + " table:" + this + " player:" + player);
@@ -97,7 +97,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		LOGGER.entering(getClass().getName(), "stand", " player:" + playerId + " table:" + getId());
 		try {
 			BlackjackPlayer player = getPlayer(playerId);
-			lockPlayerInTurn();// Lock releases immediately if player is not in turn
+			lock();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "stand");
 			dealer.stand(player);
 			dealer.updateActorAndNotify();
@@ -107,8 +107,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		}
 	}
 
-	private void lockPlayerInTurn() {
-		getPlayerInTurnLock().lock();
+	public void lock() {
+		getLock().lock();
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		LOGGER.entering(getClass().getName(), "hit ", " player:" + playerId + " table:" + getId());
 		try {
 			BlackjackPlayer player = getPlayer(playerId);
-			lockPlayerInTurn();// Lock releases immediately if player is not in turn
+			lock();// Lock releases immediately if player is not in turn
 			verifyActionClearance(player, "hit");
 			dealer.hit(player);
 			dealer.updateActorAndNotify();
@@ -131,7 +131,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		LOGGER.entering(getClass().getName(), "split", " player:" + playerId + " table:" + getId());
 		try {
 			BlackjackPlayer player = getPlayer(playerId);
-			lockPlayerInTurn();
+			lock();
 			verifyActionClearance(player, "split");
 			dealer.handleSplit(player);
 			dealer.updateActorAndNotify();
@@ -146,7 +146,7 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		LOGGER.entering(getClass().getName(), "doubleDown", " player:" + playerId + " table:" + getId());
 		try {
 			BlackjackPlayer player = getPlayer(playerId);
-			lockPlayerInTurn();
+			lock();
 			verifyActionClearance(player, "doubleDown");
 			dealer.doubleDown(player);
 			dealer.updateActorAndNotify();
@@ -156,122 +156,60 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 		}
 	}
 
-	private void unlockPlayerInTurn() {
-		if (getPlayerInTurnLock().isHeldByCurrentThread())
-			getPlayerInTurnLock().unlock();
+	public void unlockPlayerInTurn() {
+		if (getLock().isHeldByCurrentThread())
+			getLock().unlock();
 	}
 
 	private void verifyActionClearance(ICasinoPlayer player, String actionName) {
 		if (!isPlayerAllowedToMakeAction(player)) {
-			LOGGER.log(Level.SEVERE, "Player:" + player + " not allowed to make action: '" + actionName + "' playerInTurn:" + getPlayerInTurn() + " phase: " + getGamePhase() + " in table:" + this);
+			LOGGER.log(Level.SEVERE, "Player:" + player + " not allowed to make action: '" + actionName + "' playerInTurn:" + getActivePlayer() + " phase: " + getGamePhase() + " in table:" + this);
 			throw new IllegalPlayerActionException(actionName + " not allowed for player:" + player);
 		}
 	}
 
 	private boolean isPlayerAllowedToMakeAction(ICasinoPlayer player) {
-		return isPlayerInTurn(player) && isGamePhase(GamePhase.PLAY) && player.canAct();
+		return isActivePlayer(player) && isGamePhase(BlackjackGamePhase.PLAY) && player.canAct();
 	}
 
 	@Override
-	public void onPlayerLeave(UUID playerId) {
-		LOGGER.entering(getClass().getName(), "onPlayerLeave", " leavingPlayerId:" + playerId + " table:" + getId());
+	public void leave(UUID playerOrWatcherId) {
+		LOGGER.entering(getClass().getName(), "leave", " playerOrWatcherId:" + playerOrWatcherId + " table:" + getId());
 		BlackjackPlayer leavingPlayer = null;
 		try {
-			leavingPlayer = getPlayer(playerId);
-			if (leavingPlayer == null)
+			leavingPlayer = getPlayer(playerOrWatcherId);
+			if (leavingPlayer == null) {
+				removeWatcher(playerOrWatcherId);
 				return;
-			lockPlayerInTurn();
+			}
+			lock();
 			dealer.onPlayerLeave(leavingPlayer);
 		} finally {
 			unlockPlayerInTurn();
-			LOGGER.exiting(getClass().getName(), "onPlayerLeave", " leavingPlayer:" + leavingPlayer + " table:" + getId());
+			LOGGER.exiting(getClass().getName(), "leave", " playerOrWatcherId:" + leavingPlayer + " table:" + getId());
 		}
 	}
 
-	@Override
-	public void onPlayerTimeout(ICasinoPlayer timedOutPlayer) {
-		LOGGER.entering(getClass().getName(), "onPlayerTimeout", " timedOutPlayer:" + timedOutPlayer + " table:" + getId());
-		try {
-			lockPlayerInTurn();
-			if (!isPlayerInTurn(timedOutPlayer)) {
-				return;
-			}
-			dealer.handleTimedoutPlayer((BlackjackPlayer) timedOutPlayer);
-		} finally {
-			getPlayerInTurnLock().unlock();
-			LOGGER.exiting(getClass().getName(), "onPlayerTimeout", " timedOutPlayer:" + timedOutPlayer + " table:" + getId());
-		}
-	}
-
-	@Override
-	public void onBetPhaseEnd() {
-		LOGGER.entering(getClass().getName(), "onBetPhaseEnd" + this.getId());
-		try {
-			lockPlayerInTurn();
-			if (!isGamePhase(GamePhase.BET))
-				throw new IllegalPhaseException("GamePhase is not what is expected on betPhaseEnd", getGamePhase(), GamePhase.BET);
-			dealer.finalizeBetPhase();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "onBetPhaseEnd() something went wrong. Waiting for manager's call.", e);
-			BlackjackUtil.dumpTable(this, "onBetPhaseEnd");
-			updateGamePhase(GamePhase.ERROR);
-		} finally {
-			getPlayerInTurnLock().unlock();
-			LOGGER.exiting(getClass().getName(), "onBetPhaseEnd" + this.getId());
-		}
-	}
-
-	public void onInsurancePhaseEnd() {
-		LOGGER.entering(getClass().getName(), "onInsurancePhaseEnd" + this.getId());
-		try {
-			lockPlayerInTurn();
-			if (!isGamePhase(GamePhase.INSURE))
-				throw new IllegalPhaseException("GamePhase is not what is expected on insurancePhaseEnd", getGamePhase(), GamePhase.INSURE);
-			dealer.finalizeInsurancePhase();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "onInsurancePhaseEnd() something went wrong. Waiting for manager's call.", e);
-			BlackjackUtil.dumpTable(this, "onBetPhaseEnd");
-			updateGamePhase(GamePhase.ERROR);
-		} finally {
-			getPlayerInTurnLock().unlock();
-			LOGGER.exiting(getClass().getName(), "onInsurancePhaseEnd" + this.getId());
-		}
-	}
-
-	public IHand getDealerHand() {
+	public BlackjackHand getDealerHand() {
 		return dealer.getHand();
 	}
 
 	@Override
 	public synchronized void onClose() {
-		setStatus(Status.CLOSING);
+		setStatus(TableStatus.CLOSING);
 		super.onClose();
-		super.sanitizeAllSeats();
-		super.getWatchers().clear();
-		setStatus(Status.CLOSED);
 	}
 
 	@Override
-	public int getPlayerTurnTime() {
-		return getThresholds().playerTime();
-	}
-
-	@Override
-	public void prepareNewRound() {
-		dealer.prepareNewRound();
-	}
-
-	@Override
-	public boolean watch(Bridge user) {
-		BlackjackPlayer player = new BlackjackPlayer(user, null);
+	public void watch(Bridge user) {
+		BlackjackPlayer player = new BlackjackPlayer(user, this);
 		if (getPlayer(user.userId()) != null) {
-			LOGGER.fine("User " + user.userName() + " is already playing in table:" + this.toString());
-			return false;
+			LOGGER.fine("User " + user.userName() + " is already playing in table:" + this);
+			return;
 		}
 		boolean joined = super.joinAsWatcher(player);
 		if (joined)
 			dealer.onWatcherArrival(player);
-		return joined;
 	}
 
 	@Override
@@ -282,7 +220,8 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 			return;
 		try {
 //			Thread.ofVirtual().start(() -> {
-			dealer.sendStatusUpdate(getPlayer(playerId));
+
+			dealer.handlePlayerComeBack(getPlayer(playerId));
 //			});
 		} finally {
 			LOGGER.exiting(getClass().getName(), playerId.toString());
@@ -291,13 +230,23 @@ public final class BlackjackTable extends SeatedTable implements IBlackjackTable
 
 	@Override
 	public TableCard getTableCard() {
-		TableCard card = super.getTableCard();
 		List<Integer> seats = getSeats().stream().filter(seat -> !seat.hasPlayer()).map(Seat::getNumber).toList();
-		card.setAvailablePositions(seats);
-		return card;
+		tableCard.setAvailablePositions(seats);
+		return tableCard;
 	}
 
 	public void updatePlayersToWatchers(boolean all) {
 		super.updatePlayersToWatchers(all);
 	}
+
+	@Override
+	public BlackjackDealer getDealer() {
+		return this.dealer;
+	}
+
+	@Override
+	public BlackjackGamePhase getGamePhase() {
+		return (BlackjackGamePhase) phasePath.getPhase();
+	}
+
 }

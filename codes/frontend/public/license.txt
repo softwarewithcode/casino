@@ -11,8 +11,25 @@ Playing cards sprite image:
     license:
     https://creativecommons.org/publicdomain/zero/1.0/
 
+
+Playing card back side (Card Template.png)
+    https://opengameart.org/content/card-template
+    https://opengameart.org/sites/default/files/Card%20Template_3.png
+
+    license:
+    https://creativecommons.org/publicdomain/zero/1.0/
+
+Poker chips
+    https://opengameart.org/content/playing-card-assets-52-cards-deck-chips
+    https://opengameart.org/sites/default/files/poker_chips_only_2d.zip
+
+    license:
+    https://creativecommons.org/publicdomain/zero/1.0/
+
+
 Background image:
     https://opengameart.org/content/light-wood-1024x1024
 
     license:
     https://creativecommons.org/publicdomain/zero/1.0/
+

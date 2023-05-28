@@ -19,7 +19,6 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalPlayerActionException;
-import com.casino.common.table.Status;
 import com.casino.common.user.Bridge;
 
 public class StandTest extends BaseTest {
@@ -29,7 +28,7 @@ public class StandTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
+			table = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge3 = new Bridge("JohnDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
@@ -72,9 +71,10 @@ public class StandTest extends BaseTest {
 		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		table.bet(bridge2.userId(), new BigDecimal("10.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.stand(bridge2.userId());
-		});
+		assertThrows(IllegalPlayerActionException.class, () ->
+			{
+				table.stand(bridge2.userId());
+			});
 	}
 
 	@Test
@@ -90,9 +90,10 @@ public class StandTest extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.hit(bridge.userId());
 		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
-		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.stand(bridge.userId());
-		});
+		assertThrows(IllegalPlayerActionException.class, () ->
+			{
+				table.stand(bridge.userId());
+			});
 	}
 
 	@Test
@@ -107,14 +108,16 @@ public class StandTest extends BaseTest {
 		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
-		assertThrows(IllegalPlayerActionException.class, () -> {
-			table.stand(bridge.userId());
-		});
+		assertThrows(IllegalPlayerActionException.class, () ->
+			{
+				table.stand(bridge.userId());
+			});
 	}
 
 	@Test
 	public void callingStandOnSecondHandOfSplitCompletesSecondHand() {
 		List<Card> cards = dealer.getDecks();
+		cards.add(Card.of(4, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.DIAMOND));
 		cards.add(Card.of(5, Suit.DIAMOND));

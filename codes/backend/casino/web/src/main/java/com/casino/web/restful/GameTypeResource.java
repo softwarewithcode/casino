@@ -1,6 +1,5 @@
 package com.casino.web.restful;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,12 +16,12 @@ import jakarta.ws.rs.core.Response;
 public class GameTypeResource {
 	private static final Logger LOGGER = Logger.getLogger(GameTypeResource.class.getName());
 	private static final ObjectMapper MAPPER = new ObjectMapper();
+	private List<GameType> types = List.of(new GameType(0, "Blackjack"), new GameType(1, "Texas Hold'em cash"));
 
 	@GET
 	@Produces("application/json")
 	public Response fetchGameTypes() {
 		try {
-			List<GameType> types = Arrays.asList(new GameType(0, "Blackjack"));
 			var json = MAPPER.writeValueAsString(types);
 			return Response.ok(json).build();
 		} catch (Exception e) {

@@ -1,18 +1,19 @@
-31.12.2022<br>
+29.03.2023<br>
 
 Default workspace and setup contains:
-1) Latest Eclipse IDE for backend development
+1) Latest Eclipse IDE for backend development. Runs with IntelliJ community edition as well after Maven and Tomee setup.
 2) Visual Studio Code for frontend development 
 
 Development and running the files:
-1) Backend: Maven, OpenJDK 19 compiler level 19, application server which supports JakartaEE 9.1 <br>
- Default workspace uses Apache TomEE 9.0.0.RC1 as backend application server <br>
+1) Backend: Maven, Java20, application server which supports JakartaEE 9.1 <br>
+ Default workspace uses Apache TomEE 9.0.0 as backend application server and JDK20 from https://openjdk.org/projects/jdk/20/ <br>
 1.1. Import projects in Eclipse as Maven projects. Mouse right click on projects and Maven -> update <br>
 	This loads the dependencies. <br>
-1.2 In Eclipse create new Server with Apache Tomcat v10.0 server adapter. <br> Select JRE as OpenJDK19.<br>
+1.2 In Eclipse create new Server with Apache Tomcat v10.0 server adapter. <br> Select JRE as OpenJDK20.<br>
 1.3 Ship the projects into the server and check startup logs for errors. <br>
+1.4. Precompiled version should now open from http://localhost:8080/casino/
 
-2. Frontend: Vue3 with Reactive Pinia store. Npm v9.1.1, Node v16.15.0, with Volar takeover mode and .prettierc combination. <br>
+2. Frontend development: Vue3 with Reactive Pinia store. Npm v9.1.1, Node v16.15.0, with Volar takeover mode and .prettierc combination. <br>
 2.1 Open frontend folder where package.json exists, <br>
 run "npm install" -> should load the dependencies defined in package.json<br>
 run "npm run dev" -> should start the UI development server at port 5000. Package.json has predefined port 5000.<br>

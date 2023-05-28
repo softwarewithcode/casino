@@ -19,7 +19,6 @@ import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
-import com.casino.common.table.Status;
 import com.casino.common.user.Bridge;
 
 public class GamePlayTests extends BaseTest {
@@ -29,7 +28,7 @@ public class GamePlayTests extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
+			table = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge3 = new Bridge("JohnDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
@@ -171,58 +170,6 @@ public class GamePlayTests extends BaseTest {
 		assertFalse(p.canTake());
 	}
 
-	@Disabled // Players are removed after timing out
-	@Test
-	public void playersDoNotReactOnTimeButWinBecauseDealerGetsOver21() {
-		List<Card> cards = dealer.getDecks();
-		cards.add(Card.of(9, Suit.SPADE));
-		cards.add(Card.of(7, Suit.HEART));
-		cards.add(Card.of(9, Suit.DIAMOND));
-		cards.add(Card.of(2, Suit.DIAMOND));
-		cards.add(Card.of(10, Suit.SPADE));
-		cards.add(Card.of(9, Suit.DIAMOND));
-		cards.add(Card.of(6, Suit.DIAMOND));// dealer's first
-		cards.add(Card.of(9, Suit.DIAMOND));
-		cards.add(Card.of(2, Suit.DIAMOND));
-		cards.add(Card.of(10, Suit.SPADE));
-		table.join(bridge, "5");
-		table.join(bridge2, "6");
-		table.join(bridge3, "2");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
-		table.bet(bridge2.userId(), new BigDecimal("10.0"));
-		table.bet(bridge3.userId(), new BigDecimal("25.0"));
-		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		sleep(PLAYER_TIME_SECONDS * 3, ChronoUnit.SECONDS); // 3 players waiting time +1 second
-		assertEquals(new BigDecimal("1099.00"), table.getPlayer(bridge.userId()).getBalance());
-		assertEquals(new BigDecimal("1010.00"), table.getPlayer(bridge2.userId()).getBalance());
-		assertEquals(new BigDecimal("1025.00"), table.getPlayer(bridge3.userId()).getBalance());
-	}
-
-	@Disabled // Player is removed if timed out
-	@Test
-	public void splitHandGetsAdditionalCardAndCompletedWhenFirstHandIsActiveWhileTimingOut() {
-		List<Card> cards = dealer.getDecks();
-		cards.add(Card.of(9, Suit.SPADE));
-		cards.add(Card.of(7, Suit.HEART));
-		cards.add(Card.of(9, Suit.DIAMOND));
-		cards.add(Card.of(2, Suit.DIAMOND));
-		cards.add(Card.of(10, Suit.SPADE)); // dealer's second card
-		cards.add(Card.of(1, Suit.DIAMOND)); // autoplay card for second hand
-		cards.add(Card.of(6, Suit.DIAMOND)); // automatically added to first hand
-		cards.add(Card.of(10, Suit.CLUB));
-		cards.add(Card.of(8, Suit.DIAMOND));// dealer's first
-		cards.add(Card.of(10, Suit.SPADE));
-		table.join(bridge, "5");
-		table.bet(bridge.userId(), new BigDecimal("10.0"));
-		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.split(bridge.userId());
-		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("20.00"), table.getPlayer(bridge.userId()).getTotalBet());
-		assertEquals(16, table.getPlayer(bridge.userId()).getHands().get(0).calculateFinalValue());
-		assertEquals(21, table.getPlayer(bridge.userId()).getHands().get(1).calculateFinalValue());
-		assertEquals(new BigDecimal("1005.00"), table.getPlayer(bridge.userId()).getBalance());
-	}
-
 	@Test
 	public void onlyOnePlayerReactsOnTimeButAllWinsBecauseDealerGetsOver21() {
 		List<Card> cards = dealer.getDecks();
@@ -245,9 +192,9 @@ public class GamePlayTests extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.hit(bridge.userId());
 		sleep(PLAYER_TIME_SECONDS * 3, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("1099.00"), table.getPlayer(bridge.userId()).getBalance());
-		assertEquals(new BigDecimal("1010.00"), table.getPlayer(bridge2.userId()).getBalance());
-		assertEquals(new BigDecimal("1025.00"), table.getPlayer(bridge3.userId()).getBalance());
+		assertEquals(new BigDecimal("1099.00"), table.getPlayer(bridge.userId()).getCurrentBalance());
+		assertEquals(new BigDecimal("1010.00"), table.getPlayer(bridge2.userId()).getCurrentBalance());
+		assertEquals(new BigDecimal("1025.00"), table.getPlayer(bridge3.userId()).getCurrentBalance());
 	}
 
 	@Test

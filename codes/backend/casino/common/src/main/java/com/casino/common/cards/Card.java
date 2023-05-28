@@ -4,9 +4,9 @@ public class Card {
 	private final int rank;
 	private final Suit suit;
 
-	public Card(int rank, Suit suit) {
+	private Card(int rank, Suit suit) {
 		super();
-		if (rank < 1 || rank > 13)
+		if (rank < 1 || rank > 14)
 			throw new IllegalArgumentException("incorrect rank " + rank);
 		if (suit == null)
 			throw new IllegalArgumentException("suit is missing");
@@ -27,11 +27,7 @@ public class Card {
 	}
 
 	public boolean isAce() {
-		return rank == 1;
-	}
-
-	public boolean isPictureCard() {
-		return rank > 10 && rank < 14;
+		return rank == 1 || rank == 14;
 	}
 
 	@Override

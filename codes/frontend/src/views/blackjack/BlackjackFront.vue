@@ -11,7 +11,11 @@ store.populateStore()
 <template>
     <h1>Blackjack tables</h1><br>
     <div v-for="(table) in store.getTables" :key="table.id">
-        <TableCardView :card="table" />
+        <TableCardView :card="table">
+            Type: {{ table.type.toLowerCase() }}<br>
+            Min: {{ table.gameData.minimumBet }} <br>
+            Max: {{ table.gameData.maximumBet }} <br>
+            Turn time {{ table.gameData.playerTime }}s <br>
+        </TableCardView>
     </div>
-
 </template>

@@ -2,21 +2,23 @@ import { useBlackjackStore } from "../../../../../stores/blackjackStore"
 import router from "../../../../../router/router"
 import { Command } from "@/types/sockethander"
 import { useStartCounter } from "../../../timing/clock"
-import type { BlackjackPlayer } from "@/types/blackjack"
+import type { BlackjackPlayer, BlackjackTable } from "@/types/blackjack"
+import type { CasinoPlayer } from "@/types/casino"
+import { useTableViewOpener } from "@/components/composables/common/table"
+import { ViewName } from "@/components/composables/common/Views"
+import { useCasinoStore } from "@/stores/casinoStore"
 
 // @author softwarewithcode from GitHub
 const store = useBlackjackStore()
+const casinoStore = useCasinoStore()
 
-export const BLACKJACK = "BLACKJACK"
 export function useBlackjackMessageHandler(data: any) {
 	store.$patch({
 		command: data.title
 	})
 	if (store.getPlayer) {
-		const isPlayerInStorePlayingInCurrentTable: BlackjackPlayer = data.table.players.find(tablePlayer => tablePlayer.userName === store.getPlayer.userName)
-		if (!isPlayerInStorePlayingInCurrentTable) {
-			store.logout({})
-		}
+		const isPlayerInStorePlayingInCurrentTable: CasinoPlayer = data.table.players.find(tablePlayer => tablePlayer.userName === store.getPlayer.userName)
+		if (!isPlayerInStorePlayingInCurrentTable) store.logout({})
 	}
 	switch (data.title) {
 		case Command.OPEN_TABLE:
@@ -40,36 +42,43 @@ export function useBlackjackMessageHandler(data: any) {
 			finalizeRound(data)
 			break
 		default:
-			patchStore(data)
+			patchStores(data)
 	}
 }
 
 const openTable = async (data: any) => {
-	let table = data.table
-	router.push({ name: "blackjack", params: { tableId: table.id } })
+	let table: BlackjackTable = data.table
+	useTableViewOpener(table, ViewName.BLACKJACK_TABLE)
 	patchStoreAndStartTimer(data)
 }
 
 const standUp = async (data: any) => {
-	let patchObject = { table: data.table, player: data.player, command: data.title, counter: data.table.counterTime }
+	let patchObject = { table: data.table, player: data.player, command: data.title }
 	store.$patch(patchObject)
 }
 
-const patchStore = async (data: any) => {
-	let patchObject = { table: data.table, command: data.title, counter: data.table.counterTime }
+const patchStores = async (data: any) => {
+	let patchObject = { table: data.table, command: data.title }
 	const patchPlayer = data.table.players.find(player => player.userName === store.getPlayer?.userName)
 	if (store.getPlayer && patchPlayer) {
 		patchObject["player"] = patchPlayer
 	}
+	patchCasinoStore(data.table.counterTime)
 	store.$patch(patchObject)
 }
+
+const patchCasinoStore = async (counterValue: number) => {
+	let patchObject = { counter: counterValue }
+	casinoStore.$patch(patchObject)
+}
+
 const patchStoreAndStartTimer = async (data: any) => {
-	patchStore(data)
+	patchStores(data)
 	useStartCounter()
 }
 const finalizeRound = async (data: any) => {
-	const counterTime: number = data.table.tableCard.thresholds.phaseDelay
+	const counterTime: number = data.table.tableCard.gameData.roundDelay
 	data.table.counterTime = counterTime / 1000 // millis to seconds
-	patchStore(data)
+	patchStores(data)
 	useStartCounter()
 }

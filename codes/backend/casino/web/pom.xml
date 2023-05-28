@@ -9,15 +9,20 @@
 	<packaging>war</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.release>17</maven.compiler.release>
-		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.target>17</maven.compiler.target>
+		<maven.compiler.release>20</maven.compiler.release>
+		<maven.compiler.source>20</maven.compiler.source>
+		<maven.compiler.target>20</maven.compiler.target>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>casino</groupId>
 			<artifactId>blackjack</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>casino</groupId>
+			<artifactId>texas-holdem</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
@@ -72,29 +77,29 @@
 		<dependency>
 			<groupId>org.eclipse</groupId>
 			<artifactId>yasson</artifactId>
-			<version>3.0.2</version>
+			<version>3.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>5.9.1</version>
+			<version>5.9.3</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId> <!-- either Jackson or json.bind-->
 			<artifactId>jackson-core</artifactId>
-			<version>2.14.1</version>
+			<version>2.15.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version>2.14.1</version>
+			<version>2.15.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.14.1</version>
+			<version>2.15.0</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
@@ -114,9 +119,9 @@
 			<!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_war_packaging -->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.9.0</version>
+				<version>3.10.1</version>
 				<configuration>
-					<release>17</release>
+					<release>20</release>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -125,7 +130,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M8</version>
+				<version>3.0.0</version>
 			</plugin>
 		</plugins>
 	</build>

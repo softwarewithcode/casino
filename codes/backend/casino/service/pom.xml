@@ -8,12 +8,17 @@
 	<artifactId>service</artifactId>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.release>17</maven.compiler.release>
+		<maven.compiler.release>20</maven.compiler.release>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>casino</groupId>
 			<artifactId>blackjack</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>casino</groupId>
+			<artifactId>texas-holdem</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>

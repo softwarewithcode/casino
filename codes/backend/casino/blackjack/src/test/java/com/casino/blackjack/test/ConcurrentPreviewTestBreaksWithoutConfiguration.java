@@ -1,5 +1,32 @@
 package com.casino.blackjack.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
+import java.util.stream.IntStream;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.casino.blackjack.dealer.BlackjackDealer;
+import com.casino.blackjack.player.BlackjackHand;
+import com.casino.blackjack.player.BlackjackPlayer;
+import com.casino.blackjack.table.BlackjackTable;
+import com.casino.common.cards.Card;
+import com.casino.common.cards.Suit;
+import com.casino.common.table.TableData;
+import com.casino.common.table.TableThresholds;
+import com.casino.common.user.Bridge;
+
 /**
  * 
  * 12/7/2022 <br>
@@ -14,8 +41,7 @@ package com.casino.blackjack.test;
 
 //01/14/2023 -> requires jdk19. So let's see. At least tests have helped during development!
 public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
-/*	
- private BlackjackTable table;
+	private BlackjackTable table;
 	private BlackjackTable tableWith49MinAnd49MaxPlayers;
 	BlackjackPlayer doubleDownPlayer;
 	private BlackjackDealer dealer;
@@ -25,12 +51,17 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	private volatile int rejectedDoubles;
 	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(ConcurrentPreviewTestBreaksWithoutConfiguration.class.getName());
 	private Bridge bridge3;
+	private TableData tableInitData49Players;
+	private BlackjackTable table49Players;
 
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
-			tableWith49MinAnd49MaxPlayers = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitDataWithPlayersMinAndMax(49, 49));
+			TableThresholds thresholds = new TableThresholds(MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
+			TableData tableInitData = getDefaultTableInitDataWithThresholds(thresholds);
+			table = new BlackjackTable(tableInitData, blackjackInitData);
+			tableInitData49Players = getDefaultTableInitDataWithThresholds(new TableThresholds(49, 49, 49));
+			tableWith49MinAnd49MaxPlayers = new BlackjackTable(tableInitData49Players, blackjackInitData);
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			bridge3 = new Bridge("qq", table.getId(), UUID.randomUUID(), null, new BigDecimal("10000000.0"));
@@ -96,8 +127,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 
 	@Test
 	public void fiftyOneOutOfHundredPlayersGetsRejectedAnd49GetsAcceptedIn49SeatedTable() throws InterruptedException, BrokenBarrierException {
-		TableInitData tableInitData = getDefaultTableInitDataWithPlayersMinAndMax(49, 49);
-		table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
+		table = new BlackjackTable(tableInitData49Players, blackjackInitData);
 		CyclicBarrier casinoBarrier = new CyclicBarrier(101);
 		List<Thread> threads = createCasinoPlayers(100, casinoBarrier);
 		threads.forEach(Thread::start);
@@ -162,20 +192,16 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 
 	@Test
 	public void tableAcceptsWatchersSimultaneously() throws InterruptedException, BrokenBarrierException {
-		int betPhaseTimeSeconds = 6;
-		Thresholds thresholds = new Thresholds(MIN_BET, MAX_BET, betPhaseTimeSeconds, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, 49, 49, 0);
-		TableInitData tableInitData = getDefaultTableInitDataWithThresholds(thresholds);
-		table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
 		CyclicBarrier casinoBarrier = new CyclicBarrier(10001);
-		table.join(bridge, "3");
-		assertEquals(0, table.getWatchers().size());
+		tableWith49MinAnd49MaxPlayers.join(bridge, "3");
+		assertEquals(0, tableWith49MinAnd49MaxPlayers.getWatchers().size());
 		List<Thread> threads = addWatchersToTable(10000, casinoBarrier);
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
 		sleep(1, ChronoUnit.SECONDS); // All watchers have had 1 second of time to join.
-		table.join(bridge2, "4");
+		tableWith49MinAnd49MaxPlayers.join(bridge2, "4");
 		assertEquals(10000, table.getWatchers().size());
-		sleep(table.getThresholds().betPhaseTime(), ChronoUnit.SECONDS);
+		sleep(tableWith49MinAnd49MaxPlayers.getDealer().getBetPhaseTime(), ChronoUnit.SECONDS);
 	}
 
 	@Test
@@ -369,5 +395,4 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 			}
 		})).toList();
 	}
-	*/
 }

@@ -19,9 +19,8 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalPlayerActionException;
-import com.casino.common.table.Status;
-import com.casino.common.table.TableInitData;
-import com.casino.common.table.Thresholds;
+import com.casino.common.table.TableData;
+import com.casino.common.table.TableThresholds;
 import com.casino.common.user.Bridge;
 
 public class StartingHandDoubleTest extends BaseTest {
@@ -32,10 +31,9 @@ public class StartingHandDoubleTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			Thresholds thresholds = new Thresholds(new BigDecimal("0.001"), MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS, MIN_PLAYERS, MAX_PLAYERS,
-					DEFAULT_SEAT_COUNT, DEFAULT_ALLOWED_SIT_OUT_ROUNDS);
-			TableInitData tableInitData = getDefaultTableInitDataWithThresholds(thresholds);
-			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
+			TableThresholds thresholds = new TableThresholds(MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
+			TableData tableInitData = getDefaultTableInitDataWithThresholds(thresholds);
+			table = new BlackjackTable(tableInitData,blackjackInitData);
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			Field f = table.getClass().getDeclaredField("dealer");
@@ -170,11 +168,11 @@ public class StartingHandDoubleTest extends BaseTest {
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(6, Suit.SPADE));
 		table.join(bridge, "5");
-		table.bet(bridge.userId(), new BigDecimal("0.01234"));
+		table.bet(bridge.userId(), new BigDecimal("5.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("999.98"), table.getPlayer(bridge.userId()).getBalance());
+		assertEquals(new BigDecimal("995.00"), table.getPlayer(bridge.userId()).getCurrentBalance());
 		table.doubleDown(bridge.userId());
-		assertEquals(new BigDecimal("0.02"), table.getPlayer(bridge.userId()).getTotalBet());
+		assertEquals(new BigDecimal("10.00"), table.getPlayer(bridge.userId()).getTotalBet());
 		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.doubleDown(bridge.userId());
 		});

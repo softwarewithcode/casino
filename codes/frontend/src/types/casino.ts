@@ -1,68 +1,55 @@
-export interface CasinoTable {
-	tableCard: TableCard
-}
+import type { TableCard } from "./TableCard"
+import type { BlackjackPlayer } from "./blackjack"
+import type { HoldemPlayer } from "./texasHoldem"
+
 export interface GameType {
 	type: string
 	index: number
 }
+
 export interface CasinoPlayer {
 	userName: string
 	id: string
-	balance: number
-	totalBet: number
-	lastBet: number
-	actions: string[]
+	currentBalance: number
+	seatNumber: number
+	status: PlayerStatus
 }
 
-export interface CasinoHand {
-	values: number[]
-	cards: Card[]
-	bet: number
-}
-
-export interface TableCard {
-	thresholds: Thresholds
-	availablePositions: Array<Number>
-	name: string
+export interface CasinoTable<T> {
+	title: string
+	tableCard: TableCard
+	activePlayer: T
+	seats: Seat<T>[]
 	id: string
-	language: string
-	game: string
-	type: TableType
 }
 
-export interface Thresholds {
-	minimumBet: number
-	maximumBet: number
-	maxPlayers: number
-	seatCount: number
-	phaseDelay: number
-	playerTime: number
+export interface Seat<T> {
+	number: number
+	available: boolean
+	player: T
 }
 
-export interface Card {
-	rank: number
-	suit: Suit
-	visible: boolean
+export interface ChipStack {
+	chips: Map<Chip, number>
 }
 
-export interface Vector {
-	x: number
-	y: number
+export interface Chip {
+	value: number
+	image: HTMLImageElement
 }
 
-export enum Suit {
-	CLUB = "CLUB",
-	DIAMOND = "DIAMOND",
-	HEART = "HEART",
-	SPADE = "SPADE"
+export enum Games {
+	BLACKJACK = "blackjack",
+	TEXAS_HOLDEM = "texas-holdem"
 }
 
-export enum TableType {
-	MULTIPLAYER = "MULTIPLAYER",
-	SINGLE_PLAYER = "SINGLE_PLAYER"
+export enum PlayerStatus {
+	SIT_OUT = "SIT_OUT",
+	ACTIVE = "ACTIVE",
+	NEW = "NEW"
 }
-
-export interface CardImageMetadata {
-	position: Vector
-	size: Vector
+export interface Range {
+	min: number
+	max: number
 }
+export const rangeInputUpdate = "rangeInputUpdate"

@@ -2,77 +2,74 @@ package com.casino.common.player;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-import com.casino.common.cards.IHand;
-import com.casino.common.table.ICasinoTable;
-import com.casino.common.user.PlayerAction;
+import com.casino.common.functions.Functions;
+import com.casino.common.table.structure.ICasinoTable;
+import com.casino.common.action.PlayerAction;
+import com.casino.common.table.timing.TimeControl;
 
 public interface ICasinoPlayer {
-	public String getUserName();
+    String getUserName();
 
-	public BigDecimal getInitialBalance();
+    void increaseBalance(BigDecimal amount);
 
-	public BigDecimal getEndBalance();
+    void increaseBalanceAndPayout(BigDecimal amount);
 
-	public void increaseBalance(BigDecimal amount);
+    UUID getId();
 
-	public void increaseBalanceAndPayout(BigDecimal amount);
+    boolean canAct();
 
-	public UUID getId();
+    PlayerStatus getStatus();
 
-	public void onLeave();
+    void setStatus(PlayerStatus status);
 
-	public boolean canAct();
+    BigDecimal getTotalBet();
 
-	public PlayerStatus getStatus();
+    boolean hasBet();
 
-	public void setStatus(PlayerStatus status);
+    void reset();
 
-	public BigDecimal getTotalBet();
+    void subtractTotalBetFromBalance();
 
-	public boolean hasBet();
+    BigDecimal getCurrentBalance();
 
-	public void updateStartingBet(BigDecimal bet, ICasinoTable table);
+    boolean hasActiveHand();
 
-	public void reset();
+    void removeTotalBet();
 
-	public void subtractTotalBetFromBalance();
+    void prepareForNextRound();
 
-	public BigDecimal getBalance();
+    <T> void sendMessage(T message);
 
-	public List<IHand> getHands();
+    void updateAvailableActions();
 
-	public boolean hasActiveHand();
+    default void clearAvailableActions() {
+        getActions().clear();
+    }
 
-	public IHand getActiveHand();
+    List<? extends PlayerAction> getActions();
 
-	public void removeTotalBet();
+    void increaseSkips();
 
-	public boolean hasWinningChance();
+    void clearSkips();
 
-	public boolean isCompensable();
+    boolean shouldStandUp();
 
-	public void prepareNextRound();
+    boolean isConnected();
 
-	public BigDecimal getInsuranceAmount();
+    TimeControl getTimeControl();
 
-	public <T> Optional<T> autoplay(T t);
+    boolean isActive();
 
-	public <T> void sendMessage(T message);
+    default boolean isSitOut() {
+        return getStatus() == PlayerStatus.SIT_OUT;
+    }
 
-	public void updateAvailableActions();
+    ICasinoTable getTable();
 
-	public List<PlayerAction> getActions();
+    default boolean coversAmount(BigDecimal requiredAmount) {
+        return Functions.isFirstMoreOrEqualToSecond.apply(getCurrentBalance(), requiredAmount);
+    }
 
-	public void increaseBetRoundSkips();
-
-	public void clearBetRoundSkips();
-
-	public Integer getSitOutRounds();
-
-	public boolean shouldStandUp();
-
-	public boolean isConnected();
 }

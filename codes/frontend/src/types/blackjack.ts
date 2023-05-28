@@ -1,28 +1,28 @@
-import type { CasinoTable, CasinoPlayer, CasinoHand, Card } from "./casino"
+import type { CasinoPlayer, CasinoTable, Seat } from "./casino"
+import type { CardHand } from "./cards"
+import type { TableCard } from "./TableCard"
 
-export interface BlackjackTable extends CasinoTable {
-	seats: Seat[]
-	title: string
+export interface BlackjackTable extends CasinoTable<BlackjackPlayer> {
 	dealerHand: BlackjackHand
 	gamePhase: string
-	playerInTurn: BlackjackPlayer
 }
+
 export interface BlackjackPlayer extends CasinoPlayer {
 	hands: BlackjackHand[]
-	seatNumber: number
 	insuranceAmount: number
+	totalBet: number
+	lastBet: number
+	actions: string[]
 }
-export interface Seat {
-	number: number
-	player: BlackjackPlayer
-	available: boolean
-}
-export interface BlackjackHand extends CasinoHand {
+
+export interface BlackjackHand extends CardHand {
 	insured: boolean
 	split: boolean
 	insuranceBet: number
 	blackjack: boolean
 	active: boolean
+	values: number[]
+	bet: number
 }
 
 export enum PlayerAction {

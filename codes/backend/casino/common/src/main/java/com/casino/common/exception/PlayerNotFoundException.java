@@ -1,8 +1,10 @@
 package com.casino.common.exception;
 
+import java.io.Serial;
+
 public class PlayerNotFoundException extends RuntimeException {
+	@Serial
 	private static final long serialVersionUID = 1L;
-	private Integer code;
 
 	public PlayerNotFoundException() {
 		// for method expression
@@ -10,10 +12,6 @@ public class PlayerNotFoundException extends RuntimeException {
 
 	public PlayerNotFoundException(String message, int code) {
 		super(message);
-		this.code = code;
 	}
 
-	public Integer getCode() {
-		return code;
-	}
 }

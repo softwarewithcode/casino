@@ -1,25 +1,20 @@
 package com.casino.common.exception;
 
-import com.casino.common.table.phase.GamePhase;
+
+import java.io.Serial;
 
 public class IllegalPhaseException extends RuntimeException {
+	@Serial
 	private static final long serialVersionUID = 1L;
-	private final GamePhase currentPhase;
-	private final GamePhase expected;
+	private final String currentPhase;
+	private final String expected;
 
-	public IllegalPhaseException(String message, GamePhase currentPhase, GamePhase expected) {
+	public IllegalPhaseException(String message, String currentPhase, String expected) {
 		super(message);
 		this.currentPhase = currentPhase;
 		this.expected = expected;
 	}
 
-	public GamePhase getCurrentPhase() {
-		return currentPhase;
-	}
-
-	public GamePhase getExpected() {
-		return expected;
-	}
 
 	@Override
 	public String toString() {

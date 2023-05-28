@@ -1,21 +1,28 @@
-import { useBlackjackStore } from "../../../stores/blackjackStore"
+import { useCasinoStore } from "../../../stores/casinoStore"
 
-let counterId: number
+let counterId: number = -1
 let store
 export function useStartCounter() {
-	store = useBlackjackStore()
+	store = useCasinoStore()
 	startCounter()
 }
+export function useCounterRunningChecker() {
+	return counterId !== -1
+}
 
-function startCounter() {
+export function useStopCounter() {
 	if (counterId) {
 		clearInterval(counterId)
+		counterId = -1
 	}
+}
+function startCounter() {
+	useStopCounter()
 	counterId = setInterval(() => {
 		store.reduceCounter()
 		let left = store.getCounter
 		if (left <= 0) {
-			clearInterval(counterId)
+			useStopCounter()
 		}
 	}, 1000)
 }

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router"
-import type { TableCard } from "@/types/casino"
+import { ViewName } from "@/components/composables/common/Views"
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes: [
@@ -10,14 +10,26 @@ const router = createRouter({
 		},
 		{
 			path: "/blackjack/front/",
-			name: "blackjackFront",
+			name: ViewName.BLACKJACK_FRONT,
 			component: () => import("../views/blackjack/BlackjackFront.vue")
 		},
 		{
 			path: "/blackjack/:tableId",
-			name: "blackjack",
+			name: ViewName.BLACKJACK_TABLE,
 			props: true,
 			component: () => import("../views/blackjack/BlackjackTableView.vue")
+		},
+		{
+			path: "/texas-holdem/front/",
+			name: ViewName.TEXAS_HOLDEM_FRONT,
+			props: true,
+			component: () => import("../views/texas-holdem/TexasHoldemFront.vue")
+		},
+		{
+			path: "/texas-holdem/:tableId",
+			name: ViewName.TEXAS_HOLDEM_TABLE,
+			props: true,
+			component: () => import("../views/texas-holdem/TexasHoldemTableView.vue")
 		}
 	]
 })

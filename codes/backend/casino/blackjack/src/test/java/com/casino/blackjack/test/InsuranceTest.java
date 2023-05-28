@@ -11,19 +11,19 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
+import com.casino.blackjack.game.BlackjackInitData;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.dealer.BlackjackDealer;
+import com.casino.blackjack.export.BlackjackPlayerAction;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
-import com.casino.common.exception.IllegalBetException;
 import com.casino.common.exception.IllegalPlayerActionException;
-import com.casino.common.table.Status;
 import com.casino.common.user.Bridge;
-import com.casino.common.user.PlayerAction;
 
 public class InsuranceTest extends BaseTest {
 	private BlackjackTable table;
@@ -34,8 +34,10 @@ public class InsuranceTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
-			table2 = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitDataWithThresholds(getThresholdsWithBets(new BigDecimal("15.0"), new BigDecimal("3000.0"))));
+			table = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
+			BlackjackInitData blackjackInitData = createBlackjackInitData(MIN_BUYIN, MIN_BET, new BigDecimal("1000.0"), BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DEFAULT_ALLOWED_SIT_OUT_ROUNDS,
+					DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS);
+			table2 = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge3 = new Bridge("JaneDoe2", table2.getId(), UUID.randomUUID(), null, new BigDecimal("450.0"));
@@ -169,7 +171,7 @@ public class InsuranceTest extends BaseTest {
 		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isInsured());
 		assertEquals(21, dealer.getHand().calculateFinalValue());
 		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.userId()).getTotalBet());
-		assertEquals(new BigDecimal("925.00"), table.getPlayer(bridge.userId()).getBalance());
+		assertEquals(new BigDecimal("925.00"), table.getPlayer(bridge.userId()).getCurrentBalance());
 	}
 
 	@Test
@@ -189,7 +191,7 @@ public class InsuranceTest extends BaseTest {
 		assertEquals(19, dealer.getHand().calculateFinalValue());
 		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isInsured());
 		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.userId()).getTotalBet());
-		assertEquals(new BigDecimal("1025.00"), table.getPlayer(bridge.userId()).getBalance());
+		assertEquals(new BigDecimal("1025.00"), table.getPlayer(bridge.userId()).getCurrentBalance());
 	}
 
 	@Test
@@ -210,7 +212,7 @@ public class InsuranceTest extends BaseTest {
 		assertTrue(p.hasInsured());
 		assertTrue(p.hasCompletedFirstHand());
 		assertEquals(new BigDecimal("75.00"), p.getTotalBet());
-		assertEquals(new BigDecimal("975.00"), p.getBalance());
+		assertEquals(new BigDecimal("975.00"), p.getCurrentBalance());
 	}
 
 	@Test
@@ -231,7 +233,7 @@ public class InsuranceTest extends BaseTest {
 		assertTrue(dealer.getHand().isBlackjack());
 		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isInsured());
 		assertEquals(new BigDecimal("75.00"), table.getPlayer(bridge.userId()).getTotalBet());
-		assertEquals(new BigDecimal("975.00"), table.getPlayer(bridge.userId()).getBalance());
+		assertEquals(new BigDecimal("975.00"), table.getPlayer(bridge.userId()).getCurrentBalance());
 	}
 
 	@Test
@@ -280,7 +282,7 @@ public class InsuranceTest extends BaseTest {
 		assertEquals(1, table2.getDealerHand().calculateValues().get(0));
 		assertEquals(11, table2.getDealerHand().calculateValues().get(1));
 		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("300.00"), table2.getPlayer(bridge3.userId()).getBalance());
+		assertEquals(new BigDecimal("300.00"), table2.getPlayer(bridge3.userId()).getCurrentBalance());
 	}
 
 	@Test
@@ -295,7 +297,7 @@ public class InsuranceTest extends BaseTest {
 		table2.insure(bridge3.userId());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("500.00"), table2.getPlayer(bridge3.userId()).getBalance());
+		assertEquals(new BigDecimal("500.00"), table2.getPlayer(bridge3.userId()).getCurrentBalance());
 	}
 
 	@Test
@@ -311,7 +313,7 @@ public class InsuranceTest extends BaseTest {
 		table2.insure(bridge3.userId());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table2.hit(bridge3.userId());
-		assertEquals(new BigDecimal("400.00"), table2.getPlayer(bridge3.userId()).getBalance());
+		assertEquals(new BigDecimal("400.00"), table2.getPlayer(bridge3.userId()).getCurrentBalance());
 	}
 
 	@Test
@@ -327,7 +329,7 @@ public class InsuranceTest extends BaseTest {
 		table2.insure(bridge3.userId());
 		assertTrue(table2.getPlayer(bridge3.userId()).getHands().get(0).isInsured());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertTrue(table2.getPlayer(bridge3.userId()).getActions().stream().filter(action -> action == PlayerAction.SPLIT).findAny().isEmpty());
+		assertTrue(table2.getPlayer(bridge3.userId()).getActions().stream().filter(action -> action == BlackjackPlayerAction.SPLIT).findAny().isEmpty());
 	}
 
 	@Test
@@ -343,7 +345,7 @@ public class InsuranceTest extends BaseTest {
 		table2.insure(bridge3.userId());
 		assertTrue(table2.getPlayer(bridge3.userId()).getHands().get(0).isInsured());
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertTrue(table2.getPlayer(bridge3.userId()).getActions().stream().filter(action -> action == PlayerAction.DOUBLE_DOWN).findAny().isPresent());
+		assertTrue(table2.getPlayer(bridge3.userId()).getActions().stream().filter(action -> action == BlackjackPlayerAction.DOUBLE_DOWN).findAny().isPresent());
 	}
 
 	@Test

@@ -1,7 +1,9 @@
 module casino.web {
-	exports com.casino.web.socket.blackjack;
+	exports com.casino.web.blackjack;
+	exports com.casino.web.holdem;
+    exports com.casino.web.common;
 
-	requires transitive casino.service;
+    requires transitive casino.service;
 	requires transitive casino.common;
 	requires transitive jakarta.websocket;
 	requires jakarta.cdi;

@@ -14,17 +14,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.dealer.BlackjackDealer;
-import com.casino.blackjack.player.BlackjackPlayer;
+import com.casino.blackjack.game.BlackjackGamePhase;
 import com.casino.blackjack.table.BlackjackTable;
-import com.casino.common.bet.BetVerifier;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.exception.PlayerNotFoundException;
-import com.casino.common.table.Status;
-import com.casino.common.table.TableInitData;
-import com.casino.common.table.phase.GamePhase;
 import com.casino.common.user.Bridge;
 
 public class BetTest extends BaseTest {
@@ -34,7 +30,7 @@ public class BetTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
+			table = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			Field f = table.getClass().getDeclaredField("dealer");
@@ -61,13 +57,13 @@ public class BetTest extends BaseTest {
 	}
 
 	@Test
-	public void betUtilChecksCorrectPhase() {
-		table.updateGamePhase(GamePhase.BETS_COMPLETED);
-		BlackjackPlayer blackjackPlayer = new BlackjackPlayer(bridge, table);
-		IllegalBetException exception = assertThrows(IllegalBetException.class, () -> {
-			BetVerifier.verifyStartingBet(table, blackjackPlayer, MAX_BET);
+	public void betIsNotAcceptedIfGamePhaseIsNotBet() {
+		table.updateGamePhase(BlackjackGamePhase.BETS_COMPLETED);
+		table.join(bridge, "0");
+		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
+		assertThrows(IllegalPlayerActionException.class, () -> {
+			table.bet(bridge.userId(), new BigDecimal("15"));
 		});
-		assertEquals(1, exception.getCode());
 	}
 
 	@Test
@@ -132,24 +128,22 @@ public class BetTest extends BaseTest {
 	}
 
 	@Test
-	public void creatingATableWithNegativeBetAmountIsNotAllowed() { // In error case where minimum bet is negative
+	public void creatingTableWithNegativeMinBetAmountIsNotAllowed() { // In error case where minimum bet is negative
 		assertThrows(IllegalArgumentException.class, () -> {
-			TableInitData tableInitData = getDefaultTableInitDataWithBets(new BigDecimal("-1000.0"), MAX_BET);
-			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
+			createBlackjackInitData(MIN_BUYIN, new BigDecimal("-1000.0"), MAX_BET, 5, 5, 5, 5, null);
 		});
 	}
 
 	@Test
 	public void tableCannotBeCreatedIfMaximumBetIsLessThanMinimumBet() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			TableInitData tableInitData = getDefaultTableInitDataWithBets(new BigDecimal("1000.0"), MAX_BET);
-			table = new BlackjackTable(Status.WAITING_PLAYERS, tableInitData);
+			createBlackjackInitData(MIN_BUYIN, new BigDecimal("2.0"), MAX_BET, 5, 5, 5, 5, null);
 		});
 	}
 
 	@Test
 	public void negativeStartingBetIsPrevented() {
-		table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
+		table = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
 		table.join(bridge, "1");
 		assertThrows(IllegalBetException.class, () -> {
 			table.bet(bridge.userId(), new BigDecimal("-10.1"));

@@ -14,16 +14,15 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.casino.blackjack.dealer.BlackjackDealer;
+import com.casino.blackjack.game.BlackjackGamePhase;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalPlayerActionException;
-import com.casino.common.table.Status;
-import com.casino.common.table.phase.GamePhase;
+import com.casino.common.table.TableStatus;
 import com.casino.common.user.Bridge;
 
 public class DealerTest extends BaseTest {
@@ -33,7 +32,7 @@ public class DealerTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
+			table = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
@@ -54,19 +53,19 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void gamePhaseChangesFromBetToPlayAfterBetPhaseEnd() {
-		assertEquals(GamePhase.BET, table.getGamePhase());
+		assertEquals(BlackjackGamePhase.BET, table.getGamePhase());
 		table.join(bridge, "1");
-		assertEquals(GamePhase.BET, table.getGamePhase());
+		assertEquals(BlackjackGamePhase.BET, table.getGamePhase());
 		table.bet(bridge.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(GamePhase.PLAY, table.getGamePhase());
+		assertEquals(BlackjackGamePhase.PLAY, table.getGamePhase());
 	}
 
 	@Test
 	public void tableStatusChangesFromWaitingToRunningAfterFirstPlayerTakesSeat() {
-		assertTrue(table.getStatus() == Status.WAITING_PLAYERS);
+		assertTrue(table.getStatus() == TableStatus.WAITING_PLAYERS);
 		assertTrue(table.join(bridge, "1"));
-		assertTrue(table.getStatus() == Status.RUNNING);
+		assertTrue(table.getStatus() == TableStatus.RUNNING);
 	}
 
 	@Test
@@ -84,8 +83,8 @@ public class DealerTest extends BaseTest {
 		table.bet(bridge.userId(), new BigDecimal("54.0"));
 		table.bet(bridge2.userId(), new BigDecimal("51.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("946.00"), table.getPlayer(bridge.userId()).getBalance());
-		assertEquals(new BigDecimal("949.00"), table.getPlayer(bridge2.userId()).getBalance());
+		assertEquals(new BigDecimal("946.00"), table.getPlayer(bridge.userId()).getCurrentBalance());
+		assertEquals(new BigDecimal("949.00"), table.getPlayer(bridge2.userId()).getCurrentBalance());
 	}
 
 	@Test
@@ -100,7 +99,7 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void dealerCreatesEightDecks() {
-		BlackjackDealer d = new BlackjackDealer(null);
+		BlackjackDealer d = new BlackjackDealer(null, null);
 		Assertions.assertEquals(416, d.getDecks().size());
 	}
 
@@ -118,10 +117,10 @@ public class DealerTest extends BaseTest {
 		});
 		assertEquals(new BigDecimal("44.55"), table.getPlayer(bridge.userId()).getHands().get(0).getBet());
 		assertEquals(new BigDecimal("44.55"), table.getPlayer(bridge.userId()).getTotalBet());
-		assertEquals(new BigDecimal("955.45"), table.getPlayer(bridge.userId()).getBalance());
+		assertEquals(new BigDecimal("955.45"), table.getPlayer(bridge.userId()).getCurrentBalance());
 		assertEquals(new BigDecimal("51.00"), table.getPlayer(bridge2.userId()).getHands().get(0).getBet());
 		assertEquals(new BigDecimal("51.00"), table.getPlayer(bridge2.userId()).getTotalBet());
-		assertEquals(new BigDecimal("949.00"), table.getPlayer(bridge2.userId()).getBalance());
+		assertEquals(new BigDecimal("949.00"), table.getPlayer(bridge2.userId()).getCurrentBalance());
 	}
 
 	@Test
@@ -171,18 +170,18 @@ public class DealerTest extends BaseTest {
 		table.bet(bridge3.userId(), new BigDecimal("44.55"));
 		assertFalse(table.isDealerTurn());
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(bridge.userId(), table.getPlayerInTurn().getId()); // equals compares UUID -> both have the same
+		assertEquals(bridge.userId(), table.getActivePlayer().getId()); // equals compares UUID -> both have the same
 		assertFalse(table.isDealerTurn());
 		table.stand(bridge.userId());
 		assertFalse(table.isDealerTurn());
-		assertEquals(bridge2.userId(), table.getPlayerInTurn().getId());
+		assertEquals(bridge2.userId(), table.getActivePlayer().getId());
 		assertFalse(table.isDealerTurn());
 		table.stand(bridge2.userId());
 		assertFalse(table.isDealerTurn());
-		assertEquals(bridge3.userId(), table.getPlayerInTurn().getId());
+		assertEquals(bridge3.userId(), table.getActivePlayer().getId());
 		table.stand(bridge3.userId());
 		assertTrue(table.isDealerTurn());
-		assertNull(table.getPlayerInTurn());
+		assertNull(table.getActivePlayer());
 	}
 
 	@Test
@@ -208,44 +207,20 @@ public class DealerTest extends BaseTest {
 		table.bet(bridge3.userId(), new BigDecimal("44.55"));
 		assertFalse(table.isDealerTurn());
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(bridge.userId(), table.getPlayerInTurn().getId());
+		assertEquals(bridge.userId(), table.getActivePlayer().getId());
 		assertFalse(table.isDealerTurn());
 		table.hit(bridge.userId());
 		assertFalse(table.isDealerTurn());
-		assertEquals(bridge2.userId(), table.getPlayerInTurn().getId());
+		assertEquals(bridge2.userId(), table.getActivePlayer().getId());
 		assertFalse(table.isDealerTurn());
 		table.hit(bridge2.userId());
 		assertFalse(table.isDealerTurn());
-		assertEquals(bridge3.userId(), table.getPlayerInTurn().getId());
+		assertEquals(bridge3.userId(), table.getActivePlayer().getId());
 		table.hit(bridge3.userId());
 		assertTrue(table.isDealerTurn());
-		assertNull(table.getPlayerInTurn());
+		assertNull(table.getActivePlayer());
 	}
 
-	@Disabled // Dealer does not remove inactive players atm.
-	@Test
-	public void dealerCreatesNewHandIfPlayerTimesOutAndRejoins() {
-		List<Card> cards = dealer.getDecks();
-		cards.add(Card.of(10, Suit.SPADE));
-		cards.add(Card.of(10, Suit.SPADE));
-		cards.add(Card.of(10, Suit.SPADE));
-		cards.add(Card.of(2, Suit.DIAMOND));
-		cards.add(Card.of(2, Suit.DIAMOND));
-		cards.add(Card.of(2, Suit.DIAMOND));
-		cards.add(Card.of(10, Suit.DIAMOND));
-		cards.add(Card.of(10, Suit.SPADE));
-		cards.add(Card.of(10, Suit.HEART));
-		cards.add(Card.of(10, Suit.CLUB));
-		assertFalse(table.isDealerTurn());
-		table.join(bridge, "1");
-		assertFalse(table.isDealerTurn());
-		table.bet(bridge.userId(), new BigDecimal("11.11"));
-		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
-		UUID firstHandId = dealer.getHand().getId();
-		sleep(BET_ROUND_TIME_SECONDS + 1, ChronoUnit.SECONDS);
-		table.join(bridge, "1");
-		assertFalse(dealer.getHand().getId().equals(firstHandId));
-	}
 
 	@Test
 	public void dealerChangesAfterPlayerDoublesDown() {
@@ -270,17 +245,17 @@ public class DealerTest extends BaseTest {
 		table.bet(bridge3.userId(), new BigDecimal("44.55"));
 		assertFalse(table.isDealerTurn());
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(bridge.userId(), table.getPlayerInTurn().getId());
+		assertEquals(bridge.userId(), table.getActivePlayer().getId());
 		assertFalse(table.isDealerTurn());
 		table.hit(bridge.userId());
 		assertFalse(table.isDealerTurn());
-		assertEquals(bridge2.userId(), table.getPlayerInTurn().getId());
+		assertEquals(bridge2.userId(), table.getActivePlayer().getId());
 		assertFalse(table.isDealerTurn());
 		table.hit(bridge2.userId());
 		assertFalse(table.isDealerTurn());
-		assertEquals(bridge3.userId(), table.getPlayerInTurn().getId()); // equals compares UUID
+		assertEquals(bridge3.userId(), table.getActivePlayer().getId()); // equals compares UUID
 		table.hit(bridge3.userId());
 		assertTrue(table.isDealerTurn());
-		assertNull(table.getPlayerInTurn());
+		assertNull(table.getActivePlayer());
 	}
 }

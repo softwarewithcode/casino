@@ -20,7 +20,6 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalPlayerActionException;
-import com.casino.common.table.Status;
 import com.casino.common.user.Bridge;
 
 public class StartingHandSplitTest extends BaseTest {
@@ -30,7 +29,7 @@ public class StartingHandSplitTest extends BaseTest {
 	@BeforeEach
 	public void initTest() {
 		try {
-			table = new BlackjackTable(Status.WAITING_PLAYERS, getDefaultTableInitData());
+			table = new BlackjackTable(getDefaultTableInitData(),blackjackInitData);
 			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			bridge2 = new Bridge("JohnDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("100.0"));
 			Field f = table.getClass().getDeclaredField("dealer");
@@ -283,7 +282,7 @@ public class StartingHandSplitTest extends BaseTest {
 		assertEquals(new BigDecimal("6.77"), table.getPlayer(bridge2.userId()).getHands().get(0).getBet());
 		assertEquals(new BigDecimal("6.77"), table.getPlayer(bridge2.userId()).getHands().get(1).getBet());
 		assertEquals(new BigDecimal("13.54"), table.getPlayer(bridge2.userId()).getTotalBet());
-		assertEquals(new BigDecimal("86.46"), table.getPlayer(bridge2.userId()).getBalance());
+		assertEquals(new BigDecimal("86.46"), table.getPlayer(bridge2.userId()).getCurrentBalance());
 	}
 
 	@Test
@@ -298,7 +297,7 @@ public class StartingHandSplitTest extends BaseTest {
 		table.join(bridge2, "5");
 		table.bet(bridge2.userId(), new BigDecimal("50.1"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("49.90"), table.getPlayer(bridge2.userId()).getBalance());
+		assertEquals(new BigDecimal("49.90"), table.getPlayer(bridge2.userId()).getCurrentBalance());
 		assertThrows(IllegalPlayerActionException.class, () -> {
 			table.split(bridge2.userId());
 		});
@@ -423,7 +422,7 @@ public class StartingHandSplitTest extends BaseTest {
 		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isCompleted());
 		assertTrue(table.getPlayer(bridge.userId()).getHands().get(1).isCompleted());
 		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
-		assertEquals(new BigDecimal("1020.00"), table.getPlayer(bridge.userId()).getBalance());
+		assertEquals(new BigDecimal("1020.00"), table.getPlayer(bridge.userId()).getCurrentBalance());
 	}
 
 	@Test
@@ -444,7 +443,7 @@ public class StartingHandSplitTest extends BaseTest {
 		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isCompleted());
 		assertTrue(table.getPlayer(bridge.userId()).getHands().get(1).isCompleted());
 		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
-		assertEquals(new BigDecimal("980.00"), table.getPlayer(bridge.userId()).getBalance());
+		assertEquals(new BigDecimal("980.00"), table.getPlayer(bridge.userId()).getCurrentBalance());
 	}
 
 	@Test
@@ -462,7 +461,7 @@ public class StartingHandSplitTest extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.split(bridge.userId());
 		sleep(PLAYER_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertEquals(new BigDecimal("1005.00"), table.getPlayer(bridge.userId()).getBalance());
+		assertEquals(new BigDecimal("1005.00"), table.getPlayer(bridge.userId()).getCurrentBalance());
 		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isBlackjack());
 	}
 
@@ -483,7 +482,7 @@ public class StartingHandSplitTest extends BaseTest {
 //		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isCompleted());
 //		assertTrue(table.getPlayer(bridge.userId()).getHands().get(1).isCompleted());
 //		assertEquals(12, table.getPlayer(bridge.userId()).getHands().get(0).calculateFinalValue());
-//		assertEquals(new BigDecimal("1005.00"), table.getPlayer(bridge.userId()).getBalance());
+//		assertEquals(new BigDecimal("1005.00"), table.getPlayer(bridge.userId()).getCurrentBalance());
 //		assertTrue(table.getPlayer(bridge.userId()).getHands().get(0).isBlackjack());
 //	}
 }

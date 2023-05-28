@@ -1,2 +1,12 @@
 export const cardsSprite = document.getElementById("cardsSprite") as HTMLImageElement
 export const bgImage = document.getElementById("bgImage") as HTMLImageElement
+export const cardBackSideImage = document.getElementById("cardBackSideImage") as HTMLImageElement
+export const chip10kImage = document.getElementById("chip10k") as HTMLImageElement
+export const chip1kImage = document.getElementById("chip1k") as HTMLImageElement
+export const chip100Image = document.getElementById("chip100") as HTMLImageElement
+export const chip10Image = document.getElementById("chip10") as HTMLImageElement
+export const chip5Image = document.getElementById("chip5") as HTMLImageElement
+export const chip1Image = document.getElementById("chip1") as HTMLImageElement
+export const chip01Image = document.getElementById("chip01") as HTMLImageElement
+export const chipAnyImage = document.getElementById("chipAny") as HTMLImageElement
+export const chipDealer = document.getElementById("chipDealer") as HTMLImageElement

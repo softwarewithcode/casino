@@ -1,24 +1,20 @@
 package com.casino.blackjack.player;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
-
 import com.casino.common.cards.Card;
-import com.casino.common.cards.IHand;
+import com.casino.common.cards.CardHand;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
+
 @JsonIncludeProperties(value = { "cards", "values", "blackjack", "bet", "insured", "doubled", "active" })
-public class BlackjackHand implements IHand {
+public class BlackjackHand implements CardHand<BlackjackHand> {
 	private final UUID id;
 	private final Instant created;
 	private final List<Card> cards;
@@ -37,15 +33,13 @@ public class BlackjackHand implements IHand {
 		lock = new ReentrantLock();
 	}
 
-	@Override
 	public List<Integer> calculateValues() {
 		List<Integer> values = new ArrayList<>(2);
-		Integer smallestValue = cards.stream().collect(Collectors.summingInt(card -> card.getRank() > 10 ? 10 : card.getRank()));
+		Integer smallestValue = cards.stream().mapToInt(card -> Math.min(card.getRank(), 10)).sum();
 		values.add(smallestValue);
 		Optional<Card> aceOptional = cards.stream().filter(card -> card.getRank() == 1).findAny();
-		if (hasTwoPossibleValues(smallestValue, aceOptional)) {
-			values.add(Integer.valueOf(smallestValue + 10));
-		}
+		if (hasTwoPossibleValues(smallestValue, aceOptional))
+			values.add(smallestValue + 10);
 		return values;
 	}
 
@@ -53,8 +47,7 @@ public class BlackjackHand implements IHand {
 		List<Integer> vals = calculateValues();
 		return cards.size() == 2 && vals.size() == 2 && vals.get(1) == 21;
 	}
-
-	@JsonProperty
+	@JsonProperty // getter for serialization
 	public List<Integer> getValues() {
 		if (!isCompleted())
 			return calculateValues();
@@ -105,10 +98,6 @@ public class BlackjackHand implements IHand {
 		return id;
 	}
 
-	public Instant getCreated() {
-		return created;
-	}
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
@@ -131,30 +120,26 @@ public class BlackjackHand implements IHand {
 		return Objects.equals(id, other.id);
 	}
 
-	@Override
 	public boolean isCompleted() {
 		return completed != null;
 	}
 
-	@Override
 	public void complete() {
 		try {
-//			lock.lock();
+			lock.lock();
 			if (isCompleted())
 				throw new IllegalStateException("complete called on completed hand");
 			this.completed = Instant.now();
 			this.active = false;
 		} finally {
-//			lock.unlock();
+			lock.unlock();
 		}
 	}
 
-	@Override
 	public boolean isActive() {
 		return active && !isCompleted();
 	}
 
-	@Override
 	public void activate() {
 		try {
 			lock.lock();
@@ -166,7 +151,6 @@ public class BlackjackHand implements IHand {
 		}
 	}
 
-	@Override
 	public void doubleDown(Card ref) {
 		try {
 			lock.lock();
@@ -181,7 +165,6 @@ public class BlackjackHand implements IHand {
 		}
 	}
 
-	@Override
 	public void stand() {
 		try {
 			lock.lock();
@@ -193,7 +176,6 @@ public class BlackjackHand implements IHand {
 		}
 	}
 
-	@Override
 	public boolean shouldComplete() {
 		if (isCompleted())
 			return false;
@@ -202,10 +184,9 @@ public class BlackjackHand implements IHand {
 		List<Integer> vals = calculateValues();
 		if (vals.size() == 2 && vals.get(1) == 21)
 			return true;
-		return vals.get(0) >= 21 ? true : false;
+		return vals.get(0) >= 21;
 	}
 
-	@Override
 	public Integer calculateFinalValue() {
 		if (!isCompleted() || getCards().size() < 2)
 			throw new IllegalArgumentException("hand has not enough cards " + getCards().size() + " or is not completed:" + completed);
@@ -216,24 +197,21 @@ public class BlackjackHand implements IHand {
 		return values.get(1) > 21 ? first : values.get(1);
 	}
 
-	@Override
 	public boolean isInsured() {
 		return insuranceBet != null;
 	}
 
-	@Override
 	public void insure() {
 		try {
 			lock.lock();
 			if (!isActive() || isInsured() || isBlackjack())
 				throw new IllegalPlayerActionException("insurance not allowed:" + this);
-			insuranceBet = bet.divide(new BigDecimal("2"));
+			insuranceBet = bet.divide(BigDecimal.TWO,RoundingMode.DOWN);
 		} finally {
 			lock.unlock();
 		}
 	}
 
-	@Override
 	public boolean hasWinningChance() {
 		return containsCards() && bet != null && isCompleted() && calculateFinalValue() <= 21 || isInsured();
 	}
@@ -247,13 +225,11 @@ public class BlackjackHand implements IHand {
 	}
 
 	@JsonIgnore
-	@Override
 	public boolean isInsuranceCompensable() {
 		return isInsured() && isCompleted();
 	}
 
-	@Override
-	public int compareTo(IHand dealerHand) {
+	public int compareTo(BlackjackHand dealerHand) {
 		if (dealerHand == null)
 			return -1;
 		int dealerVal = calculateFinalValue();
@@ -262,15 +238,15 @@ public class BlackjackHand implements IHand {
 		boolean playerBlackjack = dealerHand.isBlackjack();
 		if (dealerBlackjack && playerBlackjack)
 			return 0;
-		if (dealerBlackjack && !playerBlackjack)
+		if (dealerBlackjack)
 			return -1;
-		if (!dealerBlackjack && playerBlackjack)
+		if (playerBlackjack)
 			return 1;
 		if (dealerVal > 21 && playerVal > 21)
 			return -1;
-		if (dealerVal > 21 && playerVal <= 21)
+		if (dealerVal > 21)
 			return 1;
-		if (dealerVal <= 21 && playerVal > 21)
+		if (playerVal > 21)
 			return -1;
 		if (dealerVal == playerVal)
 			return 0;

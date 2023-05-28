@@ -4,13 +4,10 @@ public enum Language {
 
 	ENGLISH(1);
 
-	private int language;
+	private final int language;
 
-	private Language(int numberFromDb) {
+	Language(int numberFromDb) {
 		this.language = numberFromDb;
 	}
 
-	public int getLanguage() {
-		return language;
-	}
 }
