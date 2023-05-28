@@ -1,8 +1,8 @@
 # casino
 
-Current and latest dev branch is "texas-hold'em" <br>
+
 ## About <br>
-This repository contains modularized building blocks for a simple virtual casino and includes a blackjack game. Users from different machines can see every players' cards and chips on the table just like playing a real game. Turn changes from player to player based on actions, timeouts and by received cards. <br>
+This repository contains modularized building blocks for a simple virtual casino and includes a blackjack and Texas Hold'em No Limit games. <br>
 
 ### Documentation
 /utils/documentation
@@ -11,17 +11,17 @@ This repository contains modularized building blocks for a simple virtual casino
  /utils/workspace
 
 ### Frontend
-Current frontend is merely a reference implementation for backend testing. Repo description contains a link which shows how the UI works without building a workspace. <br>
+Current frontends are merely a reference implementations for backend testing. Repo description contains a link which shows how the UI works without building a workspace. <br>
 Frontend is reactive using Pinia and Vue combination. Frontend has no animations. <br>
 Documentation section has more information about ui-backend websocket communications. It might be useful if you want to test/study WebSockets using this project. Or maybe build brand new user interface. 
 
 ### Backend
-Built originally using Java 19 with Virtual Threads / JakartaEE. Downgraded later to LTS Java17, point being to get the (backend) workspace running in a Docker container. Currently Tomee has only Java17 docker images available. Check issues tab with Docker. <br>
+Java 19 with Virtual Threads preview / JakartaEE.  <br>
 
 Some classes have Virtual Threads parts commented out for future. + ConcurrentPreviewTestBreaksWithoutConfiguration.java as Junit test class which uses Virtual Threads and Cyclic Barriers for concurrent testing.
 
 ### Future development ideas
-Next game? Roulette, Texas Hold'em, Omaha etc. <br>
+Next game? Roulette, Omaha etc. <br>
 Database handling, authentication. <br>
 
 ### For learning

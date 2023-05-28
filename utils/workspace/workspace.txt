@@ -1,7 +1,7 @@
 29.03.2023<br>
 
 Default workspace and setup contains:
-1) Latest Eclipse IDE for backend development. Runs with IntelliJ community edition as well after Maven and Tomee setup.
+1) IntelliJ community edition and/or Eclipse 2023-03.( Eclipse mainly then when modifications need to be run on server). But either one is ok with setups.
 2) Visual Studio Code for frontend development 
 
 Development and running the files:
@@ -13,7 +13,7 @@ Development and running the files:
 1.3 Ship the projects into the server and check startup logs for errors. <br>
 1.4. Precompiled version should now open from http://localhost:8080/casino/
 
-2. Frontend development: Vue3 with Reactive Pinia store. Npm v9.1.1, Node v16.15.0, with Volar takeover mode and .prettierc combination. <br>
+2. Frontend development: Vue3 with Reactive Pinia store. Npm v9.6.6, Node v18.16.0, with Volar takeover mode and .prettierc combination. <br>
 2.1 Open frontend folder where package.json exists, <br>
 run "npm install" -> should load the dependencies defined in package.json<br>
 run "npm run dev" -> should start the UI development server at port 5000. Package.json has predefined port 5000.<br>
