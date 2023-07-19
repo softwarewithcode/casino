@@ -11,8 +11,6 @@ import java.util.concurrent.CompletableFuture;
 public interface NoLimitTexasHoldemAPI extends BaseTableAPI {
 	boolean join(Bridge user, String seatNumber, Boolean waitBigBlind); // possibly?
 
-	void watch(Bridge user);
-
 	void raiseTo(UUID playerId, BigDecimal amount);
 
 	void allIn(UUID playerId); // maybe ?
@@ -25,7 +23,7 @@ public interface NoLimitTexasHoldemAPI extends BaseTableAPI {
 
 	void leave(UUID playerId);
 
-	void refresh(UUID playerId);
+	void refresh(UUID playerId); // rename to Options (UUID playerId)?
 
 	void sitOutNextHand(UUID playerId);
 
