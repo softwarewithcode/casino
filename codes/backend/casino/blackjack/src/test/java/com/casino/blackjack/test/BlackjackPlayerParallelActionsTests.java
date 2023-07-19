@@ -39,8 +39,8 @@ import com.casino.common.user.Bridge;
  * With other IDEs something similar.
  */
 
-//01/14/2023 -> requires jdk19. So let's see. At least tests have helped during development!
-public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
+//01/14/2023 -> requires jdk19
+public class BlackjackPlayerParallelActionsTests extends BaseTest {
 	private BlackjackTable table;
 	private BlackjackTable tableWith49MinAnd49MaxPlayers;
 	BlackjackPlayer doubleDownPlayer;
@@ -49,7 +49,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	private volatile int playerWhoDidNotGetSeat;
 	private volatile int rejectedInsurances;
 	private volatile int rejectedDoubles;
-	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(ConcurrentPreviewTestBreaksWithoutConfiguration.class.getName());
+	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(BlackjackPlayerParallelActionsTests.class.getName());
 	private Bridge bridge3;
 	private TableData tableInitData49Players;
 	private BlackjackTable table49Players;
@@ -126,7 +126,7 @@ public class ConcurrentPreviewTestBreaksWithoutConfiguration extends BaseTest {
 	}
 
 	@Test
-	public void fiftyOneOutOfHundredPlayersGetsRejectedAnd49GetsAcceptedIn49SeatedTable() throws InterruptedException, BrokenBarrierException {
+	public void fiftyOneOutOfHundredPlayersGetRejectedAnd49GetAcceptedIn49SeatedTable() throws InterruptedException, BrokenBarrierException {
 		table = new BlackjackTable(tableInitData49Players, blackjackInitData);
 		CyclicBarrier casinoBarrier = new CyclicBarrier(101);
 		List<Thread> threads = createCasinoPlayers(100, casinoBarrier);

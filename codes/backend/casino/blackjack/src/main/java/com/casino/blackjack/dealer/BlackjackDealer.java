@@ -17,7 +17,7 @@ import com.casino.blackjack.player.BlackjackHand;
 import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.dealer.CommunicationChannel;
-import com.casino.common.game.phase.bet.ConcurrentBetPhase;
+import com.casino.common.game.phase.bet.ParallelBetPhase;
 import com.casino.common.game.phase.bet.BetPhaser;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
@@ -63,7 +63,7 @@ public class BlackjackDealer implements CardDealer, BetPhaser, InsurancePhaser {
     }
 
     private void startBetPhaseClock(long initialDelay) {
-        ConcurrentBetPhase<BlackjackDealer> task = new ConcurrentBetPhase<>(this);
+        ParallelBetPhase<BlackjackDealer> task = new ParallelBetPhase<>(this);
         getTable().startTiming(task, initialDelay);
     }
 

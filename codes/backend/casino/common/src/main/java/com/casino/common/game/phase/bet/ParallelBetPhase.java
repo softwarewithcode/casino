@@ -4,12 +4,12 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//All players bet concurrently at the same time
-public class ConcurrentBetPhase<T extends BetPhaser> extends TimerTask {
-    private static final Logger LOGGER = Logger.getLogger(ConcurrentBetPhase.class.getName());
+//All players can bet parallel at the same time
+public class ParallelBetPhase<T extends BetPhaser> extends TimerTask {
+    private static final Logger LOGGER = Logger.getLogger(ParallelBetPhase.class.getName());
     private final T betPhaser;
 
-    public ConcurrentBetPhase(T betPhaser) {
+    public ParallelBetPhase(T betPhaser) {
         this.betPhaser = betPhaser;
         betPhaser.updateCounterTime(betPhaser.getBetPhaseTime());
     }

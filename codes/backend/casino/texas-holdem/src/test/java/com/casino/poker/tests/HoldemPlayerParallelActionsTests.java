@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * * -> Use VM Arguments -> "-ea --enable-preview" <br>
  */
-public class ConcurrentTestsRequiresConfiguration extends DefaultTableTests {
+public class HoldemPlayerParallelActionsTests extends DefaultTableTests {
 
     private volatile int rejectedRaises = 0;
 
