@@ -1,19 +1,19 @@
 package com.casino.poker.export;
 
-import com.casino.common.user.Bridge;
-import com.casino.common.api.BaseTableAPI;
-import com.casino.common.reload.Reload;
-
 import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import com.casino.common.api.BaseTableAPI;
+import com.casino.common.reload.Reload;
+import com.casino.common.user.Bridge;
+
 public interface NoLimitTexasHoldemAPI extends BaseTableAPI {
-	boolean join(Bridge user, String seatNumber, Boolean waitBigBlind); // possibly?
+	boolean join(Bridge user, String seatNumber, Boolean waitBigBlind);
 
 	void raiseTo(UUID playerId, BigDecimal amount);
 
-	void allIn(UUID playerId); // maybe ?
+	void allIn(UUID playerId);
 
 	void fold(UUID playerId);
 
