@@ -6,9 +6,6 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 
-import com.casino.common.cards.Card;
-import com.casino.common.cards.Suit;
-
 public class PotCalculationTest extends DefaultTableTests {
     @Test
     public void checksOnRiverLeadsToSplitPot() {
@@ -16,8 +13,8 @@ public class PotCalculationTest extends DefaultTableTests {
         setupDefaultHeadsUpSplitPot();
         table.check(table.getRound().getPositions().bb().getId());
         table.check(table.getRound().getPositions().sb().getId());
-        assertEquals(new BigDecimal("999.50"), table.getPlayer(bridge.userId()).getCurrentBalance());
-        assertEquals(new BigDecimal("999.50"), table.getPlayer(bridge2.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("999.50"), table.getPlayer(user.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("999.50"), table.getPlayer(user2.userId()).getCurrentBalance());
     }
 
     @Test

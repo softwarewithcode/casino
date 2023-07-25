@@ -2,7 +2,7 @@ package com.casino.service.user;
 
 import com.casino.common.functions.Functions;
 import com.casino.common.reload.Reload;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 import jakarta.enterprise.context.Dependent;
 import jakarta.websocket.Session;
 
@@ -16,14 +16,14 @@ public class UserService {
     private static final Logger LOGGER = Logger.getLogger(UserService.class.getName());
     private static final AtomicInteger guestCount = new AtomicInteger();
 
-    public Bridge createGuestPlayerBridge(UUID tableId, Session session) {
+    public User createGuestPlayerBridge(UUID tableId, Session session) {
         return createDefaultGuestPlayerBridge(tableId, session);
     }
 
-    private Bridge createDefaultGuestPlayerBridge(UUID tableId, Session session) {
+    private User createDefaultGuestPlayerBridge(UUID tableId, Session session) {
         UUID randomGuestId = UUID.randomUUID();
         int guestNumber = guestCount.incrementAndGet();
-        return new Bridge("guest" + guestNumber, tableId, randomGuestId, session, new BigDecimal("1000.0"));
+        return new User("guest" + guestNumber, tableId, randomGuestId, session, new BigDecimal("1000.0"));
     }
 
     public BigDecimal withdrawFromWallet(UUID playerId, BigDecimal reloadAmount) {

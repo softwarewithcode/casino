@@ -2,7 +2,7 @@ package com.casino.poker.tests;
 
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 import com.casino.poker.actions.PokerActionType;
 import com.casino.poker.functions.HoldemFunctions;
 import com.casino.poker.game.HoldemPhase;
@@ -59,10 +59,10 @@ public class AllInTests extends DefaultTableTests {
         defaultJoinJoin();
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
         table.fold(table.getRound().getBigBlindPlayer().getId());
-        table.join(bridge3, "4", false); // 800
-        table.join(bridge4, "5", false); // 700
-        table.join(bridge5, "1", false); // 600
-        table.join(bridge6, "0", false); // 900
+        table.join(user3, "4", false); // 800
+        table.join(user4, "5", false); // 700
+        table.join(user5, "1", false); // 600
+        table.join(user6, "0", false); // 900
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
         // Second round starts with 6 players
         everybodyMakeAction(table, PokerActionType.ALL_IN);
@@ -83,12 +83,12 @@ public class AllInTests extends DefaultTableTests {
         table.getRound().getPlayers().forEach(player -> player.getHoleCards().add(Card.of(2, Suit.SPADE)));
         everybodyMakeAction(table, PokerActionType.ALL_IN);
         assertEquals(4, table.getDealer().getPotHandler().getPots().size());
-        assertEquals(new BigDecimal("199.93"), table.getPlayer(bridgeWithCents.userId()).getCurrentBalance());
-        assertEquals(new BigDecimal("398.85"), table.getPlayer(bridge2WithCents.userId()).getCurrentBalance());
-        assertEquals(new BigDecimal("398.85"), table.getPlayer(bridge3WithCents.userId()).getCurrentBalance());
-        assertEquals(new BigDecimal("548.11"), table.getPlayer(bridge4WithCents.userId()).getCurrentBalance());
-        assertEquals(new BigDecimal("399.11"), table.getPlayer(bridge5WithCents.userId()).getCurrentBalance());
-        assertEquals(new BigDecimal("553.11"), table.getPlayer(bridge6WithCents.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("199.93"), table.getPlayer(userWithCents.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("398.85"), table.getPlayer(user2WithCents.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("398.85"), table.getPlayer(user3WithCents.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("548.11"), table.getPlayer(user4WithCents.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("399.11"), table.getPlayer(user5WithCents.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("553.11"), table.getPlayer(user6WithCents.userId()).getCurrentBalance());
 
         assertEquals(new BigDecimal("1199.62"), table.getDealer().getPotHandler().getPots().get(0).getAmount());
         assertEquals(new BigDecimal("994.60"), table.getDealer().getPotHandler().getPots().get(1).getAmount());
@@ -104,16 +104,16 @@ public class AllInTests extends DefaultTableTests {
     @Test
     public void allInsResultsToSplitPotWithRakeDeductionFromAllPots() {
         HoldemTable table = TestHoldemTableFactory.createDefaultTexasHoldemCashGameTableWithRakeCap(new BigDecimal("5000"));
-        table.join(bridge, "2", false); // 1000
-        table.join(bridge2, "3", false); // 1000
+        table.join(user, "2", false); // 1000
+        table.join(user2, "3", false); // 1000
         waitRoundToStart();
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
         table.fold(table.getRound().getBigBlindPlayer().getId());
-        Bridge extra = new Bridge("extra", table.getId(), UUID.randomUUID(), null, new BigDecimal("800.19"));
+        User extra = new User("extra", table.getId(), UUID.randomUUID(), null, new BigDecimal("800.19"));
         table.join(extra, "4", false); // 800
-        table.join(bridge4, "5", false); // 700
-        table.join(bridge5, "1", false); // 600
-        table.join(bridge6, "0", false); // 900
+        table.join(user4, "5", false); // 700
+        table.join(user5, "1", false); // 600
+        table.join(user6, "0", false); // 900
         int sbPlayerSeatNumber = table.getRound().getPositions().sbSeatNumber();
         int bbPlayerSeatNumber = table.getRound().getPositions().bbSeatNumber();
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
@@ -129,10 +129,10 @@ public class AllInTests extends DefaultTableTests {
         assertEquals(5, table.getDealer().getPotHandler().getPots().size());
         assertEquals(new BigDecimal("960.49"), table.getPlayer(sbPlayerSeatNumber).getCurrentBalance());
         assertEquals(new BigDecimal("940.49"), table.getPlayer(bbPlayerSeatNumber).getCurrentBalance());
-        assertEquals(new BigDecimal("854.99"), table.getPlayer(bridge6.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("854.99"), table.getPlayer(user6.userId()).getCurrentBalance());
         assertEquals(new BigDecimal("760.18"), table.getPlayer(extra.userId()).getCurrentBalance());
-        assertEquals(new BigDecimal("570.00"), table.getPlayer(bridge5.userId()).getCurrentBalance());
-        assertEquals(new BigDecimal("665.00"), table.getPlayer(bridge4.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("570.00"), table.getPlayer(user5.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("665.00"), table.getPlayer(user4.userId()).getCurrentBalance());
 
         assertEquals(new BigDecimal("3420.00"), table.getDealer().getPotHandler().getPots().get(0).getAmount());
         assertEquals(new BigDecimal("475.00"), table.getDealer().getPotHandler().getPots().get(1).getAmount());
@@ -150,16 +150,16 @@ public class AllInTests extends DefaultTableTests {
     @Test
     public void allInsResultsToSplitPotWithRakeCapLimit() {
         HoldemTable table = TestHoldemTableFactory.createDefaultTexasHoldemCashGameTableWithRakeCap(new BigDecimal("227.79"));
-        table.join(bridge, "2", false); // 1000
-        table.join(bridge2, "3", false); // 1000
+        table.join(user, "2", false); // 1000
+        table.join(user2, "3", false); // 1000
         waitRoundToStart();
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
         table.fold(table.getRound().getBigBlindPlayer().getId());
-        Bridge extra = new Bridge("extra", table.getId(), UUID.randomUUID(), null, new BigDecimal("800.19"));
+        User extra = new User("extra", table.getId(), UUID.randomUUID(), null, new BigDecimal("800.19"));
         table.join(extra, "4", false); // 800
-        table.join(bridge4, "5", false); // 700
-        table.join(bridge5, "1", false); // 600
-        table.join(bridge6, "0", false); // 900
+        table.join(user4, "5", false); // 700
+        table.join(user5, "1", false); // 600
+        table.join(user6, "0", false); // 900
         Integer sbPlayerSeatNumber = table.getRound().getPositions().sbSeatNumber();
         Integer bbPlayerSeatNumber = table.getRound().getPositions().bbSeatNumber();
         // Second round starts with 6 players.
@@ -176,10 +176,10 @@ public class AllInTests extends DefaultTableTests {
         assertEquals(5, table.getDealer().getPotHandler().getPots().size());
         assertEquals(new BigDecimal("969.07"), table.getPlayer(sbPlayerSeatNumber).getCurrentBalance());
         assertEquals(new BigDecimal("949.07"), table.getPlayer(bbPlayerSeatNumber).getCurrentBalance());
-        assertEquals(new BigDecimal("859.07"), table.getPlayer(bridge6.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("859.07"), table.getPlayer(user6.userId()).getCurrentBalance());
         assertEquals(new BigDecimal("760.18"), table.getPlayer(extra.userId()).getCurrentBalance());
-        assertEquals(new BigDecimal("570.00"), table.getPlayer(bridge5.userId()).getCurrentBalance());
-        assertEquals(new BigDecimal("665.00"), table.getPlayer(bridge4.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("570.00"), table.getPlayer(user5.userId()).getCurrentBalance());
+        assertEquals(new BigDecimal("665.00"), table.getPlayer(user4.userId()).getCurrentBalance());
 
         assertEquals(new BigDecimal("3420.00"), table.getDealer().getPotHandler().getPots().get(0).getAmount());
         assertEquals(new BigDecimal("475.00"), table.getDealer().getPotHandler().getPots().get(1).getAmount());
@@ -199,10 +199,10 @@ public class AllInTests extends DefaultTableTests {
         // First round starts with the first 2 players
         defaultJoinJoin();
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
-        table.join(bridge3, "4", false); // 800
-        table.join(bridge4, "5", false); // 700
-        table.join(bridge5, "1", false); // 600
-        table.join(bridge6, "0", false); // 900
+        table.join(user3, "4", false); // 800
+        table.join(user4, "5", false); // 700
+        table.join(user5, "1", false); // 600
+        table.join(user6, "0", false); // 900
         table.fold(table.getRound().getBigBlindPlayer().getId());
         Integer firstRoundSbPlayerSeatNumber = getDefaultTableSmallBlindPlayer().getSeatNumber();
         Integer firstRoundBbPlayerSeatNumber = getDefaultTableBigBlindPlayer().getSeatNumber();
@@ -257,10 +257,10 @@ public class AllInTests extends DefaultTableTests {
         // First round starts with the first 2 players
         defaultJoinJoin();
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
-        table.join(bridge3, "4", false); // 800
-        table.join(bridge4, "5", false); // 700
-        table.join(bridge5, "1", false); // 600
-        table.join(bridge6, "0", false); // 900
+        table.join(user3, "4", false); // 800
+        table.join(user4, "5", false); // 700
+        table.join(user5, "1", false); // 600
+        table.join(user6, "0", false); // 900
         table.fold(table.getRound().getBigBlindPlayer().getId());
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
         table.check(table.getActivePlayer().getId()); // Has new player's blind on table
@@ -301,12 +301,12 @@ public class AllInTests extends DefaultTableTests {
     @Test
     public void callingShortStackAllInPreFlopAsOnlyPlayerWhoCanActLeadsToRoundCompletedAutomatically() {
         System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "4");
-        table.join(bridge, "2", false); // 1000
-        table.join(bridge3, "4", false); // 800
+        table.join(user, "2", false); // 1000
+        table.join(user3, "4", false); // 800
         waitRoundToStart();
         setDealerNextCardsForStraightFlush();
         table.allIn(table.getPlayer(4).getId());
-        table.call(bridge.userId());
+        table.call(user.userId());
         waitRoundStartWithExtraWaitTime(1000);
         assertNotEquals(new BigDecimal("985.00"), table.getPlayer(2));
         assertNotEquals(new BigDecimal("780.00"), table.getPlayer(4));

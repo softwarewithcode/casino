@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import com.casino.common.table.TableCard;
 import com.casino.common.table.TableStatus;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 
 public interface BaseTableAPI {
 
@@ -14,6 +14,6 @@ public interface BaseTableAPI {
 
 	UUID getId();
 	
-	void watch(Bridge user);
+	void watch(User user);
 
 }

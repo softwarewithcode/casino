@@ -15,30 +15,29 @@ import org.junit.jupiter.api.BeforeEach;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.message.Mapper;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 import com.casino.poker.actions.PokerActionType;
 import com.casino.poker.dealer.HoldemDealer;
-import com.casino.poker.player.HoldemPlayer;
 import com.casino.poker.round.positions.PokerPositionsBuilder;
 import com.casino.poker.table.DealerButton;
 import com.casino.poker.table.HoldemTable;
 
 public class DefaultTableTests {
-	protected Bridge bridge;
-	protected Bridge bridge2;
-	protected Bridge bridge3;
-	protected Bridge bridge4;
-	protected Bridge bridge5;
-	protected Bridge bridge6;
-	protected Bridge bridgeWithoutMoney;
-	protected Bridge bridgeMaximum;
-	protected Bridge bridgeMaximum2;
-	protected Bridge bridgeWithCents;
-	protected Bridge bridge2WithCents;
-	protected Bridge bridge3WithCents;
-	protected Bridge bridge4WithCents;
-	protected Bridge bridge5WithCents;
-	protected Bridge bridge6WithCents;
+	protected User user;
+	protected User user2;
+	protected User user3;
+	protected User user4;
+	protected User user5;
+	protected User user6;
+	protected User userWithoutMoney;
+	protected User userMaximum;
+	protected User userMaximum2;
+	protected User userWithCents;
+	protected User user2WithCents;
+	protected User user3WithCents;
+	protected User user4WithCents;
+	protected User user5WithCents;
+	protected User user6WithCents;
 	protected HoldemTable table;
 	protected Long DEFAULT_ROUND_DELAY_MILLIS = TestHoldemTableFactory.DEFAULT_ROUND_DELAY + 500l;
 	protected HoldemDealer dealer;
@@ -58,21 +57,21 @@ public class DefaultTableTests {
 		try {
 			System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "2");
 			table = TestHoldemTableFactory.createDefaultTexasHoldemCashGameTable();
-			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
-			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
-			bridge3 = new Bridge("JamesDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("800"));
-			bridge4 = new Bridge("JackieDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("700"));
-			bridge5 = new Bridge("JillDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("600"));
-			bridge6 = new Bridge("JimDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("900"));
-			bridgeWithCents = new Bridge("JoseDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("203.27000000"));
-			bridge2WithCents = new Bridge("JosephineDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("402.191345"));
-			bridge3WithCents = new Bridge("Joanna", table.getId(), UUID.randomUUID(), null, new BigDecimal("402.199345"));
-			bridge4WithCents = new Bridge("JaxonDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("551.457289"));
-			bridge5WithCents = new Bridge("JuliaDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("402.4541345"));
-			bridge6WithCents = new Bridge("JasonDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("556.4553289"));
-			bridgeWithoutMoney = new Bridge("brokeDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("0"));
-			bridgeMaximum = new Bridge("maximumDoe", table.getId(), UUID.randomUUID(), null, maximumBalance);
-			bridgeMaximum2 = new Bridge("maximumDoe2", table.getId(), UUID.randomUUID(), null, maximumBalance);
+			user = new User("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
+			user2 = new User("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
+			user3 = new User("JamesDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("800"));
+			user4 = new User("JackieDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("700"));
+			user5 = new User("JillDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("600"));
+			user6 = new User("JimDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("900"));
+			userWithCents = new User("JoseDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("203.27000000"));
+			user2WithCents = new User("JosephineDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("402.191345"));
+			user3WithCents = new User("Joanna", table.getId(), UUID.randomUUID(), null, new BigDecimal("402.199345"));
+			user4WithCents = new User("JaxonDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("551.457289"));
+			user5WithCents = new User("JuliaDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("402.4541345"));
+			user6WithCents = new User("JasonDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("556.4553289"));
+			userWithoutMoney = new User("brokeDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("0"));
+			userMaximum = new User("maximumDoe", table.getId(), UUID.randomUUID(), null, maximumBalance);
+			userMaximum2 = new User("maximumDoe2", table.getId(), UUID.randomUUID(), null, maximumBalance);
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (HoldemDealer) f.get(table);
@@ -94,47 +93,47 @@ public class DefaultTableTests {
 	}
 
 	protected void defaultJoinJoin() {
-		table.join(bridge, "2", false);
-		table.join(bridge2, "3", false);
+		table.join(user, "2", false);
+		table.join(user2, "3", false);
 		waitRoundToStart();
 	}
 
 	protected void defaultJoinJoinJoin() {
-		table.join(bridge, "2", false);
-		table.join(bridge2, "3", false);
-		table.join(bridge3, "4", false);
+		table.join(user, "2", false);
+		table.join(user2, "3", false);
+		table.join(user3, "4", false);
 		waitRoundToStart();
 	}
 	protected void defaultJoinJoinJoinJoin() {
-		table.join(bridge, "2", false);
-		table.join(bridge2, "3", false);
-		table.join(bridge3, "4", false);
-		table.join(bridge4, "5", false);
+		table.join(user, "2", false);
+		table.join(user2, "3", false);
+		table.join(user3, "4", false);
+		table.join(user4, "5", false);
 		waitRoundToStart();
 	}
 	protected void maximumJoinJoin() {
-		table.join(bridgeMaximum, "3", false);
-		table.join(bridgeMaximum2, "2", false);
+		table.join(userMaximum, "3", false);
+		table.join(userMaximum2, "2", false);
 		waitRoundToStart();
 	}
 
 	protected void default6PlayersJoin6MaxTable() {
-		table.join(bridge, "0", true);
-		table.join(bridge2, "1", true);
-		table.join(bridge3, "2", true);
-		table.join(bridge4, "3", true);
-		table.join(bridge5, "4", true);
-		table.join(bridge6, "5", true);
+		table.join(user, "0", true);
+		table.join(user2, "1", true);
+		table.join(user3, "2", true);
+		table.join(user4, "3", true);
+		table.join(user5, "4", true);
+		table.join(user6, "5", true);
 		waitRoundToStart();
 	}
 
 	protected void centPlayersJoinPlayersJoin6MaxTable() {
-		table.join(bridgeWithCents, "0", true);
-		table.join(bridge2WithCents, "1", true);
-		table.join(bridge3WithCents, "2", true);
-		table.join(bridge4WithCents, "3", true);
-		table.join(bridge5WithCents, "4", true);
-		table.join(bridge6WithCents, "5", true);
+		table.join(userWithCents, "0", true);
+		table.join(user2WithCents, "1", true);
+		table.join(user3WithCents, "2", true);
+		table.join(user4WithCents, "3", true);
+		table.join(user5WithCents, "4", true);
+		table.join(user6WithCents, "5", true);
 		waitRoundToStart();
 	}
 

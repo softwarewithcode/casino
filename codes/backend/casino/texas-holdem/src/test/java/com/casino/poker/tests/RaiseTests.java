@@ -161,15 +161,15 @@ public class RaiseTests extends DefaultTableTests {
 	@Test
 	public void raisingUnderMinimumThrowsException2() {
 		// First round starts with the first 2 players
-		table.join(bridge, "2", false); // 1000
-		table.join(bridge2, "3", false); // 1000
+		table.join(user, "2", false); // 1000
+		table.join(user2, "3", false); // 1000
 		waitRoundToStart();
 		table.allIn(table.getRound().getSmallBlindPlayer().getId());
 		table.fold(table.getRound().getBigBlindPlayer().getId());
-		table.join(bridge3, "4", false); // 800
-		table.join(bridge4, "5", false); // 700
-		table.join(bridge5, "1", false); // 600
-		table.join(bridge6, "0", false); // 900
+		table.join(user3, "4", false); // 800
+		table.join(user4, "5", false); // 700
+		table.join(user5, "1", false); // 600
+		table.join(user6, "0", false); // 900
 		sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
 		// Second round starts with 6 players.
 

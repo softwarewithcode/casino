@@ -15,15 +15,15 @@ public class GamePlayTests extends DefaultTableTests {
     @Test
     public void lastPlayerWinsThePotWhenEverybodyElseFoldsAndInitialButtonIsInSeat2() {
         //First round starts with the first 2 players
-        table.join(bridge, "2", false); //1000
-        table.join(bridge2, "3", false); //1000
+        table.join(user, "2", false); //1000
+        table.join(user2, "3", false); //1000
         waitRoundToStart();
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
         table.fold(table.getRound().getBigBlindPlayer().getId());
-        table.join(bridge3, "4", false); //800
-        table.join(bridge4, "5", false); //700
-        table.join(bridge5, "1", false); //600
-        table.join(bridge6, "0", false); //900
+        table.join(user3, "4", false); //800
+        table.join(user4, "5", false); //700
+        table.join(user5, "1", false); //600
+        table.join(user6, "0", false); //900
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
         //Second round starts with 6 players.
         assignIrrevelantCardsForPlayers(table);
@@ -106,10 +106,10 @@ public class GamePlayTests extends DefaultTableTests {
         assertEquals(table.getPlayer(3), table.getRound().getPositions().buttonPlayer());
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
         table.fold(table.getRound().getBigBlindPlayer().getId());
-        table.join(bridge3, "4", false); //800
-        table.join(bridge4, "5", false); //700
-        table.join(bridge5, "1", false); //600
-        table.join(bridge6, "0", false); //900
+        table.join(user3, "4", false); //800
+        table.join(user4, "5", false); //700
+        table.join(user5, "1", false); //600
+        table.join(user6, "0", false); //900
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
         assertEquals(table.getPlayer(2), table.getRound().getPositions().buttonPlayer());
         assertEquals(table.getPlayer(2), table.getRound().getPositions().sb());
@@ -132,10 +132,10 @@ public class GamePlayTests extends DefaultTableTests {
         assertEquals(table.getPlayer(3), table.getRound().getPositions().sb());
         assertEquals(table.getPlayer(3), table.getRound().getPositions().buttonPlayer());
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
-        table.join(bridge3, "4", false); //800
-        table.join(bridge4, "5", false); //700
-        table.join(bridge5, "1", false); //600
-        table.join(bridge6, "0", false); //900
+        table.join(user3, "4", false); //800
+        table.join(user4, "5", false); //700
+        table.join(user5, "1", false); //600
+        table.join(user6, "0", false); //900
         table.fold(table.getRound().getBigBlindPlayer().getId());
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
         assertSame(table.getGamePhase(), HoldemPhase.PRE_FLOP);
@@ -161,18 +161,18 @@ public class GamePlayTests extends DefaultTableTests {
     @Test
     public void buttonDoesNotMoveWhenNewPlayerEntersInBetweenBlindsAndNewPlayerGetsBigBlind() {
         System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "1");
-        table.join(bridge, "5", false); //1000
-        table.join(bridge2, "1", false); //1000
+        table.join(user, "5", false); //1000
+        table.join(user2, "1", false); //1000
         waitRoundToStart();
         assertEquals(table.getPlayer(1), table.getRound().getPositions().buttonPlayer());
         assertEquals(table.getPlayer(1), table.getRound().getPositions().sb());
         assertEquals(table.getPlayer(5), table.getRound().getPositions().bb());
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
-        table.join(bridge3, "0", false); //800
-        table.join(bridge4, "2", false); //700
+        table.join(user3, "0", false); //800
+        table.join(user4, "2", false); //700
         assertEquals(2, table.getNewPlayerCount());
-        table.join(bridge5, "3", false); //600
-        table.join(bridge6, "4", false); //900
+        table.join(user5, "3", false); //600
+        table.join(user6, "4", false); //900
         assertEquals(4, table.getNewPlayerCount());
         table.fold(table.getRound().getBigBlindPlayer().getId());
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
@@ -191,14 +191,14 @@ public class GamePlayTests extends DefaultTableTests {
     @Test
     public void joiningInBetweenButtonAndBigBlindDuringFirstRoundMakesPlayerWait2RoundsUntilGetsDealtIn() {
         System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "0");
-        table.join(bridge, "0", false); //1000
-        table.join(bridge2, "4", false); //1000
+        table.join(user, "0", false); //1000
+        table.join(user2, "4", false); //1000
         waitRoundToStart();
         assertEquals(table.getPlayer(0), table.getRound().getPositions().buttonPlayer());
         assertEquals(table.getPlayer(0), table.getRound().getPositions().sb());
         assertEquals(table.getPlayer(4), table.getRound().getPositions().bb());
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
-        table.join(bridge3, "3", false); //800
+        table.join(user3, "3", false); //800
         table.fold(table.getRound().getBigBlindPlayer().getId());
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
         //Round 2
@@ -227,15 +227,15 @@ public class GamePlayTests extends DefaultTableTests {
     @Test
     public void takingSeatDuringRound2GivesBigBlindPositionToLatestJoiner() {
         System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "0");
-        table.join(bridge, "0", false); //1000
-        table.join(bridge2, "4", false); //1000
+        table.join(user, "0", false); //1000
+        table.join(user2, "4", false); //1000
         waitRoundToStart();
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
-        table.join(bridge3, "3", false); //800
+        table.join(user3, "3", false); //800
         table.fold(table.getRound().getBigBlindPlayer().getId());
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
         //Round 2
-        table.join(bridge4, "1", false);
+        table.join(user4, "1", false);
         assertEquals(2, table.getActivePlayerCount());
         assertEquals(2, table.getNewPlayerCount());
         assertEquals(4, table.getPlayerCount());
@@ -254,14 +254,14 @@ public class GamePlayTests extends DefaultTableTests {
     @Test
     public void waitingForBigBlindMakesPlayerWait3HandsBeforeJoiningTheGame() {
         System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "0");
-        table.join(bridge, "0", false);
-        table.join(bridge2, "4", false);
+        table.join(user, "0", false);
+        table.join(user2, "4", false);
         waitRoundToStart();
         assertEquals(table.getPlayer(0), table.getRound().getPositions().buttonPlayer());
         assertEquals(table.getPlayer(0), table.getRound().getPositions().sb());
         assertEquals(table.getPlayer(4), table.getRound().getPositions().bb());
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
-        table.join(bridge3, "3", true);
+        table.join(user3, "3", true);
         table.fold(table.getRound().getBigBlindPlayer().getId());
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
         //Round 2
@@ -269,7 +269,7 @@ public class GamePlayTests extends DefaultTableTests {
         assertEquals(table.getPlayer(4), table.getRound().getPositions().buttonPlayer());
         assertEquals(table.getPlayer(4), table.getRound().getPositions().sb());
         assertEquals(table.getPlayer(0), table.getRound().getPositions().bb());
-        table.join(bridge4, "1", false);
+        table.join(user4, "1", false);
         assertTrue(table.getPlayer(3).isWaitingBigBlind());
         assertEquals(2, table.getActivePlayerCount());
         assertEquals(2, table.getNewPlayerCount());
@@ -309,11 +309,11 @@ public class GamePlayTests extends DefaultTableTests {
     @Test
     public void playersWaitingForBigBlindAreAddedGradually() {
         System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "1");
-        table.join(bridge, "0", false);
-        table.join(bridge2, "1", false);
+        table.join(user, "0", false);
+        table.join(user2, "1", false);
         waitRoundToStart();
-        table.join(bridge3, "2", true);
-        table.join(bridge4, "3", true);
+        table.join(user3, "2", true);
+        table.join(user4, "3", true);
         waitRoundToStart();
         table.allIn(table.getRound().getSmallBlindPlayer().getId());
         table.fold(table.getRound().getBigBlindPlayer().getId());
@@ -356,7 +356,7 @@ public class GamePlayTests extends DefaultTableTests {
         defaultJoinJoin();
         sleep(TestHoldemTableFactory.DEFAULT_PLAYER_TIME, ChronoUnit.SECONDS);
         assertEquals(table.getPlayer(2).getStatus(), PlayerStatus.SIT_OUT);
-        table.join(bridge6, "5", false);
+        table.join(user6, "5", false);
         waitRoundToStart();
         assertEquals(table.getPlayer(2).getStatus(), PlayerStatus.SIT_OUT_AS_NEW);
         assertEquals(2, table.getRounds().size());

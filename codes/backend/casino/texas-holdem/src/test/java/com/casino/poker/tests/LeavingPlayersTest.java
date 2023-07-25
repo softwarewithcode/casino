@@ -3,8 +3,6 @@ package com.casino.poker.tests;
 import com.casino.common.player.PlayerStatus;
 import com.casino.common.table.TableStatus;
 import com.casino.poker.game.HoldemPhase;
-import com.casino.poker.hand.PokerHandType;
-import com.casino.poker.player.HoldemPlayer;
 import com.casino.poker.player.PokerPlayer;
 import com.casino.poker.round.positions.PokerPositionsBuilder;
 import org.junit.jupiter.api.Test;
@@ -21,7 +19,7 @@ public class LeavingPlayersTest extends DefaultTableTests {
         //PRE FLOP
         defaultJoinJoin();
         assertEquals(new BigDecimal("990.00"), table.getPlayer(2).getCurrentBalance());
-        table.leave(bridge2.userId());
+        table.leave(user2.userId());
         assertEquals(new BigDecimal("1005.00"), table.getPlayer(2).getCurrentBalance());
         assertEquals(1, table.getActivePlayerCount());
         assertEquals(1, table.getReservedSeatCount());
@@ -33,17 +31,17 @@ public class LeavingPlayersTest extends DefaultTableTests {
         System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "3");
         //PRE FLOP
         defaultJoinJoin();
-        table.call(bridge2.userId());
-        table.leave(bridge2.userId());
+        table.call(user2.userId());
+        table.leave(user2.userId());
         //Pre flop check from bridge2
-        table.check(bridge.userId());
+        table.check(user.userId());
         //Flop check from bridge2
-        table.check(bridge.userId());
+        table.check(user.userId());
         //Turn check from bridge2
-        table.check(bridge.userId());
+        table.check(user.userId());
         setupCardsForWinnerAndLoser(table.getPlayer(3), table.getPlayer(2));
         //River check from bridge2
-        table.check(bridge.userId());
+        table.check(user.userId());
         assertEquals(0, table.getSitOutPlayerCount());
         assertNotNull(table.getPlayer(2).getHand());
         assertEquals(new BigDecimal("990.00"),table.getPlayer(2).getCurrentBalance());
@@ -54,10 +52,10 @@ public class LeavingPlayersTest extends DefaultTableTests {
     public void bothHeadsUpPlayersLeaveAndHandIsCompletedByAutoplay() {
         System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "3");
         defaultJoinJoin();
-        table.call(bridge2.userId());
+        table.call(user2.userId());
         assertEquals(HoldemPhase.PRE_FLOP, table.getGamePhase());
-        table.leave(bridge.userId());
-        table.leave(bridge2.userId());
+        table.leave(user.userId());
+        table.leave(user2.userId());
         waitRoundToStart();
         assertEquals(HoldemPhase.ROUND_COMPLETED, table.getGamePhase());
         assertEquals(TableStatus.WAITING_PLAYERS, table.getStatus());
@@ -316,10 +314,10 @@ public class LeavingPlayersTest extends DefaultTableTests {
     }
     @Test
     public void remowingPlayerWhenTableHasNotYetStartedUpdatePlayerCount() {
-       table.join(bridge, "5", false);
+       table.join(user, "5", false);
        assertEquals(1, table.getNewPlayerCount());
        assertEquals(1, table.getPlayers().size());
-       table.leave(bridge.userId());
+       table.leave(user.userId());
        assertEquals(0, table.getPlayers().size());
        assertEquals(0, table.getNewPlayerCount());
     }

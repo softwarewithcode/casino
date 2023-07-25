@@ -16,26 +16,26 @@ public class TableTests extends DefaultTableTests {
 
     @Test
     public void playerGetsSeat() {
-        assertTrue(table.join(bridge, "2", false));
+        assertTrue(table.join(user, "2", false));
         assertNotNull(table.getPlayer(2));
     }
 
     @Test
     public void playerDoesNotGetReservedSeat() {
-        table.join(bridge, "2", false);
-        assertFalse(table.join(bridge2, "2", false));
+        table.join(user, "2", false);
+        assertFalse(table.join(user2, "2", false));
     }
 
     @Test
     public void playerCannotGetTwoSeats() {
-        table.join(bridge, "2", false);
-        assertFalse(table.join(bridge, "3", false));
+        table.join(user, "2", false);
+        assertFalse(table.join(user, "3", false));
     }
 
     @Test
     public void minimumBuyInMustBeCoveredToJoinTable() {
         assertThrows(IllegalArgumentException.class, () -> {
-            table.join(bridgeWithoutMoney, "2", false);
+            table.join(userWithoutMoney, "2", false);
         });
     }
 
@@ -46,7 +46,7 @@ public class TableTests extends DefaultTableTests {
 
     @Test
     public void tableStatusIsWaitingForPlayersAfterFirstJoiner() {
-        table.join(bridge, "2", false);
+        table.join(user, "2", false);
         assertSame(table.getStatus(), TableStatus.WAITING_PLAYERS);
     }
 
@@ -79,7 +79,7 @@ public class TableTests extends DefaultTableTests {
     @Test
     public void joiningTableDuringPreFlopPhaseIsPossible() {
         defaultJoinJoin();
-        table.join(bridge3, "4", false);
+        table.join(user3, "4", false);
         assertEquals(3, table.getPlayers().size());
         assertEquals(2, table.getRound().getPlayers().size());
         assertEquals(HoldemPhase.PRE_FLOP, table.getGamePhase());
@@ -88,7 +88,7 @@ public class TableTests extends DefaultTableTests {
     @Test
     public void joiningTableDuringFlopPhaseIsPossible() {
         defaultTableCallCheckToFlop();
-        table.join(bridge3, "4", false);
+        table.join(user3, "4", false);
         assertEquals(3, table.getPlayers().size());
         assertEquals(2, table.getRound().getPlayers().size());
         assertEquals(HoldemPhase.FLOP, table.getGamePhase());
@@ -97,7 +97,7 @@ public class TableTests extends DefaultTableTests {
     @Test
     public void joiningTableDuringTurnPhaseIsPossible() {
         defaultTableCheckToTurn();
-        table.join(bridge3, "4", false);
+        table.join(user3, "4", false);
         assertEquals(3, table.getPlayers().size());
         assertEquals(2, table.getRound().getPlayers().size());
         assertEquals(HoldemPhase.TURN, table.getGamePhase());
@@ -106,7 +106,7 @@ public class TableTests extends DefaultTableTests {
     @Test
     public void joiningTableDuringRiverPhaseIsPossible() {
         defaultTableCheckToRiver();
-        table.join(bridge3, "4", false);
+        table.join(user3, "4", false);
         assertEquals(3, table.getPlayers().size());
         assertEquals(2, table.getRound().getPlayers().size());
         assertEquals(HoldemPhase.RIVER, table.getGamePhase());
@@ -115,34 +115,34 @@ public class TableTests extends DefaultTableTests {
     @Test
     public void joiningTableIsPossibleDuringRunningRound() {
         defaultJoinJoin();
-        table.join(bridge3, null, false);
-        table.join(bridge4, null, false);
+        table.join(user3, null, false);
+        table.join(user4, null, false);
         assertEquals(4, table.getPlayers().size());
         assertEquals(2, table.getRound().getPlayers().size());
         table.call(getDefaultTableSmallBlindPlayer().getId());
         table.check(getDefaultTableBigBlindPlayer().getId());
-        table.join(bridge5, null, false);
+        table.join(user5, null, false);
         assertEquals(5, table.getPlayers().size());
         assertEquals(2, table.getRound().getPlayers().size());
         table.check(getDefaultTableBigBlindPlayer().getId());
-        table.join(bridge6, null, false);
+        table.join(user6, null, false);
         table.check(getDefaultTableSmallBlindPlayer().getId());
         assertEquals(6, table.getPlayers().size());
         assertEquals(2, table.getRound().getPlayers().size());
         table.check(getDefaultTableBigBlindPlayer().getId());
-        assertFalse(table.join(bridge2, null, false));
+        assertFalse(table.join(user2, null, false));
     }
 
     @Test
     public void playersWhoJoinedDuringRoundAreAddedToNextRoundWhenTheyAreNotWaitingForBigBlind() {
         defaultJoinJoin();
-        table.join(bridge3, null, false);
-        table.join(bridge4, null, false);
+        table.join(user3, null, false);
+        table.join(user4, null, false);
         table.call(getDefaultTableSmallBlindPlayer().getId());
         table.check(getDefaultTableBigBlindPlayer().getId());
-        table.join(bridge5, null, false);
+        table.join(user5, null, false);
         table.check(getDefaultTableBigBlindPlayer().getId());
-        table.join(bridge6, null, false);
+        table.join(user6, null, false);
         table.check(getDefaultTableSmallBlindPlayer().getId());
         table.check(getDefaultTableBigBlindPlayer().getId());
         table.check(getDefaultTableSmallBlindPlayer().getId());
@@ -157,13 +157,13 @@ public class TableTests extends DefaultTableTests {
     @Test
     public void joinedPlayersWhoWaitForBigBlindAreNotAddedToRound() {
         defaultJoinJoin();
-        table.join(bridge3, "4", true);
-        table.join(bridge4, null, true);
+        table.join(user3, "4", true);
+        table.join(user4, null, true);
         table.call(getDefaultTableSmallBlindPlayer().getId());
         table.check(getDefaultTableBigBlindPlayer().getId());
-        table.join(bridge5, null, false);
+        table.join(user5, null, false);
         table.check(getDefaultTableBigBlindPlayer().getId());
-        table.join(bridge6, null, false);
+        table.join(user6, null, false);
         table.check(getDefaultTableSmallBlindPlayer().getId());
         table.check(getDefaultTableBigBlindPlayer().getId());
         table.check(getDefaultTableSmallBlindPlayer().getId());
@@ -178,13 +178,13 @@ public class TableTests extends DefaultTableTests {
     @Test
     public void joinedPlayersWhoWaitForBigBlindAreNotAddedToRound_part2() {
         defaultJoinJoin();
-        table.join(bridge3, "0", true);
-        table.join(bridge4, "1", true);
+        table.join(user3, "0", true);
+        table.join(user4, "1", true);
         table.call(getDefaultTableSmallBlindPlayer().getId());
         table.check(getDefaultTableBigBlindPlayer().getId());
-        table.join(bridge5, null, false);
+        table.join(user5, null, false);
         table.check(getDefaultTableBigBlindPlayer().getId());
-        table.join(bridge6, null, false);
+        table.join(user6, null, false);
         table.check(getDefaultTableSmallBlindPlayer().getId());
         table.check(getDefaultTableBigBlindPlayer().getId());
         table.check(getDefaultTableSmallBlindPlayer().getId());
@@ -199,10 +199,10 @@ public class TableTests extends DefaultTableTests {
     @Test
     public void allPlayersAreAddedToNewRound() {
         defaultTableCheckRoundThrough();
-        table.join(bridge3, "4", false);
-        table.join(bridge4, "5", false);
-        table.join(bridge5, "1", false);
-        table.join(bridge6, "0", false);
+        table.join(user3, "4", false);
+        table.join(user4, "5", false);
+        table.join(user5, "1", false);
+        table.join(user6, "0", false);
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
         assertEquals(6, table.getRound().getPlayers().size());
     }
@@ -211,22 +211,22 @@ public class TableTests extends DefaultTableTests {
     @Test
     public void toggleWaitBigBlindSetsWaitingMode() {
         defaultJoinJoin();
-        table.join(bridge4, "4", false);
-        assertTrue(table.toggleWaitBigBlind(bridge4.userId()));
-        assertTrue(table.getPlayer(bridge4.userId()).isWaitingBigBlind());
+        table.join(user4, "4", false);
+        assertTrue(table.toggleWaitBigBlind(user4.userId()));
+        assertTrue(table.getPlayer(user4.userId()).isWaitingBigBlind());
     }
 
     @Test
     public void toggleWaitBigBlindResetsWaitingMode() {
         defaultTableCheckToRiver();
-        table.join(bridge4, "4", true);
+        table.join(user4, "4", true);
         table.check(getDefaultTableBigBlindPlayer().getId());
         table.check(getDefaultTableSmallBlindPlayer().getId());
-        assertTrue(table.getPlayer(bridge4.userId()).isWaitingBigBlind());
-        assertFalse(table.toggleWaitBigBlind(bridge4.userId()));
-        assertFalse(table.getPlayer(bridge4.userId()).isWaitingBigBlind());
+        assertTrue(table.getPlayer(user4.userId()).isWaitingBigBlind());
+        assertFalse(table.toggleWaitBigBlind(user4.userId()));
+        assertFalse(table.getPlayer(user4.userId()).isWaitingBigBlind());
         sleep(DEFAULT_ROUND_DELAY_MILLIS, ChronoUnit.MILLIS);
-        assertFalse(table.getPlayer(bridge4.userId()).isWaitingBigBlind());
+        assertFalse(table.getPlayer(user4.userId()).isWaitingBigBlind());
         assertEquals(3, table.getRound().getPlayers().size());
     }
 

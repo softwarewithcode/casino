@@ -1,7 +1,7 @@
 package com.casino.web.common;
 
 import com.casino.common.reload.Reload;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 import com.casino.common.validation.Validator;
 import com.casino.service.user.UserService;
 import com.casino.web.holdem.CasinoMessage;
@@ -15,7 +15,7 @@ public class CommonEndpoint {
 
     @Inject
     private UserService userService;
-    protected Bridge bridge;
+    protected User user;
     protected UUID tableId;
 
     protected void validateMessageExist(CasinoMessage message) {
@@ -28,11 +28,11 @@ public class CommonEndpoint {
     }
 
     protected void buildAndConnectBridge(Session session) {
-        bridge = userService.createGuestPlayerBridge(tableId, session);
+        user = userService.createGuestPlayerBridge(tableId, session);
     }
 
-    protected boolean isBridgeConnecting(Session session) {
-        return this.bridge != null && session.isOpen();
+    protected boolean isUserConnected(Session session) {
+        return this.user != null && session.isOpen();
     }
 
     public void setTableId(UUID tableId) {
@@ -46,11 +46,11 @@ public class CommonEndpoint {
 
     protected void tearDown() {
         this.tableId = null;
-        this.bridge = null;
+        this.user = null;
     }
 
-    public Bridge getBridge() {
-        return bridge;
+    public User getBridge() {
+        return user;
     }
 
     public UUID getTableId() {
@@ -58,7 +58,7 @@ public class CommonEndpoint {
     }
 
     protected BigDecimal tryWithdrawFromWallet(BigDecimal amount) {
-        return userService.withdrawFromWallet(bridge.userId(), amount);
+        return userService.withdrawFromWallet(user.userId(), amount);
     }
 
     protected void finalizeReload(Reload finishedReload) {

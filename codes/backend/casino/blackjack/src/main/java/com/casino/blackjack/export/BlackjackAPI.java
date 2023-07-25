@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.casino.common.api.BaseTableAPI;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 
 public interface BlackjackAPI extends BaseTableAPI {
-	boolean join(Bridge user, String seatNumber);
+	boolean join(User user, String seatNumber);
 	
 	void bet(UUID playerId, BigDecimal bet);
 

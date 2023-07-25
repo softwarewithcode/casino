@@ -47,8 +47,8 @@ public class HeadsUpBlindsAndButtonTests extends DefaultTableTests {
 
     @Test
     public void samePlayerCannotHaveBothBlinds() {
-        PokerPlayer p1 = new HoldemPlayer(bridge3, table);
-        PokerPlayer p2 = new HoldemPlayer(bridge4, table);
+        PokerPlayer p1 = new HoldemPlayer(user3, table);
+        PokerPlayer p2 = new HoldemPlayer(user4, table);
         assertThrows(IllegalArgumentException.class, () -> new PokerRoundPlayers(p1, p1, p2, 0, 2, 3, null));
     }
 

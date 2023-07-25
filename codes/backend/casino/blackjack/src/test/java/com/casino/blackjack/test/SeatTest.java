@@ -15,28 +15,28 @@ import com.casino.common.table.structure.Seat;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.table.TableData;
 import com.casino.common.table.TableThresholds;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 
 public class SeatTest extends BaseTest {
 	private BlackjackTable table;
 	private BlackjackTable singlePlayerTable;
-	private Bridge bridge4;
-	private Bridge bridge5;
-	private Bridge bridge6;
-	private Bridge bridge7;
+	private User user4;
+	private User user5;
+	private User user6;
+	private User user7;
 
 	@BeforeEach
 	public void initTest() {
 		try {
 			table = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
 			singlePlayerTable = new BlackjackTable(getDefaultSinglePlayerTableInitData(), blackjackInitData);
-			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
-			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
-			bridge3 = new Bridge("JaneDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
-			bridge4 = new Bridge("JaneDoe3", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
-			bridge5 = new Bridge("JaneDoe4", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
-			bridge6 = new Bridge("JaneDoe5", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
-			bridge7 = new Bridge("JaneDoe6", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
+			user = new User("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
+			user2 = new User("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
+			user3 = new User("JaneDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
+			user4 = new User("JaneDoe3", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
+			user5 = new User("JaneDoe4", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
+			user6 = new User("JaneDoe5", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
+			user7 = new User("JaneDoe6", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -44,28 +44,28 @@ public class SeatTest extends BaseTest {
 
 	@Test
 	public void initialTableJoinSetsPlayerAsWatcherInPublicTable() {
-		table.watch(bridge);
+		table.watch(user);
 		Assertions.assertEquals(1, table.getWatchers().size());
 		Assertions.assertEquals(0, table.getPlayers().size());
 	}
 
 	@Test
 	public void takingSeatChangesWatcherToPlayer() {
-		table.join(bridge, "0");
+		table.join(user, "0");
 		Assertions.assertEquals(0, table.getWatchers().size());
 		Assertions.assertEquals(1, table.getPlayers().size());
 	}
 
 	@Test
 	public void reservedSeatCannotBeTaken() {
-		table.join(bridge, "0");
-		assertFalse(table.join(bridge2, "0"));
-		Assertions.assertEquals(bridge.userId(), table.getSeats().stream().filter(seat -> seat.getPlayer() != null).findFirst().get().getPlayer().getId());
+		table.join(user, "0");
+		assertFalse(table.join(user2, "0"));
+		Assertions.assertEquals(user.userId(), table.getSeats().stream().filter(seat -> seat.getPlayer() != null).findFirst().get().getPlayer().getId());
 	}
 
 	@Test
 	public void playerCannotTakeSeatIfMinimumBetIsNotCovered() {
-		Bridge b = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("4.99"));
+		User b = new User("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("4.99"));
 		assertThrows(IllegalArgumentException.class, () -> {
 			table.join(b, "0");
 		});
@@ -87,29 +87,29 @@ public class SeatTest extends BaseTest {
 
 	@Test
 	public void secondPlayerIsNotAllowedToJoinInSinglePlayerTable() {
-		singlePlayerTable.join(bridge, "0");
+		singlePlayerTable.join(user, "0");
 		Assertions.assertEquals(1, singlePlayerTable.getPlayers().size());
-		assertFalse(singlePlayerTable.join(bridge2, "1"));
+		assertFalse(singlePlayerTable.join(user2, "1"));
 
 	}
 
 	@Test
 	public void samePlayerIsNotAllowedToJoinAgainInSinglePlayerTable() {
-		singlePlayerTable.join(bridge, "0");
+		singlePlayerTable.join(user, "0");
 		Assertions.assertEquals(1, singlePlayerTable.getPlayers().size());
-		assertFalse(singlePlayerTable.join(bridge, "1"));
+		assertFalse(singlePlayerTable.join(user, "1"));
 	}
 
 	@Test
 	public void searchAnyFreeSeatFindsLastFreeSeat() {
-		table.join(bridge, "0");
-		table.join(bridge2, "1");
-		table.join(bridge3, "3");
-		table.join(bridge4, "4");
-		table.join(bridge5, "5");
-		table.join(bridge6, "6");
-		assertTrue(table.join(bridge7, null));
+		table.join(user, "0");
+		table.join(user2, "1");
+		table.join(user3, "3");
+		table.join(user4, "4");
+		table.join(user5, "5");
+		table.join(user6, "6");
+		assertTrue(table.join(user7, null));
 		Seat expectedSeat = table.getSeats().stream().filter(seat -> seat.getNumber() == 2).findAny().get();
-		assertTrue(expectedSeat.getPlayer().getId().equals(bridge7.userId()));
+		assertTrue(expectedSeat.getPlayer().getId().equals(user7.userId()));
 	}
 }

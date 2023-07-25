@@ -21,7 +21,7 @@ import com.casino.common.table.structure.SeatedTable;
 import com.casino.common.table.TableStatus;
 import com.casino.common.table.TableCard;
 import com.casino.common.table.TableData;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
@@ -43,20 +43,20 @@ public final class BlackjackTable extends SeatedTable<BlackjackPlayer> implement
 	}
 
 	@Override
-	public boolean join(Bridge bridge, String seatNumber) {
+	public boolean join(User user, String seatNumber) {
 		LOGGER.entering(getClass().getName(), "join", getId());
 		try {
-			BlackjackPlayer player = new BlackjackPlayer(bridge, this);
+			BlackjackPlayer player = new BlackjackPlayer(user, this);
 			Optional<Seat<BlackjackPlayer>> seatOptional = super.join(seatNumber, player);
 			if (seatOptional.isPresent()) {
 				player.setSeatNumber(seatOptional.get().getNumber());
 				player.setStatus(PlayerStatus.ACTIVE);
 				dealer.onPlayerArrival(player);
-				removeWatcher(bridge.userId());
+				removeWatcher(user.userId());
 			}
 			return seatOptional.isPresent();
 		} finally {
-			LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNumber + " bridge:" + bridge + " tableId:" + getId());
+			LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNumber + " bridge:" + user + " tableId:" + getId());
 		}
 	}
 
@@ -201,7 +201,7 @@ public final class BlackjackTable extends SeatedTable<BlackjackPlayer> implement
 	}
 
 	@Override
-	public void watch(Bridge user) {
+	public void watch(User user) {
 		BlackjackPlayer player = new BlackjackPlayer(user, this);
 		if (getPlayer(user.userId()) != null) {
 			LOGGER.fine("User " + user.userName() + " is already playing in table:" + this);

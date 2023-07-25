@@ -12,7 +12,7 @@ import com.casino.common.player.PlayerStatus;
 public class PokerPlayerTests extends DefaultTableTests {
     @Test
     public void playerStatusIsNewBeforeNewGameStarts() {
-        table.join(bridge, "2", false);
+        table.join(user, "2", false);
         assertTrue(table.getPlayer(2).getStatus() == PlayerStatus.NEW);
     }
 

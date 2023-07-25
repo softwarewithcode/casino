@@ -11,7 +11,7 @@ import com.casino.common.table.TableData;
 import com.casino.common.table.TableStatus;
 import com.casino.common.table.structure.Seat;
 import com.casino.common.table.structure.SeatedTable;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 import com.casino.poker.actions.PokerActionType;
 import com.casino.poker.dealer.HoldemDealer;
 import com.casino.poker.export.NoLimitTexasHoldemAPI;
@@ -52,10 +52,10 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
     }
 
     @Override
-    public boolean join(Bridge bridge, String seatNumber, Boolean waitBigBlind) {
+    public boolean join(User user, String seatNumber, Boolean waitBigBlind) {
         LOGGER.entering(getClass().getName(), "join", getId());
         try {
-            PokerPlayer player = new HoldemPlayer(bridge, this); // rejoin case -> find existing
+            PokerPlayer player = new HoldemPlayer(user, this); // rejoin case -> find existing
             player.setWaitBigBlind(waitBigBlind);
             Optional<Seat<PokerPlayer>> seatOptional = super.join(seatNumber, player);
             if (seatOptional.isPresent()) {
@@ -65,7 +65,7 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
             }
             return seatOptional.isPresent();
         } finally {
-            LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNumber + " bridge:" + bridge + " tableId:" + getId());
+            LOGGER.exiting(getClass().getName(), "join" + " number:" + seatNumber + " bridge:" + user + " tableId:" + getId());
         }
     }
 
@@ -116,7 +116,7 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
     }
 
     @Override
-    public void watch(Bridge user) {
+    public void watch(User user) {
         LOGGER.entering(getClass().getName(), "watch", getId());
         PokerPlayer player = new HoldemPlayer(user, this);
         if (getPlayer(user.userId()) != null) {

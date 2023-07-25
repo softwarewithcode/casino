@@ -8,7 +8,7 @@ import com.casino.common.player.CasinoPlayer;
 import com.casino.common.player.PlayerStatus;
 import com.casino.common.reload.Reloadable;
 import com.casino.common.table.structure.ISeatedTable;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 import com.casino.poker.actions.PokerAction;
 import com.casino.poker.actions.PokerActionCreator;
 import com.casino.poker.actions.PokerActionType;
@@ -41,8 +41,8 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     private boolean waitBigBlind;
     private boolean hasActed;
 
-    public HoldemPlayer(Bridge bridge, ISeatedTable<PokerPlayer> table) {
-        super(bridge, table);
+    public HoldemPlayer(User user, ISeatedTable<PokerPlayer> table) {
+        super(user, table);
         chipsOnTable = BigDecimal.ZERO;
         this.holeCards = new ArrayList<>(2);
         this.missingBlindBets = new HashSet<>();

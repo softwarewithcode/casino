@@ -2,7 +2,7 @@ package com.casino.poker.tests;
 
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.player.PlayerStatus;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 import com.casino.poker.player.PokerPlayer;
 import com.casino.poker.table.HoldemTable;
 import org.junit.jupiter.api.Test;
@@ -52,12 +52,12 @@ public class HoldemPlayerParallelActionsTests extends DefaultTableTests {
 
     private List<Thread> createSitOutThreads(HoldemTable table, CyclicBarrier casinoBarrier) {
         return IntStream.rangeClosed(0, table.getSeats().size() - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
-            Bridge indexedBridge = new Bridge("player:" + index, table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
+            User indexedUser = new User("player:" + index, table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
             try {
-                table.join(indexedBridge, String.valueOf(index), false);
+                table.join(indexedUser, String.valueOf(index), false);
                 casinoBarrier.await();
                 if (index != 456) // One "random=456" player does not sit out
-                    table.sitOutNextHand(indexedBridge.userId());
+                    table.sitOutNextHand(indexedUser.userId());
             } catch (InterruptedException | BrokenBarrierException e) {
                 e.printStackTrace();
             }

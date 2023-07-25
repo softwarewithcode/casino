@@ -13,7 +13,7 @@ import com.casino.common.cards.Card;
 import com.casino.common.player.CasinoPlayer;
 import com.casino.common.player.PlayerStatus;
 import com.casino.common.table.structure.ISeatedTable;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -23,8 +23,8 @@ public final class BlackjackPlayer extends CasinoPlayer {
 	private List<BlackjackPlayerAction> actions;
 	private Integer seatNumber;
 
-	public BlackjackPlayer(Bridge bridge, ISeatedTable<BlackjackPlayer> table) {
-		super(bridge, table);
+	public BlackjackPlayer(User user, ISeatedTable<BlackjackPlayer> table) {
+		super(user, table);
 		hands = new ArrayList<>();
 		hands.add(createNewHand());
 		actions = new ArrayList<>(4);

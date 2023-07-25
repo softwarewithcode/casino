@@ -14,7 +14,7 @@ import com.casino.common.table.TableThresholds;
 import com.casino.common.table.structure.TableType;
 import com.casino.blackjack.game.BlackjackInitData;
 import com.casino.blackjack.game.BlackjackPhasePathFactory;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 
 public class BaseTest {
 	protected static final BigDecimal MIN_BET = new BigDecimal("5.0");
@@ -32,9 +32,9 @@ public class BaseTest {
 	protected static final int ONE_UNIT = 1;
 	protected static final BlackjackInitData blackjackInitData = new BlackjackInitData(MIN_BUYIN, MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DEFAULT_ALLOWED_SIT_OUT_ROUNDS,
 			DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS);
-	protected Bridge bridge;
-	protected Bridge bridge2;
-	protected Bridge bridge3;
+	protected User user;
+	protected User user2;
+	protected User user3;
 
 	@BeforeAll
 	public static void setup() {

@@ -53,25 +53,25 @@ public class BlackjackEndpoint extends CommonEndpoint {
 		LOGGER.fine("endpoint got message: " + "\n-> message:" + message);
 		try {
 			validateMessageExist(message);
-			if (!isBridgeConnecting(session))
+			if (!isUserConnected(session))
 				super.buildAndConnectBridge(session);
 			switch (message.getAction()) {
-			case OPEN_TABLE -> tableAPI.watch(bridge);
+			case OPEN_TABLE -> tableAPI.watch(user);
 			case JOIN -> {
-				if (!tableAPI.join(bridge, message.getSeat()))
+				if (!tableAPI.join(user, message.getSeat()))
 					session.getBasicRemote().sendText("{\"title\":\"FORBIDDEN\"}");
 			}
-			case BET -> tableAPI.bet(bridge.userId(), message.getAmount());
-			case TAKE -> tableAPI.hit(bridge.userId());
-			case SPLIT -> tableAPI.split(bridge.userId());
-			case DOUBLE_DOWN -> tableAPI.doubleDown(bridge.userId());
-			case STAND -> tableAPI.stand(bridge.userId());
-			case INSURE -> tableAPI.insure(bridge.userId());
-			case REFRESH -> tableAPI.refresh(bridge.userId());
+			case BET -> tableAPI.bet(user.userId(), message.getAmount());
+			case TAKE -> tableAPI.hit(user.userId());
+			case SPLIT -> tableAPI.split(user.userId());
+			case DOUBLE_DOWN -> tableAPI.doubleDown(user.userId());
+			case STAND -> tableAPI.stand(user.userId());
+			case INSURE -> tableAPI.insure(user.userId());
+			case REFRESH -> tableAPI.refresh(user.userId());
 			default -> throw new IllegalArgumentException("Unexpected messageAction: " + message.getAction());
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onMessage error:" + bridge, e);
+			LOGGER.log(Level.SEVERE, "BlackjackEndpoint: onMessage error:" + user, e);
 		}
 	}
 
@@ -79,7 +79,7 @@ public class BlackjackEndpoint extends CommonEndpoint {
 	public void onClose(Session session, CloseReason closeReason) {
 		try {
 			LOGGER.fine("Closing session:" + closeReason);
-			tableAPI.leave(bridge.userId());
+			tableAPI.leave(user.userId());
 			tearDown();
 			session.close();
 		} catch (Exception e) {

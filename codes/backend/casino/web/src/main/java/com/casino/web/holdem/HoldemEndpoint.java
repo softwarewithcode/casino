@@ -52,35 +52,35 @@ public class HoldemEndpoint extends CommonEndpoint {
 		LOGGER.fine("endpoint got message: " + "\n-> message:" + message);
 		try {
 			validateMessageExist(message);
-			if (!isBridgeConnecting(session))
+			if (!isUserConnected(session))
 				super.buildAndConnectBridge(session);
 			switch (message.getAction()) {
-			case OPEN_TABLE -> tableAPI.watch(bridge);
+			case OPEN_TABLE -> tableAPI.watch(user);
 			case JOIN -> {
-				if (!tableAPI.join(bridge, message.getSeat(), false))
+				if (!tableAPI.join(user, message.getSeat(), false))
 					session.getBasicRemote().sendText("{\"title\":\"FORBIDDEN\"}");
 			}
-			case ALL_IN -> tableAPI.allIn(bridge.userId());
-			case BET_RAISE -> tableAPI.raiseTo(bridge.userId(), message.getAmount());
-			case CALL -> tableAPI.call(bridge.userId());
-			case CHECK -> tableAPI.check(bridge.userId());
-			case FOLD -> tableAPI.fold(bridge.userId());
-			case LEAVE -> tableAPI.leave(bridge.userId());
-			case REFRESH -> tableAPI.refresh(bridge.userId());
+			case ALL_IN -> tableAPI.allIn(user.userId());
+			case BET_RAISE -> tableAPI.raiseTo(user.userId(), message.getAmount());
+			case CALL -> tableAPI.call(user.userId());
+			case CHECK -> tableAPI.check(user.userId());
+			case FOLD -> tableAPI.fold(user.userId());
+			case LEAVE -> tableAPI.leave(user.userId());
+			case REFRESH -> tableAPI.refresh(user.userId());
 			case RELOAD_CHIPS -> reloadMinBuyIn();
-			case CONTINUE_GAME -> tableAPI.continueGame(bridge.userId());
-			case SIT_OUT_NEXT_HAND -> tableAPI.sitOutNextHand(bridge.userId());
+			case CONTINUE_GAME -> tableAPI.continueGame(user.userId());
+			case SIT_OUT_NEXT_HAND -> tableAPI.sitOutNextHand(user.userId());
 			default -> throw new IllegalArgumentException("Unexpected value: " + message.getAction());
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "HoldemEndpoint: onMessage error:" + bridge, e);
+			LOGGER.log(Level.SEVERE, "HoldemEndpoint: onMessage error:" + user, e);
 		}
 	}
 
 	private void reloadMinBuyIn() {
 		BigDecimal withdrawAmount = super.tryWithdrawFromWallet(tableAPI.getTableCard().getGameData().getMinBuyIn());
 		UUID reloadId = UUID.randomUUID();
-		CompletableFuture<Reload> reload = tableAPI.reload(bridge.userId(), reloadId, withdrawAmount);
+		CompletableFuture<Reload> reload = tableAPI.reload(user.userId(), reloadId, withdrawAmount);
 		try {
 			reload.thenAccept(super::finalizeReload);
 		} catch (Exception e) {
@@ -109,7 +109,7 @@ public class HoldemEndpoint extends CommonEndpoint {
 	}
 
 	private void closeChannels(Session session) throws IOException {
-		tableAPI.leave(bridge.userId());
+		tableAPI.leave(user.userId());
 		tearDown();
 		session.close();
 	}

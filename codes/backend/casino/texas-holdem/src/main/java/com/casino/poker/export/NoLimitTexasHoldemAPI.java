@@ -6,10 +6,10 @@ import java.util.concurrent.CompletableFuture;
 
 import com.casino.common.api.BaseTableAPI;
 import com.casino.common.reload.Reload;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 
 public interface NoLimitTexasHoldemAPI extends BaseTableAPI {
-	boolean join(Bridge user, String seatNumber, Boolean waitBigBlind);
+	boolean join(User user, String seatNumber, Boolean waitBigBlind);
 
 	void raiseTo(UUID playerId, BigDecimal amount);
 

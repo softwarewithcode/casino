@@ -19,7 +19,7 @@ import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.exception.IllegalPlayerActionException;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 
 public class StandTest extends BaseTest {
 	private BlackjackTable table;
@@ -29,9 +29,9 @@ public class StandTest extends BaseTest {
 	public void initTest() {
 		try {
 			table = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
-			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
-			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
-			bridge3 = new Bridge("JohnDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
+			user = new User("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
+			user2 = new User("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
+			user3 = new User("JohnDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
 			dealer = (BlackjackDealer) f.get(table);
@@ -48,13 +48,13 @@ public class StandTest extends BaseTest {
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
-		table.join(bridge, "0");
-		table.join(bridge2, "5");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
-		table.bet(bridge2.userId(), new BigDecimal("10.0"));
+		table.join(user, "0");
+		table.join(user2, "5");
+		table.bet(user.userId(), new BigDecimal("99.0"));
+		table.bet(user2.userId(), new BigDecimal("10.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.stand(bridge.userId());
-		table.stand(bridge2.userId());
+		table.stand(user.userId());
+		table.stand(user2.userId());
 		assertTrue(table.isDealerTurn());
 	}
 
@@ -66,14 +66,14 @@ public class StandTest extends BaseTest {
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
-		table.join(bridge, "5");
-		table.join(bridge2, "6");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
-		table.bet(bridge2.userId(), new BigDecimal("10.0"));
+		table.join(user, "5");
+		table.join(user2, "6");
+		table.bet(user.userId(), new BigDecimal("99.0"));
+		table.bet(user2.userId(), new BigDecimal("10.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertThrows(IllegalPlayerActionException.class, () ->
 			{
-				table.stand(bridge2.userId());
+				table.stand(user2.userId());
 			});
 	}
 
@@ -85,14 +85,14 @@ public class StandTest extends BaseTest {
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(2, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
-		table.join(bridge, "5");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
+		table.join(user, "5");
+		table.bet(user.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.hit(bridge.userId());
-		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		table.hit(user.userId());
+		assertNull(table.getPlayer(user.userId()).getActiveHand());
 		assertThrows(IllegalPlayerActionException.class, () ->
 			{
-				table.stand(bridge.userId());
+				table.stand(user.userId());
 			});
 	}
 
@@ -104,13 +104,13 @@ public class StandTest extends BaseTest {
 		cards.add(Card.of(1, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(10, Suit.SPADE));
-		table.join(bridge, "5");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
+		table.join(user, "5");
+		table.bet(user.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		assertNull(table.getPlayer(user.userId()).getActiveHand());
 		assertThrows(IllegalPlayerActionException.class, () ->
 			{
-				table.stand(bridge.userId());
+				table.stand(user.userId());
 			});
 	}
 
@@ -124,16 +124,16 @@ public class StandTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, "0");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
+		table.join(user, "0");
+		table.bet(user.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.split(bridge.userId());
-		table.hit(bridge.userId());
-		table.stand(bridge.userId());
-		table.hit(bridge.userId());
-		table.stand(bridge.userId());
-		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
-		assertTrue(table.getPlayer(bridge.userId()).getHands().get(1).isCompleted());
+		table.split(user.userId());
+		table.hit(user.userId());
+		table.stand(user.userId());
+		table.hit(user.userId());
+		table.stand(user.userId());
+		assertNull(table.getPlayer(user.userId()).getActiveHand());
+		assertTrue(table.getPlayer(user.userId()).getHands().get(1).isCompleted());
 	}
 
 	@Test
@@ -145,11 +145,11 @@ public class StandTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, "0");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
+		table.join(user, "0");
+		table.bet(user.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.stand(bridge.userId());
-		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		table.stand(user.userId());
+		assertNull(table.getPlayer(user.userId()).getActiveHand());
 		assertTrue(dealer.getHand().isCompleted());
 		assertEquals(17, dealer.getHand().calculateValues().get(0));
 	}
@@ -163,11 +163,11 @@ public class StandTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(9, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, "0");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
+		table.join(user, "0");
+		table.bet(user.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.stand(bridge.userId());
-		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		table.stand(user.userId());
+		assertNull(table.getPlayer(user.userId()).getActiveHand());
 		assertTrue(dealer.getHand().isCompleted());
 		assertTrue(dealer.isRoundCompleted());
 		assertEquals(17, dealer.getHand().calculateValues().get(0));
@@ -182,11 +182,11 @@ public class StandTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(12, Suit.DIAMOND));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, "0");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
+		table.join(user, "0");
+		table.bet(user.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.stand(bridge.userId());
-		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		table.stand(user.userId());
+		assertNull(table.getPlayer(user.userId()).getActiveHand());
 		assertTrue(dealer.getHand().isCompleted());
 		assertEquals(18, dealer.getHand().calculateValues().get(0));
 	}
@@ -202,11 +202,11 @@ public class StandTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(4, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, "0");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
+		table.join(user, "0");
+		table.bet(user.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.stand(bridge.userId());
-		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		table.stand(user.userId());
+		assertNull(table.getPlayer(user.userId()).getActiveHand());
 		assertTrue(dealer.getHand().isCompleted());
 		assertEquals(19, dealer.getHand().calculateValues().get(0));
 	}
@@ -221,11 +221,11 @@ public class StandTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, "0");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
+		table.join(user, "0");
+		table.bet(user.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.stand(bridge.userId());
-		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		table.stand(user.userId());
+		assertNull(table.getPlayer(user.userId()).getActiveHand());
 		assertTrue(dealer.getHand().isCompleted());
 		assertEquals(20, dealer.getHand().calculateValues().get(0));
 	}
@@ -240,11 +240,11 @@ public class StandTest extends BaseTest {
 		cards.add(Card.of(3, Suit.DIAMOND));
 		cards.add(Card.of(13, Suit.HEART));
 		cards.add(Card.of(3, Suit.SPADE));
-		table.join(bridge, "0");
-		table.bet(bridge.userId(), new BigDecimal("99.0"));
+		table.join(user, "0");
+		table.bet(user.userId(), new BigDecimal("99.0"));
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-		table.stand(bridge.userId());
-		assertNull(table.getPlayer(bridge.userId()).getActiveHand());
+		table.stand(user.userId());
+		assertNull(table.getPlayer(user.userId()).getActiveHand());
 		assertTrue(dealer.getHand().isCompleted());
 		assertEquals(21, dealer.getHand().calculateValues().get(0));
 	}

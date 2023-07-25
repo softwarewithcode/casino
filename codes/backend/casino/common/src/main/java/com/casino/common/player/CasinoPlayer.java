@@ -5,7 +5,7 @@ import com.casino.common.exception.IllegalBetException;
 import com.casino.common.functions.Functions;
 import com.casino.common.table.structure.ICasinoTable;
 import com.casino.common.table.timing.Time;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -24,7 +24,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
     private static final Logger LOGGER = Logger.getLogger(CasinoPlayer.class.getName());
     protected final ICasinoTable table;
     private final ReentrantLock playerLock;
-    private final Bridge bridge;
+    private final User user;
     private final Time timeControl;
     private volatile Balance balance;
     protected volatile BigDecimal totalBet;
@@ -33,10 +33,10 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
     private volatile PlayerStatus status;
     private volatile Integer skips = 0;
 
-    public CasinoPlayer(Bridge bridge, ICasinoTable table) {
+    public CasinoPlayer(User user, ICasinoTable table) {
         super();
-        this.bridge = bridge;
-        this.balance = new Balance(bridge.initialBalance());
+        this.user = user;
+        this.balance = new Balance(user.initialBalance());
         this.status = null;
         this.payout = BigDecimal.ZERO;
         this.table = table;
@@ -48,7 +48,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
     @Override
     public String getUserName() {
-        return bridge.userName();
+        return user.userName();
     }
 
     public ICasinoTable getTable() {
@@ -58,7 +58,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
     @JsonIgnore
     @Override // never return this id to the players
     public UUID getId() {
-        return bridge.userId();
+        return user.userId();
     }
 
     protected ReentrantLock getPlayerLock() {
@@ -67,7 +67,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
     @Override
     public int hashCode() {
-        return Objects.hash(bridge.userId());
+        return Objects.hash(user.userId());
     }
 
     @Override
@@ -79,7 +79,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
         if (getClass() != obj.getClass())
             return false;
         CasinoPlayer other = (CasinoPlayer) obj;
-        return Objects.equals(bridge.userId(), other.bridge.userId());
+        return Objects.equals(user.userId(), other.user.userId());
     }
 
     @Override
@@ -109,12 +109,12 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
     @Override
     public <T> void sendMessage(T message) {
-        if (!canSendMessage(message)) {
+        if (!isReachable(message)) {
             LOGGER.log(Level.FINE, "Message cannot be delivered:" + message);
             return;
         }
         try {
-            bridge.session().getBasicRemote().sendText(message.toString());
+            user.session().getBasicRemote().sendText(message.toString());
         } catch (IOException e) {
             UUID logIdentifier = UUID.randomUUID();
             LOGGER.log(Level.SEVERE, "Could not reach player: logIdentifier: " + logIdentifier + " name;" + getUserName() + " id:" + getId(), e);
@@ -122,8 +122,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
         }
     }
 
-    private <T> boolean canSendMessage(T message) {
-        return bridge.isConnected() && message != null;
+    private <T> boolean isReachable(T message) {
+        return user.isConnected() && message != null;
     }
 
     private void verifyCallersLock() {
@@ -187,7 +187,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
     @Override
     public String toString() {
-        return "CasinoPlayer [bridge=" + bridge + ", initialBalance=" + balance.getInitialBalance() + ", balance=" + balance + ", totalBet=" + totalBet + ", payout=" + payout + ", status=" + status + ", sitOutRounds=" + skips + "]";
+        return "CasinoPlayer [bridge=" + user + ", initialBalance=" + balance.getInitialBalance() + ", balance=" + balance + ", totalBet=" + totalBet + ", payout=" + payout + ", status=" + status + ", sitOutRounds=" + skips + "]";
     }
 
     @Override
@@ -206,8 +206,8 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
     }
 
     @JsonIgnore
-    public Bridge getBridge() {
-        return bridge;
+    public User getBridge() {
+        return user;
     }
 
     @Override
@@ -229,7 +229,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
 
     @Override
     public boolean isConnected() {
-        return bridge.isConnected();
+        return user.isConnected();
     }
 
     public boolean isActive() {

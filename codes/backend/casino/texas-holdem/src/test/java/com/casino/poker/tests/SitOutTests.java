@@ -232,8 +232,8 @@ public class SitOutTests extends DefaultTableTests {
 	public void newPlayerSitsOutAndDoesNotParticipateNextRound() {
 		System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "2");
 		defaultJoinJoin();
-		table.join(bridge5, "4", false);
-		table.sitOutNextHand(bridge5.userId());
+		table.join(user5, "4", false);
+		table.sitOutNextHand(user5.userId());
 		table.fold(table.getActivePlayer().getId());
 		assertEquals(2, table.getRound().getPlayers().size());
 		assertEquals(2, table.getActivePlayerCount());
@@ -253,12 +253,12 @@ public class SitOutTests extends DefaultTableTests {
 		System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "2");
 		defaultJoinJoin();
 		//Round1 => button = 2 = sb, bb = 3
-		table.join(bridge5, "4", false);
-		table.sitOutNextHand(bridge5.userId());
+		table.join(user5, "4", false);
+		table.sitOutNextHand(user5.userId());
 		table.fold(table.getActivePlayer().getId());
 		waitRoundToStart();
 		//Round2 => button = 3 = sb, bb = 2
-		table.continueGame(bridge5.userId());
+		table.continueGame(user5.userId());
 		table.fold(table.getActivePlayer().getId());
 		assertEquals(table.getPlayer(3),table.getRound().getSmallBlindPlayer());
 		assertEquals(table.getPlayer(3),table.getRound().getPositions().buttonPlayer());
@@ -288,10 +288,10 @@ public class SitOutTests extends DefaultTableTests {
 	@Test
 	public void firstJoinerSitsOutAndOthersBeginHeadsUpButSitoutPlayerComesBackAfterFirstRoundAndIsCompletedAndIsAcceptedToPlay() {
 		System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "3");
-		table.join(bridge2, "2", false);
-		table.sitOutNextHand(bridge2.userId());
-		table.join(bridge3, "3", false);
-		table.join(bridge4, "4", false);
+		table.join(user2, "2", false);
+		table.sitOutNextHand(user2.userId());
+		table.join(user3, "3", false);
+		table.join(user4, "4", false);
 		waitRoundToStart();
 		assertEquals(1, table.getRounds().size());
 		assertEquals(2, table.getRound().getPlayers().size());
@@ -300,7 +300,7 @@ public class SitOutTests extends DefaultTableTests {
 		assertEquals(table.getPlayer(3),table.getRound().getSmallBlindPlayer());
 		assertEquals(table.getPlayer(4),table.getRound().getBigBlindPlayer());
 		assertEquals(PlayerStatus.SIT_OUT_AS_NEW, table.getPlayer(2).getStatus());
-		table.continueGame(bridge2.userId());
+		table.continueGame(user2.userId());
 		table.fold(table.getActivePlayer().getId());
 		assertEquals(HoldemPhase.ROUND_COMPLETED, table.getGamePhase());
 		waitRoundToStart();

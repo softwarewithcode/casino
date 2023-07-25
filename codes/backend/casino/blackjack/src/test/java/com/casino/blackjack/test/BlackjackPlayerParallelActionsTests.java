@@ -25,7 +25,7 @@ import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.table.TableData;
 import com.casino.common.table.TableThresholds;
-import com.casino.common.user.Bridge;
+import com.casino.common.user.User;
 
 /**
  * 
@@ -50,7 +50,7 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 	private volatile int rejectedInsurances;
 	private volatile int rejectedDoubles;
 	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(BlackjackPlayerParallelActionsTests.class.getName());
-	private Bridge bridge3;
+	private User user3;
 	private TableData tableInitData49Players;
 	private BlackjackTable table49Players;
 
@@ -62,10 +62,10 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 			table = new BlackjackTable(tableInitData, blackjackInitData);
 			tableInitData49Players = getDefaultTableInitDataWithThresholds(new TableThresholds(49, 49, 49));
 			tableWith49MinAnd49MaxPlayers = new BlackjackTable(tableInitData49Players, blackjackInitData);
-			bridge = new Bridge("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
-			bridge2 = new Bridge("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
-			bridge3 = new Bridge("qq", table.getId(), UUID.randomUUID(), null, new BigDecimal("10000000.0"));
-			doubleDownPlayer = new BlackjackPlayer(bridge3, table);
+			user = new User("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
+			user2 = new User("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
+			user3 = new User("qq", table.getId(), UUID.randomUUID(), null, new BigDecimal("10000000.0"));
+			doubleDownPlayer = new BlackjackPlayer(user3, table);
 			playerWhoDidNotGetSeat = 0;
 			playersWhoGotSeat = 0;
 			rejectedDoubles = 0;
@@ -193,13 +193,13 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 	@Test
 	public void tableAcceptsWatchersSimultaneously() throws InterruptedException, BrokenBarrierException {
 		CyclicBarrier casinoBarrier = new CyclicBarrier(10001);
-		tableWith49MinAnd49MaxPlayers.join(bridge, "3");
+		tableWith49MinAnd49MaxPlayers.join(user, "3");
 		assertEquals(0, tableWith49MinAnd49MaxPlayers.getWatchers().size());
 		List<Thread> threads = addWatchersToTable(10000, casinoBarrier);
 		threads.forEach(Thread::start);
 		casinoBarrier.await();
 		sleep(1, ChronoUnit.SECONDS); // All watchers have had 1 second of time to join.
-		tableWith49MinAnd49MaxPlayers.join(bridge2, "4");
+		tableWith49MinAnd49MaxPlayers.join(user2, "4");
 		assertEquals(10000, table.getWatchers().size());
 		sleep(tableWith49MinAnd49MaxPlayers.getDealer().getBetPhaseTime(), ChronoUnit.SECONDS);
 	}
@@ -283,26 +283,26 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 
 	private List<Thread> sendSimultaneouslyMultipleDoubleDownsFromPlayers(int playerAmount, CyclicBarrier casinoDoor) {
 		UUID uuid = UUID.randomUUID();
-		Bridge doublerBridge = new Bridge("player:" + 0, table.getId(), uuid, null, new BigDecimal("10000000.0"));
+		User doublerUser = new User("player:" + 0, table.getId(), uuid, null, new BigDecimal("10000000.0"));
 //		BlackjackPlayer doubler1 = new BlackjackPlayer(bridge3, table);
 		return IntStream.rangeClosed(0, playerAmount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
-			Bridge b = null;
+			User b = null;
 			if (index > 0)
 
-				b = new Bridge("player:" + index, table.getId(), UUID.randomUUID(), null, new BigDecimal("10000000.0"));
+				b = new User("player:" + index, table.getId(), UUID.randomUUID(), null, new BigDecimal("10000000.0"));
 			try {
 				int seatNumber = index;
 				casinoDoor.await();
 				if (index == 0) {
-					table.join(doublerBridge, "0");
-					table.bet(doublerBridge.userId(), MAX_BET);
+					table.join(doublerUser, "0");
+					table.bet(doublerUser.userId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
-					table.doubleDown(doublerBridge.userId());
+					table.doubleDown(doublerUser.userId());
 				} else {
 					table.join(b, String.valueOf(seatNumber));
 					table.bet(b.userId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS + 2, ChronoUnit.SECONDS);
-					table.doubleDown(doublerBridge.userId());//// All these players try to doubleDown for the first player
+					table.doubleDown(doublerUser.userId());//// All these players try to doubleDown for the first player
 				}
 
 			} catch (Exception e) {
@@ -314,24 +314,24 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 
 	private List<Thread> sendSimultaneouslyMultipleInsuranceRequestsForSpecificPlayer(int amount, CyclicBarrier casinoDoor) {
 		UUID uuid = UUID.randomUUID();
-		Bridge insurerBridge = new Bridge("player:" + 0, table.getId(), uuid, null, new BigDecimal("10000000.0"));
+		User insurerUser = new User("player:" + 0, table.getId(), uuid, null, new BigDecimal("10000000.0"));
 		return IntStream.rangeClosed(0, amount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
-			Bridge b = null;
+			User b = null;
 			if (index > 0)
-				b = new Bridge("player:" + index, table.getId(), UUID.randomUUID(), null, new BigDecimal("10000000.0"));
+				b = new User("player:" + index, table.getId(), UUID.randomUUID(), null, new BigDecimal("10000000.0"));
 			try {
 				int seatNumber = index;
 				casinoDoor.await();
 				if (index == 0) {
-					table.join(insurerBridge, String.valueOf(seatNumber));
-					table.bet(insurerBridge.userId(), MAX_BET);
+					table.join(insurerUser, String.valueOf(seatNumber));
+					table.bet(insurerUser.userId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-					table.insure(insurerBridge.userId());
+					table.insure(insurerUser.userId());
 				} else {
 					table.join(b, String.valueOf(seatNumber));
 					table.bet(b.userId(), MAX_BET);
 					sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
-					table.insure(insurerBridge.userId());
+					table.insure(insurerUser.userId());
 				}
 
 			} catch (Exception e) {
@@ -361,18 +361,18 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 
 	private List<Thread> createCasinoPlayers(int playerAmount, CyclicBarrier casinoDoor) {
 		return IntStream.rangeClosed(0, playerAmount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
-			Bridge indexedBridge = new Bridge("player:" + index, table.getId(), UUID.randomUUID(), null, MAX_BET);
+			User indexedUser = new User("player:" + index, table.getId(), UUID.randomUUID(), null, MAX_BET);
 			try {
 				int seatNumber = index;
 				if (index >= table.getSeats().size()) {
 					seatNumber = ThreadLocalRandom.current().nextInt(0, table.getSeats().size() - 1);
 				}
 				casinoDoor.await();
-				if (!table.join(indexedBridge, String.valueOf(seatNumber))) {
+				if (!table.join(indexedUser, String.valueOf(seatNumber))) {
 					addRejected();
 				} else {
 					addAccepted();
-					table.bet(indexedBridge.userId(), MAX_BET);
+					table.bet(indexedUser.userId(), MAX_BET);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -384,10 +384,10 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 
 	private List<Thread> addWatchersToTable(int threadAmount, CyclicBarrier casinoDoor) {
 		return IntStream.rangeClosed(0, threadAmount - 1).mapToObj(index -> Thread.ofVirtual().unstarted(() -> {
-			Bridge randomBridge = new Bridge("watcher:" + index, table.getId(), UUID.randomUUID(), null, MAX_BET);
+			User randomUser = new User("watcher:" + index, table.getId(), UUID.randomUUID(), null, MAX_BET);
 			try {
 				casinoDoor.await();
-				table.watch(randomBridge);
+				table.watch(randomUser);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (BrokenBarrierException e) {
