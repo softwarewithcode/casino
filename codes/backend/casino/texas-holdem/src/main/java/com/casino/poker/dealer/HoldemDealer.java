@@ -112,7 +112,8 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
         potHandler.clearPots();
         table.setStatus(TableStatus.WAITING_PLAYERS);
         table.getPlayers().forEach(player -> player.prepareForNextRound());
-        table.getRound().clearTableCards();
+        if (table.getRound() != null)
+            table.getRound().clearTableCards();
         notifyTableStatus(Event.NO_BETS_NO_DEAL);
         updateCounterTime(0);
     }
@@ -590,7 +591,7 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
 
     private boolean shouldCompleteRoundWithShowdown() {
         int allInPlayerCount = getAllInPlayerCount();
-        return table.getRound().getPlayers().stream().filter(player -> player.hasBalance() && player.hasHoleCards()).count() <= 1 && allInPlayerCount>=1;
+        return table.getRound().getPlayers().stream().filter(player -> player.hasBalance() && player.hasHoleCards()).count() <= 1 && allInPlayerCount >= 1;
     }
 
     private int getAllInPlayerCount() {
