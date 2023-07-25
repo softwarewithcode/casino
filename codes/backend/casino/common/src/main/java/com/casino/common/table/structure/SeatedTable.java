@@ -85,7 +85,7 @@ public abstract class SeatedTable<T extends ICasinoPlayer> extends CasinoTable i
         return optionalSeat.map(Seat::getPlayer).orElse(null);
     }
 
-    protected void sanitizeAllSeats() {
+    protected synchronized void sanitizeAllSeats() {
         List<Seat<T>> allSeats = seats.stream().toList();
         allSeats.forEach(Seat::sanitize);
     }
