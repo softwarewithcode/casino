@@ -98,7 +98,7 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
             sendHoleCardsToPlayers();
         } catch (IllegalPlayerCountException i) {
             LOGGER.log(Level.INFO, "Not enough players to start round", i);
-            changeToWaitingMode();
+            changeToWaitingPlayersMode();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error during preFlop preparation. Closing down table:", e);
             onError();
@@ -107,7 +107,7 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
         }
     }
 
-    private void changeToWaitingMode() {
+    private void changeToWaitingPlayersMode() {
         table.stopClock();
         potHandler.clearPots();
         table.setStatus(TableStatus.WAITING_PLAYERS);
