@@ -5,7 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //All players can bet parallel at the same time
-public class ParallelBetPhase<T extends BetPhaser> extends TimerTask {
+public class ParallelBetPhase<T extends ParallelBetPhaser> extends TimerTask {
     private static final Logger LOGGER = Logger.getLogger(ParallelBetPhase.class.getName());
     private final T betPhaser;
 
@@ -20,7 +20,7 @@ public class ParallelBetPhase<T extends BetPhaser> extends TimerTask {
             LOGGER.fine("BetPhaseClockTask, clock not ticking:");
             return;
         }
-        if (betPhaser.shouldPrepareNewRound()) {
+        if (betPhaser.shouldPrepareBetPhase()) {
             LOGGER.info("BetPhaseClockTask, clear previous round " + betPhaser);
             betPhaser.prepareBetPhase();
         }

@@ -18,7 +18,7 @@ import com.casino.blackjack.player.BlackjackPlayer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.dealer.CommunicationChannel;
 import com.casino.common.game.phase.bet.ParallelBetPhase;
-import com.casino.common.game.phase.bet.BetPhaser;
+import com.casino.common.game.phase.bet.ParallelBetPhaser;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Deck;
 import com.casino.common.dealer.CardDealer;
@@ -43,7 +43,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreType
 @JsonIncludeProperties(value = { /* explicitly nothing from here */})
-public class BlackjackDealer implements CardDealer, BetPhaser, InsurancePhaser {
+public class BlackjackDealer implements CardDealer, ParallelBetPhaser, InsurancePhaser {
     private static final Logger LOGGER = Logger.getLogger(BlackjackDealer.class.getName());
 
     private final BlackjackTable table;
@@ -384,7 +384,7 @@ public class BlackjackDealer implements CardDealer, BetPhaser, InsurancePhaser {
     }
 
     @Override
-    public boolean shouldPrepareNewRound() {
+    public boolean shouldPrepareBetPhase() {
         return table.getCounterTime() == getBetPhaseTime() && table.getGamePhase() == BlackjackGamePhase.ROUND_COMPLETED;
     }
 
