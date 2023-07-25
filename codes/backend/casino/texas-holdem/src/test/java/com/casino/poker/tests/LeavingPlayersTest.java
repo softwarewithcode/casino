@@ -282,7 +282,7 @@ public class LeavingPlayersTest extends DefaultTableTests {
         table.leave(table.getActivePlayer().getId());    //BB leaves and folds
         waitRoundToStart();
         assertEquals(3, table.getActivePlayerCount());
-        assertEquals(0, table.getLeftPlayerCount());
+        assertEquals(0, table.getPlayersCountWithStatus(PlayerStatus.LEFT));
         assertEquals(HoldemPhase.PRE_FLOP, table.getGamePhase());
         assertEquals(3, table.getRound().getPlayers().size());
         assertNull(table.getRound().getSmallBlindPlayer());
@@ -305,7 +305,7 @@ public class LeavingPlayersTest extends DefaultTableTests {
         waitRoundToStart();
         assertEquals(3, table.getActivePlayerCount());
         assertEquals(0, table.getSitOutPlayerCount());
-        assertEquals(0, table.getLeftPlayerCount());
+        assertEquals(0, table.getPlayersCountWithStatus(PlayerStatus.LEFT));
         assertEquals(HoldemPhase.PRE_FLOP, table.getGamePhase());
         assertEquals(3, table.getRound().getPlayers().size());
         assertNull(table.getRound().getSmallBlindPlayer());

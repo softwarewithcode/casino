@@ -214,6 +214,7 @@ public abstract class CasinoPlayer implements ICasinoPlayer {
     public void reset() {
         verifyCallersLock();
         this.totalBet = null;
+        payout = null;
     }
 
     @Override

@@ -14,7 +14,7 @@ public interface ICasinoPlayer {
 
     void increaseBalance(BigDecimal amount);
 
-    void increaseBalanceAndPayout(BigDecimal amount);
+    void increaseBalanceAndPayout(BigDecimal amount); // payout=winAmount?
 
     UUID getId();
 

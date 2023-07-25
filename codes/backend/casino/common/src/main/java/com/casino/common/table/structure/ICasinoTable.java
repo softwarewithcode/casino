@@ -60,11 +60,11 @@ public interface ICasinoTable {
 
     TableThresholds getThresholds();
 
-    default Integer getLeftPlayerCount() {
-        return (int) getPlayers().stream().filter(player -> player.getStatus() == PlayerStatus.LEFT).count();
-    }
-
     default Integer getSitOutPlayerCount() {
         return (int) getPlayers().stream().filter(player -> player.getStatus().isSitoutStatus()).count();
+    }
+
+    default Integer getPlayersCountWithStatus(PlayerStatus status) {
+        return (int) (int) getPlayers().stream().filter(player -> player.getStatus() == status).count();
     }
 }
