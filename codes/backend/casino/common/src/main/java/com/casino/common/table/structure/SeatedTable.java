@@ -1,17 +1,5 @@
 package com.casino.common.table.structure;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import com.casino.common.bet.BetVerifier;
 import com.casino.common.exception.PlayerNotFoundException;
 import com.casino.common.functions.Functions;
@@ -19,6 +7,11 @@ import com.casino.common.player.ICasinoPlayer;
 import com.casino.common.player.PlayerStatus;
 import com.casino.common.table.TableData;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author softwarewithcode from GitHub
@@ -40,46 +33,6 @@ public abstract class SeatedTable<T extends ICasinoPlayer> extends CasinoTable i
     private void createSeats(int seatCount) {
         Set<Seat<T>> seats = IntStream.range(0, seatCount).mapToObj(i -> new Seat<T>(i)).collect(Collectors.toSet());
         this.seats = Collections.synchronizedSet(seats);
-    }
-
-    public Integer getReservedSeatCount() {
-        return (int) seats.stream().filter(Seat::hasPlayer).count();
-    }
-
-    public Integer getSitOutPlayerCount() {
-       return (int) getPlayers().stream().filter(player -> player.getStatus().isSitoutStatus()).count();
-    }
-    
-    public Integer getLeftPlayerCount() {
-        return (int) getPlayers().stream().filter(player -> player.getStatus() == PlayerStatus.LEFT).count();
-     }
-
-
-    @Override
-    public Integer getActivePlayerCount() {
-        return (int) seats.stream().filter(Seat::hasActivePlayer).count();
-    }
-
-    public Integer getPlayerCount() {
-        return (int) seats.stream().filter(Seat::hasPlayer).count();
-    }
-
-    public Integer getNewPlayerCount() {
-        return (int) seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() == PlayerStatus.NEW).count();
-    }
-    
-    public Integer getNewStatusPlayerCount() {
-        return (int) seats.stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus().isNewStatus()).count();
-    }
-
-    public List<Seat<T>> getNewAndActivePlayersSeatsCoveringAmount(BigDecimal requiredAmount) {
-        return seats.stream().filter(seat -> seat.hasNewPlayerCoveringAmount(requiredAmount) || seat.hasActivePlayerCoveringAmount(requiredAmount)).sorted(Comparator.comparing(Seat::getNumber)).toList();
-    }
-
-
-    // User might have disconnected, so don't compare to active status
-    public List<T> getPlayersWithBet() {
-        return seats.stream().filter(Seat::hasPlayerWithBet).map(Seat::getPlayer).toList();
     }
 
     protected Optional<Seat<T>> join(String seatNumber, T player) {
@@ -169,7 +122,6 @@ public abstract class SeatedTable<T extends ICasinoPlayer> extends CasinoTable i
         return p != null && seats.stream().anyMatch(seat -> p.equals(seat.getPlayer()));
     }
 
-
     @Override
     public List<T> getPlayers() {
         return seats.stream().filter(Seat::hasPlayer).map(Seat::getPlayer).toList();
@@ -182,21 +134,23 @@ public abstract class SeatedTable<T extends ICasinoPlayer> extends CasinoTable i
     public List<Seat<T>> findInactivePlayerSeats() {
         return getSeats().stream().filter(seat -> seat.hasPlayer() && seat.getPlayer().getStatus() != PlayerStatus.ACTIVE).toList();
     }
-    
-    public void sanitizeSeats(List<PlayerStatus>playersStatuses) {
-    	verifyCallersLock();
-    	List<Seat<T>>seatsForCleanup=seats.stream().filter(Seat::hasPlayer).filter(seat ->  playersStatuses.contains(seat.getPlayer().getStatus())).toList();
-    	seatsForCleanup.forEach(Seat::sanitize);
+
+    public void sanitizeSeats(List<PlayerStatus> playersStatuses) {
+        verifyCallersLock();
+        List<Seat<T>> seatsForCleanup = seats.stream().filter(Seat::hasPlayer).filter(seat -> playersStatuses.contains(seat.getPlayer().getStatus())).toList();
+        seatsForCleanup.forEach(Seat::sanitize);
     }
+
     public void sanitizeSeat(int seatNumber) {
-    	verifyCallersLock();
-    	getSeat(seatNumber).sanitize();
+        verifyCallersLock();
+        getSeat(seatNumber).sanitize();
     }
 
     public void verifyPlayerHasSeat(T player) {
         if (!hasSeat(player))
             throw new PlayerNotFoundException("Player not found from table:" + player, 0);
     }
+
     @Override
     public synchronized void onClose() {
         sanitizeAllSeats();

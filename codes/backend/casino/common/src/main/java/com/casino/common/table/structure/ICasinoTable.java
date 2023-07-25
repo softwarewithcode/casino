@@ -1,17 +1,18 @@
 package com.casino.common.table.structure;
 
+import com.casino.common.dealer.BaseDealer;
+import com.casino.common.game.phase.GamePhase;
+import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.player.PlayerStatus;
+import com.casino.common.table.TableStatus;
+import com.casino.common.table.TableThresholds;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
-
-import com.casino.common.dealer.BaseDealer;
-import com.casino.common.game.phase.GamePhase;
-import com.casino.common.player.ICasinoPlayer;
-import com.casino.common.table.TableStatus;
-import com.casino.common.table.TableThresholds;
 
 public interface ICasinoTable {
 
@@ -59,4 +60,11 @@ public interface ICasinoTable {
 
     TableThresholds getThresholds();
 
+    default Integer getLeftPlayerCount() {
+        return (int) getPlayers().stream().filter(player -> player.getStatus() == PlayerStatus.LEFT).count();
+    }
+
+    default Integer getSitOutPlayerCount() {
+        return (int) getPlayers().stream().filter(player -> player.getStatus().isSitoutStatus()).count();
+    }
 }
