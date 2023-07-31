@@ -1,7 +1,7 @@
 29.03.2023<br>
 
 Default workspace and setup contains:
-1) IntelliJ community edition and/or Eclipse 2023-03.( Eclipse mainly then when modifications need to be run on server). But either one is ok with setups.
+1) IntelliJ community edition and/or Eclipse 2023-06.( Eclipse mainly then when modifications need to be run on server). But either one is ok with setups.
 2) Visual Studio Code for frontend development 
 
 Development and running the files:
