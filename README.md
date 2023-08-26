@@ -2,7 +2,7 @@
 
 ## About <br>
 This repository contains modularized building blocks for a simple virtual casino and includes Blackjack and Texas Hold'em No Limit games. <br>
-Latest dev branch is roulette, including common structure changes.
+Latest dev branch is roulette, including common structure changes. <br>
 ### Documentation
 /utils/documentation
 
