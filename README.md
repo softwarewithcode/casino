@@ -2,9 +2,7 @@
 
 ## About <br>
 This repository includes Roulette, Blackjack and Texas Hold'em No Limit games. <br>
-Roulette is the latest game and uses async approach for delays that are expected in order to give possibility
-for user interface to show animations in the meanwhile.<br>
-Thus there is no expectations for UI to stack events in queues in case of simultaneous occurring events.
+Roulette is the latest game and uses async approach for generated delays that are expected in some game states.<br>
 
 ### Documentation
 /utils/documentation
