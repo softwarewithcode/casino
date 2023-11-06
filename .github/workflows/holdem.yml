@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Holdem tests in roulette branch
+name: Holdem tests in master branch
 
 on:
   push:

@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Roulette tests in roulette branch
+name: Roulette tests in master branch
 
 on:
   push:

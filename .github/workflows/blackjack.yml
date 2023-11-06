@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Blackjack tests in roulette branch
+name: Blackjack tests in master branch
 
 on:
   push:
