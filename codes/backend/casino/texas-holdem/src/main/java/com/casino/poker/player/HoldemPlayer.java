@@ -4,7 +4,7 @@ import com.casino.common.bet.BetVerifier;
 import com.casino.common.cards.Card;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.functions.Functions;
-import com.casino.common.player.CasinoPlayer;
+import com.casino.common.player.Player;
 import com.casino.common.player.PlayerStatus;
 import com.casino.common.reload.Reloadable;
 import com.casino.common.table.structure.ISeatedTable;
@@ -22,6 +22,7 @@ import com.casino.poker.table.HoldemTable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import jakarta.websocket.Session;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 
 @JsonIgnoreProperties(value = {"holeCards"}) // Explicitly ignore holeCards.
 @JsonIncludeProperties(value = {"hand", "chipsOnTable", "seatNumber", "actions", "userName", "currentBalance", "chipsOnTable", "cardsBackSideVisible", "status", "cards"})
-public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Reloadable {
+public final class HoldemPlayer extends Player implements PokerPlayer, Reloadable {
     private final List<Card> holeCards;
     private final Set<BetToken> missingBlindBets;
     private HoldemHand hand;
@@ -89,7 +90,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void prepareForNextRound() {
         try {
-            tryLock();
+            tryLockOrThrow();
             this.hasActed = false;
             if (this.holeCards != null)
                 this.holeCards.clear();
@@ -112,7 +113,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void updateAvailableActions() {
         try {
-            tryLock();
+            tryLockOrThrow();
             this.actions = new PokerActionCreator().createActions(this);
         } finally {
             releaseLock();
@@ -175,7 +176,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void addChipsOnTable(BigDecimal increaseAmount) {
         try {
-            tryLock();
+            tryLockOrThrow();
             verifyCoversAmount(increaseAmount);
             if (chipsOnTable == null)
                 chipsOnTable = BigDecimal.ZERO;
@@ -194,7 +195,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void takeChipsBackFromTable() {
         try {
-            tryLock();
+            tryLockOrThrow();
             increaseBalance(chipsOnTable);
             chipsOnTable = BigDecimal.ZERO;
         } finally {
@@ -205,7 +206,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void removeSomeChipsFromTable(BigDecimal removeAmount) {
         try {
-            tryLock();
+            tryLockOrThrow();
             if (!Functions.isFirstMoreOrEqualToSecond.apply(chipsOnTable, removeAmount))
                 throw new IllegalArgumentException("Cannot remove " + removeAmount + " from table:" + chipsOnTable);
             chipsOnTable = chipsOnTable.subtract(removeAmount);
@@ -235,7 +236,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
         try {
             if (tableCards.size() != 5)
                 throw new IllegalStateException("Should be 5 tableCards while assigning pokerHand. Was:" + tableCards.size());
-            tryLock();
+            tryLockOrThrow();
             this.hand = HandFactory.constructPokerHand(tableCards, getHoleCards());
         } finally {
             releaseLock();
@@ -245,7 +246,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void call(BigDecimal missingFromTable) {
         try {
-            tryLock();
+            tryLockOrThrow();
             BetVerifier.verifySufficientBalance(missingFromTable, this);
             chipsOnTable = chipsOnTable.add(missingFromTable);
             updateBalanceAndTotalBet(missingFromTable);
@@ -258,7 +259,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void betOrRaise(BigDecimal raiseAmount) {
         try {
-            tryLock();
+            tryLockOrThrow();
             BigDecimal additionalAmount = raiseAmount.subtract(getTableChipCount());
             BetVerifier.verifySufficientBalance(additionalAmount, this);
             chipsOnTable = chipsOnTable.add(additionalAmount);
@@ -272,7 +273,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void fold() {
         try {
-            tryLock();
+            tryLockOrThrow();
             hasActed = true;
             this.hand = null;
             this.holeCards.clear();
@@ -284,7 +285,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void check() {
         try {
-            tryLock();
+            tryLockOrThrow();
             hasActed = true;
         } finally {
             releaseLock();
@@ -294,7 +295,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void allIn() {
         try {
-            tryLock();
+            tryLockOrThrow();
             hasActed = true;
             chipsOnTable = chipsOnTable.add(getCurrentBalance());
             updateBalanceAndTotalBet(getCurrentBalance());
@@ -309,7 +310,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public BigDecimal tryFillUpToLimit(BigDecimal additionalAmount, BigDecimal fillUpLimit) {
         try {
-            tryLock();
+            tryLockOrThrow();
             BigDecimal maxAllowedAddition = fillUpLimit.subtract(getCurrentBalance());
             if (Functions.isFirstMoreOrEqualToSecond_(BigDecimal.ZERO, maxAllowedAddition))
                 return BigDecimal.ZERO;
@@ -324,7 +325,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void clearActed() {
         try {
-            tryLock();
+            tryLockOrThrow();
             this.hasActed = false;
         } finally {
             releaseLock();
@@ -340,7 +341,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     @Override
     public void addHoleCard(Card card) {
         try {
-            tryLock();
+            tryLockOrThrow();
             if (holeCards.size() > 2)
                 throw new IllegalArgumentException("Too many holeCards " + getUserName());
             holeCards.add(card);
@@ -396,7 +397,7 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     }
 
     @Override
-    public void continueGame(boolean immediate) {
+    public void returnFromBreak(boolean immediate) {
         try {
             takeLock();
             if (immediate)
@@ -410,4 +411,5 @@ public final class HoldemPlayer extends CasinoPlayer implements PokerPlayer, Rel
     public BigDecimal getChipsOnTable() {
         return chipsOnTable; // For serialization
     }
+
 }

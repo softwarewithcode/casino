@@ -12,8 +12,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.casino.blackjack.dealer.BlackjackDealer;
-import com.casino.blackjack.game.BlackjackInitData;
+import com.casino.blackjack.dealer.Dealer;
+import com.casino.blackjack.game.BlackjackData;
 import com.casino.blackjack.game.BlackjackPhasePathFactory;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
@@ -30,21 +30,21 @@ public class BalanceTest extends BaseTest {
 	private BlackjackTable table;
 	private User user;
 	private User user2;
-	private BlackjackDealer dealer;
+	private Dealer dealer;
 
 	@BeforeEach
 	public void initTest() {
 		try {
 			TableThresholds thresholds = new TableThresholds(MIN_PLAYERS, MAX_PLAYERS, DEFAULT_SEAT_COUNT);
 			TableData tableInitData = new TableData(BlackjackPhasePathFactory.buildBlackjackPath(), TableStatus.WAITING_PLAYERS, thresholds, UUID.randomUUID(), Language.ENGLISH, TableType.MULTIPLAYER, Game.BLACKJACK);
-			BlackjackInitData blackjackInitData = new BlackjackInitData(MIN_BUYIN, MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DEFAULT_ALLOWED_SIT_OUT_ROUNDS,
+			BlackjackData blackjackInitData = new BlackjackData(MIN_BUYIN, MIN_BET, MAX_BET, BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DEFAULT_ALLOWED_SIT_OUT_ROUNDS,
 					DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS);
 			table = new BlackjackTable(tableInitData, blackjackInitData);
 			user = new User("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			user2 = new User("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
-			dealer = (BlackjackDealer) f.get(table);
+			dealer = (Dealer) f.get(table);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -11,14 +11,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
-import com.casino.blackjack.game.BlackjackInitData;
+import com.casino.blackjack.game.BlackjackData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.casino.blackjack.dealer.BlackjackDealer;
+import com.casino.blackjack.dealer.Dealer;
 import com.casino.blackjack.export.BlackjackPlayerAction;
-import com.casino.blackjack.player.BlackjackPlayer;
+import com.casino.blackjack.player.BlackjackPlayer_;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
@@ -28,14 +28,14 @@ import com.casino.common.user.User;
 public class InsuranceTest extends BaseTest {
 	private BlackjackTable table;
 	private BlackjackTable table2;
-	private BlackjackDealer dealer;
-	private BlackjackDealer dealer2;
+	private Dealer dealer;
+	private Dealer dealer2;
 
 	@BeforeEach
 	public void initTest() {
 		try {
 			table = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
-			BlackjackInitData blackjackInitData = createBlackjackInitData(MIN_BUYIN, MIN_BET, new BigDecimal("1000.0"), BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DEFAULT_ALLOWED_SIT_OUT_ROUNDS,
+			BlackjackData blackjackInitData = createBlackjackInitData(MIN_BUYIN, MIN_BET, new BigDecimal("1000.0"), BET_ROUND_TIME_SECONDS, INSURANCE_ROUND_TIME_SECONDS, PLAYER_TIME_SECONDS, DEFAULT_ALLOWED_SIT_OUT_ROUNDS,
 					DELAY_BEFORE_STARTING_NEW_BET_PHASE_MILLIS);
 			table2 = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
 			user = new User("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
@@ -43,8 +43,8 @@ public class InsuranceTest extends BaseTest {
 			user3 = new User("JaneDoe2", table2.getId(), UUID.randomUUID(), null, new BigDecimal("450.0"));
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
-			dealer = (BlackjackDealer) f.get(table);
-			dealer2 = (BlackjackDealer) f.get(table2);
+			dealer = (Dealer) f.get(table);
+			dealer2 = (Dealer) f.get(table2);
 			List<Card> cards = dealer.getDecks();
 			cards.add(Card.of(4, Suit.CLUB));
 			cards.add(Card.of(8, Suit.DIAMOND));
@@ -134,7 +134,7 @@ public class InsuranceTest extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		sleep(INSURANCE_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		table.doubleDown(user.userId());
-		BlackjackPlayer p = table.getPlayer(user.userId());
+		BlackjackPlayer_ p = table.getPlayer(user.userId());
 		assertTrue(p.hasDoubled());
 	}
 
@@ -208,7 +208,7 @@ public class InsuranceTest extends BaseTest {
 		assertEquals(18, table.getPlayer(user.userId()).getActiveHand().calculateValues().get(0));
 		table.stand(user.userId());
 		assertTrue(dealer.getHand().isBlackjack());
-		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(user.userId());
+		BlackjackPlayer_ p = (BlackjackPlayer_) table.getPlayer(user.userId());
 		assertTrue(p.hasInsured());
 		assertTrue(p.hasCompletedFirstHand());
 		assertEquals(new BigDecimal("75.00"), p.getTotalBet());
@@ -228,7 +228,7 @@ public class InsuranceTest extends BaseTest {
 		table.hit(user.userId());
 		assertEquals(18, table.getPlayer(user.userId()).getActiveHand().calculateValues().get(0));
 		table.hit(user.userId());
-		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(user.userId());
+		BlackjackPlayer_ p = (BlackjackPlayer_) table.getPlayer(user.userId());
 		assertEquals(28, p.getFirstHandFinalValue());
 		assertTrue(dealer.getHand().isBlackjack());
 		assertTrue(table.getPlayer(user.userId()).getHands().get(0).isInsured());

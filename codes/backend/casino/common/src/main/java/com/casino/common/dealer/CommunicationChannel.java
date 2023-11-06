@@ -2,15 +2,17 @@ package com.casino.common.dealer;
 
 import com.casino.common.message.Event;
 import com.casino.common.message.MessageTitle;
-import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.user.Connectable;
 
 public interface CommunicationChannel {
-	void notifyPlayerArrival(ICasinoPlayer player);
+	void notifyPlayerArrival(Connectable player);
 
-	void notifyPlayer(Event title, ICasinoPlayer player);
+	void notifyEvent(Event title, Connectable toWhom);
 
-	<T> void notifyPlayerWithCustomMessage(ICasinoPlayer player, T message);
-	void notifyAll(MessageTitle title, ICasinoPlayer player);
+	<T> void notifyMessage(Connectable toWhom, T message);
+	void notifyEverybody(MessageTitle title, Connectable toWhom);
 
-	void notifyTableOpening(ICasinoPlayer watcher);
+	void notifyPrivateData(Connectable watcher);
+	
+	void notifyUpdate();
 }

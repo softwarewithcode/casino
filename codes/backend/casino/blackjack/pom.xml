@@ -8,7 +8,7 @@
 	<artifactId>blackjack</artifactId>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.release>20</maven.compiler.release>
+		<maven.compiler.release>21</maven.compiler.release>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>5.9.3</version>
+			<version>5.10.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -30,24 +30,8 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>3.3.0</version>
 			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.11.0</version>
-				<configuration>
-					<release>20</release>
-					<compilerArgs>
-						<arg>--enable-preview</arg>
-					</compilerArgs>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0</version>
-				<configuration>
-					<argLine>--enable-preview</argLine>
-				</configuration>
-			</plugin>
+
+
 		</plugins>
 	</build>
 </project>

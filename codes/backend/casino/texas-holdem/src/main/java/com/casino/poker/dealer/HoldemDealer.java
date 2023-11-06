@@ -1,13 +1,13 @@
 package com.casino.poker.dealer;
 
 import com.casino.common.cards.Deck;
-import com.casino.common.dealer.CommunicationChannel;
-import com.casino.common.dealer.Notifier;
+import com.casino.common.dealer.TableGameCroupier;
+import com.casino.common.dealer.PlayerTimingCroupier;
 import com.casino.common.exception.IllegalPlayerCountException;
 import com.casino.common.functions.Functions;
 import com.casino.common.game.phase.GamePhaser;
 import com.casino.common.message.Event;
-import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.player.CasinoPlayer;
 import com.casino.common.player.PlayerStatus;
 import com.casino.common.reload.DefaultReloader;
 import com.casino.common.reload.Reload;
@@ -19,7 +19,7 @@ import com.casino.poker.bet.BlindBetsHandler;
 import com.casino.poker.bet.HoldemBlindBetsHandler;
 import com.casino.poker.functions.HoldemFunctions;
 import com.casino.poker.game.HoldemPhase;
-import com.casino.poker.game.PokerInitData;
+import com.casino.poker.game.PokerData;
 import com.casino.poker.message.PokerMapper;
 import com.casino.poker.player.PokerPlayer;
 import com.casino.poker.pot.PokerPotHandler;
@@ -28,7 +28,7 @@ import com.casino.poker.pot.PotHandler;
 import com.casino.poker.round.NewRoundTask;
 import com.casino.poker.round.PokerRound;
 import com.casino.poker.round.positions.PokerPositionsBuilder;
-import com.casino.poker.round.positions.PokerRoundPlayers;
+import com.casino.poker.round.positions.HoldemRoundPlayers;
 import com.casino.poker.showdown.ShowdownHandler;
 import com.casino.poker.table.HoldemTable;
 
@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,13 +47,11 @@ import java.util.stream.Collectors;
 /**
  * Main controller of Texas No-Limit Holdem game.
  */
-public class HoldemDealer implements PokerDealer, GamePhaser {
+public class HoldemDealer extends TableGameCroupier implements PokerDealer, GamePhaser, PlayerTimingCroupier {
     public static final BigDecimal GLOBAL_RESTRICTION_OF_MAXIMUM_RAISE = new BigDecimal("100000000000");
     private static final Logger LOGGER = Logger.getLogger(HoldemDealer.class.getName());
     private final HoldemTable table;
-    private final ReentrantLock dealerLock;
-    private final CommunicationChannel notifier;
-    private final PokerInitData pokerInitData;
+    private final PokerData pokerInitData;
     private final Reloader reloader;
     private final BlindBetsHandler blindsHandler;
     private final ShowdownHandler showdownHandler;
@@ -62,13 +59,12 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     private Deck deck;
     private boolean showdown;
 
-    public HoldemDealer(HoldemTable holdemTable, PokerInitData pokerInitData) {
+    public HoldemDealer(HoldemTable holdemTable, PokerData pokerInitData) {
+        super(holdemTable);
         this.table = holdemTable;
         this.deck = Deck.createAndShuffle();
-        this.notifier = new Notifier(table);
         this.pokerInitData = pokerInitData;
         this.reloader = new DefaultReloader();
-        this.dealerLock = new ReentrantLock();
         this.potHandler = new PokerPotHandler(holdemTable, getGameData().rakePercent(), getGameData().rakeCap());
         this.blindsHandler = new HoldemBlindBetsHandler(potHandler);
         this.showdownHandler = new ShowdownHandler();
@@ -79,15 +75,21 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     }
 
     @Override
-    public <T extends ICasinoPlayer> void onPlayerArrival(T player) {
+    public <T extends CasinoPlayer> void onPlayerArrival(T player) {
         try {
-            notifier.notifyPlayerArrival(player);
-            dealerLock.lock();
+            player.setStatus(PlayerStatus.NEW);
+            voice.notifyPlayerArrival(player);
+            croupierLock.lock();
             startTableIfPossible();
         } finally {
-            dealerLock.unlock();
+            croupierLock.unlock();
         }
     }
+
+	private void startTableIfPossible() {
+		if (canStartGame())
+		    startGame();
+	}
 
     @Override
     public void onRoundStart() {
@@ -108,14 +110,14 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     }
 
     private void changeToWaitingPlayersMode() {
-        table.stopClock();
+        table.stopTiming();
         potHandler.clearPots();
         table.setStatus(TableStatus.WAITING_PLAYERS);
-        table.getPlayers().forEach(player -> player.prepareForNextRound());
+        table.getPlayers().forEach(CasinoPlayer::prepareForNextRound);
         if (table.getRound() != null)
             table.getRound().clearTableCards();
-        notifyTableStatus(Event.NO_BETS_NO_DEAL);
-        updateCounterTime(0);
+        sendStatusUpdate(Event.NO_BETS_NO_DEAL);
+        table.updateCounterTime(0);
     }
 
     @Override
@@ -124,7 +126,7 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     }
 
     @Override
-    public void onPlayerTimeout(ICasinoPlayer timedOutPlayer) {
+    public void onPlayerTimeout(CasinoPlayer timedOutPlayer) {
         LOGGER.entering(getClass().getName(), "onPlayerTimeout", " timedOutPlayer:" + timedOutPlayer + " holdemTable:" + table.getId());
         try {
             table.getLock().lock();
@@ -140,13 +142,14 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     }
 
     @Override
-    public void onPlayerLeave(PokerPlayer leavingPlayer) {
+    public <T extends CasinoPlayer> void onPlayerLeave(T leavingPlayer) {
         leavingPlayer.setStatus(PlayerStatus.LEFT);
-        handleTimedOutOrLeavingPlayer(leavingPlayer);
-        if (table.isActivePlayer(leavingPlayer)) // && table.getGamePhase() != HoldemPhase.ROUND_COMPLETED
-            changePlayerOrPhase(leavingPlayer);
+        handleTimedOutOrLeavingPlayer((PokerPlayer) leavingPlayer);
+//        if (table.isActivePlayer(leavingPlayer))  Autoplay calls changePlayerOrPhase
+//            changePlayerOrPhase((PokerPlayer) leavingPlayer);
+        // For HU situation !?
         if (table.getStatus() != TableStatus.RUNNING)
-            table.sanitizeSeat(leavingPlayer.getSeatNumber());
+            table.sanitizeSeat(((PokerPlayer) leavingPlayer).getSeatNumber());
     }
 
     private void completeRound() {
@@ -160,13 +163,13 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
         removePlayersWhoLeft();
         handleReloads();
         table.updateGamePhase(HoldemPhase.ROUND_COMPLETED);
-        notifier.notifyAll(Event.ROUND_COMPLETED, null);
+        voice.notifyEverybody(Event.ROUND_COMPLETED, null);
         updateSitoutPlayers();
         startNewRoundTimer();
     }
 
     private void removePlayersWhoLeft() {
-        table.sanitizeSeats(List.of(PlayerStatus.LEFT));
+        table.sanitizeSeatsByPlayerStatus(List.of(PlayerStatus.LEFT));
     }
 
     private void handleReloads() {
@@ -176,63 +179,53 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
 
     @Override
     public void onError() {
-        PokerDealer.super.onError();
+        PlayerTimingCroupier.super.onError();
         reloader.completePendingReloads();
     }
-
-    private void startTableAndRound() {
+    
+    @Override
+    protected void startGame() {
         table.setStatus(TableStatus.RUNNING);
         startNewRoundTimer();
     }
 
-    private boolean shouldStartTableAndNewRoundTimer() {
+    @Override
+    protected boolean canStartGame() {
         return table.getStatus() == TableStatus.WAITING_PLAYERS && table.getPlayers().size() >= 2;
     }
 
-    @Override
-    public <T extends ICasinoPlayer> void onWatcherArrival(T watcher) {
-        notifier.notifyTableOpening(watcher);
-    }
-
     private void sendHoleCardsToPlayers() {
-        // TODO this is not idempotent atm!
-        table.getRound().getPlayers().parallelStream().forEach(this::notifyIndividualHoleCards);
-
+        table.getRound().getPlayers().parallelStream().toList().forEach(this::notifyIndividualHoleCards);
     }
 
     private void notifyIndividualHoleCards(PokerPlayer toPlayer) {
         String message = PokerMapper.createHoleCardsMessage(Event.INITIAL_DEAL_DONE, table, toPlayer);
-        notifier.notifyPlayerWithCustomMessage(toPlayer, message);
+        voice.notifyMessage(toPlayer, message);
     }
 
     private void notifyPlayedAction(PokerActionType type, PokerPlayer player) {
-        notifier.notifyAll(type, player);
+        voice.notifyEverybody(type, player);
     }
 
     private void tryStartNewPokerRound() {
         try {
-            dealerLock.lock();
+            croupierLock.lock();
             handleReloads();
             potHandler.clearPots();
             organizeSeatsAndPlayers();
             List<Seat<PokerPlayer>> roundCandidates = calculateRoundCandidates(table);
             List<PokerPlayer> newEntrants = filterNewEntrants(roundCandidates);
-            PokerRoundPlayers positions = calculatePokerPositions(roundCandidates);
-            List<PokerPlayer> roundParticipants = filterActivePlayers(positions.players());
-            verifyRoundParticipantCount(roundParticipants);
-            createRound(positions, roundParticipants, newEntrants);
-            updateSkipCount();
+            HoldemRoundPlayers positions = calculatePokerPositions(roundCandidates);
+            verifyRoundParticipantCount(positions.players());
+            createRound(positions,  newEntrants);
+            updateSkipCounts();
             blindsHandler.handleBlindBets(table);
-            shuffleAndDealHoleCards();
+            shuffleDeckAndDealHoleCards();
             assignPreFlopStarter();
             table.updateGamePhase(HoldemPhase.PRE_FLOP);
         } finally {
-            dealerLock.unlock();
+            croupierLock.unlock();
         }
-    }
-
-    private List<PokerPlayer> filterActivePlayers(List<PokerPlayer> roundCandidates) {
-        return roundCandidates.stream().filter(PokerPlayer::isActive).toList();
     }
 
     private List<PokerPlayer> filterNewEntrants(List<Seat<PokerPlayer>> roundCandidates) {
@@ -240,11 +233,11 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     }
 
     private void organizeSeatsAndPlayers() {
-        table.sanitizeSeats(List.of(PlayerStatus.LEFT));
+        table.sanitizeSeatsByPlayerStatus(List.of(PlayerStatus.LEFT));
         table.getPlayers().forEach(PokerPlayer::prepareForNextRound);
     }
 
-    private void shuffleAndDealHoleCards() {
+    private void shuffleDeckAndDealHoleCards() {
         deck = Deck.createAndShuffle();
         dealHoleCards();
     }
@@ -282,25 +275,25 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
         return player -> player.canAct() && player.getSeatNumber() != excludeSeatNumber;
     }
 
-    private PokerRoundPlayers calculatePokerPositions(List<Seat<PokerPlayer>> roundAttendants) {
+    private HoldemRoundPlayers calculatePokerPositions(List<Seat<PokerPlayer>> roundAttendants) {
         if (roundAttendants.size() < 2)
             throw new IllegalPlayerCountException("not enough players to start calculations. was:" + roundAttendants.size()); // Basically not exceptional situation
         return isFirstRound() ? initFirstRound(roundAttendants) : initContinuationRound(roundAttendants);
     }
 
-    private PokerRoundPlayers initContinuationRound(List<Seat<PokerPlayer>> roundAttendants) {
+    private HoldemRoundPlayers initContinuationRound(List<Seat<PokerPlayer>> roundAttendants) {
         return PokerPositionsBuilder.of(table, roundAttendants.stream().map(Seat::getPlayer).collect(Collectors.toList())).build();
     }
 
     private boolean isFirstRound() {
-        return table.getRounds().size() == 0;
+        return table.getRounds().isEmpty();
     }
 
-    private void createRound(PokerRoundPlayers positions, List<PokerPlayer> roundParticipants, List<PokerPlayer> newJoiners) {
-        table.addRound(new PokerRound(positions, roundParticipants, newJoiners, table.getId()));
+    private void createRound(HoldemRoundPlayers positions, List<PokerPlayer> newJoiners) {
+        table.addRound(new PokerRound(positions,  newJoiners, table.getId()));
     }
 
-    private void updateSkipCount() {
+    private void updateSkipCounts() {
         List<PokerPlayer> sitOuts = table.getPlayers().stream().filter(PokerPlayer::isSitOut).toList();
         sitOuts.forEach(PokerPlayer::increaseSkips);
     }
@@ -316,7 +309,7 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     }
 
     @Override
-    public void tearDown() {
+    public void tearDownTable() {
         reloader.completePendingReloads();
     }
 
@@ -328,12 +321,12 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     }
 
     @Override
-    public void continueGame(PokerPlayer player) {
+    public void handleReturningPlayer(PokerPlayer player) {
         try {
             table.getLock().lock();
             boolean immediate = table.getRound() != null && table.getRound().isPlayer(player);
-            player.continueGame(immediate);
-            notifyTableStatus(Event.STATUS_UPDATE);
+            player.returnFromBreak(immediate);
+            sendStatusUpdate(Event.STATUS_UPDATE);
             startTableIfPossible();
         } finally {
             table.getLock().unlock();
@@ -341,24 +334,19 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     }
 
     @Override
-    public void sitOut(PokerPlayer player, Boolean immediate) {
+    public void handleSitOut(PokerPlayer player, Boolean immediate) {
         player.sitOut(immediate);
         if (immediate)
-            notifyTableStatus(Event.STATUS_UPDATE);
-    }
-
-    private void startTableIfPossible() {
-        if (shouldStartTableAndNewRoundTimer())
-            startTableAndRound();
+            sendStatusUpdate(Event.STATUS_UPDATE);
     }
 
     @Override
-    public PokerInitData getGameData() {
+    public PokerData getGameData() {
         return this.pokerInitData;
     }
 
     @Override
-    public int getPlayerTurnTime() {
+    public Integer getPlayerTurnTime() {
         return this.pokerInitData.playerTime();
     }
 
@@ -373,13 +361,13 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
             throw new IllegalStateException("Not enough valid players to start the round");
     }
 
-    private PokerRoundPlayers initFirstRound(List<Seat<PokerPlayer>> roundAttendants) {
+    private HoldemRoundPlayers initFirstRound(List<Seat<PokerPlayer>> roundAttendants) {
         List<PokerPlayer> attendants = roundAttendants.stream().map(Seat::getPlayer).toList();
         return PokerPositionsBuilder.of(table, attendants).build();
     }
 
-    public void notifyTableStatus(Event event) {
-        notifier.notifyAll(event, null);
+    public void sendStatusUpdate(Event event) {
+        voice.notifyEverybody(event, null);
     }
 
     private void changeTurn(PokerPlayer player) {
@@ -420,8 +408,9 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
         }
     }
 
-    public void call(PokerPlayer player) {
-        table.stopClock();
+    @Override
+    public void handleCall(PokerPlayer player) {
+        table.stopTiming();
         BigDecimal callAmount = table.getRound().getMostChipsOnTable().subtract(player.getTableChipCount());
         player.call(callAmount);
         potHandler.addTableChipsCount(callAmount, player);
@@ -429,50 +418,27 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
         changePlayerOrPhase(player);
     }
 
-    public void check(PokerPlayer player) {
-        table.stopClock();
+    @Override
+    public void handleCheck(PokerPlayer player) {
+        table.stopTiming();
         player.check();
         notifyPlayedAction(PokerActionType.CHECK, player);
         changePlayerOrPhase(player);
     }
 
-    public void fold(PokerPlayer player) {
-        table.stopClock();
+    @Override
+    public void handleFold(PokerPlayer player) {
+        table.stopTiming();
         potHandler.removePlayer(player);
         player.fold();
         notifyPlayedAction(PokerActionType.FOLD, player);
         changePlayerOrPhase(player);
     }
 
-    private boolean shouldCompleteRound() {
-        return table.getGamePhase() == HoldemPhase.RIVER || table.getRound().isWinnerKnown();
-    }
-
-    private void changePlayerOrPhase(PokerPlayer lastActor) {
-        if (table.getRound().isWinnerKnown()) {
-            completeGamePhase();
-            return;
-        }
-        getNextPlayerWhoCanAct(lastActor.getSeatNumber()).ifPresentOrElse(this::activateOrAutoplayPlayer, this::completeGamePhase);
-    }
-
-    private void activateOrAutoplayPlayer(PokerPlayer actor) {
-        changeTurn(actor);
-        notifyTableStatus(Event.STATUS_UPDATE);
-        if (actor.shouldAutoPlay())
-            autoPlay(actor);
-    }
-
-    private void autoPlay(PokerPlayer player) {
-        if (HoldemFunctions.hasAction.apply(player, PokerActionType.CHECK))
-            check(player);
-        else
-            fold(player);
-    }
-
-    public void betOrRaise(PokerPlayer player, BigDecimal raiseToAmount) {
+    @Override
+    public void handleBetOrRaise(PokerPlayer player, BigDecimal raiseToAmount) {
         HoldemFunctions.verifyRaiseIsTechnicallyCorrect(player, raiseToAmount, table);
-        table.stopClock();
+        table.stopTiming();
         clearActedFlagForPlayersWhoCanAct();
         if (shouldSetInitialRaiseAmount())
             setInitialRaiseAmount(raiseToAmount);
@@ -483,7 +449,33 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
         notifyPlayedAction(PokerActionType.BET_RAISE, player);
         table.getRound().setLastRaiserQQQ(player);
         Optional<PokerPlayer> nextPlayerOptional = getNextPlayerWhoCanAct(player.getSeatNumber());
-        nextPlayerOptional.ifPresentOrElse(this::activateOrAutoplayPlayer, this::completeGamePhase);
+        nextPlayerOptional.ifPresentOrElse(this::activateOrAutoplayPlayer, this::completeCurrentGamePhase);
+    }
+
+    private boolean shouldCompleteRound() {
+        return table.getGamePhase() == HoldemPhase.RIVER || table.getRound().isWinnerKnown();
+    }
+
+    private void changePlayerOrPhase(PokerPlayer lastActor) {
+        if (table.getRound().isWinnerKnown()) {
+            completeCurrentGamePhase();
+            return;
+        }
+        getNextPlayerWhoCanAct(lastActor.getSeatNumber()).ifPresentOrElse(this::activateOrAutoplayPlayer, this::completeCurrentGamePhase);
+    }
+
+    private void activateOrAutoplayPlayer(PokerPlayer actor) {
+        changeTurn(actor);
+        sendStatusUpdate(Event.STATUS_UPDATE);
+        if (actor.shouldAutoPlay())
+            autoPlay(actor);
+    }
+
+    private void autoPlay(PokerPlayer player) {
+        if (HoldemFunctions.hasAction.apply(player, PokerActionType.CHECK))
+            handleCheck(player);
+        else
+            handleFold(player);
     }
 
     private void setInitialRaiseAmount(BigDecimal raiseToAmount) {
@@ -503,15 +495,15 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     }
 
     private boolean isOpenTable() {
-        return table.getRound().getPlayers().stream().filter(PokerPlayer::hasChipsOnTable).toList().size() == 0;
+        return table.getRound().getPlayers().stream().filter(PokerPlayer::hasChipsOnTable).toList().isEmpty();
     }
 
     public PotHandler getPotHandler() {
         return potHandler;
     }
 
-    public void allIn(PokerPlayer player) {
-        table.stopClock();
+    public void handleAllIn(PokerPlayer player) {
+        table.stopTiming();
         BigDecimal allInTotal = player.getCurrentBalance().add(player.getTableChipCount());
         if (Functions.isFirstMoreThanSecond.apply(allInTotal, table.getRound().getMostChipsOnTable())) {
             clearActedFlagForPlayersWhoCanAct();
@@ -525,7 +517,7 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
         notifyPlayedAction(PokerActionType.ALL_IN, player);
         updateLastSpeakingPlayerFromAction(player);
         Optional<PokerPlayer> nextPlayerOptional = getNextPlayerWhoCanAct(player.getSeatNumber());
-        nextPlayerOptional.ifPresentOrElse(this::activateOrAutoplayPlayer, this::completeGamePhase);
+        nextPlayerOptional.ifPresentOrElse(this::activateOrAutoplayPlayer, this::completeCurrentGamePhase);
     }
 
     private void updateLastSpeakingPlayerFromAction(PokerPlayer lastActor) {
@@ -549,14 +541,14 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
         playersWhoCanAct.forEach(PokerPlayer::clearActed);
     }
 
-    private void completeGamePhase() {
+    private void completeCurrentGamePhase() {
         potHandler.onPhaseCompletion();
         if (shouldCompleteRound()) {
             completeRound();
             return;
         }
         if (shouldCompleteRoundWithShowdown()) {
-            showdown();
+        	showdown();
             completeRound();
             return;
         }
@@ -574,13 +566,16 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     public boolean isShowdown() {
         return showdown;
     }
-
-    @Override
-    public void prepareNextGamePhase() {
+     @Override
+	  public void notifyPhaseCompleted() {
+		   prepareNextGamePhase();
+	  }
+    
+    private void prepareNextGamePhase() {
         table.getPhasePath().updateNext();
         table.getRound().setInitialRaiseAmount(BigDecimal.ZERO);
         addTableCards();
-        notifyTableStatus(Event.STATUS_UPDATE);
+        sendStatusUpdate(Event.STATUS_UPDATE);
         if (shouldAutoPlayActivePlayer())
             autoPlay((PokerPlayer) table.getActivePlayer());
     }
@@ -627,7 +622,7 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
 
     private void preparePlayersForNextPhase() {
         giveBackExtraChipsFromTable();
-        PokerRoundPlayers positions = table.getRound().getPositions();
+        HoldemRoundPlayers positions = table.getRound().getPositions();
         table.getRound().setLastSpeakingPlayer(getLastWhoCanActOnPhaseChange().orElseThrow());
         table.getRound().getPlayers().forEach(PokerPlayer::clearActed);
         if (table.getRound().isHeadsUp())
@@ -648,14 +643,14 @@ public class HoldemDealer implements PokerDealer, GamePhaser {
     public CompletableFuture<Reload> handleReload(Reload reload) {
         try {
             CompletableFuture<Reload> reloadFuture = getReloader().addPendingReload(reload);
-            dealerLock.lock();
+            croupierLock.lock();
             if (table.getStatus() == TableStatus.WAITING_PLAYERS) {
                 getReloader().completePendingReloads();
-                notifyTableStatus(Event.STATUS_UPDATE);
+                sendStatusUpdate(Event.STATUS_UPDATE);
             }
             return reloadFuture;
         } finally {
-            dealerLock.unlock();
+            croupierLock.unlock();
         }
     }
 }

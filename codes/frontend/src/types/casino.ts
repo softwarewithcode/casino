@@ -1,6 +1,5 @@
 import type { TableCard } from "./TableCard"
-import type { BlackjackPlayer } from "./blackjack"
-import type { HoldemPlayer } from "./texasHoldem"
+import type { Vector } from "./vectors"
 
 export interface GameType {
 	type: string
@@ -11,10 +10,21 @@ export interface CasinoPlayer {
 	userName: string
 	id: string
 	currentBalance: number
+	initialBalance: number
 	seatNumber: number
 	status: PlayerStatus
 }
 
+export interface TableGamesPlayer extends CasinoPlayer {
+	totalBet: number
+	totalOnTable: number
+	lastBet: number
+	actions: string[]
+}
+export interface Range {
+	min: number
+	max: number
+}
 export interface CasinoTable<T> {
 	title: string
 	tableCard: TableCard
@@ -28,6 +38,10 @@ export interface Seat<T> {
 	available: boolean
 	player: T
 }
+export enum TableType {
+	MULTIPLAYER = "MULTIPLAYER",
+	SINGLEPLAYER = "SINGLEPLAYER"
+}
 
 export interface ChipStack {
 	chips: Map<Chip, number>
@@ -36,11 +50,14 @@ export interface ChipStack {
 export interface Chip {
 	value: number
 	image: HTMLImageElement
+	position?: Vector
+	size?: Vector
 }
 
 export enum Games {
 	BLACKJACK = "blackjack",
-	TEXAS_HOLDEM = "texas-holdem"
+	TEXAS_HOLDEM = "texas-holdem",
+	ROULETTE = "roulette"
 }
 
 export enum PlayerStatus {

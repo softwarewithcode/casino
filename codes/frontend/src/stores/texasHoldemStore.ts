@@ -4,7 +4,6 @@ import { useTablesFetch } from "../components/composables/communication/http"
 import { Games } from "@/types/casino"
 import { type Card } from "@/types/cards"
 import type { TableCard } from "@/types/TableCard"
-import { usePlayerEqualsChecker } from "@/components/composables/common/table"
 import { useStopCounter } from "@/components/composables/timing/clock"
 
 export const useTexasHoldemStore = defineStore("texasHoldemStore", {

@@ -1,6 +1,7 @@
-import { BLACKJACK, TEXAS_HOLDEM } from "@/types/games"
+import { BLACKJACK, ROULETTE, TEXAS_HOLDEM } from "@/types/games"
 import { useBlackjackMessageHandler } from "./handlers/blackjackMessageHandler"
-import { useHoldemMessageHandler } from "./handlers/holdemMessagHandler"
+import { useHoldemMessageHandler } from "./handlers/holdemMessageHandler"
+import { useRouletteMessageHandler } from "./handlers/rouletteMessageHandler"
 let websocket: WebSocket
 // @author softwarewithcode from GitHub
 const base = import.meta.env.VITE_CASINO_WS_ENDPOINT
@@ -19,16 +20,17 @@ function initSocket(finalURI: string) {
 	websocket.onopen = event => useSocketSend(JSON.parse(openTableJSON))
 	websocket.onmessage = event => {
 		let data = JSON.parse(event.data)
-		if (!data.table) {
-			alert("error")
-			return
-		}
-		switch (data.table.tableCard.game) {
+
+		//TODO common login and openTable handler
+		switch (data.game) {
 			case BLACKJACK:
 				useBlackjackMessageHandler(data)
 				break
 			case TEXAS_HOLDEM:
 				useHoldemMessageHandler(data)
+				break
+			case ROULETTE:
+				useRouletteMessageHandler(data)
 				break
 			default:
 				throw new Error("no handler for data " + JSON.stringify(data))
@@ -39,11 +41,8 @@ function initSocket(finalURI: string) {
 		showNotification()
 	}
 	websocket.onclose = event => {
-		console.log("socket closes, bye!")
 		showNotification()
 	}
 
-	const showNotification = () => {
-		console.log("closed")
-	}
+	const showNotification = () => {}
 }

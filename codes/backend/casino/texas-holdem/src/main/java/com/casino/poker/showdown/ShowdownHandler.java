@@ -12,11 +12,12 @@ public final class ShowdownHandler implements DelayedGamePhaseChanger {
     private static final Logger LOGGER = Logger.getLogger(ShowdownHandler.class.getName());
     private static final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
+    // RouletteWheel implements async way with delayedExecutor, similar implementation here would be better approach
     @Override
     public void executeWithDelay(GamePhaser phaser, long delay, TimeUnit timeUnit) {
         while (phaser.getTable().getGamePhase() != HoldemPhase.RIVER) {
             try {
-                ScheduledFuture<?> sf = scheduledExecutorService.schedule(() -> phaser.prepareNextGamePhase(), delay, timeUnit);
+                ScheduledFuture<?> sf = scheduledExecutorService.schedule(() -> phaser.notifyPhaseCompleted(), delay, timeUnit);
                 sf.get();
             } catch (InterruptedException e) {
                 LOGGER.log(Level.INFO, "Showdown wait was interrupted. Continuing immediately in table:" + phaser.getTable().getId() + " reason:", e);

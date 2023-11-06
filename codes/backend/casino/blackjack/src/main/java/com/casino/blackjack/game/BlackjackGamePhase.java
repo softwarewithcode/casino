@@ -12,7 +12,7 @@ public enum BlackjackGamePhase implements GamePhase {
 	}
 
 	@Override
-	public boolean isRunning() {
+	public boolean isGameRunning() {
 		return this.running;
 	}
 

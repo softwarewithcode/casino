@@ -13,8 +13,8 @@ store.populateStore()
     <div v-for="(table) in store.getTables" :key="table.id">
         <TableCardView :card="table">
             Type: {{ table.type.toLowerCase() }}<br>
-            Min: {{ table.gameData.minimumBet }} <br>
-            Max: {{ table.gameData.maximumBet }} <br>
+            Min: {{ table.gameData.minBet }} <br>
+            Max: {{ table.gameData.maxBet }} <br>
             Turn time {{ table.gameData.playerTime }}s <br>
         </TableCardView>
     </div>

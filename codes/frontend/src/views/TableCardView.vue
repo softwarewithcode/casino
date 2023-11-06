@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TableType } from '@/types/TableCard';
+
 import type { TableCard } from '@/types/TableCard';
 import { useOpenTable } from "@/components/composables/communication/socket/websocket";
 

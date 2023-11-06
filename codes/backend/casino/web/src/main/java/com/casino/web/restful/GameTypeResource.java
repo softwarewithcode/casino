@@ -16,7 +16,8 @@ import jakarta.ws.rs.core.Response;
 public class GameTypeResource {
 	private static final Logger LOGGER = Logger.getLogger(GameTypeResource.class.getName());
 	private static final ObjectMapper MAPPER = new ObjectMapper();
-	private List<GameType> types = List.of(new GameType(0, "Blackjack"), new GameType(1, "Texas Hold'em cash"));
+	private List<GameType> types = List.of(new GameType(0, "Blackjack"), new GameType(1, "Texas Hold'em cash"),
+			new GameType(2, "Roulette"));
 
 	@GET
 	@Produces("application/json")

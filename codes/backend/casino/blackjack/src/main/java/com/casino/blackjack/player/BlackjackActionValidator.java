@@ -11,7 +11,7 @@ import com.casino.common.exception.IllegalPlayerActionException;
 //Checks if action is technically allowed. Caller needs to check GamePhase
 public class BlackjackActionValidator {
 
-	public static void validateInsureAction(BlackjackPlayer player) {
+	public static void validateInsureAction(BlackjackPlayer_ player) {
 		validateBasicConditions(player);
 		if (player.getFirstHand().isInsured())
 			throw new IllegalPlayerActionException("hand already insured");
@@ -19,7 +19,7 @@ public class BlackjackActionValidator {
 		validateBalance(insuranceAmount, player);
 	}
 
-	public static void validateDoubleDownAction(BlackjackPlayer player) {
+	public static void validateDoubleDownAction(BlackjackPlayer_ player) {
 		validateBasicConditions(player);
 		List<Integer> values = player.getFirstHand().calculateValues();
 		int val = values.get(0);
@@ -28,7 +28,7 @@ public class BlackjackActionValidator {
 		validateBalance(player.getFirstHand().getBet(), player);
 	}
 
-	private static void validateBalance(BigDecimal requiredBalance, BlackjackPlayer player) {
+	private static void validateBalance(BigDecimal requiredBalance, BlackjackPlayer_ player) {
 		try {
 			BetVerifier.verifySufficientBalance(requiredBalance, player);
 		} catch (Exception e) {
@@ -36,7 +36,7 @@ public class BlackjackActionValidator {
 		}
 	}
 
-	public static void validateSplitAction(BlackjackPlayer player) {
+	public static void validateSplitAction(BlackjackPlayer_ player) {
 		validateBasicConditions(player);
 		if (!BlackjackUtil.haveSameValue(player.getFirstHand().getCards().get(0), player.getFirstHand().getCards().get(1)))
 			throw new IllegalPlayerActionException("not equal values");
@@ -45,7 +45,7 @@ public class BlackjackActionValidator {
 		validateBalance(player.getFirstHand().getBet(), player);
 	}
 
-	public static boolean isSplitTechnicallyAllowed(BlackjackPlayer player) {
+	public static boolean isSplitTechnicallyAllowed(BlackjackPlayer_ player) {
 		try {
 			validateSplitAction(player);
 			return true;
@@ -54,7 +54,7 @@ public class BlackjackActionValidator {
 		}
 	}
 
-	public static boolean isDoubleDownTechnicallyAllowed(BlackjackPlayer player) {
+	public static boolean isDoubleDownTechnicallyAllowed(BlackjackPlayer_ player) {
 		try {
 			validateDoubleDownAction(player);
 			return true;
@@ -63,7 +63,7 @@ public class BlackjackActionValidator {
 		}
 	}
 
-	private static void validateBasicConditions(BlackjackPlayer player) {
+	private static void validateBasicConditions(BlackjackPlayer_ player) {
 		if (player.getHands().size() != 1)
 			throw new IllegalPlayerActionException("wrong hand count:" + player.getUserName() + " " + player.getHands().size());
 		if (!player.getFirstHand().isActive())

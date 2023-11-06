@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.casino.common.game.GameData;
 import com.casino.common.table.TableCard;
-import com.casino.service.game.BlackjackService;
+import com.casino.service.table.BlackjackTableService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.inject.Inject;
@@ -18,7 +19,7 @@ import jakarta.ws.rs.core.Response;
 public class BlackjackTableResource {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackTableResource.class.getName());
 	@Inject
-	private BlackjackService blackjackService;
+	private BlackjackTableService blackjackTableService;
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 
 	@GET
@@ -26,7 +27,7 @@ public class BlackjackTableResource {
 	@Produces("application/json")
 	public Response fetchTableCards() {
 		try {
-			List<TableCard> cards = blackjackService.fetchTableCards(0, 100);
+			List<TableCard<? extends GameData>> cards = blackjackTableService.fetchTableCards(0, 100);
 			var json = MAPPER.writeValueAsString(cards);
 			return Response.ok(json).build();
 		} catch (Exception e) {

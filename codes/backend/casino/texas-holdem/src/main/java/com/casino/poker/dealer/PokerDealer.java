@@ -4,31 +4,25 @@ import com.casino.common.dealer.CardDealer;
 import com.casino.common.reload.Reloader;
 import com.casino.poker.bet.BlindBetsHandler;
 import com.casino.poker.player.PokerPlayer;
-import com.casino.poker.pot.PokerPotHandler;
 import com.casino.poker.pot.PotHandler;
 
 import java.math.BigDecimal;
 
 public interface PokerDealer extends CardDealer {
 
-
     BigDecimal calculateMinRaise();
 
     boolean isAnyChipsOnTable();
 
-    void prepareNextGamePhase();
-
-    void onPlayerLeave(PokerPlayer player);
-
     Reloader getReloader();
 
-    void tearDown();
+    void tearDownTable();
 
     BigDecimal countAllPlayersChipsOnTable();
 
-    void continueGame(PokerPlayer player);
+    void handleReturningPlayer(PokerPlayer player);
 
-    void sitOut(PokerPlayer player, Boolean immediate);
+    void handleSitOut(PokerPlayer player, Boolean immediate);
 
     void onRoundStart();
 
@@ -36,4 +30,11 @@ public interface PokerDealer extends CardDealer {
 
     PotHandler getPotHandler();
 
+    void handleBetOrRaise(PokerPlayer player, BigDecimal raiseToAmount);
+
+    void handleFold(PokerPlayer player);
+
+    void handleCheck(PokerPlayer player);
+
+    void handleCall(PokerPlayer player);
 }

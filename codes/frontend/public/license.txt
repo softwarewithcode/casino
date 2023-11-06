@@ -32,4 +32,13 @@ Background image:
 
     license:
     https://creativecommons.org/publicdomain/zero/1.0/
+	
+
+Roulette 
+	
+	roulette-bets.png 
+	created with https://app.diagrams.net/ 	https://www.drawio.com/doc/faq/usage-terms
+	License
+	https://creativecommons.org/publicdomain/zero/1.0/
+	
 

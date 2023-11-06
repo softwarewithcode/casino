@@ -1,6 +1,6 @@
 package com.casino.poker.functions;
 
-import com.casino.common.bet.Range;
+import com.casino.common.bet.BetRange;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.functions.Functions;
@@ -77,7 +77,7 @@ public final class HoldemFunctions {
     }
     public final static void verifyRaiseIsTechnicallyCorrect(PokerPlayer player, BigDecimal raiseAmount, HoldemTable table) {
         PokerAction action = HoldemFunctions.getActionType.apply(player, PokerActionType.BET_RAISE).orElseThrow(() -> new IllegalPlayerActionException("BetOrRaise is not allowed action:" + player.getUserName()));
-        Range raiseRange = action.getRange();
+        BetRange raiseRange = action.getRange();
         if (!raiseRange.isInRange(raiseAmount))
             throw new IllegalBetException("Raise " + raiseAmount + " is not in allowed range. InitialRaiseAmount=" + table.getRound().getInitialRaiseAmount() + ", minimumTo=" + raiseRange.min(), 1);
         if (Functions.isFirstMoreOrEqualToSecond.apply(raiseAmount, HoldemDealer.GLOBAL_RESTRICTION_OF_MAXIMUM_RAISE))

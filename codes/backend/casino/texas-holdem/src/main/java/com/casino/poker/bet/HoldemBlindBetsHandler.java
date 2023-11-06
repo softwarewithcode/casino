@@ -2,7 +2,7 @@ package com.casino.poker.bet;
 
 import com.casino.common.player.PlayerStatus;
 import com.casino.poker.functions.HoldemFunctions;
-import com.casino.poker.game.PokerInitData;
+import com.casino.poker.game.PokerData;
 import com.casino.poker.player.PokerPlayer;
 import com.casino.poker.pot.PotHandler;
 import com.casino.poker.round.PokerRound;
@@ -25,14 +25,14 @@ public class HoldemBlindBetsHandler implements BlindBetsHandler {
 
     @Override
     public void postSmallBlind(PokerPlayer player) {
-        PokerInitData initData = (PokerInitData) player.getTable().getDealer().getGameData();
+        PokerData initData = (PokerData) player.getTable().getDealer().getGameData();
         player.addChipsOnTable(initData.smallBlind());
         potHandler.addTableChipsCount(initData.smallBlind(), player);
     }
 
     @Override
     public void postBigBlind(PokerPlayer player) {
-        PokerInitData initData = (PokerInitData) player.getTable().getDealer().getGameData();
+        PokerData initData = (PokerData) player.getTable().getDealer().getGameData();
         player.addChipsOnTable(initData.bigBlind());
         potHandler.addTableChipsCount(initData.bigBlind(), player);
     }
@@ -123,7 +123,7 @@ public class HoldemBlindBetsHandler implements BlindBetsHandler {
 
     private void payMissingBlindBets(PokerPlayer holdemPlayer) {
         PokerTable<PokerPlayer> table = (PokerTable) holdemPlayer.getTable();
-        PokerInitData initData = (PokerInitData) table.getDealer().getGameData();
+        PokerData initData = (PokerData) table.getDealer().getGameData();
         if (isMissingSmallBlind(holdemPlayer)) {
             holdemPlayer.subtractFromBalance(initData.smallBlind());
             table.getDealer().getPotHandler().addToActivePot(initData.smallBlind());
@@ -137,7 +137,7 @@ public class HoldemBlindBetsHandler implements BlindBetsHandler {
 
 
     private void collectSmallAndBigBlind(PokerTable<PokerPlayer> table) {
-        PokerInitData initData = (PokerInitData) table.getDealer().getGameData();
+        PokerData initData = (PokerData) table.getDealer().getGameData();
         if (table.getRound().getPositions().sb() != null)
             postSmallBlind(table.getRound().getPositions().sb());
         postBigBlind(table.getRound().getPositions().bb());
@@ -147,7 +147,7 @@ public class HoldemBlindBetsHandler implements BlindBetsHandler {
     private void collectNewPlayerBlinds(PokerTable<PokerPlayer> table) {
         if (table.getRounds().size() == 1)
             return;// No new player's blind in the first round since button position is random
-        PokerInitData initData = (PokerInitData) table.getDealer().getGameData();
+        PokerData initData = (PokerData) table.getDealer().getGameData();
         List<PokerPlayer> newPlayers = table.getRound().newPlayers();
         List<PokerPlayer> playersMissingNewPlayerBlind = table.getRound().getPlayers().stream().filter(newPlayers::contains).filter(player -> !player.equals(table.getRound().getBigBlindPlayer()))
                 .filter(player -> !player.equals(table.getRound().getSmallBlindPlayer())).filter(player -> !player.equals(table.getRound().getPositions().buttonPlayer())).toList();

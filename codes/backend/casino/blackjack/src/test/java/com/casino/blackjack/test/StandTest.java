@@ -11,10 +11,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
+import com.casino.blackjack.game.BlackjackGamePhase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.casino.blackjack.dealer.BlackjackDealer;
+import com.casino.blackjack.dealer.Dealer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
@@ -23,7 +24,7 @@ import com.casino.common.user.User;
 
 public class StandTest extends BaseTest {
 	private BlackjackTable table;
-	private BlackjackDealer dealer;
+	private Dealer dealer;
 
 	@BeforeEach
 	public void initTest() {
@@ -34,7 +35,7 @@ public class StandTest extends BaseTest {
 			user3 = new User("JohnDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
-			dealer = (BlackjackDealer) f.get(table);
+			dealer = (Dealer) f.get(table);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -169,7 +170,7 @@ public class StandTest extends BaseTest {
 		table.stand(user.userId());
 		assertNull(table.getPlayer(user.userId()).getActiveHand());
 		assertTrue(dealer.getHand().isCompleted());
-		assertTrue(dealer.isRoundCompleted());
+		assertTrue(table.getGamePhase()== BlackjackGamePhase.ROUND_COMPLETED);
 		assertEquals(17, dealer.getHand().calculateValues().get(0));
 	}
 

@@ -13,7 +13,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.casino.blackjack.dealer.BlackjackDealer;
+import com.casino.blackjack.dealer.Dealer;
 import com.casino.blackjack.game.BlackjackGamePhase;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
@@ -25,7 +25,7 @@ import com.casino.common.user.User;
 
 public class BetTest extends BaseTest {
 	private BlackjackTable table;
-	private BlackjackDealer dealer;
+	private Dealer dealer;
 
 	@BeforeEach
 	public void initTest() {
@@ -35,7 +35,7 @@ public class BetTest extends BaseTest {
 			user2 = new User("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
-			dealer = (BlackjackDealer) f.get(table);
+			dealer = (Dealer) f.get(table);
 			List<Card> cards = dealer.getDecks();
 			cards.add(Card.of(4, Suit.CLUB));
 			cards.add(Card.of(8, Suit.DIAMOND));

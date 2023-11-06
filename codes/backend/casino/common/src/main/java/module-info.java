@@ -18,11 +18,15 @@ module casino.common {
 	exports com.casino.common.game.phase.bet;
 	exports com.casino.common.game.phase.insurance;
 	exports com.casino.common.api;
-    exports com.casino.common.action;
+	exports com.casino.common.action;
+	exports com.casino.common.executors;
+	exports com.casino.common.runner;
+	exports com.casino.common.ranges;
 
-    requires transitive com.fasterxml.jackson.annotation;
+	requires transitive com.fasterxml.jackson.annotation;
 	requires transitive com.fasterxml.jackson.databind;
-	requires transitive jakarta.json.bind;
 	requires transitive jakarta.websocket;
 	requires java.logging;
+
+	provides com.casino.common.runner.RunMode with com.casino.common.runner.CasinoMode;
 }

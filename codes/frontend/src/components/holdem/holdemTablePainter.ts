@@ -3,12 +3,12 @@ import { useVectorAdder, useVectorXComponentAdder, useVectorYComponentAdder, typ
 
 import { blackFont, blueFont, grayColorAlpha, grayColorAlpha6, orangeLargeFont } from "../../types/fontsAndColors"
 
-import { chipDealer, chipAnyImage } from "../../types/images"
 import { useCardBackSidePainter, useCardPainter, useImagePainter, useImagePainter2, usePlayerBoxStartingCornerCalculator, useRectanglePainter, useTextPainter, useWait } from "../composables/rendering/commonPainter"
 import { useActivePlayerChecker, useNextSeatNumberCalculator, usePlayerAllowedStatusesChecker, usePlayerEqualsChecker, useSeatToIndexMapper } from "../composables/common/table"
 import { type HoldemTable, type HoldemPlayer, GamePhase, type HoldemAction, TableAction, type GameAction } from "@/types/texasHoldem"
 import { bgImage } from "../../types/images"
 import { useChipsTransformer } from "./chipsCalculator"
+import { chipAny, chipDealer } from "@/types/chips"
 let playerBoxHeight
 let playerBoxWidth
 let mainPlayerBoxWidth
@@ -20,7 +20,7 @@ let mainPlayerBoxIndex: number
 let chipSize: Vector
 let buttonSize: number
 let cardSize: Vector
-let hiddenCardSize: Vector
+let hiddenCardSize: Vector // back side of the card
 const potText = "Pot:"
 let canvasMiddlePoint: Vector
 let potChipsStartPoint: Vector
@@ -59,7 +59,7 @@ const initPainterData = (canvas: HTMLCanvasElement, mainPlayer: HoldemPlayer, tb
 }
 
 function paintDealerButton(canvas: HTMLCanvasElement, position: Vector) {
-	useImagePainter2(canvas, chipDealer, { x: 0, y: 0 }, { x: chipDealer.width, y: chipDealer.height }, position, dealerButtonSize)
+	useImagePainter2(canvas, chipDealer.image, { x: 0, y: 0 }, { x: chipDealer.image.width, y: chipDealer.image.height }, position, dealerButtonSize)
 }
 
 const paintMainPlayerBox = (mainPlayer: HoldemPlayer, canvas: HTMLCanvasElement, isInTurn: boolean) => {
@@ -76,7 +76,6 @@ const paintMainPlayerBox = (mainPlayer: HoldemPlayer, canvas: HTMLCanvasElement,
 		useCardPainter(canvas, mainPlayer.cards[0], firstCardPosition, cardSize)
 		useCardPainter(canvas, mainPlayer.cards[1], useVectorXComponentAdder(firstCardPosition, 95), cardSize)
 	} else if (mainPlayer.cards && mainPlayer.cards.length === 0) {
-		console.log("mainPlayerCards:" + mainPlayer.cards.length)
 		useCardBackSidePainter(canvas, firstCardPosition, hiddenCardSize)
 		useCardBackSidePainter(canvas, useVectorXComponentAdder(firstCardPosition, 50), hiddenCardSize)
 	}
@@ -159,7 +158,7 @@ const paintChips = (canvas: HTMLCanvasElement, startingPoint: Vector, endPoint: 
 		for (let j = 0; j < chipCount; j++) {
 			const chipStartingPoint = useVectorXComponentAdder(startingPoint, chipSize.x * paintedChipsCount)
 			if (chipStartingPoint.x > useVectorXComponentAdder(endPoint, -chipSize.x).x) {
-				useImagePainter2(canvas, chipAnyImage, { x: 0, y: 0 }, { x: chip.image.width, y: chip.image.height }, useVectorXComponentAdder(endPoint, -chipSize.x), chipSize)
+				useImagePainter2(canvas, chipAny.image, { x: 0, y: 0 }, { x: chip.image.width, y: chip.image.height }, useVectorXComponentAdder(endPoint, -chipSize.x), chipSize)
 			} else {
 				useImagePainter2(canvas, chip.image, { x: 0, y: 0 }, { x: chip.image.width, y: chip.image.height }, chipStartingPoint, chipSize)
 			}

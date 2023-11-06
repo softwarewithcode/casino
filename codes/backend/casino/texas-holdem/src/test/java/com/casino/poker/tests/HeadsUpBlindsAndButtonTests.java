@@ -5,7 +5,7 @@ import com.casino.poker.functions.HoldemFunctions;
 import com.casino.poker.game.HoldemPhase;
 import com.casino.poker.player.HoldemPlayer;
 import com.casino.poker.player.PokerPlayer;
-import com.casino.poker.round.positions.PokerRoundPlayers;
+import com.casino.poker.round.positions.HoldemRoundPlayers;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -49,7 +49,7 @@ public class HeadsUpBlindsAndButtonTests extends DefaultTableTests {
     public void samePlayerCannotHaveBothBlinds() {
         PokerPlayer p1 = new HoldemPlayer(user3, table);
         PokerPlayer p2 = new HoldemPlayer(user4, table);
-        assertThrows(IllegalArgumentException.class, () -> new PokerRoundPlayers(p1, p1, p2, 0, 2, 3, null));
+        assertThrows(IllegalArgumentException.class, () -> new HoldemRoundPlayers(p1, p1, p2, 0, 2, 3, null));
     }
 
     @Test

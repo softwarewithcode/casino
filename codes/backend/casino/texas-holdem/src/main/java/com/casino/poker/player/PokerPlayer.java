@@ -1,17 +1,17 @@
 package com.casino.poker.player;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Set;
+
 import com.casino.common.cards.Card;
-import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.player.CardPlayer;
 import com.casino.poker.actions.PokerAction;
 import com.casino.poker.actions.PokerActionType;
 import com.casino.poker.bet.BetToken;
 import com.casino.poker.hand.PokerHand;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Set;
-
-public interface PokerPlayer extends ICasinoPlayer {
+public interface PokerPlayer extends CardPlayer {
 
     void createPokerHand(List<Card> tableCards);
 
@@ -51,7 +51,7 @@ public interface PokerPlayer extends ICasinoPlayer {
 
     void sitOut(boolean immediate);
 
-    void continueGame(boolean immediate);
+    void returnFromBreak(boolean immediate);
 
     void setWaitBigBlind(boolean waiBigBlind);
 

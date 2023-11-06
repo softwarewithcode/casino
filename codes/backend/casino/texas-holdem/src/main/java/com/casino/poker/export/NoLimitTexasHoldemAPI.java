@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import com.casino.common.api.BaseTableAPI;
+import com.casino.common.api.TableAPI;
 import com.casino.common.reload.Reload;
 import com.casino.common.user.User;
 
-public interface NoLimitTexasHoldemAPI extends BaseTableAPI {
+public interface NoLimitTexasHoldemAPI extends TableAPI {
 	boolean join(User user, String seatNumber, Boolean waitBigBlind);
 
 	void raiseTo(UUID playerId, BigDecimal amount);
@@ -20,10 +20,6 @@ public interface NoLimitTexasHoldemAPI extends BaseTableAPI {
 	void call(UUID playerId);
 
 	void check(UUID playerId);
-
-	void leave(UUID playerId);
-
-	void refresh(UUID playerId); // rename to Options (UUID playerId)?
 
 	void sitOutNextHand(UUID playerId);
 

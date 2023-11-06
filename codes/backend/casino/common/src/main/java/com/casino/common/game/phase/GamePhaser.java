@@ -1,8 +1,8 @@
 package com.casino.common.game.phase;
 
-import com.casino.common.table.structure.ICasinoTable;
+import com.casino.common.table.structure.CasinoTable;
 
 public interface GamePhaser {
-    void prepareNextGamePhase();
-    ICasinoTable getTable();
+    void notifyPhaseCompleted();
+    CasinoTable getTable();
 }

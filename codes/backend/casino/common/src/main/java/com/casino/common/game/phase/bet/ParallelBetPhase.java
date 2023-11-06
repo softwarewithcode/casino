@@ -16,19 +16,15 @@ public class ParallelBetPhase<T extends ParallelBetPhaser> extends TimerTask {
 
     @Override
     public void run() {
-        if (!betPhaser.isClockTicking()) {
-            LOGGER.fine("BetPhaseClockTask, clock not ticking:");
-            return;
-        }
-        if (betPhaser.shouldPrepareBetPhase()) {
-            LOGGER.info("BetPhaseClockTask, clear previous round " + betPhaser);
-            betPhaser.prepareBetPhase();
+        if (betPhaser.shouldRestartBetPhase()) {
+            LOGGER.info("BetPhaseClockTask, clear previous round " + betPhaser.getTable().getId());
+            betPhaser.reInitializeBetPhase();
         }
         int counterValue = betPhaser.getCounterTime();
         counterValue--;
         betPhaser.updateCounterTime(counterValue);
         if (LOGGER.isLoggable(Level.INFO))
-            LOGGER.fine("BetPhaseClockTask, secondsLeft:" + counterValue + " in table:" + betPhaser.getTableId());
+            LOGGER.fine("BetPhaseClockTask, secondsLeft:" + counterValue + " in table:" + betPhaser.getTable().getId());
         if (counterValue == 0) {
             betPhaser.stopClock();
             betPhaser.onBetPhaseEnd();

@@ -49,8 +49,8 @@ public class PokerPositionsBuilder {
         organize();
     }
 
-    public PokerRoundPlayers build() {
-        return new PokerRoundPlayers(smallBlindPlayer, bigBlindPlayer, buttonPlayer, buttonSeatNumber, smallBlindSeatNumber, bigBlindPlayer.getSeatNumber(), roundCandidates);
+    public HoldemRoundPlayers build() {
+        return new HoldemRoundPlayers(smallBlindPlayer, bigBlindPlayer, buttonPlayer, buttonSeatNumber, smallBlindSeatNumber, bigBlindPlayer.getSeatNumber(), roundCandidates);
     }
 
     public static PokerPositionsBuilder of(HoldemTable table, List<PokerPlayer> roundAttendants) {
@@ -58,9 +58,9 @@ public class PokerPositionsBuilder {
     }
 
     private void organize() {
-        if (shouldInitFirstRound()) {
+        if (shouldInitFirstRound()) 
             initFirstRound();
-        } else
+        else
             initContinuationRound();
     }
 
@@ -113,7 +113,7 @@ public class PokerPositionsBuilder {
 
     private List<PokerPlayer> dropNewCandidatesSittingBetweenButtonAndBigBlind() {
         List<PokerPlayer> activeAndNewPlayers = getActiveAndNewPlayersStartingFromButtonPlayer();
-        if (activeAndNewPlayers.size() == 0)
+        if (activeAndNewPlayers.isEmpty())
             return activeAndNewPlayers;
         activeAndNewPlayers.remove(0);//ButtonPlayer removed
         List<PokerPlayer> droppedPlayers = activeAndNewPlayers.stream().takeWhile(this::isNewAndNotBigBlind).toList();
@@ -150,14 +150,13 @@ public class PokerPositionsBuilder {
         if (roundCandidates.size() == 2) {
             smallBlindPlayer = buttonPlayer;
             smallBlindSeatNumber = smallBlindPlayer.getSeatNumber();
-            bigBlindPlayer = findCandidateStartingFromSeatNumber(smallBlindPlayer.getSeatNumber());
         } else {
             smallBlindPlayer = findCandidateStartingFromSeatNumber(buttonPlayer.getSeatNumber());
             if (smallBlindPlayer != null)
                 smallBlindSeatNumber = smallBlindPlayer.getSeatNumber();
             assert smallBlindPlayer != null;
-            bigBlindPlayer = findCandidateStartingFromSeatNumber(smallBlindPlayer.getSeatNumber());
         }
+        bigBlindPlayer = findCandidateStartingFromSeatNumber(smallBlindPlayer.getSeatNumber());
         roundCandidates.forEach(player -> player.setWaitBigBlind(false));
     }
 
@@ -216,7 +215,7 @@ public class PokerPositionsBuilder {
         if (isPreviousSmallBlindPlayerContinuing())
             return false;
         else if (hasShrinkToHeadsUpGameBetweenPreviousRoundPlayers()) {
-            return previousSmallBlindPlayer != null && !previousSmallBlindPlayer.equals(nextFromPreviousSmallBlindPlayer.get()) && !previousBigBlindPlayer.equals(nextFromPreviousSmallBlindPlayer.get());
+            return nextFromPreviousSmallBlindPlayer.map(pokerPlayer -> previousSmallBlindPlayer != null && !previousSmallBlindPlayer.equals(pokerPlayer) && !previousBigBlindPlayer.equals(pokerPlayer)).orElse(true);
         }
         return true;
     }

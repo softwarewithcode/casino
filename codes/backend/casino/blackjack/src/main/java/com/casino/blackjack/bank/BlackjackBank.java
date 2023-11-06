@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.casino.blackjack.player.BlackjackHand;
-import com.casino.blackjack.player.BlackjackPlayer;
+import com.casino.blackjack.player.BlackjackPlayer_;
 
 /**
  * 
@@ -17,13 +17,13 @@ public class BlackjackBank {
 	private static final Logger LOGGER = Logger.getLogger(BlackjackBank.class.getName());
 	private static final BigDecimal TWO_AND_HALF = new BigDecimal("2.5");
 
-	public static void matchBalances(List<BlackjackPlayer> players, BlackjackHand dealerHand) {
+	public static void matchBalances(List<BlackjackPlayer_> players, BlackjackHand dealerHand) {
 		LOGGER.fine("Dealer starts balance matching");
-		List<BlackjackPlayer> playersWithWinningChances = players.stream().filter(BlackjackPlayer::hasWinningChance).toList();
+		List<BlackjackPlayer_> playersWithWinningChances = players.stream().filter(BlackjackPlayer_::hasWinningChance).toList();
 		playersWithWinningChances.forEach(player -> payForWinners(player, dealerHand));
 	}
 
-	private static void payForWinners(BlackjackPlayer player, BlackjackHand dealerHand) {
+	private static void payForWinners(BlackjackPlayer_ player, BlackjackHand dealerHand) {
 		player.getHands().forEach(playerHand -> {
 			if (shouldPayInsuranceBet(playerHand, dealerHand))
 				player.increaseBalanceAndPayout(playerHand.getInsuranceBet().multiply(BigDecimal.TWO));

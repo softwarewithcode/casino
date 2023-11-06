@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.casino.blackjack.dealer.BlackjackDealer;
+import com.casino.blackjack.dealer.Dealer;
 import com.casino.blackjack.game.BlackjackGamePhase;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
@@ -27,7 +27,7 @@ import com.casino.common.user.User;
 
 public class DealerTest extends BaseTest {
 	private BlackjackTable table;
-	private BlackjackDealer dealer;
+	private Dealer dealer;
 
 	@BeforeEach
 	public void initTest() {
@@ -35,8 +35,8 @@ public class DealerTest extends BaseTest {
 			table = new BlackjackTable(getDefaultTableInitData(), blackjackInitData);
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
-			dealer = (BlackjackDealer) f.get(table);
-			dealer = (BlackjackDealer) f.get(table);
+			dealer = (Dealer) f.get(table);
+			dealer = (Dealer) f.get(table);
 			user = new User("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			user2 = new User("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			user3 = new User("JohnDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
@@ -99,7 +99,7 @@ public class DealerTest extends BaseTest {
 
 	@Test
 	public void dealerCreatesEightDecks() {
-		BlackjackDealer d = new BlackjackDealer(null, null);
+		Dealer d = new Dealer(null, null);
 		Assertions.assertEquals(416, d.getDecks().size());
 	}
 

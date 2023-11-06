@@ -1,10 +1,10 @@
-@@ -0,0 +1,68 @@
 # Compiled class file
 *.class
 
 # Log file
 *.log
 
+**local**
 # BlueJ files
 *.ctxt
 
@@ -44,6 +44,7 @@ target/
 */target/*
 */.metadata/*
 */metadata/*
+**metadata**
 bin/
 */bin*
 tmp/

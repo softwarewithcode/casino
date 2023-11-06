@@ -25,7 +25,7 @@ public enum HoldemPhase implements GamePhase {
 	}
 
 	@Override
-	public boolean isRunning() {
+	public boolean isGameRunning() {
 		return running;
 	}
 }

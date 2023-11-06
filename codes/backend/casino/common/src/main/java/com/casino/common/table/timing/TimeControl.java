@@ -2,16 +2,16 @@ package com.casino.common.table.timing;
 
 public interface TimeControl {
 
-	Integer getAdditionalTime();
+	Integer getTimeBank();
 
-	Integer increaseAdditionalTime(Integer amount);
+	Integer increaseTimeBank(Integer amount);
 
-	Integer reduceSecond(boolean timeBankable);
+	Integer reduceSecond(boolean timeBankAllowed);
 
 	Integer getTotalTime();
 
-	Integer getTurnTime();
+	Integer getPlayerTime();
 
-	void setPlayerTime(Integer time);
+	void initPlayerTime(Integer time);
 
 }

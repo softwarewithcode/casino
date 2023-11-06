@@ -30,6 +30,18 @@ const router = createRouter({
 			name: ViewName.TEXAS_HOLDEM_TABLE,
 			props: true,
 			component: () => import("../views/texas-holdem/TexasHoldemTableView.vue")
+		},
+		{
+			path: "/roulette/front/",
+			name: ViewName.ROULETTE_FRONT,
+			props: true,
+			component: () => import("../views/roulette/RouletteFront.vue")
+		},
+		{
+			path: "/roulette/:tableId",
+			name: ViewName.ROULETTE_TABLE,
+			props: true,
+			component: () => import("../views/roulette/RouletteTable.vue")
 		}
 	]
 })

@@ -17,9 +17,9 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.casino.blackjack.dealer.BlackjackDealer;
+import com.casino.blackjack.dealer.Dealer;
 import com.casino.blackjack.player.BlackjackHand;
-import com.casino.blackjack.player.BlackjackPlayer;
+import com.casino.blackjack.player.BlackjackPlayer_;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
@@ -43,8 +43,8 @@ import com.casino.common.user.User;
 public class BlackjackPlayerParallelActionsTests extends BaseTest {
 	private BlackjackTable table;
 	private BlackjackTable tableWith49MinAnd49MaxPlayers;
-	BlackjackPlayer doubleDownPlayer;
-	private BlackjackDealer dealer;
+	BlackjackPlayer_ doubleDownPlayer;
+	private Dealer dealer;
 	private volatile int playersWhoGotSeat;
 	private volatile int playerWhoDidNotGetSeat;
 	private volatile int rejectedInsurances;
@@ -65,14 +65,14 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 			user = new User("JohnDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			user2 = new User("JaneDoe", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000"));
 			user3 = new User("qq", table.getId(), UUID.randomUUID(), null, new BigDecimal("10000000.0"));
-			doubleDownPlayer = new BlackjackPlayer(user3, table);
+			doubleDownPlayer = new BlackjackPlayer_(user3, table);
 			playerWhoDidNotGetSeat = 0;
 			playersWhoGotSeat = 0;
 			rejectedDoubles = 0;
 			rejectedInsurances = 0;
 			playersWhoGotSeat = 0;
 			playerWhoDidNotGetSeat = 0;
-			BlackjackDealer dealer = getDealer(table);
+			Dealer dealer = getDealer(table);
 			List<Card> cards = dealer.getDecks();
 			cards.add(Card.of(4, Suit.CLUB));
 			cards.add(Card.of(8, Suit.DIAMOND));
@@ -84,12 +84,12 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 		}
 	}
 
-	private BlackjackDealer getDealer(BlackjackTable table) {
+	private Dealer getDealer(BlackjackTable table) {
 		try {
 			Field f;
 			f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
-			return (BlackjackDealer) f.get(table);
+			return (Dealer) f.get(table);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -114,7 +114,7 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 		rejectedDoubles++;
 	}
 
-	@Test
+	@Test  
 	public void threeOutOfTenConcurrentPlayersDontGetSeatInASevenSeatedTable() throws InterruptedException, BrokenBarrierException {
 		CyclicBarrier casinoBarrier = new CyclicBarrier(11);
 		List<Thread> threads = createCasinoPlayers(10, casinoBarrier);
@@ -125,7 +125,7 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 		assertEquals(7, playersWhoGotSeat);
 	}
 
-	@Test
+	@Test  //******** fails occasionally TODO
 	public void fiftyOneOutOfHundredPlayersGetRejectedAnd49GetAcceptedIn49SeatedTable() throws InterruptedException, BrokenBarrierException {
 		table = new BlackjackTable(tableInitData49Players, blackjackInitData);
 		CyclicBarrier casinoBarrier = new CyclicBarrier(101);
@@ -139,7 +139,7 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 	}
 
 	@Test
-	public void insuranceCanBetSetOnlyOnceByPlayer() throws InterruptedException, BrokenBarrierException {
+	public void insuranceCanBeSetOnlyOnceByPlayer() throws InterruptedException, BrokenBarrierException {
 		table = tableWith49MinAnd49MaxPlayers;
 		List<Card> cards = getDealer(table).getDecks();
 		cards.add(Card.of(1, Suit.DIAMOND));// Dealer's ace
@@ -273,7 +273,7 @@ public class BlackjackPlayerParallelActionsTests extends BaseTest {
 		casinoBarrier.await();
 		int waitSecondsForPlayersToFinish = 9;
 		sleep(BET_ROUND_TIME_SECONDS + waitSecondsForPlayersToFinish + 3, ChronoUnit.SECONDS);
-		BlackjackPlayer b = (BlackjackPlayer) table.getPlayer(0);
+		BlackjackPlayer_ b = (BlackjackPlayer_) table.getPlayer(0);
 		assertEquals(15, b.getFirstHandFinalValue());
 		assertEquals(MAX_BET.multiply(BigDecimal.TWO).setScale(2), table.getPlayer(0).getTotalBet());
 		assertEquals(MAX_BET.multiply(BigDecimal.TWO).setScale(2), b.getBet(0));

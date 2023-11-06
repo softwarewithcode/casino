@@ -1,6 +1,6 @@
-import type { Vector } from "../../../types/vectors"
+import { useVectorAdder, type Vector } from "../../../types/vectors"
 import type { Card } from "@/types/cards"
-import type { CasinoColor, CasinoFont } from "@/types/fontsAndColors"
+import { whiteColor, type CasinoColor, type CasinoFont } from "@/types/fontsAndColors"
 import { cardBackSideImage, cardsSprite } from "@/types/images"
 import { useCardLocator } from "./cardLocator"
 export const useDefaultCardWidthRatio: number = 0.72
@@ -17,7 +17,35 @@ export function useCanvasInitializer(canvas: HTMLCanvasElement) {
 	canvas.height = document.documentElement.clientHeight > 800 ? 800 : document.documentElement.clientHeight
 }
 
-export const useRectanglePainter = (canvas: HTMLCanvasElement, startPosition: Vector, widthAndHeight: Vector, highlight: boolean, color?: CasinoColor) => {
+export function useRectangleTransparentFiller(canvas: HTMLCanvasElement, startPosition: Vector, widthAndHeight: Vector, fillColor: CasinoColor) {
+	const ctx = canvas.getContext("2d")
+	if (!ctx) return
+	const originalStyle = ctx.strokeStyle
+	const originalWidth = ctx.lineWidth
+	const originalAlpha = ctx.globalAlpha
+	const originalFill = ctx.fillStyle
+	ctx.globalAlpha = fillColor.alpha
+	ctx.fillStyle = fillColor.color
+	ctx.fillRect(startPosition.x, startPosition.y, widthAndHeight.x, widthAndHeight.y)
+	ctx.strokeRect(startPosition.x, startPosition.y, widthAndHeight.x, widthAndHeight.y)
+	ctx.strokeStyle = originalStyle
+	ctx.lineWidth = originalWidth
+	ctx.globalAlpha = originalAlpha
+	ctx.fillStyle = originalFill
+}
+
+export const useCirclePainter = (canvas: HTMLCanvasElement, centerPoint: Vector, radius: number, angles: Vector, color: CasinoColor) => {
+	const ctx = canvas.getContext("2d")
+	if (!ctx) return
+	const originalStyle = ctx.strokeStyle
+	ctx.strokeStyle = color.color
+	ctx.lineWidth = 4
+	ctx.beginPath()
+	ctx.arc(centerPoint.x, centerPoint.y, radius, angles.x, angles.y)
+	ctx.stroke()
+	ctx.strokeStyle = originalStyle
+}
+export const useRectanglePainter = (canvas: HTMLCanvasElement, startPosition: Vector, widthAndHeight: Vector, highlight: boolean, fillColor?: CasinoColor) => {
 	const ctx = canvas.getContext("2d")
 	if (!ctx) return
 	const originalStyle = ctx.strokeStyle
@@ -25,12 +53,12 @@ export const useRectanglePainter = (canvas: HTMLCanvasElement, startPosition: Ve
 	const originalAlpha = ctx.globalAlpha
 	const originalFill = ctx.fillStyle
 	if (highlight) {
-		ctx.strokeStyle = "green"
-		ctx.lineWidth = 10
+		ctx.strokeStyle = "yellow"
+		ctx.lineWidth = 3
 	}
-	if (color) {
-		ctx.globalAlpha = color.alpha
-		ctx.fillStyle = color.color
+	if (fillColor) {
+		ctx.globalAlpha = fillColor.alpha
+		ctx.fillStyle = fillColor.color
 		ctx.fillRect(startPosition.x, startPosition.y, widthAndHeight.x, widthAndHeight.y)
 	}
 	ctx.strokeRect(startPosition.x, startPosition.y, widthAndHeight.x, widthAndHeight.y)
@@ -39,7 +67,26 @@ export const useRectanglePainter = (canvas: HTMLCanvasElement, startPosition: Ve
 	ctx.globalAlpha = originalAlpha
 	ctx.fillStyle = originalFill
 }
-
+export const useRectanglePainter2 = (canvas: HTMLCanvasElement, startPosition: Vector, widthAndHeight: Vector, text: string, lineWidth?: number, borderColor?: CasinoColor, fillColor?: CasinoColor) => {
+	const ctx = canvas.getContext("2d")
+	if (!ctx) return
+	const originalStyle = ctx.strokeStyle
+	const originalWidth = ctx.lineWidth
+	const originalAlpha = ctx.globalAlpha
+	const originalFill = ctx.fillStyle
+	ctx.strokeStyle = borderColor ? borderColor.color : "black"
+	ctx.lineWidth = lineWidth ? lineWidth : 3
+	if (fillColor) {
+		ctx.globalAlpha = fillColor.alpha
+		ctx.fillStyle = fillColor.color
+		ctx.fillRect(startPosition.x, startPosition.y, widthAndHeight.x, widthAndHeight.y)
+	} else ctx.strokeRect(startPosition.x, startPosition.y, widthAndHeight.x, widthAndHeight.y)
+	useTextPainter(canvas, useVectorAdder(startPosition, 3, 10), text, { color: "white", faceAndSize: "14" })
+	ctx.strokeStyle = originalStyle
+	ctx.lineWidth = originalWidth
+	ctx.globalAlpha = originalAlpha
+	ctx.fillStyle = originalFill
+}
 export const useTextPainter = (canvas: HTMLCanvasElement, startPosition: Vector, text: string, font: CasinoFont) => {
 	const ctx = canvas.getContext("2d")
 	if (!ctx || !text) return

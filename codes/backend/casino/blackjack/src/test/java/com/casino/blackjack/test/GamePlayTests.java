@@ -13,8 +13,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.casino.blackjack.dealer.BlackjackDealer;
-import com.casino.blackjack.player.BlackjackPlayer;
+import com.casino.blackjack.dealer.Dealer;
+import com.casino.blackjack.player.BlackjackPlayer_;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
@@ -22,7 +22,7 @@ import com.casino.common.user.User;
 
 public class GamePlayTests extends BaseTest {
 	private BlackjackTable table;
-	private BlackjackDealer dealer;
+	private Dealer dealer;
 
 	@BeforeEach
 	public void initTest() {
@@ -33,7 +33,7 @@ public class GamePlayTests extends BaseTest {
 			user3 = new User("JohnDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("1000.0"));
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
-			dealer = (BlackjackDealer) f.get(table);
+			dealer = (Dealer) f.get(table);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -55,7 +55,7 @@ public class GamePlayTests extends BaseTest {
 		assertEquals(Suit.SPADE, table.getPlayer(user.userId()).getHands().get(0).getCards().get(0).getSuit());
 		assertEquals(9, table.getPlayer(user.userId()).getHands().get(0).getCards().get(1).getRank());
 		assertEquals(Suit.DIAMOND, table.getPlayer(user.userId()).getHands().get(0).getCards().get(1).getSuit());
-		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(user.userId());
+		BlackjackPlayer_ p = (BlackjackPlayer_) table.getPlayer(user.userId());
 		assertTrue(p.canTake());
 		table.hit(user.userId());
 		assertEquals(3, table.getPlayer(user.userId()).getHands().get(0).getCards().size());
@@ -81,7 +81,7 @@ public class GamePlayTests extends BaseTest {
 		assertEquals(Suit.SPADE, table.getPlayer(user.userId()).getHands().get(0).getCards().get(0).getSuit());
 		assertEquals(9, table.getPlayer(user.userId()).getHands().get(0).getCards().get(1).getRank());
 		assertEquals(Suit.DIAMOND, table.getPlayer(user.userId()).getHands().get(0).getCards().get(1).getSuit());
-		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(user.userId());
+		BlackjackPlayer_ p = (BlackjackPlayer_) table.getPlayer(user.userId());
 		assertTrue(p.canTake());
 		table.hit(user.userId());
 		assertEquals(3, table.getPlayer(user.userId()).getHands().get(0).getCards().size());
@@ -146,7 +146,7 @@ public class GamePlayTests extends BaseTest {
 		sleep(BET_ROUND_TIME_SECONDS, ChronoUnit.SECONDS);
 		assertEquals(21, table.getPlayer(user.userId()).getHands().get(0).calculateValues().get(1));
 		assertTrue(table.getPlayer(user.userId()).getHands().get(0).isBlackjack());
-		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(user.userId());
+		BlackjackPlayer_ p = (BlackjackPlayer_) table.getPlayer(user.userId());
 		assertFalse(p.canTake());
 	}
 
@@ -165,7 +165,7 @@ public class GamePlayTests extends BaseTest {
 		table.hit(table.getPlayer(user.userId()).getId());
 		assertFalse(table.getPlayer(user.userId()).getHands().get(0).isBlackjack());
 		assertEquals(21, table.getPlayer(user.userId()).getHands().get(0).calculateValues().get(0));
-		BlackjackPlayer p = (BlackjackPlayer) table.getPlayer(user.userId());
+		BlackjackPlayer_ p = (BlackjackPlayer_) table.getPlayer(user.userId());
 		assertFalse(p.canTake());
 	}
 

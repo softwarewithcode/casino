@@ -1,4 +1,4 @@
-import type { CasinoPlayer, CasinoTable, Seat } from "./casino"
+import type { CasinoPlayer, CasinoTable, TableGamesPlayer, Seat } from "./casino"
 import type { CardHand } from "./cards"
 import type { TableCard } from "./TableCard"
 
@@ -7,12 +7,9 @@ export interface BlackjackTable extends CasinoTable<BlackjackPlayer> {
 	gamePhase: string
 }
 
-export interface BlackjackPlayer extends CasinoPlayer {
+export interface BlackjackPlayer extends TableGamesPlayer {
 	hands: BlackjackHand[]
 	insuranceAmount: number
-	totalBet: number
-	lastBet: number
-	actions: string[]
 }
 
 export interface BlackjackHand extends CardHand {

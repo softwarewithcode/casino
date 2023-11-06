@@ -1,57 +1,28 @@
 package com.casino.web.holdem;
 
-import java.math.BigDecimal;
-
+import com.casino.common.game.Game;
 import com.casino.poker.export.TexasHoldemCashGamePlayerAction;
+import com.casino.web.common.ClientMessage;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import jakarta.json.bind.annotation.JsonbProperty;
+@JsonInclude(Include.NON_NULL)
+@JsonIncludeProperties(value = { "game", "action", "amount" })
+public final class HoldemMessage extends ClientMessage {
+	private TexasHoldemCashGamePlayerAction action;
 
-public class HoldemMessage implements CasinoMessage{
-    @JsonbProperty("action")
-    private TexasHoldemCashGamePlayerAction action;
-    @JsonbProperty("userId")
-    private String userId;
-
-    @JsonbProperty("seat")
-    private String seat;
-
-    @JsonbProperty("amount")
-    private BigDecimal amount;
+	@Override
+	public Game getGame() {
+		return Game.TEXAS_HOLDEM;
+	}
 
 	public TexasHoldemCashGamePlayerAction getAction() {
-        return action;
-    }
+		return action;
+	}
 
-    public void setAction(TexasHoldemCashGamePlayerAction action) {
-        this.action = action;
-    }
+	public void setAction(TexasHoldemCashGamePlayerAction action) {
+		this.action = action;
+	}
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getSeat() {
-        return seat;
-    }
-
-    public void setSeat(String seat) {
-        this.seat = seat;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    @Override
-    public String toString() {
-        return "HoldemMessage [action=" + action + ", userId=" + userId + ", amount=" + amount + "]";
-    }
 }

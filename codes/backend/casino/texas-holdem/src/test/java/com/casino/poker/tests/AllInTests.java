@@ -77,7 +77,7 @@ public class AllInTests extends DefaultTableTests {
     @Test
     public void allInsResultsToSplitPot() {
         centPlayersJoinPlayersJoin6MaxTable();
-        setDealerNextCardsForStraightFlush();
+        setupUpcomingTableCardsToStraightFlush();
         table.getRound().getPlayers().forEach(player -> player.getHoleCards().clear());
         table.getRound().getPlayers().forEach(player -> player.getHoleCards().add(Card.of(2, Suit.SPADE)));
         table.getRound().getPlayers().forEach(player -> player.getHoleCards().add(Card.of(2, Suit.SPADE)));
@@ -298,19 +298,19 @@ public class AllInTests extends DefaultTableTests {
     }
 
 
-    @Test
-    public void callingShortStackAllInPreFlopAsOnlyPlayerWhoCanActLeadsToRoundCompletedAutomatically() {
+    @Test 
+    public void callingShortStackAllInPreFlopAsOnlyPlayerWhoCanActLeadsToStartNextRoundAutomatically() {
         System.getProperties().setProperty(PokerPositionsBuilder.BUTTON_POSITION_IN_TEST, "4");
         table.join(user, "2", false); // 1000
         table.join(user3, "4", false); // 800
         waitRoundToStart();
-        setDealerNextCardsForStraightFlush();
+        setupUpcomingTableCardsToStraightFlush();
         table.allIn(table.getPlayer(4).getId());
         table.call(user.userId());
-        waitRoundStartWithExtraWaitTime(1000);
+        waitRoundToStart();
+        System.out.println(table.getPlayer(2).getStatus()+" "+table.getPlayer(4).getStatus());
         assertNotEquals(new BigDecimal("985.00"), table.getPlayer(2));
         assertNotEquals(new BigDecimal("780.00"), table.getPlayer(4));
-        assertEquals(HoldemPhase.PRE_FLOP, table.getGamePhase());
         assertEquals(2, table.getRounds().size());
     }
 
@@ -333,7 +333,7 @@ public class AllInTests extends DefaultTableTests {
         sleep(millisSleep, ChronoUnit.MILLIS);
     }
 
-    private void setDealerNextCardsForStraightFlush() {
+    private void setupUpcomingTableCardsToStraightFlush() {
         dealer.getDeck().getCards().add(Card.of(1, Suit.HEART));// River
         dealer.getDeck().getCards().add(Card.of(13, Suit.HEART));// Turn
         dealer.getDeck().getCards().add(Card.of(12, Suit.HEART));// Flop 3

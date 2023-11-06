@@ -14,5 +14,7 @@ public enum Event implements MessageTitle {
     OPEN_TABLE,
     TIMED_OUT,
     SIT_OUT,
-    SHOWDOWN
+    SHOWDOWN,
+    SPINNING,
+    INIT_DATA
 }

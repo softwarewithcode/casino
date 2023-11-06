@@ -15,7 +15,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.casino.blackjack.dealer.BlackjackDealer;
+import com.casino.blackjack.dealer.Dealer;
 import com.casino.blackjack.table.BlackjackTable;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
@@ -24,7 +24,7 @@ import com.casino.common.user.User;
 
 public class StartingHandSplitTest extends BaseTest {
 	private BlackjackTable table;
-	private BlackjackDealer dealer;
+	private Dealer dealer;
 
 	@BeforeEach
 	public void initTest() {
@@ -34,7 +34,7 @@ public class StartingHandSplitTest extends BaseTest {
 			user2 = new User("JohnDoe2", table.getId(), UUID.randomUUID(), null, new BigDecimal("100.0"));
 			Field f = table.getClass().getDeclaredField("dealer");
 			f.setAccessible(true);
-			dealer = (BlackjackDealer) f.get(table);
+			dealer = (Dealer) f.get(table);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

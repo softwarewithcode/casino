@@ -9,4 +9,6 @@ export const chip5Image = document.getElementById("chip5") as HTMLImageElement
 export const chip1Image = document.getElementById("chip1") as HTMLImageElement
 export const chip01Image = document.getElementById("chip01") as HTMLImageElement
 export const chipAnyImage = document.getElementById("chipAny") as HTMLImageElement
-export const chipDealer = document.getElementById("chipDealer") as HTMLImageElement
+export const chipDealerImage = document.getElementById("chipDealer") as HTMLImageElement
+export const chipWhiteImage = document.getElementById("chipWhite") as HTMLImageElement
+export const rouletteBetsBoard = document.getElementById("rouletteBetsBoard") as HTMLImageElement

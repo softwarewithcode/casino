@@ -9,29 +9,31 @@ import com.casino.common.game.Game;
 import com.casino.common.game.GameData;
 import com.casino.common.language.Language;
 import com.casino.common.table.structure.TableType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-@JsonIncludeProperties(value = { "thresholds", "gameData", "id", "language", "game","type","availablePositions"})
-public class TableCard implements Serializable {
+@JsonInclude(Include.NON_NULL)
+@JsonIncludeProperties(value = { "thresholds", "gameData", "id", "language", "game", "type", "availablePositions" })
+public class TableCard<T extends GameData> implements Serializable {
 
 	@Serial
 	private static final long serialVersionUID = 1L;
 	private final TableThresholds thresholds;
-	private final GameData gameData;
+	private final T gameData;
 	private final UUID id;
 	private final Language language;
 	private final Game game;
 	private final TableType type;
 	private List<Integer> availablePositions;
 
-	public TableCard(TableData initData, GameData gameData) {
-		super();
-		this.thresholds = initData.thresholds();
-		this.id = initData.id();
-		this.language = initData.language();
-		this.game = initData.game();
-		this.type = initData.tableType();
+	public TableCard(TableData tableData, T gameData) {
+		this.thresholds = tableData.thresholds();
+		this.id = tableData.id();
+		this.language = tableData.language();
+		this.game = tableData.game();
+		this.type = tableData.tableType();
 		this.gameData = gameData;
 	}
 
@@ -55,14 +57,16 @@ public class TableCard implements Serializable {
 		return type;
 	}
 
-	public GameData getGameData() {
+	public T getGameData() {
 		return gameData;
 	}
+
 	// getter for serialization
 	public Language getLanguage() {
 		return language;
 	}
-	@JsonProperty// getter for serialization
+
+	@JsonProperty // getter for serialization
 	public List<Integer> getAvailablePositions() {
 		return availablePositions;
 	}

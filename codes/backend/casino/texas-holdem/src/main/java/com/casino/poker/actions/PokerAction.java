@@ -1,19 +1,19 @@
 package com.casino.poker.actions;
 
-import com.casino.common.bet.Range;
+import com.casino.common.bet.BetRange;
 import com.casino.common.action.PlayerAction;
 
 public class PokerAction implements PlayerAction {
 
-	private final Range range;
+	private final BetRange range;
 	private final PokerActionType type;
 
-	private PokerAction(Range range, PokerActionType action) {
+	private PokerAction(BetRange range, PokerActionType action) {
 		this.range = range;
 		this.type = action;
 	}
 
-	public Range getRange() {
+	public BetRange getRange() {
 		return range;
 	}
 
@@ -21,7 +21,7 @@ public class PokerAction implements PlayerAction {
 		return type;
 	}
 
-	public static PokerAction of(Range range, PokerActionType action) {
+	public static PokerAction of(BetRange range, PokerActionType action) {
 		return new PokerAction(range, action);
 	}
 

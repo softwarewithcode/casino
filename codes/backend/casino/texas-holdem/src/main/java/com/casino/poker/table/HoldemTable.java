@@ -1,5 +1,16 @@
 package com.casino.poker.table;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.casino.common.cards.Card;
 import com.casino.common.exception.IllegalPlayerActionException;
 import com.casino.common.message.Event;
@@ -17,19 +28,13 @@ import com.casino.poker.dealer.HoldemDealer;
 import com.casino.poker.export.NoLimitTexasHoldemAPI;
 import com.casino.poker.functions.HoldemFunctions;
 import com.casino.poker.game.HoldemPhase;
-import com.casino.poker.game.PokerInitData;
+import com.casino.poker.game.PokerData;
 import com.casino.poker.player.HoldemPlayer;
 import com.casino.poker.player.PokerPlayer;
 import com.casino.poker.pot.Pot;
 import com.casino.poker.round.PokerRound;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author softwarewithcode from GitHub
@@ -41,14 +46,13 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
     private final HoldemDealer dealer;
     private final DealerButton button;
     private final List<PokerRound> rounds;
-    private final TableCard tableCard;
 
-    public HoldemTable(TableData initData, PokerInitData pokerInitData) {
-        super(initData);
-        this.dealer = new HoldemDealer(this, pokerInitData);
+    public HoldemTable(TableData tableData, PokerData pokerData) {
+        super(tableData);
+        super.tableCard = new TableCard<>(tableData, pokerData);
+        this.dealer = new HoldemDealer(this, pokerData);
         this.button = new DealerButton(null);
         this.rounds = new ArrayList<>(3);
-        this.tableCard = new TableCard(initData, pokerInitData);
     }
 
     @Override
@@ -60,7 +64,6 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
             Optional<Seat<PokerPlayer>> seatOptional = super.join(seatNumber, player);
             if (seatOptional.isPresent()) {
                 player.setSeatNumber(seatOptional.get().getNumber());
-                player.setStatus(PlayerStatus.NEW);
                 dealer.onPlayerArrival(player);
             }
             return seatOptional.isPresent();
@@ -76,7 +79,7 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
             getLock().lock();
             PokerPlayer player = getPlayer(playerId);
             verifyActionClearance(player, PokerActionType.CALL);
-            dealer.call(player);
+            dealer.handleCall(player);
         } finally {
             getLock().unlock();
             LOGGER.exiting(getClass().getName(), "call" + " player:" + playerId + " table:" + getId());
@@ -90,43 +93,13 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
             getLock().lock();
             PokerPlayer player = getPlayer(playerId);
             verifyActionClearance(player, PokerActionType.CHECK);
-            dealer.check(player);
+            dealer.handleCheck(player);
         } finally {
             getLock().unlock();
             LOGGER.exiting(getClass().getName(), "check" + " player:" + playerId + " table:" + getId());
         }
     }
 
-    @Override
-    public void leave(UUID leavingPlayerOrWatcher) {
-        LOGGER.entering(getClass().getName(), "leave", getId());
-        try {
-            PokerPlayer leavingPlayer = getPlayer(leavingPlayerOrWatcher);
-            if (leavingPlayer == null) {
-                removeWatcher(leavingPlayerOrWatcher);
-                return;
-            }
-            getLock().lock();// Only leaving players should lock the table. Leaving players affects gameplay.
-            dealer.onPlayerLeave(leavingPlayer);
-        } finally {
-            if (getLock().isHeldByCurrentThread())
-                getLock().unlock();
-            LOGGER.exiting(getClass().getName(), "leave" + " player:" + leavingPlayerOrWatcher + " table:" + getId());
-        }
-    }
-
-    @Override
-    public void watch(User user) {
-        LOGGER.entering(getClass().getName(), "watch", getId());
-        PokerPlayer player = new HoldemPlayer(user, this);
-        if (getPlayer(user.userId()) != null) {
-            LOGGER.fine("User " + user.userName() + " is already playing in table:" + this);
-            return;
-        }
-        if (super.joinAsWatcher(player))
-            dealer.onWatcherArrival(player);
-        LOGGER.exiting(getClass().getName(), "watch" + " player:" + getId() + " table:" + getId());
-    }
 
     @Override
     public void raiseTo(UUID playerId, BigDecimal amount) {
@@ -135,7 +108,7 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
             getLock().lock();
             PokerPlayer player = getPlayer(playerId);
             verifyActionClearance(player, PokerActionType.BET_RAISE);
-            dealer.betOrRaise(player, amount);
+            dealer.handleBetOrRaise(player, amount);
         } finally {
             getLock().unlock();
             LOGGER.exiting(getClass().getName(), "raise" + " player:" + playerId + " table:" + getId());
@@ -149,7 +122,7 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
             getLock().lock();
             PokerPlayer player = getPlayer(playerId);
             verifyActionClearance(player, PokerActionType.ALL_IN);
-            dealer.allIn(player);
+            dealer.handleAllIn(player);
         } finally {
             getLock().unlock();
             LOGGER.exiting(getClass().getName(), "raise" + " player:" + playerId + " table:" + getId());
@@ -163,7 +136,7 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
             getLock().lock();
             PokerPlayer player = getPlayer(playerId);
             verifyActionClearance(player, PokerActionType.FOLD);
-            dealer.fold(player);
+            dealer.handleFold(player);
         } finally {
             getLock().unlock();
             LOGGER.exiting(getClass().getName(), "fold" + " player:" + playerId + " table:" + getId());
@@ -179,24 +152,17 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
 
     private boolean isPlayerAllowedToAct(PokerPlayer player, PokerActionType pokerAction) {
         verifyPlayerHasSeat(player);
-        return isActivePlayer(player) && HoldemFunctions.hasAction.apply(player, pokerAction) && getGamePhase().isRunning();
+        return isActivePlayer(player) && HoldemFunctions.hasAction.apply(player, pokerAction) && getGamePhase().isGameRunning();
     }
 
     @Override
     public void refresh(UUID id) {
-        dealer.notifyTableStatus(Event.STATUS_UPDATE);
+        dealer.sendStatusUpdate(Event.STATUS_UPDATE);
     }
 
     @Override
     public HoldemDealer getDealer() {
         return dealer;
-    }
-
-    @Override
-    public TableCard getTableCard() {
-        List<Integer> seats = getSeats().stream().filter(seat -> !seat.hasPlayer()).map(Seat::getNumber).toList();
-        tableCard.setAvailablePositions(seats);
-        return tableCard;
     }
 
     public List<PokerRound> getRounds() {
@@ -207,7 +173,7 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
     public void sitOutNextHand(UUID playerId) {
         PokerPlayer player = getPlayer(playerId);
         Objects.requireNonNull(player);
-        dealer.sitOut(player, false); // does not affect game immediately, no lock
+        dealer.handleSitOut(player, false); // does not affect game immediately, no lock
     }
 
     @Override
@@ -216,7 +182,7 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
             getLock().lock(); // continuing can affect game immediately
             PokerPlayer player = getPlayer(playerId);
             Objects.requireNonNull(player);
-            dealer.continueGame(player);
+            dealer.handleReturningPlayer(player);
         } finally {
             getLock().unlock();
             LOGGER.exiting(getClass().getName(), "continueGame" + " player:" + playerId + " table:" + getId());
@@ -275,7 +241,7 @@ public final class HoldemTable extends SeatedTable<PokerPlayer> implements NoLim
     @Override
     public synchronized void onClose() {
         setStatus(TableStatus.CLOSING);
-        dealer.tearDown();
+        dealer.tearDownTable();
         super.onClose();
     }
 

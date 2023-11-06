@@ -1,12 +1,6 @@
 import type { Chip, ChipStack } from "@/types/casino"
-import { chip100Image, chip10Image, chip10kImage, chip1Image, chip1kImage, chip5Image } from "@/types/images"
+import { chip100F, chip10F, chip10kF, chip1F, chip1kF, chip5F } from "../../types/chips"
 
-const chip10kF = { value: 10000, image: chip10kImage }
-const chip1kF = { value: 1000, image: chip1kImage }
-const chip100F = { value: 100, image: chip100Image }
-const chip10F = { value: 10, image: chip10Image }
-const chip5F = { value: 5, image: chip5Image }
-const chip1F = { value: 1, image: chip1Image }
 export const useChipsTransformer = (amount: number): ChipStack => {
 	if (amount === 0) return {} as ChipStack
 	//debugger

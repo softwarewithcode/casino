@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { PlayerAction, GamePhase, type BlackjackPlayer } from "@/types/blackjack";
-import type { Seat } from "@/types/casino";
+import { TableType, type Seat } from "@/types/casino";
 import { useActorsPainter, useInitialDealPainter, useCardsAndHandValuesPainter } from "../../components/blackjack/blackjackTablePainter";
 import { useCanvasInitializer, useCanvasClearer } from "../../components/composables/rendering/commonPainter";
 import { onMounted, onUnmounted, ref, computed, reactive } from "vue";
 import { useSocketSend, useSocketClose } from "@/components/composables/communication/socket/websocket";
 import { useBlackjackStore } from "../../stores/blackjackStore";
 import { mapActions, storeToRefs } from "pinia";
-import { useActivePlayerChecker, useDescendingSeatsSorter, useGameCanvasFinder, useSeatChecker, useMainBoxPlayerFinder } from "@/components/composables/common/table"
+import { useActivePlayerChecker, useDescendingSeatsSorter, useGameCanvasFinder, useSeatChecker, useHeroFinder } from "@/components/composables/common/table"
 import { bgImage, } from "../../types/images"
-import { Command } from "@/types/sockethander";
-import { TableType } from "@/types/TableCard";
+import { ServerCommand } from "@/types/servercommands";
 import TakeSeatButtonRow from "../TakeSeatButtonRow.vue";
 import { useCasinoStore } from "@/stores/casinoStore";
 const props = defineProps<{ tableId: string }>();
@@ -35,16 +34,17 @@ onMounted(() => {
 
 onUnmounted(() => {
     unSubscribe()
+    console.log("Closing:")
     useSocketClose()
     blackjackStore.$reset()
 })
 const onStorePatch = () => {
-    drawTable(table.value.gamePhase === "PLAY" && command.value === Command.INITIAL_DEAL_DONE);
+    drawTable(table.value.gamePhase === "PLAY" && command.value === ServerCommand.INITIAL_DEAL_DONE);
     if (table.value.gamePhase !== GamePhase.ROUND_COMPLETED) return
     betAmount.value = 0
     const tablePlayer = table.value.seats.find(seat => seat.player?.userName === player.value?.userName)?.player
     if (tablePlayer)
-        previousBetAmount.value = tablePlayer.totalBet > table.value.tableCard.gameData.maximumBet ? table.value.tableCard.gameData.maximumBet : tablePlayer.totalBet
+        previousBetAmount.value = tablePlayer.totalBet > table.value.tableCard.gameData.maxBet ? table.value.tableCard.gameData.maxBet : tablePlayer.totalBet
 }
 const counterText = computed<string>(() => {
     if (counter.value <= 0 || !canvasReady.value)
@@ -55,7 +55,7 @@ const counterText = computed<string>(() => {
     if (table.value.gamePhase === GamePhase.INSURE)
         return "Insurance time left " + counter.value
 
-    if (command.value === Command.PLAYER_TIME_START || command.value === Command.INITIAL_DEAL_DONE)
+    if (command.value === ServerCommand.PLAYER_TIME_START || command.value === ServerCommand.INITIAL_DEAL_DONE)
         return "Player " + table.value.activePlayer?.userName + " " + counter.value
 
     if (betsAllowed.value)
@@ -73,19 +73,19 @@ const adjustBet = (amount: number) => {
 }
 
 const hasSeat = computed<boolean>(() => useSeatChecker(player.value))
-const canReduceMinimum = computed<boolean>(() => betsAllowed.value && betAmount.value - table.value.tableCard.gameData.minimumBet >= 0)
+const canReduceMinimum = computed<boolean>(() => betsAllowed.value && betAmount.value - table.value.tableCard.gameData.minBet >= 0)
 const canAddMinimum = computed<boolean>(() => {
     return betsAllowed.value && betAmount.value >= 0
-        && betAmount.value + table.value.tableCard.gameData.minimumBet <= table.value.tableCard.gameData.maximumBet
-        && player.value?.currentBalance - (betAmount.value + table.value.tableCard.gameData.minimumBet) >= 0
+        && betAmount.value + table.value.tableCard.gameData.minBet <= table.value.tableCard.gameData.maxBet
+        && player.value?.currentBalance - (betAmount.value + table.value.tableCard.gameData.minBet) >= 0
 })
 const canBetMinimum = computed<boolean>(() => {
     return betsAllowed.value
-        && player.value?.currentBalance >= table.value.tableCard.gameData.minimumBet
-        && betAmount.value !== table.value.tableCard.gameData.minimumBet
+        && player.value?.currentBalance >= table.value.tableCard.gameData.minBet
+        && betAmount.value !== table.value.tableCard.gameData.minBet
 })
 
-const canBetMaximum = computed<boolean>(() => betsAllowed.value && player.value?.currentBalance > table.value.tableCard.gameData.maximumBet)
+const canBetMaximum = computed<boolean>(() => betsAllowed.value && player.value?.currentBalance > table.value.tableCard.gameData.maxBet)
 const betsAllowed = computed<boolean>(() => table.value.gamePhase === GamePhase.BET && hasSeat.value && counter.value > 0)
 const canTakeSeat = computed<boolean>(() => {
     const tableCard = table.value.tableCard
@@ -112,7 +112,7 @@ const drawTable = async (initialDeal: boolean) => {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
     ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-    const mainBoxPlayer = useMainBoxPlayerFinder(table.value, player.value) as BlackjackPlayer
+    const mainBoxPlayer = useHeroFinder(table.value, player.value) as BlackjackPlayer
     useActorsPainter(table.value, mainBoxPlayer, canvas);
     if (initialDeal)
         useInitialDealPainter(table.value, mainBoxPlayer, canvas)
@@ -167,20 +167,20 @@ const insuranceAvailable = computed<boolean>(() => {
             <TakeSeatButtonRow :seats=getSeatsDescending />
         </div>
         <div v-if="betsAllowed" id="betRow" style="position:absolute" :style="getMainBoxPlayerActionStyle()">
-            <button :disabled="!canReduceMinimum" @click="adjustBet(betAmount - table.tableCard.gameData.minimumBet)">
-                Reduce {{ table.tableCard.gameData.minimumBet }}
+            <button :disabled="!canReduceMinimum" @click="adjustBet(betAmount - table.tableCard.gameData.minBet)">
+                Reduce {{ table.tableCard.gameData.minBet }}
             </button>
-            <button :disabled="!canBetMinimum" @click="adjustBet(table.tableCard.gameData.minimumBet)">
-                Minimum {{ table.tableCard.gameData.minimumBet }}
+            <button :disabled="!canBetMinimum" @click="adjustBet(table.tableCard.gameData.minBet)">
+                Minimum {{ table.tableCard.gameData.minBet }}
             </button>
             <button :disabled="!canBetPrevious" @click="adjustBet(previousBetAmount)">
                 Previous {{ previousBetAmount }}
             </button>
-            <button :disabled="!canAddMinimum" @click="adjustBet(betAmount + table.tableCard.gameData.minimumBet)">
-                Add {{ table.tableCard.gameData.minimumBet }}
+            <button :disabled="!canAddMinimum" @click="adjustBet(betAmount + table.tableCard.gameData.minBet)">
+                Add {{ table.tableCard.gameData.minBet }}
             </button>
-            <button :disabled="!canBetMaximum" @click="adjustBet(table.tableCard.gameData.maximumBet)">
-                Max {{ table.tableCard.gameData.maximumBet }}
+            <button :disabled="!canBetMaximum" @click="adjustBet(table.tableCard.gameData.maxBet)">
+                Max {{ table.tableCard.gameData.maxBet }}
             </button>
             <button :disabled="!hasBet" @click="adjustBet(0)">
                 Remove bet

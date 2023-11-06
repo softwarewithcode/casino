@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 import com.casino.poker.game.HoldemPhase;
 import org.junit.jupiter.api.Test;
 
-import com.casino.common.bet.Range;
+import com.casino.common.bet.BetRange;
 import com.casino.common.exception.IllegalBetException;
 import com.casino.poker.actions.PokerAction;
 import com.casino.poker.actions.PokerActionType;
@@ -48,12 +48,12 @@ public class RaiseTests extends DefaultTableTests {
 
 	@Test
 	public void creatingNegativeBetRangeThrowsException() {
-		assertThrows(IllegalArgumentException.class, () -> new Range(new BigDecimal("-0.01"), BigDecimal.ONE));
+		assertThrows(IllegalArgumentException.class, () -> new BetRange(new BigDecimal("-0.01"), BigDecimal.ONE));
 	}
 
 	@Test
 	public void creatingBetRangeWhereMinimumAmountIsMoreThanMaximumThrowsException() {
-		assertThrows(IllegalArgumentException.class, () -> new Range(new BigDecimal("5.0"), new BigDecimal("4.99")));
+		assertThrows(IllegalArgumentException.class, () -> new BetRange(new BigDecimal("5.0"), new BigDecimal("4.99")));
 	}
 
 	@Test

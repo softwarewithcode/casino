@@ -3,7 +3,7 @@
 import { onMounted, onUnmounted, ref, computed, reactive } from "vue";
 import { useSocketSend, useSocketClose } from "@/components/composables/communication/socket/websocket";
 import { useCasinoStore } from "@/stores/casinoStore";
-import { useActivePlayerChecker, useMainBoxPlayerFinder, useDescendingSeatsSorter, usePlayerAllowedStatusesChecker } from "@/components/composables/common/table"
+import { useActivePlayerChecker, useHeroFinder, useDescendingSeatsSorter, usePlayerAllowedStatusesChecker } from "@/components/composables/common/table"
 import { useCanvasClearer } from "@/components/composables/rendering/commonPainter";
 import { useTexasHoldemStore } from "@/stores/texasHoldemStore";
 import { storeToRefs } from "pinia";
@@ -15,7 +15,7 @@ import type { HoldemAction } from "@/types/texasHoldem";
 import { type Range } from "@/types/casino";
 import RangeView from "../RangeView.vue";
 
-import { Command } from "@/types/sockethander";
+import { ServerCommand } from "@/types/servercommands";
 import { useCounterRunningChecker } from "@/components/composables/timing/clock";
 const holdemStore = useTexasHoldemStore();
 const casinoStore = useCasinoStore()
@@ -34,7 +34,7 @@ const onStorePatch = () => {
         setTimeout(resetLastActionFromPlayerAndDrawTable, 2100, resetPlayer)
     }
     drawTable()
-    if (command.value === Command.ROUND_COMPLETED) {
+    if (command.value === ServerCommand.ROUND_COMPLETED) {
         setTimeout(finalizeRound, 2500)
     }
 }
@@ -69,7 +69,7 @@ const resetLastActionFromPlayerAndDrawTable = (playerWhosLastActionWillBeReset: 
 }
 const drawTable = async () => {
     const canvas: HTMLCanvasElement = findCanvas()
-    const mainBoxPlayer = useMainBoxPlayerFinder(table.value, mainPlayer.value) as HoldemPlayer
+    const mainBoxPlayer = useHeroFinder(table.value, mainPlayer.value) as HoldemPlayer
     useHoldemTablePainter(table.value, mainBoxPlayer, canvas)
 }
 
@@ -197,3 +197,4 @@ button {
     margin: 15px
 }
 </style>
+@/types/sockethandler@/types/servercommands

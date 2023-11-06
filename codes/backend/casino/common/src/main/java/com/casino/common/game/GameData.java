@@ -17,5 +17,7 @@ public interface GameData {
 	Integer getPlayerTime();
 
 	Integer getExtraTime();
+	
+	Game getGame();
 
 }

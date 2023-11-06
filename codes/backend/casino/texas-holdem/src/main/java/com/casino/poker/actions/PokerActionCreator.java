@@ -1,6 +1,6 @@
 package com.casino.poker.actions;
 
-import com.casino.common.bet.Range;
+import com.casino.common.bet.BetRange;
 import com.casino.common.functions.Functions;
 import com.casino.poker.dealer.PokerDealer;
 import com.casino.poker.functions.HoldemFunctions;
@@ -18,7 +18,7 @@ public final class PokerActionCreator implements ActionCreator {
         if (player.isAllIn())
             return actions;
         actions.add(PokerAction.of(null, PokerActionType.FOLD));
-        actions.add(PokerAction.of(new Range(player.getCurrentBalance(), player.getCurrentBalance()), PokerActionType.ALL_IN));
+        actions.add(PokerAction.of(new BetRange(player.getCurrentBalance(), player.getCurrentBalance()), PokerActionType.ALL_IN));
         HoldemTable table = player.getTable();
         BigDecimal mostChipsOnTable = table.getRound().getMostChipsOnTable();
         if (canCheck(player, mostChipsOnTable))
@@ -34,19 +34,19 @@ public final class PokerActionCreator implements ActionCreator {
 
     private PokerAction createCallAction(HoldemPlayer player, BigDecimal biggestMoneyAmountOnTable) {
         BigDecimal callAmount = calculateCallAmount(player, biggestMoneyAmountOnTable);
-        Range range = new Range(callAmount, callAmount);
+        BetRange range = new BetRange(callAmount, callAmount);
         return PokerAction.of(range, PokerActionType.CALL);
     }
 
     private PokerAction createRaiseAction(HoldemPlayer player) {
         BigDecimal minRaise = ((PokerDealer) player.getTable().getDealer()).calculateMinRaise();
-        Range range = new Range(minRaise, player.getCurrentBalance().add(player.getTableChipCount()));
+        BetRange range = new BetRange(minRaise, player.getCurrentBalance().add(player.getTableChipCount()));
         return PokerAction.of(range, PokerActionType.BET_RAISE);
     }
 
     private PokerAction createBetAction(HoldemPlayer player) {
         BigDecimal minBet = player.getTable().getDealer().getGameData().bigBlind();
-        Range range = new Range(minBet, player.getCurrentBalance());
+        BetRange range = new BetRange(minBet, player.getCurrentBalance());
         return PokerAction.of(range, PokerActionType.BET_RAISE);
     }
 

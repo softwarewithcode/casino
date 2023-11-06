@@ -2,7 +2,7 @@ package com.casino.poker.round;
 
 import com.casino.common.cards.Card;
 import com.casino.poker.player.PokerPlayer;
-import com.casino.poker.round.positions.PokerRoundPlayers;
+import com.casino.poker.round.positions.HoldemRoundPlayers;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,8 +14,8 @@ import java.util.UUID;
 
 
 public final class PokerRound {
-    private final PokerRoundPlayers positions;
-    private final List<PokerPlayer> players;
+    private final HoldemRoundPlayers positions;
+   // private final List<PokerPlayer> players;
     private final List<PokerPlayer> newPlayers;
     private BigDecimal initialRaiseAmount;
     private PokerPlayer lastRaiser;
@@ -24,13 +24,13 @@ public final class PokerRound {
     private final UUID roundId;
     private Instant completed;
 
-    public PokerRound(PokerRoundPlayers positions, List<PokerPlayer> roundParticipants, List<PokerPlayer> newPlayers, UUID tableId) {
+    public PokerRound(HoldemRoundPlayers positions, List<PokerPlayer> newPlayers, UUID tableId) {
         this.positions = positions;
         roundId = UUID.randomUUID();
         tableCards = new ArrayList<>(5);
         setLastSpeakingPlayer(positions.bb());
         initialRaiseAmount = BigDecimal.ZERO;
-        players = roundParticipants;
+      //  players = previousRoundPlayers;
         this.newPlayers = newPlayers;
     }
 
@@ -68,7 +68,7 @@ public final class PokerRound {
         return positions.bb();
     }
 
-    public PokerRoundPlayers getPositions() {
+    public HoldemRoundPlayers getPositions() {
         return positions;
     }
 
@@ -107,7 +107,7 @@ public final class PokerRound {
     }
 
     public List<PokerPlayer> getPlayers() {
-        return players.stream().toList();
+        return positions.players();
     }
 
     public BigDecimal getMostChipsOnTable() {

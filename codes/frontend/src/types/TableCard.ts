@@ -1,3 +1,5 @@
+import type { TableType, Range } from "./casino"
+
 export interface TableCard {
 	availablePositions: Array<Number>
 	name?: string
@@ -13,6 +15,7 @@ export interface Thresholds {
 	seatCount: number
 }
 export interface GameData {
+	// has props which are not used in all tables
 	minPlayers: string
 	maxPlayers: string
 	type: string
@@ -23,13 +26,9 @@ export interface GameData {
 	bigBlind: number
 	rakeCap: number
 	rakePercent: number
-	minimumBet: number
-	maximumBet: number
+	minBet: number
+	maxBet: number
 	roundDelay: number
 	playerTime: number
-}
-
-export enum TableType {
-	MULTIPLAYER = "MULTIPLAYER",
-	SINGLE_PLAYER = "SINGLE_PLAYER"
+	tableNumbers: Range
 }

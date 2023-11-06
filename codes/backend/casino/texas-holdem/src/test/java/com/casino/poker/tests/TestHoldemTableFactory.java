@@ -10,7 +10,7 @@ import com.casino.common.table.TableThresholds;
 import com.casino.common.table.structure.TableType;
 import com.casino.poker.bet.BetType;
 import com.casino.poker.game.HoldemPhase;
-import com.casino.poker.game.PokerInitData;
+import com.casino.poker.game.PokerData;
 import com.casino.poker.table.HoldemTable;
 import com.casino.poker.table.PokerTableType;
 
@@ -37,38 +37,38 @@ public class TestHoldemTableFactory {
 
     public static HoldemTable createDefaultTexasHoldemCashGameTable() {
         TableData tableData = createDefaultInitialTableData(DEFAULT_SEAT_COUNT);
-        PokerInitData pokerInitData = createDefaultPokerInitData();
+        PokerData pokerInitData = createDefaultPokerInitData();
         return new HoldemTable(tableData, pokerInitData);
     }
 
     public static HoldemTable createDefaultTexasHoldemCashGameTableWithRakeCap(BigDecimal rake) {
         TableData tableData = createDefaultInitialTableData(DEFAULT_SEAT_COUNT);
-        PokerInitData pokerInitData = createDefaultPokerInitDataWithRake(rake);
+        PokerData pokerInitData = createDefaultPokerInitDataWithRake(rake);
         return new HoldemTable(tableData, pokerInitData);
     }
 
     public static HoldemTable createTableWithSeatCount(int seatCount) {
         TableData tableData = createDefaultInitialTableData(seatCount);
-        PokerInitData pokerInitData = createDefaultPokerInitData();
+        PokerData pokerInitData = createDefaultPokerInitData();
         return new HoldemTable(tableData, pokerInitData);
     }
 
     // Contains no optional parameters
-    private static PokerInitData createPokerInitData(PokerTableType tableType, Integer playerTime, Integer timeBank, Integer defaultSkipCount, BetType betType, BigDecimal minBuyIn, BigDecimal maxBuyIn, BigDecimal smallBlind,
+    private static PokerData createPokerInitData(PokerTableType tableType, Integer playerTime, Integer timeBank, Integer defaultSkipCount, BetType betType, BigDecimal minBuyIn, BigDecimal maxBuyIn, BigDecimal smallBlind,
                                                      BigDecimal bigBlind, BigDecimal rakePercent, BigDecimal rakeCap, boolean antes, boolean straddle) {
-        return new PokerInitData(tableType, playerTime, timeBank, defaultSkipCount, betType, minBuyIn, maxBuyIn, smallBlind, bigBlind, rakePercent, rakeCap, antes, DEFAULT_ANTE, straddle, DEFAULT_ROUND_DELAY);
+        return new PokerData(tableType, playerTime, timeBank, defaultSkipCount, betType, minBuyIn, maxBuyIn, smallBlind, bigBlind, rakePercent, rakeCap, antes, DEFAULT_ANTE, straddle, DEFAULT_ROUND_DELAY);
     }
 
     private static TableData createTableData(PhasePath path, TableStatus status, TableThresholds tableThresholds, UUID tableId, Language language, TableType tableType, Game game) {
         return new TableData(path, status, tableThresholds, tableId, language, tableType, game);
     }
 
-    private static PokerInitData createDefaultPokerInitData() {
+    private static PokerData createDefaultPokerInitData() {
         return createPokerInitData(PokerTableType.CASH, DEFAULT_PLAYER_TIME, DEFAULT_TIME_BANK, DEFAULT_SKIP_COUNT, BetType.NO_LIMIT, DEFAULT_MIN_BUY_IN, DEFAULT_MAX_BUY_IN, DEFAULT_SMALL_BLIND, DEFAULT_BIG_BLIND, DEFAULT_RAKE_PERCENT,
                 DEFAULT_RAKE_CAP, false, false);
     }
 
-    private static PokerInitData createDefaultPokerInitDataWithRake(BigDecimal rake) {
+    private static PokerData createDefaultPokerInitDataWithRake(BigDecimal rake) {
         return createPokerInitData(PokerTableType.CASH, DEFAULT_PLAYER_TIME, DEFAULT_TIME_BANK, DEFAULT_SKIP_COUNT, BetType.NO_LIMIT, DEFAULT_MIN_BUY_IN, DEFAULT_MAX_BUY_IN, DEFAULT_SMALL_BLIND, DEFAULT_BIG_BLIND, DEFAULT_RAKE_PERCENT,
                 rake, false, false);
     }

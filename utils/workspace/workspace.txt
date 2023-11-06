@@ -1,33 +1,31 @@
-29.03.2023<br>
+02/11/2023<br>
 
-Default workspace and setup contains:
-1) IntelliJ community edition and/or Eclipse 2023-06.( Eclipse mainly then when modifications need to be run on server). But either one is ok with setups.
-2) Visual Studio Code for frontend development 
+Tech:<br>
+  Backend: IntelliJ (2023.2.2), Eclipse (2023-09 (4.29.0)), Maven IDE integrated, Java21 [https://jdk.java.net/21/], TomEE 9.1.1 plume,<br><br>
+  Frontend: Visual Studio Code, Vue, Pinia, HTML canvas, TypeScript, Npm v10.2.1, Node v20.9.0<br><br>
 
-Development and running the files:
-1) Backend: Maven, Java20, application server which supports JakartaEE 9.1 <br>
- Default workspace uses Apache TomEE 9.0.0 as backend application server and JDK20 from https://openjdk.org/projects/jdk/20/ <br>
-1.1. Import projects in Eclipse as Maven projects. Mouse right click on projects and Maven -> update <br>
-	This loads the dependencies. <br>
-1.2 In Eclipse create new Server with Apache Tomcat v10.0 server adapter. <br> Select JRE as OpenJDK20.<br>
-1.3 Compile Java codes with " -ea --enable-preview", configurable from Eclipse compiler settings. <br>
-1.4 Ship the projects into the server, add server launch configuration argument " -ea --enable-preview" before starting and then check startup logs for errors.
-1.4. Precompiled version should now open from http://localhost:8080/casino/
+Development and running the files:<br>
 
-2. Frontend development: Vue3 with Reactive Pinia store. Npm v9.8.0, Node v18.16.0, with Volar takeover mode and .prettierc combination. <br>
-2.1 Open frontend folder where package.json exists, <br>
-run "npm install" -> should load the dependencies defined in package.json<br>
-run "npm run dev" -> should start the UI development server at port 5000. Package.json has predefined port 5000.<br>
+IntelliJ (2023.2.2)
+1.0 File -> New -> Project from Version Control -> checkout corresponding branch
+1.1 Right click casino project's pom.xml -> Add as Maven project -> Reload project and dependencies
 
+Eclipse (2023-09 (4.29.0))
+2.0. Download repository. Checkout corresponding branch. Import projects in Eclipse as Maven projects.<br>
+     Mouse right click on projects and Maven -> update <br>
+2.1 Create new Server with Apache Tomcat v10.0 server adapter. <br> Select JRE as jdk-21.<br>
+2.2 Ship the projects into the server and then check startup logs for errors.
+1.4. Precompiled UI version should now open from http://localhost:8080/casino/
+
+2. Frontend development: <br>
+2.1 In Visual Studio Code -> open frontend folder where package.json exists, <br>
+run "npm i" -> loads the dependencies defined in package.json<br>
+run "npm run dev" -> starts the UI development server at port 5000. Package.json has predefined port 5000.<br>
 open http://localhost:5000 <br>
-It should show blackjack and Texas hold'em games as options.<br>
-Opening one table connects to the backend server using WebSocket for example: ws://localhost:8080/casino/blackjack/{tableID} <br>
-Texas hold'em requires at least two participants.
 
 Restart backend server when tables run out or create more default tables. Restart should take only few seconds.
 <br>
-Now this is only how it works in theory. There are many different things with your environment, starting from the operating system and versions. <br>
-So it is expected that at least some problem solving is ahead, already starting from the commited codes which might contain errors. <br>
 
-JUnit tests contains timings for different phases and wait times. <br> There might be some issues with different machines and processor usages, running all tests require " -ea --enable-preview"
-as JVM argument.
+JUnit tests contains timings for different phases and wait times. <br> There could be some issues with different machines. <br>
+ GitHub site contains "Actions" tab where CI tools show 4 different builds for each commit. <br>
+ Running all tests takes time thus projects have separate builds to get the result faster.

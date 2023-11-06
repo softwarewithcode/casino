@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import com.casino.common.cards.Card;
 import com.casino.common.cards.Suit;
 import com.casino.common.message.Mapper;
+import com.casino.common.runner.CasinoMode;
 import com.casino.common.user.User;
 import com.casino.poker.actions.PokerActionType;
 import com.casino.poker.dealer.HoldemDealer;
@@ -49,7 +50,7 @@ public class DefaultTableTests {
 
 	@BeforeAll
 	public static void setup() {
-		System.getProperties().setProperty(Mapper.JUNIT_RUNNER, "true");
+		System.getProperties().setProperty(CasinoMode.TEST_RUNNER_WITH_FIXED_VALUE, "true");
 	}
 
 	@BeforeEach

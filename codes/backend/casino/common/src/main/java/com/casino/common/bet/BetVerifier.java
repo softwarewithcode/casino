@@ -3,17 +3,17 @@ package com.casino.common.bet;
 import java.math.BigDecimal;
 
 import com.casino.common.exception.IllegalBetException;
-import com.casino.common.player.ICasinoPlayer;
-import com.casino.common.table.structure.ICasinoTable;
+import com.casino.common.player.CasinoPlayer;
+import com.casino.common.table.structure.CasinoTable;
 
 public class BetVerifier {
 
-	public static void verifyBetIsAllowedInTable(ICasinoTable table, ICasinoPlayer player, BigDecimal betAttempt) {
+	public static void verifyBetIsAllowedInTable(CasinoTable table, CasinoPlayer player, BigDecimal betAttempt) {
 		verify(table, player, betAttempt);
 		verifySufficientBalance(betAttempt, player);
 	}
 
-	private static void verify(ICasinoTable table, ICasinoPlayer player, BigDecimal betAttempt) {
+	private static void verify(CasinoTable table, CasinoPlayer player, BigDecimal betAttempt) {
 		if (betAttempt == null)
 			throw new IllegalBetException("no bet is given in table:" + table + " player:" + player, 2);
 		if (betAttempt.equals(BigDecimal.ZERO))
@@ -28,7 +28,7 @@ public class BetVerifier {
 			throw new IllegalBetException("bet cannot be negative" + table + " player:" + player, 9);
 	}
 
-	public static void verifySufficientBalance(BigDecimal requiredBalance, ICasinoPlayer player) {
+	public static void verifySufficientBalance(BigDecimal requiredBalance, CasinoPlayer player) {
 		if (player.getCurrentBalance().compareTo(requiredBalance) < 0)
 			throw new IllegalArgumentException("player has not enough money: Should have " + requiredBalance.toString() + " has: " + player.getCurrentBalance().toString());
 	}

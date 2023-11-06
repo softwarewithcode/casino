@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.casino.common.player.ICasinoPlayer;
+import com.casino.common.player.CasinoPlayer;
 import com.casino.common.player.PlayerStatus;
 
-public class Seat<T extends ICasinoPlayer> {
+public class Seat<T extends CasinoPlayer> {
     private final int number;
     private T player;
 
@@ -30,10 +30,6 @@ public class Seat<T extends ICasinoPlayer> {
 
     public boolean hasPlayerWithBet() {
         return hasPlayer() && this.player.hasBet();
-    }
-
-    public boolean hasActivePlayerWithBet() {
-        return hasPlayerWithBet() && player.getStatus() == PlayerStatus.ACTIVE && player.hasActiveHand();
     }
 
     public boolean hasPlayer() {
@@ -64,7 +60,7 @@ public class Seat<T extends ICasinoPlayer> {
         player = null;
     }
 
-    public boolean removePlayerIfHolder(ICasinoPlayer player) {
+    public boolean removePlayerIfHolder(CasinoPlayer player) {
         if (this.player == null || player == null)
             return false;
         if (this.player.equals(player)) {
