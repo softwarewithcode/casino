@@ -10,9 +10,9 @@ name: Roulette tests in roulette branch
 
 on:
   push:
-    branches: [ "roulette" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "roulette" ]
+    branches: [ "master" ]
 
 jobs:
   build:
