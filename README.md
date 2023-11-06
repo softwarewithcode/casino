@@ -1,8 +1,9 @@
 # casino
 
 ## About <br>
-This repository contains modularized building blocks for a simple virtual casino and includes Blackjack and Texas Hold'em No Limit games. <br>
-Latest dev branch is roulette, including common structure changes. <br>
+This repository contains modularized building blocks for a simple virtual casino and includes Roulette, Blackjack
+and Texas Hold'em No Limit games. <br>
+
 ### Documentation
 /utils/documentation
 
@@ -15,7 +16,7 @@ Frontends are reactive using Pinia and Vue combination. Frontends have no animat
 Documentation section has more information about UI-Backend websocket communications.
 
 ### Backend
-Java 19 with Virtual Threads preview / JakartaEE.  <br>
+Java 21 with Virtual Threads  / JakartaEE.  <br>
 
 
 
