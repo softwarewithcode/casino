@@ -1,5 +1,5 @@
 # casino
-
+ <br> Latest branch is 'slots' for Fruit(s) slot. <br>
 ## About <br>
 This repository includes Roulette, Blackjack and Texas Hold'em No Limit games. <br>
 Roulette is the latest game and uses async approach for generated delays that are expected in some game states.<br>
